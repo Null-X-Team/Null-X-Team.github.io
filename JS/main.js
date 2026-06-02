@@ -265,12 +265,11 @@ const _0xUnblockersData = [
  {
   id: "ub_uv",
   title: "Nautilus OS",
-  // Added a leading slash so it always goes back to the root directory
-  url: "/unblockers/NautilusOS/index.html", 
+  url: "unblockers/NautilusOS/index.html", 
   desc: "High speed web proxy built for advanced performance and bypass capabilities."
  }
- // Future unblocker files can be appended safely right here
 ];
+
 /**
  * Helper: Filter data for popular/featured games
  */
@@ -412,18 +411,14 @@ function applyTheme(theme) {
 
 /**
  * DIRECT DIRECTORY IFRAME LAUNCH SYSTEM
- * Forces the document to cleanly render the target game directly from its actual 
- * subdirectory path route without mutating inner script resources.
  */
 function launchGame(gameId) {
     const game = _0xData.find(g => g.id === gameId);
     if (game) {
-        // Build absolute URL resolving exactly to your directory structural path
         const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
         const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
         const absoluteGameUrl = baseDir + game.url;
 
-        // Clear the layout context completely to build the isolated window frame
         document.open();
         document.write(`
             <!DOCTYPE html>
@@ -444,7 +439,6 @@ function launchGame(gameId) {
         `);
         document.close();
 
-        // Inject navigation button wrapper overhead
         const backNavContainer = document.createElement('div');
         backNavContainer.id = "null-back-nav";
         backNavContainer.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
@@ -888,11 +882,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const val = e.target.value;
             if (val === "none") {
                 localStorage.removeItem('savedCloak');
-                location.reload(); 
             } else {
                 localStorage.setItem('savedCloak', val);
                 applyCloak(val);
             }
+            location.reload(); 
         };
     }
 
