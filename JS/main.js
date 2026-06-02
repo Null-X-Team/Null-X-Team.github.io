@@ -259,6 +259,25 @@ const _0xData = [
 ];
 
 /**
+ * Null_X Database / Unblockers Registry
+ */
+const _0xUnblockersData = [
+ {
+  id: "ub_uv",
+  title: "Ultraviolet",
+  url: "unblockers/ultraviolet/index.html",
+  desc: "High speed web proxy built for advanced performance and bypass capabilities."
+ },
+ {
+  id: "ub_rh",
+  title: "Rammerhead",
+  url: "unblockers/rammerhead/index.html",
+  desc: "Advanced proxy route system keeping browser sessions fast and persistent."
+ }
+ // Future unblocker files can be appended safely right here
+];
+
+/**
  * Helper: Filter data for popular/featured games
  */
 function getMostPopular() {
@@ -453,6 +472,57 @@ function launchGame(gameId) {
     }
 }
 
+/**
+ * DIRECT DIRECTORY UNBLOCKER LAUNCH SYSTEM
+ */
+function launchUnblocker(unblockerId) {
+    const item = _0xUnblockersData.find(u => u.id === unblockerId);
+    if (item) {
+        const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
+        const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
+        const absoluteUrl = baseDir + item.url;
+
+        document.open();
+        document.write(`
+            <!DOCTYPE html>
+            <html lang="en">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>${item.title}</title>
+                <style>
+                    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+                    iframe { width: 100%; height: 100%; border: none; display: block; }
+                </style>
+            </head>
+            <body>
+                <iframe src="${absoluteUrl}"></iframe>
+            </body>
+            </html>
+        `);
+        document.close();
+
+        const backNavContainer = document.createElement('div');
+        backNavContainer.id = "null-back-nav";
+        backNavContainer.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
+        
+        backNavContainer.innerHTML = `
+            <button onclick="window.location.reload();" style="
+                background: #0a0a0a;
+                color: #8b00ff;
+                border: 2px solid #8b00ff;
+                padding: 8px 14px;
+                font-weight: bold;
+                border-radius: 6px;
+                cursor: pointer;
+                box-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
+                font-size: 13px;
+            ">← Back to Hub</button>
+        `;
+        document.body.appendChild(backNavContainer);
+    }
+}
+
 function showLibrary() {
     const heroSection = document.getElementById('heroSection');
     const gameGrid = document.getElementById('gameGrid');
@@ -468,6 +538,26 @@ function showLibrary() {
                 <div class="game-desc-overlay">${game.desc}</div>
             `;
             card.onclick = () => launchGame(game.id);
+            gameGrid.appendChild(card);
+        });
+    }
+}
+
+function showUnblockers() {
+    const heroSection = document.getElementById('heroSection');
+    const gameGrid = document.getElementById('gameGrid');
+    if (heroSection) heroSection.style.display = 'none';
+    if (gameGrid) {
+        gameGrid.innerHTML = '';
+        gameGrid.style.display = 'grid';
+        _0xUnblockersData.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'game-card';
+            card.innerHTML = `
+                <h3>${item.title}</h3>
+                <div class="game-desc-overlay">${item.desc}</div>
+            `;
+            card.onclick = () => launchUnblocker(item.id);
             gameGrid.appendChild(card);
         });
     }
@@ -585,6 +675,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cloakSelector = document.getElementById('cloakSelector');
     const navHome = document.getElementById('nav-home');
     const navGames = document.getElementById('nav-games');
+    const navUnblockers = document.getElementById('nav-unblockers');
     const navComms = document.getElementById('nav-communications');
     const heroSection = document.getElementById('heroSection');
     const gameGrid = document.getElementById('gameGrid');
@@ -676,6 +767,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 8. Navigation & Widget Event Handlers ---
     if (navGames) navGames.onclick = (e) => { e.preventDefault(); showLibrary(); };
+    if (navUnblockers) navUnblockers.onclick = (e) => { e.preventDefault(); showUnblockers(); };
     if (navHome) navHome.onclick = (e) => { e.preventDefault(); showHome(); };
 
     // Autoclicker Visibility Management Switches
