@@ -264,15 +264,9 @@ const _0xData = [
 const _0xUnblockersData = [
  {
   id: "ub_uv",
-  title: "Ultraviolet",
-  url: "unblockers/ultraviolet/index.html",
+  title: "Nautilus OS",
+  url: "unblockers/NautilusOS/index.html",
   desc: "High speed web proxy built for advanced performance and bypass capabilities."
- },
- {
-  id: "ub_rh",
-  title: "Rammerhead",
-  url: "unblockers/rammerhead/index.html",
-  desc: "Advanced proxy route system keeping browser sessions fast and persistent."
  }
  // Future unblocker files can be appended safely right here
 ];
