@@ -1,957 +1,291 @@
 import { applyCloak } from '../Cloaks/Cloaks.js';
 
-/**
- * Null_X Database / Game Registry
- */
 const _0xData = [
- {
-  id: "b_ap",
-  title: atob("QnJvdGF0byBBbGwgUGFpbiBObyBHYWlu"),
-  url: "Games/brotatoAPNG/Brotato.html",
-  desc: "The newest version of Brotato with the All Pain No Gain update.",
-  popular: true
-},
- {
-  id: "y_io",
-  title: atob("WW9ob2hvLmlv"),
-  url: "Games/yohoho/index.html",
-  desc: "A pirate-themed battle royale game where you collect gold, fight opponents, and survive to become the strongest pirate.",
-  popular: true
-},
-  {
-    id: "s_lp",
-    title: atob("U2xvcGU="), 
-    url: "Games/slope/index.html",
-    desc: "A fast-paced 3D platformer. Stay on the track!",
-    popular: true
-  },
-  {
-    id: "d_md",
-    title: atob("RHJpdmUwYWQ="), 
-    url: "Games/drivemad/index.html",
-    desc: "Challenging physics-based driving. Don't flip your truck!",
-    popular: true
-  },
-  {
-    id: "b_ft",
-    title: atob("QnVsbGV0IEZvcmNl"), 
-    url: "Games/bulletforce/index.html",
-    desc: "Action-packed multiplayer FPS. dominate the battlefield.",
-    popular: true
-  },
-  {
-  id: "b_bb",
-  title: atob("QmFzZWJhbGwgQnJvcw=="),
-  url: "Games/baseballbros/Baseballbros.html",
-  desc: "A fun arcade-style baseball game with fast-paced action and competitive gameplay.",
-  popular: true
-},
-  {
-  id: "b_kt",
-  title: atob("QmFza2V0QnJvcw=="),
-  url: "Games/basketbros/Basketbros.html",
-  desc: "A chaotic multiplayer basketball game packed with crazy dunks and fast-paced matches.",
-  popular: true
-},
-  {
-  id: "b_sts",
-  title: atob("QmFza2V0YmFsbCBTdGFycw=="),
-  url: "Games/basketballstars/Basketballstars.html",
-  desc: "A fast-paced 1v1 basketball game featuring flashy moves, quick matches, and competitive street-style gameplay.",
-  popular: true
-},
-  {
-  id: "c_cc",
-  title: atob("Q29va2llIENsaWNrZXI="),
-  url: "Games/cookie clicker/Cookieclicker.html",
-  desc: "An addictive incremental game where you click cookies to earn more cookies and unlock upgrades.",
-  popular: true
-},
-  {
-  id: "b_rd",
-  title: atob("QmFza2V0IFJhbmRvbQ=="),
-  url: "Games/basketrandom/Basketrandom.html",
-  desc: "A chaotic basketball game with random physics, unpredictable jumps, and funny matches.",
-  popular: true
-},
- {
-  id: "r_bw",
-  title: atob("UmV0cm8gQm93bA=="),
-  url: "Games/retrobowl/Retrobowl.html",
-  desc: "A retro-style football game where you manage your team and lead them to championship glory.",
-  popular: true
-},
- {
-  id: "a_us",
-  title: atob("QW1vbmcgVXM="),
-  url: "Games/amongus/Amongus.html",
-  desc: "A social deduction game where crewmates complete tasks while impostors secretly sabotage the mission.",
-  popular: true
-},
- {
-  id: "d_dk",
-  title: atob("RG9raSBEb2tpIExpdGVyYXR1cmUgQ2x1Yg=="),
-  url: "Games/dokidoki/index.html",
-  desc: "A psychological horror visual novel that starts as a cute dating sim but quickly takes a dark turn.",
-  popular: true
-},
- {
-  id: "p_tr",
-  title: atob("UG9seVRyYWNr"),
-  url: "Games/polytrack/index.html",
-  desc: "A fast-paced low-poly racing game with smooth drifting, sharp turns, and high-speed action.",
-  popular: true
-},
- {
-  id: "a_gr",
-  title: atob("QWdhci5pbw=="),
-  url: "Games/agar/index.html",
-  desc: "A multiplayer cell-eating game where you grow larger by consuming smaller players and avoiding bigger ones. (may cause lag)",
-  popular: true
-},
- {
-  id: "t_ts",
-  title: atob("VHJ1Y2sgU2lt"),
-  url: "Games/trucksim/index.html",
-  desc: "An Indian truck driving simulator where you transport cargo across roads, manage balance, and navigate realistic driving challenges.",
-  popular: true
-},
- {
-  id: "g_ta",
-  title: atob("R3JhbmQgVGhlZnQgQXV0bw=="),
-  url: "Games/GTA/index.html",
-  desc: "An open-world action game where you explore the city, complete missions, and cause chaos in a sandbox environment.",
-  popular: true
-},
- {
-  id: "t_pa",
-  title: atob("VGhyb3cgYSBQb3RhdG8="),
-  url: "Games/TAPA/index.html",
-  desc: "A goofy physics-based game where you launch potatoes through chaotic obstacle-filled levels.",
-  popular: true
-},
- {
-  id: "t_p2",
-  title: atob("VGhyb3cgYSBQb3RhdG8gMg=="),
-  url: "Games/TAPA2/index.html",
-  desc: "The sequel to Throw a Potato, featuring crazier levels, bigger launches, and even more chaotic physics gameplay.",
-  popular: true
-},
- {
-  id: "t_to",
-  title: atob("VHVuZyBUdW5nIFR1bmcgU2FodXIgT2JieQ=="),
-  url: "Games/T^3sahurobby/index.html",
-  desc: "A chaotic obstacle-course platformer inspired by meme humor, tricky jumps, and fast-paced parkour gameplay.",
-  popular: true
-},
- {
-  id: "t_bb",
-  title: atob("VHVuZyBCYWxkaSBCYXNpY3M="),
-  url: "Games/tungbaldibasics/index.html",
-  desc: "A meme-inspired horror school game filled with strange characters, puzzles, and chaotic chases.",
-  popular: true
-},
- {
-  id: "w_dl",
-  title: atob("V29yZGxl"),
-  url: "Games/wordle/index.html",
-  desc: "A daily word puzzle game where you guess a hidden five-letter word in six tries using color hints.",
-  popular: true
-},
- {
-  id: "v_3x",
-  title: atob("VmV4IDMgWG1hcw=="),
-  url: "Games/Vex/Vex 3 Xmas/index.html",
-  desc: "A challenging stickman parkour platformer filled with traps, jumps, and precision movement.",
-  popular: true
-},
-{
-  id: "v_4",
-  title: atob("VmV4IDQ="),
-  url: "Games/Vex/Vex 4/index.html",
-  desc: "A fast-paced platformer where you run, jump, and climb through deadly obstacle courses.",
-  popular: true
-},
-{
-  id: "v_5",
-  title: atob("VmV4IDU="),
-  url: "Games/Vex/Vex 5/index.html",
-  desc: "More intense parkour levels with tougher traps and tighter timing challenges.",
-  popular: true
-},
-{
-  id: "v_6",
-  title: atob("VmV4IDY="),
-  url: "Games/Vex/Vex 6/index.html",
-  desc: "A refined platforming experience with new obstacles and smoother movement mechanics.",
-  popular: true
-},
-{
-  id: "v_7",
-  title: atob("VmV4IDc="),
-  url: "Games/Vex/Vex 7/index.html",
-  desc: "A highly difficult parkour platformer with complex level design and precision jumps.",
-  popular: true
-},
-{
-  id: "v_8",
-  title: atob("VmV4IDg="),
-  url: "Games/Vex/Vex 8/index.html",
-  desc: "The latest in the series with tougher levels, new mechanics, and faster gameplay.",
-  popular: true
-},
-{
-  id: "v_ch",
-  title: atob("VmV4IENoYWxsZW5nZXM="),
-  url: "Games/Vex/Vex Challenges/index.html",
-  desc: "Special challenge levels designed to test your timing, movement, and parkour skills.",
-  popular: true
-},
-{
-  id: "v_x2",
-  title: atob("VmV4IHgzbSAy"),
-  url: "Games/Vex/Vex x3m 2/index.html",
-  desc: "A sequel expansion with harder levels and new parkour challenges.",
-  popular: true
-},
-{
-  id: "v_xm",
-  title: atob("VmV4IHgzbQ=="),
-  url: "Games/Vex/Vex x3m/index.html",
-  desc: "A fast-paced stickman parkour mode with tricky obstacle courses and momentum-based movement.",
-  popular: true
-},
-{
-  id: "v_3",
-  title: atob("VmV4IDM="),
-  url: "Games/Vex/Vex3/index.html",
-  desc: "A classic entry in the Vex series featuring tight platforming and challenging level design.",
-  popular: true
-},
- {
-  id: "slice_master",
-  title: atob("U2xpY2UgTWFzdGVy"),
-  url: "Games/sliceMaster/index.html",
-  desc: "A satisfying physics-based slicing game where you flip your knife and chop through obstacles with perfect timing.",
-  popular: true
-},
- {
-  id: "skinwalker",
-  title: atob("U2tpbndhbGtlcg=="),
-  url: "Games/skinwalker/index.html",
-  desc: "A suspenseful horror-survival game where you must navigate the wilderness and evade a mythical creature tracking your every move.",
-  popular: true
-},
- {
-  id: "skib_shooter",
-  title: atob("U2tpYmkgU2hvb3Rlcg=="),
-  url: "Games/skibshooter/index.html",
-  desc: "An action-packed shooter game where you defend your territory against waves of quirky incoming enemies.",
-  popular: true
-},
- {
-  id: "ragdoll_drop",
-  title: atob("UmFnZG9sbCBEcm9w"),
-  url: "Games/ragdrop/index.html",
-  desc: "A chaotic physics game where you drop ragdoll characters and watch them tumble through obstacles.",
-  popular: true
-}
+  { id: "b_ap", title: "Brotato All Pain No Gain", url: "Games/brotatoAPNG/Brotato.html", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
+  { id: "y_io", title: "Yohoho.io", url: "Games/yohoho/index.html", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
+  { id: "s_lp", title: "Slope", url: "Games/slope/index.html", desc: "A fast-paced 3D platformer. Stay on the track!", popular: true },
+  { id: "d_md", title: "Drive0ad", url: "Games/drivemad/index.html", desc: "Challenging physics-based driving. Don't flip your truck!", popular: true },
+  { id: "b_ft", title: "Bullet Force", url: "Games/bulletforce/index.html", desc: "Action-packed multiplayer FPS. Dominate the battlefield.", popular: true },
+  { id: "b_bb", title: "Baseball Bros", url: "Games/baseballbros/Baseballbros.html", desc: "An arcade baseball game with fast-paced matches.", popular: true },
+  { id: "b_kt", title: "BasketBros", url: "Games/basketbros/Basketbros.html", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
+  { id: "b_sts", title: "Basketball Stars", url: "Games/basketballstars/Basketballstars.html", desc: "Fast-paced 1v1 street-style basketball matches.", popular: true },
+  { id: "c_cc", title: "Cookie Clicker", url: "Games/cookie clicker/Cookieclicker.html", desc: "Click cookies to build an industrial empire.", popular: true },
+  { id: "b_rd", title: "Basket Random", url: "Games/basketrandom/Basketrandom.html", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
+  { id: "r_bw", title: "Retro Bowl", url: "Games/retrobowl/Retrobowl.html", desc: "Manage your team and lead them to gridiron glory.", popular: true },
+  { id: "a_us", title: "Among Us", url: "Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true },
+  { id: "d_dk", title: "Doki Doki Literature Club", url: "Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true },
+  { id: "p_tr", title: "PolyTrack", url: "Games/polytrack/index.html", desc: "A fast-paced low-poly racing game with crisp drifting controls.", popular: true },
+  { id: "a_gr", title: "Agar.io", url: "Games/agar/index.html", desc: "Multiplayer cells-eating battle arena. (May experience latency issues)", popular: true },
+  { id: "t_ts", title: "Truck Sim", url: "Games/trucksim/index.html", desc: "Navigate tricky roads transporting heavy structural cargo safely.", popular: true },
+  { id: "g_ta", title: "Grand Theft Auto", url: "Games/GTA/index.html", desc: "Classic open-world sandbox environment full of sandbox operations.", popular: true },
+  { id: "t_pa", title: "Throw a Potato", url: "Games/TAPA/index.html", desc: "Physics arcade game where you launch a potato over complex obstacles.", popular: true },
+  { id: "t_p2", title: "Throw a Potato 2", url: "Games/TAPA2/index.html", desc: "The official sequel featuring refined launch engines and bigger stages.", popular: true },
+  { id: "t_to", title: "Tung Tung Tung Sahur Obby", url: "Games/T^3sahurobby/index.html", desc: "Meme-inspired obstacle map built to test jumping accuracy.", popular: true },
+  { id: "t_bb", title: "Tung Baldi Basics", url: "Games/tungbaldibasics/index.html", desc: "Horror puzzle game featuring surreal environments and puzzle challenges.", popular: true },
+  { id: "w_dl", title: "Wordle", url: "Games/wordle/index.html", desc: "Figure out the daily hidden five-letter word within six attempts.", popular: true },
+  { id: "v_3x", title: "Vex 3 Xmas", url: "Games/Vex/Vex 3 Xmas/index.html", desc: "Festive holiday edition of the classic stickman parkour challenge.", popular: true },
+  { id: "v_4", title: "Vex 4", url: "Games/Vex/Vex 4/index.html", desc: "Sprint, leap, and dodge deadly stage traps dynamically.", popular: true },
+  { id: "v_5", title: "Vex 5", url: "Games/Vex/Vex 5/index.html", desc: "Hardcore level obstacles matching elite timing requirements.", popular: true },
+  { id: "v_6", title: "Vex 6", url: "Games/Vex/Vex 6/index.html", desc: "Refined stickman parkour tracks with brand new stage assets.", popular: true },
+  { id: "v_7", title: "Vex 7", url: "Games/Vex/Vex 7/index.html", desc: "Complex levels engineered to test your reflexes.", popular: true },
+  { id: "v_8", title: "Vex 8", url: "Games/Vex/Vex 8/index.html", desc: "The absolute latest installment in the Vex platforming franchise.", popular: true },
+  { id: "v_ch", title: "Vex Challenges", url: "Games/Vex/Vex Challenges/index.html", desc: "Bite-sized high-speed speedrunning tasks for testing agility.", popular: true },
+  { id: "v_x2", title: "Vex x3m 2", url: "Games/Vex/Vex x3m 2/index.html", desc: "Extreme driving mechanics combined with classic Vex obstacle formats.", popular: true },
+  { id: "v_xm", title: "Vex x3m", url: "Games/Vex/Vex x3m/index.html", desc: "Blast through motorcycle speed trials with tight balance adjustments.", popular: true },
+  { id: "v_3", title: "Vex 3", url: "Games/Vex/Vex3/index.html", desc: "The iconic original entry into the parkour system.", popular: true },
+  { id: "slice_master", title: "Slice Master", url: "Games/sliceMaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
+  { id: "skinwalker", title: "Skinwalker", url: "Games/skinwalker/index.html", desc: "Atmospheric survival horror centered around staying undetected outdoors.", popular: true },
+  { id: "skib_shooter", title: "Skib Shooters", url: "Games/skibshooter/index.html", desc: "Dynamic target arena where waves of attackers stream in continuously.", popular: true },
+  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "Games/ragdrop/index.html", desc: "Drop your structural targets down pins to clear high score records.", popular: true }
 ];
 
-/**
- * Null_X Database / Unblockers Registry
- */
-const _0xUnblockersData = [
- {
-  id: "ub_uv",
-  title: "Nautilus OS",
-  url: "unblockers/NautilusOS/index.html", 
-  desc: "High speed web proxy built for advanced performance and bypass capabilities."
- }
-];
-
-/**
- * Helper: Filter data for popular/featured games
- */
-function getMostPopular() {
-    return _0xData.filter(g => g.popular);
-}
-
-/**
- * Global Function: Opens encrypted chat in a new tab
- * Cloaks the window title as "Grades" for stealth.
- */
-window.openNullChat = function() {
-    const user = localStorage.getItem('chatUser');
-    if (!user) {
-        window.location.href = "Login/login.html";
-        return;
-    }
-    const chatWin = window.open('chat/chat.html', '_blank');
-    if (chatWin) {
-        chatWin.document.title = "Grades";
-    }
-};
-
-/**
- * Core Architecture Tab Cloaking Payload Engine
- */
 function launchStealthWindow(maskType, targetEnv) {
-    const currentUrl = window.location.href;
-    
-    let title = "Google Docs";
-    let escapeRedirect = "https://docs.google.com";
+  const currentUrl = window.location.href;
+  let title = "Google Docs";
+  let escapeRedirect = "https://docs.google.com";
 
-    if (maskType === 'Google Classroom') {
-        title = "Classes";
-        escapeRedirect = "https://classroom.google.com";
-    } else if (maskType === 'Google Drive') {
-        title = "My Drive - Google Drive";
-        escapeRedirect = "https://drive.google.com";
-    } else if (maskType === 'Gmail') {
-        title = "Inbox";
-        escapeRedirect = "https://mail.google.com";
-    } else if (maskType === 'Canvas') {
-        title = "Dashboard";
-        escapeRedirect = "https://canvas.instructure.com";
-    } else if (maskType === 'Canva') {
-        title = "Home - Canva";
-        escapeRedirect = "https://www.canva.com";
-    } else if (maskType === 'Microsoft 365') {
-        title = "Microsoft 365";
-        escapeRedirect = "https://www.office.com";
-    } else if (maskType === 'NoRedInk') {
-        title = "NoRedInk";
-        escapeRedirect = "https://www.noredink.com";
-    } else if (maskType === 'Neptune Navigate') {
-        title = "Neptune Navigate";
-        escapeRedirect = "https://neptunenavigate.com";
-    } else if (maskType === 'Pear Assessment') {
-        title = "Pear Assessment";
-        escapeRedirect = "https://www.pearassessment.com";
-    } else if (maskType === 'Membean') {
-        title = "Membean: Dashboard";
-        escapeRedirect = "https://membean.com";
-    } else if (maskType === 'i-Ready Reading' || maskType === 'i-Ready Math') {
-        title = "i-Ready";
-        escapeRedirect = "https://login.i-ready.com";
-    } else if (maskType === 'DeltaMath') {
-        title = "DeltaMath";
-        escapeRedirect = "https://www.deltamath.com";
-    } else if (maskType === 'ExploreLearning Gizmos') {
-        title = "Gizmos Dashboard";
-        escapeRedirect = "https://www.explorelearning.com";
-    } else if (maskType === 'Progress Learning') {
-        title = "Progress Learning";
-        escapeRedirect = "https://progresslearning.com";
-    } else if (maskType === 'Student Support Time') {
-        title = "Student Support Time";
-        escapeRedirect = "https://studentsupporttime.com";
-    } else if (maskType === 'Kahoot') {
-        title = "Enter Game PIN - Kahoot!";
-        escapeRedirect = "https://kahoot.it";
-    } else if (maskType === 'Nearpod') {
-        title = "Nearpod";
-        escapeRedirect = "https://nearpod.com";
+  const customCloaks = {
+    'Google Classroom': { t: "Classes", r: "https://classroom.google.com" },
+    'Google Drive': { t: "My Drive - Google Drive", r: "https://drive.google.com" },
+    'Gmail': { t: "Inbox", r: "https://mail.google.com" },
+    'Canvas': { t: "Dashboard", r: "https://canvas.instructure.com" },
+    'Canva': { t: "Home - Canva", r: "https://www.canva.com" },
+    'Microsoft 365': { t: "Microsoft 365", r: "https://www.office.com" },
+    'NoRedInk': { t: "NoRedInk", r: "https://www.noredink.com" },
+    'Neptune Navigate': { t: "Neptune Navigate", r: "https://neptunenavigate.com" },
+    'Pear Assessment': { t: "Pear Assessment", r: "https://www.pearassessment.com" },
+    'Membean': { t: "Membean: Dashboard", r: "https://membean.com" },
+    'i-Ready Reading': { t: "i-Ready", r: "https://login.i-ready.com" },
+    'i-Ready Math': { t: "i-Ready", r: "https://login.i-ready.com" },
+    'DeltaMath': { t: "DeltaMath", r: "https://www.deltamath.com" },
+    'ExploreLearning Gizmos': { t: "Gizmos Dashboard", r: "https://www.explorelearning.com" },
+    'Progress Learning': { t: "Progress Learning", r: "https://progresslearning.com" },
+    'Student Support Time': { t: "Student Support Time", r: "https://studentsupporttime.com" },
+    'Kahoot': { t: "Enter Game PIN - Kahoot!", r: "https://kahoot.it" },
+    'Nearpod': { t: "Nearpod", r: "https://nearpod.com" }
+  };
+
+  if (customCloaks[maskType]) {
+    title = customCloaks[maskType].t;
+    escapeRedirect = customCloaks[maskType].r;
+  }
+
+  let targetTab;
+  if (targetEnv === 'blob') {
+    const htmlPayload = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${title}</title>
+        <style>
+          body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+          iframe { width:100%; height:100%; border:none; margin:0; padding:0; }
+        </style>
+      </head>
+      <body><iframe src="${currentUrl}"></iframe></body>
+      </html>
+    `;
+    const blob = new Blob([htmlPayload], { type: 'text/html' });
+    targetTab = window.open(URL.createObjectURL(blob), '_blank');
+  } else {
+    targetTab = window.open('about:blank', '_blank');
+    if (targetTab) {
+      targetTab.document.title = title;
+      const frame = targetTab.document.createElement('iframe');
+      frame.src = currentUrl;
+      frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;";
+      targetTab.document.body.appendChild(frame);
     }
+  }
 
-    let targetTab;
-
-    if (targetEnv === 'blob') {
-        const htmlPayload = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <meta charset="UTF-8">
-                <title>${title}</title>
-                <style>
-                    body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
-                    iframe { width:100%; height:100%; border:none; margin:0; padding:0; }
-                </style>
-            </head>
-            <body>
-                <iframe src="${currentUrl}"></iframe>
-            </body>
-            </html>
-        `;
-        const blob = new Blob([htmlPayload], { type: 'text/html' });
-        const blobUrl = URL.createObjectURL(blob);
-        targetTab = window.open(blobUrl, '_blank');
-    } else {
-        targetTab = window.open('about:blank', '_blank');
-        if (targetTab) {
-            targetTab.document.title = title;
-            const frame = targetTab.document.createElement('iframe');
-            frame.src = currentUrl;
-            frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;";
-            targetTab.document.body.appendChild(frame);
-        }
-    }
-
-    if (!targetTab) {
-        alert("Pop-up blocked! Please allow system popup permissions for deployment.");
-        return;
-    }
-
-    window.location.replace(escapeRedirect);
+  if (!targetTab) {
+    alert("Pop-up blocked! Please allow popup permissions.");
+    return;
+  }
+  window.location.replace(escapeRedirect);
 }
 
 function applyTheme(theme) {
-    const root = document.documentElement;
-    if (theme === 'midnight') {
-        root.style.setProperty('--accent', '#ffffff');
-        root.style.setProperty('--container-bg', '#000000');
-        document.body.style.background = "#000000";
-    } else {
-        root.style.setProperty('--accent', '#8b00ff');
-        root.style.setProperty('--container-bg', 'rgba(15, 15, 25, 0.95)');
-        document.body.style.background = "linear-gradient(135deg, #0a0a0a, #1a0033)";
-    }
+  const root = document.documentElement;
+  if (theme === 'midnight') {
+    root.style.setProperty('--accent', '#ffffff');
+    root.style.setProperty('--container-bg', '#000000');
+    document.body.style.background = "#000000";
+  } else {
+    root.style.setProperty('--accent', '#8b00ff');
+    root.style.setProperty('--container-bg', 'rgba(15, 15, 25, 0.95)');
+    document.body.style.background = "linear-gradient(135deg, #0a0a0a, #1a0033)";
+  }
 }
 
-/**
- * DIRECT DIRECTORY IFRAME LAUNCH SYSTEM
- */
 function launchGame(gameId) {
-    const game = _0xData.find(g => g.id === gameId);
-    if (game) {
-        const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
-        const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
-        const absoluteGameUrl = baseDir + game.url;
+  const game = _0xData.find(g => g.id === gameId);
+  if (game) {
+    const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
+    const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
+    
+    document.open();
+    document.write(`
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <title>${game.title}</title>
+        <style>body,html{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;}iframe{width:100%;height:100%;border:none;display:block;}</style>
+      </head>
+      <body><iframe src="${baseDir + game.url}"></iframe></body>
+      </html>
+    `);
+    document.close();
 
-        document.open();
-        document.write(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${game.title}</title>
-                <style>
-                    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-                    iframe { width: 100%; height: 100%; border: none; display: block; }
-                </style>
-            </head>
-            <body>
-                <iframe src="${absoluteGameUrl}"></iframe>
-            </body>
-            </html>
-        `);
-        document.close();
-
-        const backNavContainer = document.createElement('div');
-        backNavContainer.id = "null-back-nav";
-        backNavContainer.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-        
-        backNavContainer.innerHTML = `
-            <button onclick="window.location.reload();" style="
-                background: #0a0a0a;
-                color: #8b00ff;
-                border: 2px solid #8b00ff;
-                padding: 8px 14px;
-                font-weight: bold;
-                border-radius: 6px;
-                cursor: pointer;
-                box-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
-                font-size: 13px;
-            ">← Back to Games</button>
-        `;
-        document.body.appendChild(backNavContainer);
-    }
+    const backNav = document.createElement('div');
+    backNav.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
+    backNav.innerHTML = `<button onclick="window.location.reload();" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
+    document.body.appendChild(backNav);
+  }
 }
 
-/**
- * DIRECT DIRECTORY UNBLOCKER LAUNCH SYSTEM
- */
-function launchUnblocker(unblockerId) {
-    const item = _0xUnblockersData.find(u => u.id === unblockerId);
-    if (item) {
-        const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
-        const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
-        const absoluteUrl = baseDir + item.url;
-
-        document.open();
-        document.write(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>${item.title}</title>
-                <style>
-                    body, html { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-                    iframe { width: 100%; height: 100%; border: none; display: block; }
-                </style>
-            </head>
-            <body>
-                <iframe src="${absoluteUrl}"></iframe>
-            </body>
-            </html>
-        `);
-        document.close();
-
-        const backNavContainer = document.createElement('div');
-        backNavContainer.id = "null-back-nav";
-        backNavContainer.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-        
-        backNavContainer.innerHTML = `
-            <button onclick="window.location.reload();" style="
-                background: #0a0a0a;
-                color: #8b00ff;
-                border: 2px solid #8b00ff;
-                padding: 8px 14px;
-                font-weight: bold;
-                border-radius: 6px;
-                cursor: pointer;
-                box-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
-                font-size: 13px;
-            ">← Back to Hub</button>
-        `;
-        document.body.appendChild(backNavContainer);
-    }
+function renderLibraryGrid(gamesArray) {
+  const gameGrid = document.getElementById('gameGrid');
+  if (!gameGrid) return;
+  gameGrid.innerHTML = '';
+  gamesArray.forEach(game => {
+    const card = document.createElement('div');
+    card.className = 'game-card';
+    card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+    card.onclick = () => launchGame(game.id);
+    gameGrid.appendChild(card);
+  });
 }
 
-function showLibrary() {
-    const heroSection = document.getElementById('heroSection');
-    const gameGrid = document.getElementById('gameGrid');
-    if (heroSection) heroSection.style.display = 'none';
-    if (gameGrid) {
-        gameGrid.innerHTML = '';
-        gameGrid.style.display = 'grid';
-        _0xData.forEach(game => {
-            const card = document.createElement('div');
-            card.className = 'game-card';
-            card.innerHTML = `
-                <h3>${game.title}</h3>
-                <div class="game-desc-overlay">${game.desc}</div>
-            `;
-            card.onclick = () => launchGame(game.id);
-            gameGrid.appendChild(card);
-        });
-    }
+function showHomeView() {
+  const heroSection = document.getElementById('heroSection');
+  const randomSection = document.querySelector('.random-section');
+  if (heroSection) heroSection.style.display = 'flex';
+  if (randomSection) randomSection.style.display = 'block';
+  renderLibraryGrid(_0xData.slice(0, 6));
 }
 
-function showUnblockers() {
-    const heroSection = document.getElementById('heroSection');
-    const gameGrid = document.getElementById('gameGrid');
-    if (heroSection) heroSection.style.display = 'none';
-    if (gameGrid) {
-        gameGrid.innerHTML = '';
-        gameGrid.style.display = 'grid';
-        _0xUnblockersData.forEach(item => {
-            const card = document.createElement('div');
-            card.className = 'game-card';
-            card.innerHTML = `
-                <h3>${item.title}</h3>
-                <div class="game-desc-overlay">${item.desc}</div>
-            `;
-            card.onclick = () => launchUnblocker(item.id);
-            gameGrid.appendChild(card);
-        });
-    }
+function showAllGamesView() {
+  const heroSection = document.getElementById('heroSection');
+  const randomSection = document.querySelector('.random-section');
+  if (heroSection) heroSection.style.display = 'none';
+  if (randomSection) randomSection.style.display = 'none';
+  renderLibraryGrid(_0xData);
 }
 
-function showHome() {
-    const heroSection = document.getElementById('heroSection');
-    const gameGrid = document.getElementById('gameGrid');
-    if (heroSection) heroSection.style.display = 'flex';
-    if (gameGrid) gameGrid.style.display = 'none';
-}
-
-/**
- * Main Initialization Logic
- */
 document.addEventListener('DOMContentLoaded', () => {
-    
-    // --- 0. INTERACTIVE INITIALIZATION: AUTO-LAUNCH SYSTEM CHECK ---
-    const autoLaunchEnabled = localStorage.getItem('autoLaunchStealth') === 'true';
-    const savedCloakSelection = localStorage.getItem('savedCloak') || 'Google Classroom';
-    const savedEnvironmentSetting = localStorage.getItem('autoLaunchEnv') || 'about:blank';
+  if (localStorage.getItem('autoLaunchStealth') === 'true') {
+    localStorage.removeItem('autoLaunchStealth');
+    setTimeout(() => {
+      launchStealthWindow(localStorage.getItem('savedCloak') || 'Google Classroom', localStorage.getItem('autoLaunchEnv') || 'about:blank');
+    }, 300);
+    return;
+  }
 
-    if (autoLaunchEnabled) {
-        localStorage.removeItem('autoLaunchStealth'); 
-        setTimeout(() => {
-            launchStealthWindow(savedCloakSelection, savedEnvironmentSetting);
-        }, 300);
-        return;
-    }
+  showHomeView();
 
-    // --- 1. Educational Cloak Countdown Engine ---
-    const cloakElement = document.getElementById('educational-cloak');
-    const cloakTimerText = document.getElementById('cloak-timer');
-    const cloakCheckbox = document.getElementById('toggle-study-cloak');
-    
-    const isCloakDisabled = localStorage.getItem('disableStudyCloak') === 'true';
-    
-    if (cloakCheckbox) {
-        cloakCheckbox.checked = isCloakDisabled;
-        cloakCheckbox.addEventListener('change', (e) => {
-            localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
-        });
-    }
+  const randomBtn = document.getElementById('randomBtn');
+  if (randomBtn) {
+    randomBtn.onclick = () => {
+      const idx = Math.floor(Math.random() * _0xData.length);
+      launchGame(_0xData[idx].id);
+    };
+  }
 
-    if (isCloakDisabled) {
-        if (cloakElement) cloakElement.style.display = 'none';
-    } else {
-        let clockSecondsLeft = 20;
-        if (cloakTimerText) cloakTimerText.textContent = clockSecondsLeft;
-        
-        const countdownLoop = setInterval(() => {
-            clockSecondsLeft--;
-            if (cloakTimerText) cloakTimerText.textContent = clockSecondsLeft;
-            
-            if (clockSecondsLeft <= 0) {
-                clearInterval(countdownLoop);
-                if (cloakElement) {
-                    cloakElement.style.opacity = '0';
-                    cloakElement.style.visibility = 'hidden';
-                    setTimeout(() => {
-                        cloakElement.style.display = 'none';
-                    }, 500);
-                }
-            }
-        }, 1000);
-    }
-    
-    // --- 2. Theme & Cloak Persistence ---
-    const savedTheme = localStorage.getItem('selectedTheme');
-    if (savedTheme) applyTheme(savedTheme);
-
-    // Setup Theme Click Triggers inside settings
-    document.querySelectorAll('.theme-card').forEach(card => {
-        card.addEventListener('click', () => {
-            const chosenTheme = card.getAttribute('data-theme');
-            localStorage.setItem('selectedTheme', chosenTheme);
-            applyTheme(chosenTheme);
-        });
-    });
-
-    const savedCloak = localStorage.getItem('savedCloak');
-    if (savedCloak && savedCloak !== "none") {
-        try { 
-            applyCloak(savedCloak); 
-        } catch (e) { 
-            console.error("Cloak Error:", e); 
+  // Cloak Timer Script logic
+  const cloakElement = document.getElementById('educational-cloak');
+  const cloakTimerText = document.getElementById('cloak-timer');
+  if (localStorage.getItem('disableStudyCloak') === 'true') {
+    if (cloakElement) cloakElement.style.display = 'none';
+  } else {
+    let secs = 20;
+    const loop = setInterval(() => {
+      secs--;
+      if (cloakTimerText) cloakTimerText.textContent = secs;
+      if (secs <= 0) {
+        clearInterval(loop);
+        if (cloakElement) {
+          cloakElement.style.opacity = '0';
+          setTimeout(() => cloakElement.style.display = 'none', 500);
         }
-    }
+      }
+    }, 1000);
+  }
 
-    // --- 3. Authentication UI Sync ---
-    const user = localStorage.getItem('chatUser');
-    const welcomeText = document.getElementById('welcome-text');
-    const signInBtn = document.getElementById('signInBtn');
+  const savedTheme = localStorage.getItem('selectedTheme');
+  if (savedTheme) applyTheme(savedTheme);
 
-    if (user) {
-        if (welcomeText) welcomeText.textContent = `Hello, ${user}`;
-        if (signInBtn) signInBtn.textContent = "Sign Out";
-    }
+  document.querySelectorAll('.theme-card').forEach(card => {
+    card.onclick = () => {
+      const val = card.getAttribute('data-theme');
+      localStorage.setItem('selectedTheme', val);
+      applyTheme(val);
+    };
+  });
 
-    if (signInBtn) {
-        signInBtn.onclick = () => {
-            if (localStorage.getItem('chatUser')) {
-                localStorage.removeItem('chatUser');
-                location.reload();
-            } else {
-                window.location.href = "Login/login.html";
-            }
-        };
-    }
+  const savedCloak = localStorage.getItem('savedCloak');
+  if (savedCloak && savedCloak !== "none") {
+    try { applyCloak(savedCloak); } catch(e) {}
+  }
 
-    // --- 4. DOM Element Selection ---
-    const settingsModal = document.getElementById('settingsModal');
-    const settingsBtn = document.getElementById('settingsBtn');
-    const closeSettings = document.getElementById('closeSettings');
-    const cloakSelector = document.getElementById('cloakSelector');
-    const navHome = document.getElementById('nav-home');
-    const navGames = document.getElementById('nav-games');
-    const navUnblockers = document.getElementById('nav-unblockers');
-    const navComms = document.getElementById('nav-communications');
-    const heroSection = document.getElementById('heroSection');
-    const gameGrid = document.getElementById('gameGrid');
-    
-    const stealthOpener = document.getElementById('stealthOpener');
-    const autoLaunchCheckbox = document.getElementById('toggle-auto-launch');
-    const autoLaunchOptionsDiv = document.getElementById('auto-launch-options');
-    const autoLaunchEnvSelect = document.getElementById('auto-launch-environment');
-    
-    const panicShortcutInput = document.getElementById('panicShortcut');
-    const panicLinkInput = document.getElementById('panicLink');
-    const savePanicBtn = document.getElementById('savePanic');
+  const user = localStorage.getItem('chatUser');
+  if (user) {
+    if (document.getElementById('welcome-text')) document.getElementById('welcome-text').textContent = `Hello, ${user}`;
+    if (document.getElementById('signInBtn')) document.getElementById('signInBtn').textContent = "Sign Out";
+  }
 
-    // Autoclicker DOM Interface Map
-    const navAutoclicker = document.getElementById('nav-autoclicker');
-    const autoclickerWidget = document.getElementById('autoclicker-widget');
-    const closeWidget = document.getElementById('close-widget');
-    const toggleClickerBtn = document.getElementById('toggle-clicker-btn');
-    const clickSpeedInput = document.getElementById('click-speed');
-    const clickKeyInput = document.getElementById('click-key');
-    const clickerStatus = document.getElementById('clicker-status');
+  if (document.getElementById('signInBtn')) {
+    document.getElementById('signInBtn').onclick = () => {
+      if (localStorage.getItem('chatUser')) {
+        localStorage.removeItem('chatUser');
+        location.reload();
+      } else {
+        window.location.href = "Login/login.html";
+      }
+    };
+  }
 
-    // --- 6. Direct Stealth Action Trigger ---
-    if (stealthOpener) {
-        stealthOpener.onclick = (e) => {
-            e.preventDefault();
-            const currentCloak = localStorage.getItem('savedCloak') || 'Google Classroom';
-            const currentEnv = localStorage.getItem('autoLaunchEnv') || 'about:blank';
-            launchStealthWindow(currentCloak, currentEnv);
-        };
-    }
+  // Bind Standard Menus
+  if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
+  if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+  if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
+  if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
 
-    // --- 7. Persistent Configuration Settings State Management ---
-    if (autoLaunchCheckbox && autoLaunchOptionsDiv && autoLaunchEnvSelect) {
-        autoLaunchCheckbox.checked = localStorage.getItem('autoLaunchEnvActive') === 'true';
-        autoLaunchEnvSelect.value = savedEnvironmentSetting;
+  if (document.getElementById('stealthOpener')) {
+    document.getElementById('stealthOpener').onclick = (e) => {
+      e.preventDefault();
+      launchStealthWindow(localStorage.getItem('savedCloak') || 'Google Classroom', localStorage.getItem('autoLaunchEnv') || 'about:blank');
+    };
+  }
 
-        if (autoLaunchCheckbox.checked) {
-            autoLaunchOptionsDiv.classList.remove('hidden');
-        } else {
-            autoLaunchOptionsDiv.classList.add('hidden');
-        }
+  const cloakSelector = document.getElementById('cloakSelector');
+  if (cloakSelector) {
+    if (savedCloak) cloakSelector.value = savedCloak;
+    cloakSelector.onchange = (e) => {
+      if (e.target.value === "none") localStorage.removeItem('savedCloak');
+      else localStorage.setItem('savedCloak', e.target.value);
+      location.reload();
+    };
+  }
 
-        autoLaunchCheckbox.addEventListener('change', (e) => {
-            const status = e.target.checked;
-            localStorage.setItem('autoLaunchEnvActive', status ? 'true' : 'false');
-            
-            if (status) {
-                localStorage.setItem('autoLaunchStealth', 'true');
-                autoLaunchOptionsDiv.classList.remove('hidden');
-            } else {
-                localStorage.removeItem('autoLaunchStealth');
-                autoLaunchOptionsDiv.classList.add('hidden');
-            }
-        });
-
-        autoLaunchEnvSelect.addEventListener('change', (e) => {
-            localStorage.setItem('autoLaunchEnv', e.target.value);
-            if (autoLaunchCheckbox.checked) {
-                localStorage.setItem('autoLaunchStealth', 'true');
-            }
-        });
-    }
-
-    if (panicShortcutInput) {
-        panicShortcutInput.value = localStorage.getItem('panicKey') || "";
-        panicShortcutInput.onclick = () => {
-            panicShortcutInput.placeholder = "Press any key...";
-            const captureKey = (e) => {
-                e.preventDefault();
-                localStorage.setItem('panicKey', e.key);
-                panicShortcutInput.value = e.key;
-                window.removeEventListener('keydown', captureKey);
-            };
-            window.addEventListener('keydown', captureKey);
-        };
-    }
-
-    if (savePanicBtn) {
-        savePanicBtn.onclick = () => {
-            let link = panicLinkInput.value || "https://classroom.google.com";
-            if (!link.startsWith('http')) {
-                link = 'https://' + link;
-            }
-            localStorage.setItem('panicUrl', link);
-            alert("Panic settings saved!");
-        };
-    }
-
-    // --- 8. Navigation & Widget Event Handlers ---
-    if (navGames) navGames.onclick = (e) => { e.preventDefault(); showLibrary(); };
-    if (navUnblockers) navUnblockers.onclick = (e) => { e.preventDefault(); showUnblockers(); };
-    if (navHome) navHome.onclick = (e) => { e.preventDefault(); showHome(); };
-
-    // Autoclicker Visibility Management Switches
-    if (navAutoclicker && autoclickerWidget) {
-        navAutoclicker.onclick = (e) => {
-            e.preventDefault();
-            autoclickerWidget.style.display = 'block';
-            autoclickerWidget.classList.remove('hidden');
-        };
-    }
-
-    if (closeWidget && autoclickerWidget) {
-        closeWidget.onclick = () => {
-            autoclickerWidget.style.display = 'none';
-            autoclickerWidget.classList.add('hidden');
-            if (clickerInterval) stopAutoclicker();
-        };
-    }
-
-    // Core Autoclicker Engine Mechanics
-    let clickerInterval = null;
-    let mouseX = 0;
-    let mouseY = 0;
-
-    window.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+  const searchBar = document.getElementById('searchBar');
+  if (searchBar) {
+    searchBar.addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase().trim();
+      if (!term) { showHomeView(); return; }
+      document.getElementById('heroSection').style.display = 'none';
+      document.querySelector('.random-section').style.display = 'none';
+      const hits = _0xData.filter(g => g.title.toLowerCase().includes(term) || g.desc.toLowerCase().includes(term));
+      renderLibraryGrid(hits);
     });
+  }
 
-    function startAutoclicker() {
-        const speed = parseInt(clickSpeedInput.value) || 100;
-        
-        clickerStatus.textContent = "Running";
-        clickerStatus.className = "running";
-        toggleClickerBtn.textContent = "Stop Clicker";
-        toggleClickerBtn.style.background = "#ff4444";
-
-        clickerInterval = setInterval(() => {
-            const targetElement = document.elementFromPoint(mouseX, mouseY);
-            if (targetElement) {
-                targetElement.click();
-            }
-        }, speed);
+  // Panic Button Key Triggers
+  window.addEventListener('keydown', (e) => {
+    if (e.key === localStorage.getItem('panicKey')) {
+      window.location.href = localStorage.getItem('panicUrl') || "https://classroom.google.com";
     }
-
-    function stopAutoclicker() {
-        clearInterval(clickerInterval);
-        clickerInterval = null;
-        clickerStatus.textContent = "Stopped";
-        clickerStatus.className = "stopped";
-        toggleClickerBtn.textContent = "Start Clicker";
-        toggleClickerBtn.style.background = "#8b00ff";
-    }
-
-    if (toggleClickerBtn) {
-        toggleClickerBtn.onclick = () => {
-            if (clickerInterval) {
-                stopAutoclicker();
-            } else {
-                startAutoclicker();
-            }
-        };
-    }
-
-    if (clickKeyInput) {
-        clickKeyInput.onclick = () => {
-            clickKeyInput.value = "";
-            clickKeyInput.placeholder = "Press any key...";
-            
-            const captureWidgetKey = (e) => {
-                e.preventDefault();
-                clickKeyInput.value = e.key.toLowerCase();
-                window.removeEventListener('keydown', captureWidgetKey);
-            };
-            window.addEventListener('keydown', captureWidgetKey);
-        };
-    }
-
-    // Global Key Bind Listeners
-    window.addEventListener('keydown', (e) => {
-        if (document.activeElement.tagName === 'INPUT') return;
-        
-        const assignedKey = clickKeyInput ? clickKeyInput.value.toLowerCase() : 'z';
-        if (e.key.toLowerCase() === assignedKey) {
-            if (clickerInterval) {
-                stopAutoclicker();
-            } else {
-                startAutoclicker();
-            }
-        }
-    });
-
-    if (navComms) {
-        navComms.onclick = (e) => {
-            e.preventDefault();
-            if (heroSection) heroSection.style.display = 'none';
-            if (gameGrid) {
-                gameGrid.innerHTML = `
-                    <div class="game-card" id="chatCardLauncher" style="cursor:pointer; border: 1px solid #8b00ff; background: #0a0a0a; grid-column: span 1; padding: 20px;">
-                        <div class="game-info">
-                            <h3>Null Chat</h3>
-                            <p>Encrypted Comms (Sign-in Required)</p>
-                        </div>
-                    </div>
-                    <div class="form-wrapper" style="grid-column: 1 / -1; margin-top: 30px;">
-                        <h2 class="form-title">Request a Game</h2>
-                        <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSdM5VOrjMSdmRv5udVq9PTP4olf6kBQtShX3ZT9-I45Uu0nfQ/viewform?embedded=true" class="google-form-iframe" width="100%" height="700" frameborder="0" style="border-radius: 10px; background: #fff;">
-                        Loading…
-                        </iframe>
-                    </div>
-                `;
-                gameGrid.style.display = 'grid';
-                document.getElementById('chatCardLauncher').onclick = () => openNullChat();
-            }
-        };
-    }
-
-    if (settingsBtn) settingsBtn.onclick = () => settingsModal.style.display = 'flex';
-    if (closeSettings) closeSettings.onclick = () => settingsModal.style.display = 'none';
-
-    if (cloakSelector) {
-        if (savedCloak) cloakSelector.value = savedCloak;
-        cloakSelector.onchange = (e) => {
-            const val = e.target.value;
-            if (val === "none") {
-                localStorage.removeItem('savedCloak');
-            } else {
-                localStorage.setItem('savedCloak', val);
-                applyCloak(val);
-            }
-            location.reload(); 
-        };
-    }
-
-    // --- SEARCH BAR ENGINE ---
-    const searchBar = document.getElementById('searchBar');
-    if (searchBar) {
-        searchBar.addEventListener('input', (e) => {
-            const searchTerm = e.target.value.toLowerCase().trim();
-
-            if (searchTerm !== "") {
-                if (heroSection) heroSection.style.display = 'none';
-                if (gameGrid) {
-                    gameGrid.innerHTML = '';
-                    gameGrid.style.display = 'grid';
-                }
-            } else {
-                showHome();
-                return;
-            }
-
-            // Filter the existing _0xData array items
-            const filteredGames = _0xData.filter(game => {
-                const clearTitle = game.title.toLowerCase();
-                const clearDesc = game.desc.toLowerCase();
-                return clearTitle.includes(searchTerm) || clearDesc.includes(searchTerm);
-            });
-
-            if (filteredGames.length === 0) {
-                gameGrid.innerHTML = `<div style="color: #666; grid-column: 1/-1; text-align: center; padding: 40px; font-family: sans-serif;">No games found matching "${e.target.value}"</div>`;
-                return;
-            }
-
-            filteredGames.forEach(game => {
-                const card = document.createElement('div');
-                card.className = 'game-card';
-                card.innerHTML = `
-                    <h3>${game.title}</h3>
-                    <div class="game-desc-overlay">${game.desc}</div>
-                `;
-                card.onclick = () => launchGame(game.id);
-                gameGrid.appendChild(card);
-            });
-        });
-    }
-
-    // --- 9. Page Content Initialization ---
-    const popular = getMostPopular();
-    if (popular.length > 0) {
-        const titleEl = document.getElementById('hero-title');
-        const descEl = document.getElementById('hero-desc');
-        const playBtn = document.getElementById('playFeatured');
-
-        if (titleEl) titleEl.textContent = popular[0].title;
-        if (descEl) descEl.textContent = popular[0].desc;
-        if (playBtn) playBtn.onclick = () => launchGame(popular[0].id);
-    }
-
-    window.addEventListener('keydown', (e) => {
-        const panicKey = localStorage.getItem('panicKey');
-        if (panicKey && e.key === panicKey) {
-            let url = localStorage.getItem('panicUrl') || "https://classroom.google.com";
-            if (!url.startsWith('http')) {
-                url = 'https://' + url;
-            }
-            window.location.href = url;
-        }
-    });
+  });
 });
