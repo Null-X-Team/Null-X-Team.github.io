@@ -265,12 +265,12 @@ const _0xUnblockersData = [
  {
   id: "ub_uv",
   title: "Nautilus OS",
-  url: "unblockers/NautilusOS/index.html",
+  // Added a leading slash so it always goes back to the root directory
+  url: "/unblockers/NautilusOS/index.html", 
   desc: "High speed web proxy built for advanced performance and bypass capabilities."
  }
  // Future unblocker files can be appended safely right here
 ];
-
 /**
  * Helper: Filter data for popular/featured games
  */
