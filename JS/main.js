@@ -810,6 +810,48 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     }
 
+    // --- SEARCH BAR ENGINE ---
+    const searchBar = document.getElementById('searchBar');
+    if (searchBar) {
+        searchBar.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase().trim();
+
+            if (searchTerm !== "") {
+                if (heroSection) heroSection.style.display = 'none';
+                if (gameGrid) {
+                    gameGrid.innerHTML = '';
+                    gameGrid.style.display = 'grid';
+                }
+            } else {
+                showHome();
+                return;
+            }
+
+            // Filter the existing _0xData array items
+            const filteredGames = _0xData.filter(game => {
+                const clearTitle = game.title.toLowerCase();
+                const clearDesc = game.desc.toLowerCase();
+                return clearTitle.includes(searchTerm) || clearDesc.includes(searchTerm);
+            });
+
+            if (filteredGames.length === 0) {
+                gameGrid.innerHTML = `<div style="color: #666; grid-column: 1/-1; text-align: center; padding: 40px; font-family: sans-serif;">No games found matching "${e.target.value}"</div>`;
+                return;
+            }
+
+            filteredGames.forEach(game => {
+                const card = document.createElement('div');
+                card.className = 'game-card';
+                card.innerHTML = `
+                    <h3>${game.title}</h3>
+                    <div class="game-desc-overlay">${game.desc}</div>
+                `;
+                card.onclick = () => launchGame(game.id);
+                gameGrid.appendChild(card);
+            });
+        });
+    }
+
     // --- 9. Page Content Initialization ---
     const popular = getMostPopular();
     if (popular.length > 0) {
