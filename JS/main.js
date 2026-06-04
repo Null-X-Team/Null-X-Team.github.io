@@ -141,7 +141,6 @@ function launchGame(gameId) {
 
     const backNav = document.createElement('div');
     backNav.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-    // Fixed destination path parameters to drop index.html completely from back-routing
     backNav.innerHTML = `<button onclick="window.location.replace('/');" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
     document.body.appendChild(backNav);
   }
@@ -160,16 +159,13 @@ function renderLibraryGrid(gamesArray) {
   });
 }
 
-// Fixed Featured Initialization Logic Controller
 function initFeaturedModule() {
   const heroTitle = document.getElementById('hero-title');
   const heroDesc = document.getElementById('hero-desc');
   const playFeaturedBtn = document.getElementById('playFeatured');
 
   if (_0xData.length > 0 && heroTitle) {
-    // Select a randomized game structure node from the main database matrix arrays
     const randomGameSelection = _0xData[Math.floor(Math.random() * _0xData.length)];
-    
     heroTitle.textContent = randomGameSelection.title;
     if (heroDesc) heroDesc.textContent = randomGameSelection.desc;
     if (playFeaturedBtn) {
@@ -184,7 +180,6 @@ function showHomeView() {
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
   
-  // Dynamic fix applied: Empty the underlying grid block array so it sits clean on home navigation
   const gameGrid = document.getElementById('gameGrid');
   if (gameGrid) gameGrid.innerHTML = '';
   
@@ -218,12 +213,11 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Cloak Timer Script logic: Reset timer variable down to 10 seconds execution
+  // Cloak Timer Script logic
   const cloakElement = document.getElementById('educational-cloak');
   const cloakTimerText = document.getElementById('cloak-timer');
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
 
-  // Toggle state verification checkbox controller setup inside settings
   const toggleStudyCloakInput = document.getElementById('toggle-study-cloak');
   if (toggleStudyCloakInput) {
     toggleStudyCloakInput.checked = isSplashDisabled;
@@ -235,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (isSplashDisabled) {
     if (cloakElement) cloakElement.style.display = 'none';
   } else {
-    let secs = 10; // Updated clock step configuration to 10 seconds
+    let secs = 10; 
     if (cloakTimerText) cloakTimerText.textContent = secs;
     const loop = setInterval(() => {
       secs--;
@@ -266,10 +260,24 @@ document.addEventListener('DOMContentLoaded', () => {
     try { applyCloak(savedCloak); } catch(e) {}
   }
 
+  // --- Dynamic Greeting & Authentic Sign-In Updates ---
   const user = localStorage.getItem('chatUser');
   if (user) {
-    if (document.getElementById('welcome-text')) document.getElementById('welcome-text').textContent = `Hello, ${user}`;
-    if (document.getElementById('signInBtn')) document.getElementById('signInBtn').textContent = "Sign Out";
+    // Greets authenticated user matching request parameters
+    if (document.getElementById('welcome-text')) {
+      document.getElementById('welcome-text').textContent = `Hello, ${user}`;
+    }
+    if (document.getElementById('signInBtn')) {
+      document.getElementById('signInBtn').textContent = "Sign Out";
+    }
+  } else {
+    // Defaults to Guest profile if missing active database registration storage tokens
+    if (document.getElementById('welcome-text')) {
+      document.getElementById('welcome-text').textContent = "Hello, Guest";
+    }
+    if (document.getElementById('signInBtn')) {
+      document.getElementById('signInBtn').textContent = "Sign In";
+    }
   }
 
   if (document.getElementById('signInBtn')) {
@@ -278,6 +286,21 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('chatUser');
         location.reload();
       } else {
+        window.location.href = "Login/login.html";
+      }
+    };
+  }
+
+  // --- Communications Shield Controller ---
+  const commsNavBtn = document.getElementById('nav-communications');
+  if (commsNavBtn) {
+    commsNavBtn.onclick = (e) => {
+      e.preventDefault();
+      if (localStorage.getItem('chatUser')) {
+        // Safe navigation to internal chat directory if logged into profile matrix
+        window.location.href = "chat/chat.html";
+      } else {
+        // Forces redirection sequence to authentication screen when unlogged
         window.location.href = "Login/login.html";
       }
     };
