@@ -301,9 +301,13 @@
 
                 if (userMatches.length > 0) {
                     showMessage('Login successful! Redirecting...', false);
-                    localStorage.setItem('currentUser', username);
+                    
+                    // FIX 1: Saved under 'chatUser' to connect seamlessly with main.js greeting checks
+                    localStorage.setItem('chatUser', username);
+                    
                     setTimeout(() => {
-                        window.location.href = 'index.html';
+                        // FIX 2: Added '../' to target root folder index.html instead of hitting a 404
+                        window.location.href = '../index.html';
                     }, 1500);
                 } else {
                     showMessage('Incorrect username or password.');
