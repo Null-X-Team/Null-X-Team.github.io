@@ -141,7 +141,8 @@ function launchGame(gameId) {
 
     const backNav = document.createElement('div');
     backNav.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-    backNav.innerHTML = `<button onclick="window.location.reload();" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
+    // Fixed destination path parameters to drop index.html completely from back-routing
+    backNav.innerHTML = `<button onclick="window.location.replace('/');" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
     document.body.appendChild(backNav);
   }
 }
@@ -159,12 +160,35 @@ function renderLibraryGrid(gamesArray) {
   });
 }
 
+// Fixed Featured Initialization Logic Controller
+function initFeaturedModule() {
+  const heroTitle = document.getElementById('hero-title');
+  const heroDesc = document.getElementById('hero-desc');
+  const playFeaturedBtn = document.getElementById('playFeatured');
+
+  if (_0xData.length > 0 && heroTitle) {
+    // Select a randomized game structure node from the main database matrix arrays
+    const randomGameSelection = _0xData[Math.floor(Math.random() * _0xData.length)];
+    
+    heroTitle.textContent = randomGameSelection.title;
+    if (heroDesc) heroDesc.textContent = randomGameSelection.desc;
+    if (playFeaturedBtn) {
+      playFeaturedBtn.onclick = () => launchGame(randomGameSelection.id);
+    }
+  }
+}
+
 function showHomeView() {
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
-  renderLibraryGrid(_0xData.slice(0, 6));
+  
+  // Dynamic fix applied: Empty the underlying grid block array so it sits clean on home navigation
+  const gameGrid = document.getElementById('gameGrid');
+  if (gameGrid) gameGrid.innerHTML = '';
+  
+  initFeaturedModule();
 }
 
 function showAllGamesView() {
@@ -194,13 +218,25 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Cloak Timer Script logic
+  // Cloak Timer Script logic: Reset timer variable down to 10 seconds execution
   const cloakElement = document.getElementById('educational-cloak');
   const cloakTimerText = document.getElementById('cloak-timer');
-  if (localStorage.getItem('disableStudyCloak') === 'true') {
+  const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
+
+  // Toggle state verification checkbox controller setup inside settings
+  const toggleStudyCloakInput = document.getElementById('toggle-study-cloak');
+  if (toggleStudyCloakInput) {
+    toggleStudyCloakInput.checked = isSplashDisabled;
+    toggleStudyCloakInput.onchange = (e) => {
+      localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
+    };
+  }
+
+  if (isSplashDisabled) {
     if (cloakElement) cloakElement.style.display = 'none';
   } else {
-    let secs = 20;
+    let secs = 10; // Updated clock step configuration to 10 seconds
+    if (cloakTimerText) cloakTimerText.textContent = secs;
     const loop = setInterval(() => {
       secs--;
       if (cloakTimerText) cloakTimerText.textContent = secs;
