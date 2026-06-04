@@ -7,6 +7,31 @@ const ADMIN_NAME = "glaeesas";
 let allUsers = [];
 let lastMessageTime = 0;
 
+// --- ANTI-PII FILTER ENGINE ---
+function containsPersonalInfo(text) {
+    // 1. Email Pattern
+    const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+
+    // 2. Phone Number Pattern (Matches standard numeric spacing variations)
+    const phonePattern = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
+
+    // 3. Physical Address Heuristic Patterns
+    const addressKeywords = /\b(street|st|avenue|ave|drive|dr|road|rd|lane|ln|way|court|ct|zip|zipcode)\b/i;
+    const houseNumberPattern = /\d{3,5}\s+[a-zA-Z0-9\s]{3,}/;
+
+    if (emailPattern.test(text)) {
+        return "Emails are not allowed to be shared.";
+    }
+    if (phonePattern.test(text)) {
+        return "Phone numbers are not allowed to be shared.";
+    }
+    if (addressKeywords.test(text) && houseNumberPattern.test(text)) {
+        return "Physical addresses are not allowed to be shared.";
+    }
+
+    return null; // Content is clean
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     const user = localStorage.getItem('chatUser');
     
@@ -190,6 +215,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         const val = input.value.trim();
         if (!val) return;
         
+        // --- PRE-FLIGHT PRIVACY WALL ---
+        // Bypass privacy protection block if user is system admin/owner
+        if (lowerUser !== ADMIN_NAME.toLowerCase()) {
+            const piiWarning = containsPersonalInfo(val);
+            if (piiWarning) {
+                alert(`[SECURITY BLOCK] ${piiWarning} Please remove personal information and try again.`);
+                return; 
+            }
+        }
+
         input.value = ""; 
         lastMessageTime = now;
 
