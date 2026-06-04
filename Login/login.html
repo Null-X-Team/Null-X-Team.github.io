@@ -194,11 +194,10 @@
 
     <script>
         // --- CONFIGURATION ---
-        // Automatically mapped to your verified project endpoint
         const BASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/users';
+        const ROLES_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/user_roles';
         
-        // --- FIXED ---
-        // Swapped out the publishable string for your exact JWT cryptographic Anon Key
+        // Exact cryptographic JWT Anon Token
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
         const headers = {
@@ -256,14 +255,14 @@
             }
         }
 
-        // --- SIGN UP / ACCOUNT CREATION ---
+        // --- SIGN UP / TWO-TABLE INITIALIZATION ---
         async function handleSignUp(username, password) {
             try {
                 // 1. Check if username is already taken inside your users table
                 const checkUrl = `${BASE_URL}?username=eq.${encodeURIComponent(username)}&select=username`;
                 const checkRes = await fetch(checkUrl, { method: 'GET', headers: headers });
                 
-                if (!checkRes.ok) throw new Error(`Database rejected request. Status: ${checkRes.status}`);
+                if (!checkRes.ok) throw new Error(`Database rejected availability check. Status: ${checkRes.status}`);
                 const existingUsers = await checkRes.json();
                 
                 if (existingUsers.length > 0) {
@@ -271,18 +270,32 @@
                     return;
                 }
 
-                // 2. Insert new user credentials directly
+                // 2. Insert new user credentials directly into your main 'users' table
                 const insertRes = await fetch(BASE_URL, {
                     method: 'POST',
                     headers: { ...headers, 'Prefer': 'return=representation' },
                     body: JSON.stringify({ username: username, password: password })
                 });
 
-                if (insertRes.ok) {
+                if (!insertRes.ok) throw new Error(`Registration failed in main table. Status: ${insertRes.status}`);
+
+                // 3. Automated safe entry inside 'user_roles' table
+                // Schema default fallback triggers here to handle standard account creations safely
+                const rolesRes = await fetch(ROLES_URL, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        username: username, 
+                        role_tag: 'User', 
+                        is_banned: false 
+                    })
+                });
+
+                if (rolesRes.ok) {
                     showMessage('Account created successfully! Switching to login...', false);
                     setTimeout(() => { setMode('login'); }, 2000);
                 } else {
-                    throw new Error(`Insert failed. Status: ${insertRes.status}`);
+                    throw new Error(`Role allocation handshake failed. Status: ${rolesRes.status}`);
                 }
             } catch (err) {
                 showMessage('Connection error: ' + err.message);
@@ -293,7 +306,7 @@
         // --- USER LOGIN ---
         async function handleLogin(username, password) {
             try {
-                // Match the explicit username and password string combination
+                // Verification against users credentials table 
                 const loginUrl = `${BASE_URL}?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}&select=*`;
                 const res = await fetch(loginUrl, { method: 'GET', headers: headers });
                 
@@ -303,11 +316,11 @@
                 if (userMatches.length > 0) {
                     showMessage('Login successful! Redirecting...', false);
                     
-                    // FIX 1: Saved under 'chatUser' to connect seamlessly with main.js greeting checks
+                    // Saves user token to local session cache
                     localStorage.setItem('chatUser', username);
                     
                     setTimeout(() => {
-                        // FIX 2: Added '../' to target root folder index.html instead of hitting a 404
+                        // Relocates them safely back up to your root dashboard hub index page
                         window.location.href = '../index.html';
                     }, 1500);
                 } else {
