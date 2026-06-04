@@ -1,5 +1,7 @@
-const SUPABASE_URL = 'https://ukwjojxutcjkvabnybtj.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd2pvanh1dGNqa3ZhYm55YnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk5NDAsImV4cCI6MjA5Mzg1NTk0MH0.iLr9OrIZlRBrbcI1XDE0zl7t_wpwVg3ko3DgppxbUh8'; 
+// --- CONFIGURATION CORRECTION ---
+// Realigned to target the same database used by login.html
+const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
+const SUPABASE_KEY = 'sb_publishable_b3YUWIgrmUX1-Dl_Ee_4fg_MbKUuzrO'; 
 
 const ADMIN_NAME = "glaeesas";
 let allUsers = [];
@@ -14,9 +16,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
 
-    // 2. HARD SECURITY KILL-SWITCH: Verify the user actually exists in user_roles
+    // 2. HARD SECURITY KILL-SWITCH: Verify the user actually exists
     try {
-        const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=username`, {
+        // Changed path to point to 'users' table to align with login storage targets
+        const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const verifyData = await verifyRes.json();
@@ -158,7 +161,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
                 const isDel = msg.content === "Message Was Deleted By Owner";
-                const role = roles.find(r => r.username === msg.username);
+                const role = roles?.find ? roles.find(r => r.username === msg.username) : null;
                 const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
                 let tag = msg.username.toLowerCase() === ADMIN_NAME ? `<span style="color:#ff4444; font-weight:bold; margin-right:5px;">[OWNER]</span>` : (role?.role_tag ? `<span style="color:#aaa; font-weight:bold;">[${role.role_tag.toUpperCase()}]</span> ` : "");
