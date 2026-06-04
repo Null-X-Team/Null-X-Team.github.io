@@ -197,8 +197,9 @@
         // Automatically mapped to your verified project endpoint
         const BASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/users';
         
-        // Your exact dashboard publishable key
-        const ANON_KEY = 'sb_publishable_b3YUWIgrmUX1-Dl_Ee_4fg_MbKUuzrO';
+        // --- FIXED ---
+        // Swapped out the publishable string for your exact JWT cryptographic Anon Key
+        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
         const headers = {
             'apikey': ANON_KEY,
