@@ -1,7 +1,7 @@
 // --- CONFIGURATION CORRECTION ---
-// Realigned to target the same database used by login.html
+// Fully aligned to your project id and matching JWT Anon Key
 const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
-const SUPABASE_KEY = 'sb_publishable_b3YUWIgrmUX1-Dl_Ee_4fg_MbKUuzrO'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
 const ADMIN_NAME = "glaeesas";
 let allUsers = [];
@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 2. HARD SECURITY KILL-SWITCH: Verify the user actually exists
     try {
-        // Changed path to point to 'users' table to align with login storage targets
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
