@@ -195,7 +195,6 @@
     <script>
         // --- CONFIGURATION ---
         const BASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/users';
-        const ROLES_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/user_roles';
         
         // Exact cryptographic JWT Anon Token
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
@@ -255,7 +254,7 @@
             }
         }
 
-        // --- SIGN UP / TWO-TABLE INITIALIZATION ---
+        // --- CLEANED UP SIGN UP (AUTOMATED BY SQL TRIGGER) ---
         async function handleSignUp(username, password) {
             try {
                 // 1. Check if username is already taken inside your users table
@@ -271,37 +270,18 @@
                 }
 
                 // 2. Insert new user credentials directly into your main 'users' table
+                // The database trigger handles building their profile inside user_roles instantly!
                 const insertRes = await fetch(BASE_URL, {
                     method: 'POST',
                     headers: { ...headers, 'Prefer': 'return=representation' },
                     body: JSON.stringify({ username: username, password: password })
                 });
 
-                if (!insertRes.ok) throw new Error(`Registration failed in main table. Status: ${insertRes.status}`);
-
-                // 3. Automated clean entry inside 'user_roles' table
-                // Passing explicit null structures ensures Supabase accepts the default rules smoothly
-                const rolesRes = await fetch(ROLES_URL, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ 
-                        username: username, 
-                        role_tag: 'User', 
-                        is_banned: false,
-                        temp_ban_until: null,
-                        last_action_type: null,
-                        last_action_reason: null,
-                        last_action_category: null,
-                        pfp_url: 'https://api.dicebear.com/7.x/bottts/svg' // Sets dynamic fallback robot avatar
-                    })
-                });
-
-                if (rolesRes.ok) {
+                if (insertRes.ok) {
                     showMessage('Account created successfully! Switching to login...', false);
                     setTimeout(() => { setMode('login'); }, 2000);
                 } else {
-                    const errorText = await rolesRes.text();
-                    throw new Error(`Role allocation handshake failed: ${errorText}`);
+                    throw new Error(`Registration failed in main table. Status: ${insertRes.status}`);
                 }
             } catch (err) {
                 showMessage('Connection error: ' + err.message);
@@ -326,7 +306,6 @@
                     localStorage.setItem('chatUser', username);
                     
                     setTimeout(() => {
-                        // Relocates them safely back up to your root dashboard hub index page
                         window.location.href = '../index.html';
                     }, 1500);
                 } else {
