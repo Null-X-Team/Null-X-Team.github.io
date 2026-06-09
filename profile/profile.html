@@ -22,9 +22,7 @@
         <div class="main-content">
             <div class="profile-header-banner">
                 <div class="pfp-wrapper">
-                    <img id="pfp-preview" src="https://via.placeholder.com/150" alt="User PFP">
-                    <label for="pfp-input" class="pfp-edit-overlay">Edit</label>
-                    <input type="file" id="pfp-input" accept="image/*" style="display:none;">
+                    <img id="pfp-preview" src="https://api.dicebear.com/7.x/bottts/svg" alt="User PFP">
                 </div>
                 <h1 id="display-username">Loading...</h1>
             </div>
@@ -34,6 +32,11 @@
                     <h3>About Me</h3>
                     <textarea id="bio-input" placeholder="Write something about yourself..."></textarea>
                     
+                    <div style="margin-top: 15px; margin-bottom: 15px; text-align: left;">
+                        <label for="pfp-url-input">Profile Picture URL</label>
+                        <input type="url" id="pfp-url-input" placeholder="Paste image link (e.g., from Imgur or Discord)">
+                    </div>
+
                     <div class="info-row">
                         <span>Account Status:</span>
                         <span id="account-status" style="color: #00c853;">Active</span>
