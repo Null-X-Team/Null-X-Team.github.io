@@ -1,11 +1,12 @@
 const SUPABASE_URL = 'https://ukwjojxutcjkvabnybtj.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd2pvanh1dGNqa3ZhYm55YnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk5NDAsImV4cCI6MjA5Mzg1NTk0MH0.iLr9OrIZlRBrbcI1XDE0zl7t_wpwVg3ko3DgppxbUh8';
 
+const DEFAULT_PFP = '../imgs/download.jpeg';
+
 document.addEventListener('DOMContentLoaded', async () => {
     const user = localStorage.getItem('chatUser');
     if (!user) { window.location.href = "../Login/login.html"; return; }
 
-    // Display their primary account username across the text targets
     document.getElementById('display-username').textContent = user;
     document.getElementById('info-username').textContent = user;
 
@@ -25,18 +26,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data && data[0]) {
                 const profile = data[0];
                 
-                // Map database entries to input fields safely
                 if (profile.bio) bioInput.value = profile.bio;
                 
                 if (profile.pfp_url) {
                     pfpPreview.src = profile.pfp_url;
                     pfpUrlInput.value = profile.pfp_url;
                 } else {
-                    // Fallback default avatar if database field is blank
-                    pfpPreview.src = 'https://api.dicebear.com/7.x/bottts/svg';
+                    pfpPreview.src = DEFAULT_PFP;
                 }
                 
-                // Format the created timestamp cleanly
                 if (profile.created_at) {
                     const joined = new Date(profile.created_at).toLocaleDateString();
                     document.getElementById('join-date').textContent = joined;
@@ -48,14 +46,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // --- 2. LIVE AVATAR PREVIEW ---
-    // When a user pastes a new image URL link, automatically update the display picture instantly!
     pfpUrlInput.addEventListener('input', () => {
         const urlValue = pfpUrlInput.value.trim();
-        if (urlValue) {
-            pfpPreview.src = urlValue;
-        } else {
-            pfpPreview.src = 'https://api.dicebear.com/7.x/bottts/svg';
-        }
+        pfpPreview.src = urlValue ? urlValue : DEFAULT_PFP;
     });
 
     // --- 3. SAVE PROFILE DATA ---
@@ -76,7 +69,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 },
                 body: JSON.stringify({ 
                     bio: bio, 
-                    pfp_url: pfpUrl || 'https://api.dicebear.com/7.x/bottts/svg'
+                    pfp_url: pfpUrl || DEFAULT_PFP
                 })
             });
 
