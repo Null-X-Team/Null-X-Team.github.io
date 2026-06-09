@@ -3,54 +3,97 @@
 const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
+// --- AI MODERATION CONFIGURATION ---
+// Replace with your preferred AI endpoint (e.g., Hugging Face, OpenAI, or a custom worker)
+const AI_MODERATION_ENDPOINT = 'https://api-inference.huggingface.co/models/beki/en_spacy_pii_distilbert';
+const AI_API_KEY = 'hf_YOUR_HUGGINGFACE_API_KEY_HERE'; // Insert your API key token here
+
 const ADMIN_NAME = "glaeesas";
 let allUsers = [];
 let lastMessageTime = 0;
 
-// --- ANTI-PII FILTER ENGINE ---
-function containsPersonalInfo(text) {
-    // 1. Email Pattern
+// --- CORE PATTERN FILTER ---
+function containsCorePII(text) {
     const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-
-    // 2. Phone Number Pattern (Matches standard numeric spacing variations)
     const phonePattern = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
-
-    // 3. Physical Address Heuristic Patterns
     const addressKeywords = /\b(street|st|avenue|ave|drive|dr|road|rd|lane|ln|way|court|ct|zip|zipcode)\b/i;
     const houseNumberPattern = /\d{3,5}\s+[a-zA-Z0-9\s]{3,}/;
 
-    if (emailPattern.test(text)) {
-        return "Emails are not allowed to be shared.";
-    }
-    if (phonePattern.test(text)) {
-        return "Phone numbers are not allowed to be shared.";
-    }
-    if (addressKeywords.test(text) && houseNumberPattern.test(text)) {
-        return "Physical addresses are not allowed to be shared.";
-    }
+    if (emailPattern.test(text)) return "Emails are not allowed to be shared.";
+    if (phonePattern.test(text)) return "Phone numbers are not allowed to be shared.";
+    if (addressKeywords.test(text) && houseNumberPattern.test(text)) return "Physical addresses are not allowed to be shared.";
+    
+    return null;
+}
 
-    return null; // Content is clean
+// --- AI MODEL ANALYZER ---
+async function checkMessageWithAI(text, registeredUsers = []) {
+    try {
+        // Fallback: If no AI key is configured yet, rely on a basic whitelist comparison
+        if (AI_API_KEY.includes('YOUR_HUGGINGFACE')) {
+            const words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").split(/\s+/);
+            const lowerCaseUsers = registeredUsers.map(u => u.toLowerCase());
+            const commonWords = ['i', 'you', 'he', 'she', 'they', 'we', 'it', 'the', 'a', 'an', 'and', 'but', 'or', 'if', 'is', 'am', 'are', 'was', 'were', 'be', 'been', 'to', 'for', 'with', 'in', 'on', 'at', 'by', 'of', 'up', 'do', 'go', 'can', 'will', 'no', 'yes', 'not', 'me', 'my', 'your', 'his', 'her', 'this', 'that'];
+            
+            for (let word of words) {
+                const clean = word.trim().toLowerCase();
+                if (clean.length > 2 && word[0] === word[0].toUpperCase() && !commonWords.includes(clean)) {
+                    if (!lowerCaseUsers.includes(clean)) {
+                        return `The name "${word}" is not a registered user. Privacy protection active.`;
+                    }
+                }
+            }
+            return null;
+        }
+
+        // Send text to your chosen AI Text Classifier / PII recognition model
+        const response = await fetch(AI_MODERATION_ENDPOINT, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${AI_API_KEY}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ inputs: text })
+        });
+
+        if (!response.ok) return null; // Pass message through if AI engine fails to maintain uptime
+        
+        const result = await response.json();
+        
+        // This parser logic adjusts depending on your exact model's output syntax
+        // Example assumes a classification layout returning label weights (e.g., LABEL_1 for PII presence)
+        if (result && result[0]) {
+            const topPrediction = result[0].sort((a, b) => b.score - a.score)[0];
+            // If the model identifies a high confidence score for PII / Name detection
+            if ((topPrediction.label === 'LABEL_1' || topPrediction.label === 'PII') && topPrediction.score > 0.85) {
+                return "Real-world names or personal details detected by system moderation.";
+            }
+        }
+        
+        return null;
+    } catch (err) {
+        console.error("AI engine handshake failed:", err);
+        return null; 
+    }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = localStorage.getItem('chatUser');
     
-    // 1. If no local storage exists, boot them out immediately
+    // 1. Lockout Check
     if (!user) {
         window.location.href = "../Login/login.html";
         return;
     }
 
-    // 2. HARD SECURITY KILL-SWITCH: Verify the user actually exists
+    // 2. Session Integrity Handshake
     try {
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const verifyData = await verifyRes.json();
 
-        // If backend database returns nothing, this user does not exist! Evict them.
         if (!verifyData || verifyData.length === 0) {
-            console.warn("Ghost session detected. Clearing storage and executing lockout.");
             localStorage.removeItem('chatUser');
             localStorage.clear();
             window.location.href = "../Login/login.html";
@@ -60,7 +103,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Security handshake failed:", authError);
     }
 
-    // 3. BAN CHECK: Make sure this user isn't actively flagged as banned in the database
+    // 3. Status Rule Verification Engine
     try {
         const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=is_banned,temp_ban_until`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -69,16 +112,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         
         if (banData && banData[0]) {
             const profile = banData[0];
-            
-            // Handle Permanent Ban Check
             if (profile.is_banned === true) {
                 alert("This account has been permanently banned from the server.");
                 localStorage.removeItem('chatUser');
                 window.location.href = "../Login/login.html";
                 return;
             }
-            
-            // Handle Temporary Ban Check
             if (profile.temp_ban_until) {
                 const expiryTime = new Date(profile.temp_ban_until).getTime();
                 if (expiryTime > Date.now()) {
@@ -93,11 +132,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Ban check failed:", banCheckErr);
     }
 
-    // --- CONTINUATION OF ORIGINAL ENGINE FLOW ---
     const lowerUser = user.toLowerCase();
     document.getElementById('username-display').textContent = user;
     
-    // Admin Tab Visibility Check
     if (lowerUser === ADMIN_NAME.toLowerCase()) {
         const adminTab = document.getElementById('admin-tab');
         if (adminTab) adminTab.style.display = 'block';
@@ -205,7 +242,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.error(e); }
     }
 
-    // --- SENDING ---
+    // --- SENDING + MODERATION CHECKS ---
     document.getElementById('chat-form').onsubmit = async (e) => {
         e.preventDefault();
         const now = Date.now();
@@ -215,13 +252,21 @@ document.addEventListener('DOMContentLoaded', async () => {
         const val = input.value.trim();
         if (!val) return;
         
-        // --- PRE-FLIGHT PRIVACY WALL ---
-        // Bypass privacy protection block if user is system admin/owner
+        // --- 1. LOCAL STRUCTURAL PATTERN SCAN ---
         if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-            const piiWarning = containsPersonalInfo(val);
-            if (piiWarning) {
-                alert(`[SECURITY BLOCK] ${piiWarning} Please remove personal information and try again.`);
+            const staticWarning = containsCorePII(val);
+            if (staticWarning) {
+                alert(`[SECURITY BLOCK] ${staticWarning}`);
                 return; 
+            }
+        }
+
+        // --- 2. ASYNCHRONOUS AI CONTENT COMPLIANCE WALL ---
+        if (lowerUser !== ADMIN_NAME.toLowerCase()) {
+            const aiWarning = await checkMessageWithAI(val, allUsers);
+            if (aiWarning) {
+                alert(`[SECURITY BLOCK] ${aiWarning}`);
+                return;
             }
         }
 
