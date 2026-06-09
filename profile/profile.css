@@ -27,12 +27,22 @@ body {
     flex-direction: column;
 }
 
+/* 🔥 FIXED: Added gap to spread the navigation buttons apart */
+.sidebar nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; 
+    padding-top: 10px;
+}
+
 .nav-item {
     padding: 15px 25px;
     color: var(--text-dim);
     text-decoration: none;
     transition: 0.2s;
     font-weight: 500;
+    border-radius: 8px;
+    margin: 0 10px; /* Gives them a clean button look inside the sidebar */
 }
 
 .nav-item.active {
@@ -91,7 +101,6 @@ body {
     color: var(--nx-purple);
 }
 
-/* Added styling for text inputs and labels inside settings cards */
 .settings-card label {
     display: block;
     font-size: 11px;
@@ -107,7 +116,7 @@ body {
     border-radius: 8px;
     color: white;
     padding: 12px;
-    box-sizing: border-box; /* Prevents input stretching past containers */
+    box-sizing: border-box;
     outline: none;
     transition: border-color 0.2s ease;
 }
