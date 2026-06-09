@@ -1,7 +1,7 @@
 const SUPABASE_URL = 'https://ukwjojxutcjkvabnybtj.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd2pvanh1dGNqa3ZhYm55YnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk5NDAsImV4cCI6MjA5Mzg1NTk0MH0.iLr9OrIZlRBrbcI1XDE0zl7t_wpwVg3ko3DgppxbUh8';
 
-const DEFAULT_PFP = '../imgs/download.jpeg';
+const DEFAULT_PFP = 'https://Glaxyias.github.io/imgs/download.jpeg';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const user = localStorage.getItem('chatUser');
