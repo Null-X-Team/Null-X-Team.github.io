@@ -4,11 +4,11 @@ const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
 // --- AI MODERATION CONFIGURATION ---
-// Replace with your preferred AI endpoint (e.g., Hugging Face, OpenAI, or a custom worker)
 const AI_MODERATION_ENDPOINT = 'https://api-inference.huggingface.co/models/beki/en_spacy_pii_distilbert';
-const AI_API_KEY = 'hf_YOUR_HUGGINGFACE_API_KEY_HERE'; // Insert your API key token here
+const AI_API_KEY = 'hf_YOUR_HUGGINGFACE_API_KEY_HERE'; 
 
 const ADMIN_NAME = "glaeesas";
+const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
 let lastMessageTime = 0;
 
@@ -29,7 +29,6 @@ function containsCorePII(text) {
 // --- AI MODEL ANALYZER ---
 async function checkMessageWithAI(text, registeredUsers = []) {
     try {
-        // Fallback: If no AI key is configured yet, rely on a basic whitelist comparison
         if (AI_API_KEY.includes('YOUR_HUGGINGFACE')) {
             const words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").split(/\s+/);
             const lowerCaseUsers = registeredUsers.map(u => u.toLowerCase());
@@ -46,7 +45,6 @@ async function checkMessageWithAI(text, registeredUsers = []) {
             return null;
         }
 
-        // Send text to your chosen AI Text Classifier / PII recognition model
         const response = await fetch(AI_MODERATION_ENDPOINT, {
             method: 'POST',
             headers: {
@@ -56,15 +54,12 @@ async function checkMessageWithAI(text, registeredUsers = []) {
             body: JSON.stringify({ inputs: text })
         });
 
-        if (!response.ok) return null; // Pass message through if AI engine fails to maintain uptime
+        if (!response.ok) return null; 
         
         const result = await response.json();
         
-        // This parser logic adjusts depending on your exact model's output syntax
-        // Example assumes a classification layout returning label weights (e.g., LABEL_1 for PII presence)
         if (result && result[0]) {
             const topPrediction = result[0].sort((a, b) => b.score - a.score)[0];
-            // If the model identifies a high confidence score for PII / Name detection
             if ((topPrediction.label === 'LABEL_1' || topPrediction.label === 'PII') && topPrediction.score > 0.85) {
                 return "Real-world names or personal details detected by system moderation.";
             }
@@ -105,7 +100,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // 3. Status Rule Verification Engine
     try {
-        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=is_banned,temp_ban_until`, {
+        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=is_banned,temp_ban_until,pfp_url`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const banData = await banRes.json();
@@ -126,6 +121,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     window.location.href = "../Login/login.html";
                     return;
                 }
+            }
+            // Update current user's profile avatar on the bottom left footer bar status display
+            const systemFooterAvatar = document.getElementById('current-user-avatar');
+            if (systemFooterAvatar) {
+                systemFooterAvatar.style.backgroundImage = `url('${profile.pfp_url || DEFAULT_PFP}')`;
+                systemFooterAvatar.style.backgroundSize = "cover";
+                systemFooterAvatar.style.backgroundPosition = "center";
             }
         }
     } catch (banCheckErr) {
@@ -180,7 +182,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- USER DIRECTORY ---
     const fetchAllUsers = async () => {
         try {
-            const rolesRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=username`, {
+            const rolesRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=*`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const rolesData = await rolesRes.json();
@@ -189,8 +191,19 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const msgsData = await msgsRes.json();
 
-            const combined = [...rolesData.map(u => u.username), ...msgsData.map(u => u.username)];
-            allUsers = [...new Set(combined)].filter(name => name != null);
+            // Track usernames and store profile structures globally to map within directories
+            const combinedNames = [...rolesData.map(u => u.username), ...msgsData.map(u => u.username)];
+            const uniqueNames = [...new Set(combinedNames)].filter(name => name != null);
+            
+            allUsers = uniqueNames.map(name => {
+                const foundProfile = rolesData.find(r => r.username === name);
+                return {
+                    username: name,
+                    pfp_url: foundProfile ? foundProfile.pfp_url : DEFAULT_PFP,
+                    role_tag: foundProfile ? foundProfile.role_tag : 'User'
+                };
+            });
+            
             renderUserDirectory();
         } catch (err) { console.error(err); }
     };
@@ -198,11 +211,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     const renderUserDirectory = (filterTerm = "") => {
         const listContainer = document.getElementById('user-list-display');
         if (!listContainer) return;
-        const filtered = allUsers.filter(u => u.toLowerCase().includes(filterTerm.toLowerCase()));
-        listContainer.innerHTML = filtered.map(username => `
+        const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
+        listContainer.innerHTML = filtered.map(u => `
             <div class="admin-card" style="text-align:center;">
-                <div class="avatar" style="margin: 0 auto 10px; width:50px; height:50px; background:#333; border-radius:50%;"></div>
-                <strong>${username}</strong>
+                <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover;">
+                <strong>${u.username}</strong>
+                <div style="font-size:11px; color:#aaa; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
             </div>
         `).join('');
     };
@@ -222,19 +236,35 @@ document.addEventListener('DOMContentLoaded', async () => {
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
                 const isDel = msg.content === "Message Was Deleted By Owner";
-                const role = roles?.find ? roles.find(r => r.username === msg.username) : null;
+                const role = roles && roles.find ? roles.find(r => r.username === msg.username) : null;
                 const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 
-                let tag = msg.username.toLowerCase() === ADMIN_NAME ? `<span style="color:#ff4444; font-weight:bold; margin-right:5px;">[OWNER]</span>` : (role?.role_tag ? `<span style="color:#aaa; font-weight:bold;">[${role.role_tag.toUpperCase()}]</span> ` : "");
+                const userPfp = role && role.pfp_url ? role.pfp_url : DEFAULT_PFP;
+                const evaluatedRole = role && role.role_tag ? role.role_tag : 'User';
+                
+                // Render custom role tags dynamically beside names
+                let tag = "";
+                if (msg.username.toLowerCase() === ADMIN_NAME.toLowerCase() || evaluatedRole.toLowerCase() === 'admin') {
+                    tag = `<span class="badge admin-badge">ADMIN</span>`;
+                } else if (evaluatedRole && evaluatedRole.toLowerCase() !== 'user') {
+                    tag = `<span class="badge custom-badge">[${evaluatedRole.toUpperCase()}]</span>`;
+                }
 
                 const div = document.createElement('div');
-                div.className = `message ${msg.username === user ? 'my-message' : 'other-message'}`;
+                div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 div.innerHTML = `
-                    <div style="font-size: 0.85rem; margin-bottom: 4px; opacity: 0.8;">
-                        ${tag}<strong>${msg.username}</strong> <span style="font-size:10px; opacity:0.5; margin-left:5px;">${time}</span>
+                    <img src="${userPfp}" class="chat-pfp" alt="Avatar">
+                    <div class="message-content-node">
+                        <div class="message-meta-header">
+                            <strong>${msg.username}</strong>
+                            ${tag}
+                            <span class="message-timestamp">${time}</span>
+                        </div>
+                        <div class="message-text-bubble ${msg.username === user ? 'my-bubble-color' : 'other-bubble-color'}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
+                            ${msg.content}
+                        </div>
+                        ${(lowerUser === ADMIN_NAME && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
                     </div>
-                    <div style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">${msg.content}</div>
-                     ${(lowerUser === ADMIN_NAME && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
                 `;
                 msgContainer.appendChild(div);
             });
@@ -263,7 +293,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // --- 2. ASYNCHRONOUS AI CONTENT COMPLIANCE WALL ---
         if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-            const aiWarning = await checkMessageWithAI(val, allUsers);
+            const stringUserList = allUsers.map(u => u.username);
+            const aiWarning = await checkMessageWithAI(val, stringUserList);
             if (aiWarning) {
                 alert(`[SECURITY BLOCK] ${aiWarning}`);
                 return;
