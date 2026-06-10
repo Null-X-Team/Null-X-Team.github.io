@@ -1,5 +1,4 @@
 // --- CONFIGURATION CORRECTION ---
-// Fully aligned to your project id and matching JWT Anon Key
 const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
@@ -12,7 +11,6 @@ const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
 let lastMessageTime = 0;
 
-// --- CORE PATTERN FILTER ---
 function containsCorePII(text) {
     const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
     const phonePattern = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
@@ -26,7 +24,6 @@ function containsCorePII(text) {
     return null;
 }
 
-// --- AI MODEL ANALYZER ---
 async function checkMessageWithAI(text, registeredUsers = []) {
     try {
         if (AI_API_KEY.includes('YOUR_HUGGINGFACE')) {
@@ -47,15 +44,11 @@ async function checkMessageWithAI(text, registeredUsers = []) {
 
         const response = await fetch(AI_MODERATION_ENDPOINT, {
             method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${AI_API_KEY}`,
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Authorization': `Bearer ${AI_API_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ inputs: text })
         });
 
         if (!response.ok) return null; 
-        
         const result = await response.json();
         
         if (result && result[0]) {
@@ -64,7 +57,6 @@ async function checkMessageWithAI(text, registeredUsers = []) {
                 return "Real-world names or personal details detected by system moderation.";
             }
         }
-        
         return null;
     } catch (err) {
         console.error("AI engine handshake failed:", err);
@@ -75,13 +67,11 @@ async function checkMessageWithAI(text, registeredUsers = []) {
 document.addEventListener('DOMContentLoaded', async () => {
     const user = localStorage.getItem('chatUser');
     
-    // 1. Lockout Check
     if (!user) {
         window.location.href = "../Login/login.html";
         return;
     }
 
-    // 2. Session Integrity Handshake
     try {
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -98,7 +88,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         console.error("Security handshake failed:", authError);
     }
 
-    // 3. Status Rule Verification Engine
     try {
         const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=is_banned,temp_ban_until,pfp_url`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -122,12 +111,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                     return;
                 }
             }
-            // Update current user's profile avatar on the bottom left footer bar status display
+            
+            // 🔥 FIXED: Populates image and sets redirection to user's profile view
             const systemFooterAvatar = document.getElementById('current-user-avatar');
             if (systemFooterAvatar) {
-                systemFooterAvatar.style.backgroundImage = `url('${profile.pfp_url || DEFAULT_PFP}')`;
-                systemFooterAvatar.style.backgroundSize = "cover";
-                systemFooterAvatar.style.backgroundPosition = "center";
+                systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
             }
         }
     } catch (banCheckErr) {
@@ -191,7 +179,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
             const msgsData = await msgsRes.json();
 
-            // Track usernames and store profile structures globally to map within directories
             const combinedNames = [...rolesData.map(u => u.username), ...msgsData.map(u => u.username)];
             const uniqueNames = [...new Set(combinedNames)].filter(name => name != null);
             
@@ -214,8 +201,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
         listContainer.innerHTML = filtered.map(u => `
             <div class="admin-card" style="text-align:center;">
-                <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover;">
-                <strong>${u.username}</strong>
+                <a href="../Profile/profile.html?user=${encodeURIComponent(u.username)}">
+                    <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%;">
+                </a>
+                <a href="../Profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
+                    ${u.username}
+                </a>
                 <div style="font-size:11px; color:#aaa; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
             </div>
         `).join('');
@@ -242,7 +233,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const userPfp = role && role.pfp_url ? role.pfp_url : DEFAULT_PFP;
                 const evaluatedRole = role && role.role_tag ? role.role_tag : 'User';
                 
-                // Render custom role tags dynamically beside names
                 let tag = "";
                 if (msg.username.toLowerCase() === ADMIN_NAME.toLowerCase() || evaluatedRole.toLowerCase() === 'admin') {
                     tag = `<span class="badge admin-badge">ADMIN</span>`;
@@ -252,11 +242,17 @@ document.addEventListener('DOMContentLoaded', async () => {
 
                 const div = document.createElement('div');
                 div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
+                
+                // 🔥 FIXED: Links the text badge username and visual avatar image to user profile URLs
                 div.innerHTML = `
-                    <img src="${userPfp}" class="chat-pfp" alt="Avatar">
+                    <a href="../Profile/profile.html?user=${encodeURIComponent(msg.username)}">
+                        <img src="${userPfp}" class="chat-pfp" alt="Avatar">
+                    </a>
                     <div class="message-content-node">
                         <div class="message-meta-header">
-                            <strong>${msg.username}</strong>
+                            <a href="../Profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
+                                <strong>${msg.username}</strong>
+                            </a>
                             ${tag}
                             <span class="message-timestamp">${time}</span>
                         </div>
@@ -272,7 +268,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.error(e); }
     }
 
-    // --- SENDING + MODERATION CHECKS ---
     document.getElementById('chat-form').onsubmit = async (e) => {
         e.preventDefault();
         const now = Date.now();
@@ -282,7 +277,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const val = input.value.trim();
         if (!val) return;
         
-        // --- 1. LOCAL STRUCTURAL PATTERN SCAN ---
         if (lowerUser !== ADMIN_NAME.toLowerCase()) {
             const staticWarning = containsCorePII(val);
             if (staticWarning) {
@@ -291,7 +285,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
 
-        // --- 2. ASYNCHRONOUS AI CONTENT COMPLIANCE WALL ---
         if (lowerUser !== ADMIN_NAME.toLowerCase()) {
             const stringUserList = allUsers.map(u => u.username);
             const aiWarning = await checkMessageWithAI(val, stringUserList);
@@ -312,7 +305,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         fetchMessages();
     };
 
-    // --- ADMIN ACTIONS ---
     window.adminExecute = async (action) => {
         let target = document.getElementById(action === 'warn' ? 'warn-search' : 'ban-search').value.trim();
         const reason = document.getElementById(action === 'warn' ? 'warn-reason' : 'ban-reason').value.trim();
