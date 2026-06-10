@@ -1,24 +1,38 @@
-const SUPABASE_URL = 'https://ukwjojxutcjkvabnybtj.supabase.co'; 
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd2pvanh1dGNqa3ZhYm55YnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk5NDAsImV4cCI6MjA5Mzg1NTk0MH0.iLr9OrIZlRBrbcI1XDE0zl7t_wpwVg3ko3DgppxbUh8';
+const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
 const DEFAULT_PFP = 'https://Glaxyias.github.io/imgs/download.jpeg';
 
 document.addEventListener('DOMContentLoaded', async () => {
-    const user = localStorage.getItem('chatUser');
-    if (!user) { window.location.href = "../Login/login.html"; return; }
+    const loggedInUser = localStorage.getItem('chatUser');
+    if (!loggedInUser) { window.location.href = "../Login/login.html"; return; }
 
-    document.getElementById('display-username').textContent = user;
-    document.getElementById('info-username').textContent = user;
+    // 🔥 URL Parser: Check if we are viewing someone else or our own profile settings
+    const urlParams = new URLSearchParams(window.location.search);
+    const targetUser = urlParams.get('user') || loggedInUser;
+    const isOwnProfile = (targetUser.toLowerCase() === loggedInUser.toLowerCase());
+
+    document.getElementById('display-username').textContent = targetUser;
+    document.getElementById('info-username').textContent = targetUser;
 
     const pfpPreview = document.getElementById('pfp-preview');
     const pfpUrlInput = document.getElementById('pfp-url-input');
     const bioInput = document.getElementById('bio-input');
+    const saveBtn = document.getElementById('save-profile-btn');
     const statusEl = document.getElementById('save-status');
 
-    // --- 1. LOAD EXISTING PROFILE ---
+    // Hide editing elements if viewing another user's bio card
+    if (!isOwnProfile) {
+        if(pfpUrlInput) pfpUrlInput.style.display = 'none';
+        if(saveBtn) saveBtn.style.display = 'none';
+        bioInput.setAttribute('readonly', 'true');
+        bioInput.style.background = '#111';
+        bioInput.style.borderColor = '#222';
+    }
+
     const loadProfile = async () => {
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=*`, {
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}&select=*`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const data = await response.json();
@@ -30,7 +44,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 if (profile.pfp_url) {
                     pfpPreview.src = profile.pfp_url;
-                    pfpUrlInput.value = profile.pfp_url;
+                    if(pfpUrlInput) pfpUrlInput.value = profile.pfp_url;
                 } else {
                     pfpPreview.src = DEFAULT_PFP;
                 }
@@ -45,46 +59,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // --- 2. LIVE AVATAR PREVIEW ---
-    pfpUrlInput.addEventListener('input', () => {
-        const urlValue = pfpUrlInput.value.trim();
-        pfpPreview.src = urlValue ? urlValue : DEFAULT_PFP;
-    });
+    if (isOwnProfile && pfpUrlInput) {
+        pfpUrlInput.addEventListener('input', () => {
+            const urlValue = pfpUrlInput.value.trim();
+            pfpPreview.src = urlValue ? urlValue : DEFAULT_PFP;
+        });
+    }
 
-    // --- 3. SAVE PROFILE DATA ---
-    document.getElementById('save-profile-btn').onclick = async () => {
-        const bio = bioInput.value;
-        const pfpUrl = pfpUrlInput.value.trim();
+    if (isOwnProfile && saveBtn) {
+        saveBtn.onclick = async () => {
+            const bio = bioInput.value;
+            const pfpUrl = pfpUrlInput.value.trim();
 
-        statusEl.textContent = "Saving...";
-        statusEl.style.color = "white";
+            statusEl.textContent = "Saving...";
+            statusEl.style.color = "white";
 
-        try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}`, {
-                method: 'PATCH',
-                headers: { 
-                    'apikey': SUPABASE_KEY, 
-                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ 
-                    bio: bio, 
-                    pfp_url: pfpUrl || DEFAULT_PFP
-                })
-            });
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}`, {
+                    method: 'PATCH',
+                    headers: { 
+                        'apikey': SUPABASE_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                        'Content-Type': 'application/json' 
+                    },
+                    body: JSON.stringify({ 
+                        bio: bio, 
+                        pfp_url: pfpUrl || DEFAULT_PFP
+                    })
+                });
 
-            if (response.ok) {
-                statusEl.textContent = "Profile Updated Successfully!";
-                statusEl.style.color = "#00c853";
-            } else {
-                throw new Error("Database rejected update request.");
+                if (response.ok) {
+                    statusEl.textContent = "Profile Updated Successfully!";
+                    statusEl.style.color = "#00c853";
+                } else {
+                    throw new Error("Database rejected update request.");
+                }
+            } catch (err) {
+                statusEl.textContent = "Error saving profile. Try again.";
+                statusEl.style.color = "#ff4444";
+                console.error(err);
             }
-        } catch (err) {
-            statusEl.textContent = "Error saving profile. Try again.";
-            statusEl.style.color = "#ff4444";
-            console.error(err);
-        }
-    };
+        };
+    }
 
     loadProfile();
 });
