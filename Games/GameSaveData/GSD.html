@@ -1,1 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Save Manager</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #ffffff;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .save-card {
+            background: #141414;
+            border: 1px solid #1f1f1f;
+            border-radius: 12px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0,5);
+        }
+        h2 {
+            margin-top: 0;
+            color: #8b00ff;
+            font-size: 1.5rem;
+        }
+        .status-box {
+            background: #050505;
+            border: 1px solid #222;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #aaa;
+            margin-bottom: 20px;
+            word-break: break-all;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        .btn-group {
+            display: flex;
+            gap: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background 0.2s;
+        }
+        .save-btn { background: #8b00ff; color: white; }
+        .save-btn:hover { background: #a033ff; }
+        .load-btn { background: #222; color: #ccc; border: 1px solid #333; }
+        .load-btn:hover { background: #333; color: white; }
+        #message {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
 
+    <div class="save-card">
+        <h2>🎮 Universal Cloud Save</h2>
+        <div style="font-size: 0.85rem; color: #555; text-transform: uppercase; margin-bottom: 5px;">Active Player:</div>
+        <div id="player-display" style="font-size: 1.1rem; font-weight: bold; margin-bottom: 20px;">Checking...</div>
+
+        <div style="font-size: 0.85rem; color: #555; text-transform: uppercase; margin-bottom: 5px;">Current Raw JSON Data:</div>
+        <div id="data-preview" class="status-box">No data loaded yet.</div>
+
+        <div class="btn-group">
+            <button class="load-btn" id="fetch-btn">Sync From Cloud</button>
+            <button class="save-btn" id="push-btn">Upload Current Progress</button>
+        </div>
+
+        <div id="message"></div>
+    </div>
+
+    <script type="module">
+        // Connection configurations matching your core client credentials
+        const SUPABASE_URL = 'https://sczkzwfcpmngwglbydmu.supabase.co'; 
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNjemt6d2ZjcG1uZ3dnbGJ5ZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDYxNTksImV4cCI6MjA5Njc4MjE1OX0.0O2pPwasyorT86MmJDoTccIlDKFFwRLoUIEZ_npDUII'; 
+
+        const playerDisplay = document.getElementById('player-display');
+        const dataPreview = document.getElementById('data-preview');
+        const msg = document.getElementById('message');
+
+        // Grab current system username
+        const loggedInUser = localStorage.getItem('chatUser');
+        
+        if (!loggedInUser) {
+            playerDisplay.textContent = "Guest Mode (Not Logged In)";
+            playerDisplay.style.color = "#ff4444";
+        } else {
+            playerDisplay.textContent = loggedInUser;
+        }
+
+        // --- 1. DOWNLOAD FROM CLOUD SYSTEM ---
+        async function loadGameDataCloud() {
+            if (!loggedInUser) return;
+            msg.textContent = "Syncing cloud data...";
+            msg.style.color = "white";
+
+            try {
+                // Queries your database specifically looking for rows belonging to this user
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/Gamesavedata?username=eq.${encodeURIComponent(loggedInUser)}&select=*`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                });
+                const data = await response.json();
+
+                if (data && data[0] && data[0].save_string) {
+                    const saveString = data[0].save_string;
+                    dataPreview.textContent = saveString;
+
+                    // Write it down into LocalStorage so the active locally running game can read it instantly!
+                    localStorage.setItem('game_save_slots', saveString);
+                    
+                    msg.textContent = "Cloud progress downloaded successfully!";
+                    msg.style.color = "#00c853";
+                } else {
+                    dataPreview.textContent = "{}";
+                    msg.textContent = "No remote cloud saves found for this account.";
+                    msg.style.color = "#aaa";
+                }
+            } catch (err) {
+                console.error(err);
+                msg.textContent = "Sync failed. Network connection error.";
+                msg.style.color = "#ff4444";
+            }
+        }
+
+        // --- 2. UPLOAD TO CLOUD SYSTEM ---
+        async function saveGameDataCloud() {
+            if (!loggedInUser) {
+                alert("Please log in to save your game files to the cloud!");
+                return;
+            }
+
+            // Gather up whatever storage keys your game files are using locally
+            const localProgress = localStorage.getItem('game_save_slots') || "{}";
+            dataPreview.textContent = localProgress;
+
+            msg.textContent = "Uploading to secure database cloud...";
+            msg.style.color = "white";
+
+            try {
+                // UPSERT handles both: updates old existing row OR creates a brand new record if it's their first time playing
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/Gamesavedata`, {
+                    method: 'POST',
+                    headers: { 
+                        'apikey': SUPABASE_KEY, 
+                        'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                        'Content-Type': 'application/json',
+                        'Prefer': 'resolution=merge-duplicates' // Tells Supabase to overwrite duplicate records
+                    },
+                    body: JSON.stringify({ 
+                        username: loggedInUser, 
+                        save_string: localProgress,
+                        updated_at: new Date().toISOString()
+                    })
+                });
+
+                if (response.ok) {
+                    msg.textContent = "Progress backed up to cloud successfully!";
+                    msg.style.color = "#00c853";
+                } else {
+                    throw new Error("Cloud synchronization write error event.");
+                }
+            } catch (err) {
+                console.error(err);
+                msg.textContent = "Upload failed. Check your database structure.";
+                msg.style.color = "#ff4444";
+            }
+        }
+
+        // Hook functions up to the interactive buttons
+        document.getElementById('fetch-btn').onclick = loadGameDataCloud;
+        document.getElementById('push-btn').onclick = saveGameDataCloud;
+
+        // Auto-fetch profile settings history right when they load this frame panel up
+        if (loggedInUser) {
+            loadGameDataCloud();
+        }
+    </script>
+</body>
+</html>
