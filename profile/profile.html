@@ -3,63 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULL_X | Profile</title>
+    <title>Profile Settings</title>
     <link rel="stylesheet" href="profile.css">
 </head>
 <body>
-    <div class="hub-container">
+    <div class="profile-container">
         <div class="sidebar">
-            <div class="logo">
-                <h2 style="color:white; padding: 20px;">Nx</h2>
+            <div class="sidebar-header">
+                <h2>Settings</h2>
             </div>
-            <nav>
-                <a href="../main/index.html" class="nav-item">Home</a>
-                <a href="#" class="nav-item active">Profile</a>
-                <a href="../chat/chat.html" class="nav-item">Communications</a>
-            </nav>
+            <div class="sidebar-menu">
+                <a href="https://glaxyias.github.io" class="menu-item">
+                    <span class="icon">🏠</span> Home
+                </a>
+                <a href="../Chat/chat.html" class="menu-item">
+                    <span class="icon">💬</span> Chat Server
+                </a>
+                <div class="menu-item active">
+                    <span class="icon">👤</span> Profile Card
+                </div>
+            </div>
         </div>
 
         <div class="main-content">
-            <div class="profile-header-banner">
-                <div class="pfp-wrapper">
-                    <img id="pfp-preview" src="https://api.dicebear.com/7.x/bottts/svg" alt="User PFP">
-                </div>
-                <h1 id="display-username">Loading...</h1>
-            </div>
-
-            <div class="profile-settings-grid">
-                <div class="settings-card">
-                    <h3>About Me</h3>
-                    <textarea id="bio-input" placeholder="Write something about yourself..."></textarea>
-                    
-                    <div style="margin-top: 15px; margin-bottom: 15px; text-align: left;">
+            <div class="profile-card">
+                <div class="avatar-upload-section">
+                    <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                    <div class="upload-inputs">
                         <label for="pfp-url-input">Profile Picture URL</label>
-                        <input type="url" id="pfp-url-input" placeholder="Paste image link (e.g., from Imgur or Discord)">
+                        <input type="url" id="pfp-url-input" placeholder="Paste your custom direct image link here...">
                     </div>
-
-                    <div class="info-row">
-                        <span>Account Status:</span>
-                        <span id="account-status" style="color: #00c853;">Active</span>
-                    </div>
-                    
-                    <button id="save-profile-btn" class="nx-btn">Save Profile</button>
-                    <p id="save-status"></p>
                 </div>
 
-                <div class="settings-card">
-                    <h3>Account Info</h3>
-                    <div class="readonly-box">
+                <div class="profile-details-section">
+                    <div class="input-group">
                         <label>Username</label>
-                        <p id="info-username">---</p>
+                        <div class="username-static-display">
+                            <span id="display-username">Loading...</span>
+                        </div>
                     </div>
-                    <div class="readonly-box">
-                        <label>Joined Date</label>
-                        <p id="join-date">---</p>
+
+                    <div class="input-group">
+                        <label for="bio-input">About Me / Bio</label>
+                        <textarea id="bio-input" placeholder="Tell the community a little bit about yourself..." maxlength="250"></textarea>
+                    </div>
+
+                    <div class="meta-info">
+                        <div class="info-row">
+                            <span>Account Holder:</span>
+                            <strong id="info-username">-</strong>
+                        </div>
+                        <div class="info-row">
+                            <span>Joined Community:</span>
+                            <span id="join-date">-</span>
+                        </div>
+                    </div>
+
+                    <div class="actions-row">
+                        <button id="save-profile-btn" class="save-btn">Save Changes</button>
+                        <span id="save-status"></span>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
     <script type="module" src="profile.js"></script>
 </body>
 </html>
