@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 
                 // 🔥 FIXED: Links the text badge username and visual avatar image to user profile URLs
                 div.innerHTML = `
-                    <a href="../Profile/profile.html?user=${encodeURIComponent(msg.username)}">
+                    <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}">
                         <img src="${userPfp}" class="chat-pfp" alt="Avatar">
                     </a>
                     <div class="message-content-node">
