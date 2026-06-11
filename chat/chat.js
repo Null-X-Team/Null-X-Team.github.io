@@ -201,10 +201,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
         listContainer.innerHTML = filtered.map(u => `
             <div class="admin-card" style="text-align:center;">
-                <a href="../Profile/profile.html?user=${encodeURIComponent(u.username)}">
+                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}">
                     <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%;">
                 </a>
-                <a href="../Profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
+                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
                     ${u.username}
                 </a>
                 <div style="font-size:11px; color:#aaa; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
