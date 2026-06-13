@@ -1,25 +1,25 @@
 /* ==========================================================
-   THEME CONFIGURATIONS
+   NULL_X CORE THEMES CONFIGURATION
    ========================================================== */
 
-/* 1. DEFAULT PURPLE THEME (Default Site Look) */
+/* 1. DEFAULT PURPLE THEME */
 :root {
-  --bg-dashboard: #0b0813;        /* Dark purple-tinted background */
-  --bg-sidebar: #110d22;          /* Sidebar panels */
-  --accent-color: #8b00ff;        /* Main brand purple */
-  --accent-hover: #a033ff;       /* Light purple hover states */
+  --bg-dashboard: #0b0813;        /* Dark purple canvas */
+  --bg-sidebar: #110d22;          /* Purple panel background */
+  --accent-color: #8b00ff;        /* Neon brand purple */
+  --accent-hover: #a033ff;       /* Vibrant hover purple */
   --border-color: rgba(139, 0, 255, 0.15); 
-  --text-main: #ffffff;
-  --text-muted: #888888;
+  --text-main: #ffffff;           /* White main text */
+  --text-muted: #888888;          /* Muted grey text */
 }
 
-/* 2. MIDNIGHT THEME (Deep Black, Greys, and Clean Whites) */
+/* 2. MIDNIGHT THEME (Pitch Black, Grey Borders, and White Text) */
 body.theme-midnight {
-  --bg-dashboard: #000000;        /* Pure black canvas */
-  --bg-sidebar: #121212;          /* Deep grey/black panels */
-  --accent-color: #333333;        /* Charcoal accents instead of purple */
-  --accent-hover: #444444;       /* Medium grey hover states */
-  --border-color: #262626;        /* Clean grey borders */
-  --text-main: #ffffff;           /* Crisp white text */
-  --text-muted: #aaaaaa;          /* High-visibility muted text */
+  --bg-dashboard: #000000;        /* Pitch black background canvas */
+  --bg-sidebar: #0a0a0a;          /* Dark charcoal/black panels */
+  --accent-color: #444444;        /* Dark grey accent focus elements */
+  --accent-hover: #666666;       /* Medium grey hover items */
+  --border-color: #333333;        /* True solid grey panel borders */
+  --text-main: #ffffff;           /* Bright white text */
+  --text-muted: #aaaaaa;          /* High-visibility light grey text */
 }
