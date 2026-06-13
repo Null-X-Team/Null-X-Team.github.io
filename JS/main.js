@@ -106,19 +106,6 @@ function launchStealthWindow(maskType, targetEnv) {
   window.location.replace(escapeRedirect);
 }
 
-function applyTheme(theme) {
-  const root = document.documentElement;
-  if (theme === 'midnight') {
-    root.style.setProperty('--accent', '#ffffff');
-    root.style.setProperty('--container-bg', '#000000');
-    document.body.style.background = "#000000";
-  } else {
-    root.style.setProperty('--accent', '#8b00ff');
-    root.style.setProperty('--container-bg', 'rgba(15, 15, 25, 0.95)');
-    document.body.style.background = "linear-gradient(135deg, #0a0a0a, #1a0033)";
-  }
-}
-
 function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
@@ -244,17 +231,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1000);
   }
 
-  const savedTheme = localStorage.getItem('selectedTheme');
-  if (savedTheme) applyTheme(savedTheme);
-
-  document.querySelectorAll('.theme-card').forEach(card => {
-    card.onclick = () => {
-      const val = card.getAttribute('data-theme');
-      localStorage.setItem('selectedTheme', val);
-      applyTheme(val);
-    };
-  });
-
   const savedCloak = localStorage.getItem('savedCloak');
   if (savedCloak && savedCloak !== "none") {
     try { applyCloak(savedCloak); } catch(e) {}
@@ -263,7 +239,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- Dynamic Greeting & Authentic Sign-In Updates ---
   const user = localStorage.getItem('chatUser');
   if (user) {
-    // Greets authenticated user matching request parameters
     if (document.getElementById('welcome-text')) {
       document.getElementById('welcome-text').textContent = `Hello, ${user}`;
     }
@@ -271,7 +246,6 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('signInBtn').textContent = "Sign Out";
     }
   } else {
-    // Defaults to Guest profile if missing active database registration storage tokens
     if (document.getElementById('welcome-text')) {
       document.getElementById('welcome-text').textContent = "Hello, Guest";
     }
@@ -297,10 +271,8 @@ document.addEventListener('DOMContentLoaded', () => {
     commsNavBtn.onclick = (e) => {
       e.preventDefault();
       if (localStorage.getItem('chatUser')) {
-        // Safe navigation to internal chat directory if logged into profile matrix
         window.location.href = "chat/chat.html";
       } else {
-        // Forces redirection sequence to authentication screen when unlogged
         window.location.href = "Login/login.html";
       }
     };
