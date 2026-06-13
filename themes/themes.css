@@ -1,1 +1,25 @@
+/* ==========================================================
+   THEME CONFIGURATIONS
+   ========================================================== */
 
+/* 1. DEFAULT PURPLE THEME (Default Site Look) */
+:root {
+  --bg-dashboard: #0b0813;        /* Dark purple-tinted background */
+  --bg-sidebar: #110d22;          /* Sidebar panels */
+  --accent-color: #8b00ff;        /* Main brand purple */
+  --accent-hover: #a033ff;       /* Light purple hover states */
+  --border-color: rgba(139, 0, 255, 0.15); 
+  --text-main: #ffffff;
+  --text-muted: #888888;
+}
+
+/* 2. MIDNIGHT THEME (Deep Black, Greys, and Clean Whites) */
+body.theme-midnight {
+  --bg-dashboard: #000000;        /* Pure black canvas */
+  --bg-sidebar: #121212;          /* Deep grey/black panels */
+  --accent-color: #333333;        /* Charcoal accents instead of purple */
+  --accent-hover: #444444;       /* Medium grey hover states */
+  --border-color: #262626;        /* Clean grey borders */
+  --text-main: #ffffff;           /* Crisp white text */
+  --text-muted: #aaaaaa;          /* High-visibility muted text */
+}
