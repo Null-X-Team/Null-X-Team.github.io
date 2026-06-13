@@ -1,21 +1,19 @@
 // Master Dynamic Theme Switcher Engine
 window.applyTheme = function(themeName) {
-  // Read all existing classes attached to the body tag
-  const classes = Array.from(document.body.classList);
+  // 1. Find all classes on the body that start with "theme-"
+  const classesToRemove = Array.from(document.body.classList).filter(cls => 
+    cls.startsWith('theme-')
+  );
   
-  // Wipe out any old theme flags safely
-  classes.forEach(cls => {
-    if (cls.startsWith('theme-')) {
-      document.body.classList.remove(cls);
-    }
-  });
+  // 2. Wipe them out completely
+  classesToRemove.forEach(cls => document.body.classList.remove(cls));
   
-  // Apply requested theme profile layout
-  if (themeName !== 'default') {
+  // 3. Apply the brand new theme class if it's not the default
+  if (themeName && themeName !== 'default') {
     document.body.classList.add(`theme-${themeName}`);
   }
   
-  // Backup user configuration profile state
+  // 4. Backup user configuration profile state to local storage
   localStorage.setItem('nullx-theme', themeName);
 };
 
@@ -24,8 +22,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('nullx-theme') || 'default';
   window.applyTheme(savedTheme);
   
-  // Attach event handlers natively into layout click targets
+  // Attach click event listeners to the document to catch theme card clicks
   document.addEventListener('click', (e) => {
+    // Look for the closest element with the 'theme-card' class
     const card = e.target.closest('.theme-card');
     if (card) {
       const selectedTheme = card.getAttribute('data-theme');
