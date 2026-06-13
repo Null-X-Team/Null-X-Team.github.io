@@ -1,25 +1,280 @@
 /* ==========================================================
-   NULL_X CORE THEMES CONFIGURATION
+   NULL_X COMPREHENSIVE THEME STORAGE (23 UNIQUE VARIATIONS)
    ========================================================== */
+
+/* --- CORE ANIMATIONS FOR LIVE ACCENT EFFECTS --- */
+@keyframes rgb-fade {
+  0%   { --accent-color: #ff0000; --accent-hover: #ff5555; }
+  17%  { --accent-color: #ff8800; --accent-hover: #ffa333; }
+  33%  { --accent-color: #ffff00; --accent-hover: #ffff55; }
+  50%  { --accent-color: #00ff00; --accent-hover: #55ff55; }
+  67%  { --accent-color: #00ffff; --accent-hover: #55ffff; }
+  83%  { --accent-color: #0000ff; --accent-hover: #5555ff; }
+  100% { --accent-color: #ff0000; --accent-hover: #ff5555; }
+}
+
+@keyframes neon-pulse {
+  0%, 100% { --border-color: rgba(0, 255, 239, 0.4); }
+  50% { --border-color: rgba(0, 255, 239, 0.9); }
+}
+
+@keyframes matrix-glow {
+  0%, 100% { --text-main: #00ff00; }
+  50% { --text-main: #33ff33; }
+}
+
 
 /* 1. DEFAULT PURPLE THEME */
 :root {
-  --bg-dashboard: #0b0813;        /* Dark purple canvas */
-  --bg-sidebar: #110d22;          /* Purple panel background */
-  --accent-color: #8b00ff;        /* Neon brand purple */
-  --accent-hover: #a033ff;       /* Vibrant hover purple */
+  --bg-dashboard: #0b0813;
+  --bg-sidebar: #110d22;
+  --accent-color: #8b00ff;
+  --accent-hover: #a033ff;
   --border-color: rgba(139, 0, 255, 0.15); 
-  --text-main: #ffffff;           /* White main text */
-  --text-muted: #888888;          /* Muted grey text */
+  --text-main: #ffffff;
+  --text-muted: #888888;
 }
 
-/* 2. MIDNIGHT THEME (Pitch Black, Grey Borders, and White Text) */
+/* 2. MIDNIGHT (Pitch Black, Grey Borders, White Text) */
 body.theme-midnight {
-  --bg-dashboard: #000000;        /* Pitch black background canvas */
-  --bg-sidebar: #0a0a0a;          /* Dark charcoal/black panels */
-  --accent-color: #444444;        /* Dark grey accent focus elements */
-  --accent-hover: #666666;       /* Medium grey hover items */
-  --border-color: #333333;        /* True solid grey panel borders */
-  --text-main: #ffffff;           /* Bright white text */
-  --text-muted: #aaaaaa;          /* High-visibility light grey text */
+  --bg-dashboard: #000000;
+  --bg-sidebar: #0a0a0a;
+  --accent-color: #444444;
+  --accent-hover: #666666;
+  --border-color: #333333;
+  --text-main: #ffffff;
+  --text-muted: #aaaaaa;
+}
+
+/* 3. VAMPIRE RED */
+body.theme-vampire {
+  --bg-dashboard: #0d0202;
+  --bg-sidebar: #160505;
+  --accent-color: #ff0000;
+  --accent-hover: #ff3333;
+  --border-color: rgba(255, 0, 0, 0.2);
+  --text-main: #ffffff;
+  --text-muted: #aa8888;
+}
+
+/* 4. OCEAN DEEP */
+body.theme-ocean {
+  --bg-dashboard: #020b14;
+  --bg-sidebar: #051425;
+  --accent-color: #0088ff;
+  --accent-hover: #33a2ff;
+  --border-color: rgba(0, 136, 255, 0.2);
+  --text-main: #e6f3ff;
+  --text-muted: #739ec6;
+}
+
+/* 5. FOREST DRUID */
+body.theme-forest {
+  --bg-dashboard: #030c05;
+  --bg-sidebar: #08170b;
+  --accent-color: #00cc44;
+  --accent-hover: #22ff66;
+  --border-color: rgba(0, 204, 68, 0.18);
+  --text-main: #ebf7ed;
+  --text-muted: #7da683;
+}
+
+/* 6. CYBERPUNK 2077 */
+body.theme-cyberpunk {
+  --bg-dashboard: #1c0024;
+  --bg-sidebar: #001219;
+  --accent-color: #fcee0a;
+  --accent-hover: #ffff55;
+  --border-color: #00f0ff;
+  --text-main: #00f0ff;
+  --text-muted: #fcee0a;
+}
+
+/* 7. TOXIC WASTELAND */
+body.theme-toxic {
+  --bg-dashboard: #0f1402;
+  --bg-sidebar: #192104;
+  --accent-color: #a3ff00;
+  --accent-hover: #b8ff33;
+  --border-color: rgba(163, 255, 0, 0.2);
+  --text-main: #f0ffdb;
+  --text-muted: #8b9973;
+}
+
+/* 8. SOLAR FLARE */
+body.theme-solar {
+  --bg-dashboard: #140700;
+  --bg-sidebar: #240d02;
+  --accent-color: #ff5500;
+  --accent-hover: #ff7733;
+  --border-color: rgba(255, 85, 0, 0.25);
+  --text-main: #fff0e6;
+  --text-muted: #c49980;
+}
+
+/* 9. ICE BLIZZARD */
+body.theme-ice {
+  --bg-dashboard: #0f191c;
+  --bg-sidebar: #17272c;
+  --accent-color: #00f3ff;
+  --accent-hover: #66f7ff;
+  --border-color: rgba(0, 243, 255, 0.2);
+  --text-main: #e6fdff;
+  --text-muted: #8ca3a6;
+}
+
+/* 10. RETRO ARCADE (80s Synth) */
+body.theme-arcade {
+  --bg-dashboard: #120421;
+  --bg-sidebar: #21022b;
+  --accent-color: #ff007f;
+  --accent-hover: #ff3399;
+  --border-color: #390099;
+  --text-main: #00ffff;
+  --text-muted: #9e0059;
+}
+
+/* 11. BUBBLEGUM PASTEL */
+body.theme-bubblegum {
+  --bg-dashboard: #261c21;
+  --bg-sidebar: #3d2b34;
+  --accent-color: #ffb7b2;
+  --accent-hover: #ffc6ff;
+  --border-color: #ffc6ff;
+  --text-main: #fff0f5;
+  --text-muted: #b5839c;
+}
+
+/* 12. MILITARY DESERT STRIKE */
+body.theme-desert {
+  --bg-dashboard: #14120c;
+  --bg-sidebar: #211e14;
+  --accent-color: #d4af37;
+  --accent-hover: #e5c158;
+  --border-color: #4a422d;
+  --text-main: #f5f2eb;
+  --text-muted: #8f866e;
+}
+
+/* 13. ROYAL LUXURY */
+body.theme-royal {
+  --bg-dashboard: #0f0314;
+  --bg-sidebar: #1b0a24;
+  --accent-color: #ffd700;
+  --accent-hover: #fff066;
+  --border-color: rgba(255, 215, 0, 0.3);
+  --text-main: #ffffff;
+  --text-muted: #b386cc;
+}
+
+/* 14. GHOSTLY APPARITION */
+body.theme-ghost {
+  --bg-dashboard: #11161a;
+  --bg-sidebar: #1d242a;
+  --accent-color: #708090;
+  --accent-hover: #93a3b1;
+  --border-color: rgba(255,255,255,0.08);
+  --text-main: #f0f4f8;
+  --text-muted: #546573;
+}
+
+/* 15. COCOA ESPRESSO */
+body.theme-espresso {
+  --bg-dashboard: #0f0b08;
+  --bg-sidebar: #1c140f;
+  --accent-color: #875c36;
+  --accent-hover: #a67649;
+  --border-color: #3b2a1e;
+  --text-main: #fcf8f5;
+  --text-muted: #9c8473;
+}
+
+/* 16. CHRONO COPPER */
+body.theme-copper {
+  --bg-dashboard: #140d0a;
+  --bg-sidebar: #241610;
+  --accent-color: #b87333;
+  --accent-hover: #cd7f32;
+  --border-color: #4d2f23;
+  --text-main: #faebd7;
+  --text-muted: #947161;
+}
+
+/* 17. CRIMSON ECLIPSE */
+body.theme-eclipse {
+  --bg-dashboard: #050508;
+  --bg-sidebar: #101017;
+  --accent-color: #800020;
+  --accent-hover: #990026;
+  --border-color: #33141c;
+  --text-main: #f5e6e8;
+  --text-muted: #7a6366;
+}
+
+/* 18. COTTON CANDY */
+body.theme-cotton {
+  --bg-dashboard: #121a24;
+  --bg-sidebar: #1b2836;
+  --accent-color: #84dcc6;
+  --accent-hover: #ffa6c9;
+  --border-color: #ffa6c9;
+  --text-main: #ffffff;
+  --text-muted: #a5b3c2;
+}
+
+
+/* --- SPECIAL EFFECT THEMES --- */
+
+/* 19. ANIMATED CHROMA FADE (Dynamic RGB Engine Loop) */
+body.theme-rgb {
+  --bg-dashboard: #030303;
+  --bg-sidebar: #0f0f0f;
+  --border-color: #222222;
+  --text-main: #ffffff;
+  --text-muted: #777777;
+  animation: rgb-fade 12s infinite linear;
+}
+
+/* 20. MATRIX DIGITAL RAIN (Glowing Text Pulse Effect) */
+body.theme-matrix {
+  --bg-dashboard: #000000;
+  --bg-sidebar: #050a05;
+  --accent-color: #00ff00;
+  --accent-hover: #55ff55;
+  --border-color: #003300;
+  --text-muted: #004400;
+  animation: matrix-glow 4s infinite ease-in-out;
+}
+
+/* 21. NEON PULSE RUNNER (Blinking Glowing Borders) */
+body.theme-neon {
+  --bg-dashboard: #020005;
+  --bg-sidebar: #090314;
+  --accent-color: #00ffef;
+  --accent-hover: #ff007f;
+  --text-main: #ffffff;
+  --text-muted: #625073;
+  animation: neon-pulse 3s infinite ease-in-out;
+}
+
+/* 22. MOONLIGHT SHADOW */
+body.theme-moonlight {
+  --bg-dashboard: #080a0f;
+  --bg-sidebar: #101420;
+  --accent-color: #7b92b5;
+  --accent-hover: #9cb2d6;
+  --border-color: rgba(123, 146, 181, 0.2);
+  --text-main: #f0f4fa;
+  --text-muted: #616f85;
+}
+
+/* 23. AMBER STEAMPUNK */
+body.theme-amber {
+  --bg-dashboard: #120d06;
+  --bg-sidebar: #1f160b;
+  --accent-color: #ffbf00;
+  --accent-hover: #ffd04d;
+  --border-color: #402d14;
+  --text-main: #fff7e6;
+  --text-muted: #948269;
 }
