@@ -1,8 +1,16 @@
 :root {
+  /* Dynamic Variable Fallbacks / Default Purple Configuration */
   --accent: #8b00ff;
   --bg-gradient: linear-gradient(135deg, #0a0a0a, #1a0033);
   --container-bg: rgba(15, 15, 25, 0.95);
   --text: #e0e0e0;
+  
+  /* Layout Architecture Color Tokens Linked to Theme Customizations */
+  --bg-dashboard: #0f0a1f;
+  --bg-sidebar: #1a1433;
+  --border-color: #4b2e8a;
+  --text-main: #e0e0ff;
+  --text-muted: #b0a0ff;
 }
 
 /* Base Reset */
@@ -14,12 +22,13 @@
 
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background: #0f0a1f;
-  color: #e0e0ff;
+  background: var(--bg-dashboard) !important;
+  color: var(--text-main) !important;
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 }
 
 .container { 
@@ -39,8 +48,8 @@ body {
 
 /* Sidebar Navigation */
 .left-nav {
-  background: var(--container-bg);
-  border-right: 1px solid var(--accent);
+  background: var(--bg-sidebar) !important;
+  border-right: 1px solid var(--border-color) !important;
   padding: 20px;
   display: flex;
   flex-direction: column;
@@ -48,6 +57,7 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .logo {
@@ -85,7 +95,7 @@ nav {
   display: flex;
   align-items: center;
   padding: 14px 18px;
-  color: #b0a0ff;
+  color: var(--text-muted);
   text-decoration: none;
   border-radius: 12px;
   font-weight: 500;
@@ -95,8 +105,8 @@ nav {
 
 .nav-item:hover {
   background: rgba(107, 33, 168, 0.3);
-  color: white;
-  border-color: rgba(139, 0, 255, 0.5);
+  color: var(--text-main);
+  border-color: var(--accent);
   padding-left: 22px;
 }
 
@@ -122,21 +132,23 @@ nav {
   align-items: center;
   justify-content: space-between;
   padding: 20px 30px;
-  background: #1a1433;
-  border-bottom: 1px solid #4b2e8a;
+  background: var(--bg-sidebar) !important;
+  border-bottom: 1px solid var(--border-color) !important;
   position: sticky;
   top: 0;
   z-index: 90;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .greeting h1 {
   font-size: 26px;
   font-weight: 700;
   letter-spacing: -0.5px;
+  color: var(--text-main);
 }
 
 .greeting p {
-  color: #b0a0ff;
+  color: var(--text-muted);
   font-size: 14px;
   margin-top: 2px;
 }
@@ -152,8 +164,8 @@ nav {
   width: 100%;
   padding: 12px 20px;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--accent);
-  color: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   border-radius: 10px;
   outline: none;
   font-size: 15px;
@@ -163,16 +175,16 @@ nav {
 .search-bar input:focus {
   background: rgba(255, 255, 255, 0.08);
   box-shadow: 0 0 15px rgba(139, 0, 255, 0.3);
-  border-color: #c084fc;
+  border-color: var(--accent);
 }
 
 /* Hero Section Styles */
 .hero {
   margin: 30px;
   padding: 60px;
-  background: linear-gradient(135deg, #2a1f4d 0%, #1a1433 100%);
+  background: linear-gradient(135deg, var(--bg-sidebar) 0%, var(--bg-dashboard) 100%);
   border-radius: 24px;
-  border: 1px solid #8b5cf6;
+  border: 1px solid var(--border-color);
   position: relative;
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
@@ -214,10 +226,12 @@ nav {
   margin-bottom: 15px;
   font-weight: 800;
   line-height: 1.1;
+  color: var(--text-main);
 }
 
 .hero p {
-  color: #ccc;
+  color: var(--text-main);
+  opacity: 0.8;
   font-size: 17px;
   max-width: 550px;
   margin-bottom: 30px;
@@ -239,20 +253,19 @@ nav {
 }
 
 .play-btn {
-  background: linear-gradient(90deg, #a855f7, #c084fc);
+  background: var(--accent) !important;
   color: white;
-  box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
 }
 
 .play-btn:hover {
   transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 25px rgba(168, 85, 247, 0.6);
+  filter: brightness(1.2);
 }
 
 .secondary-btn {
   background: rgba(255, 255, 255, 0.08);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  color: var(--text-main);
+  border: 1px solid var(--border-color) !important;
   backdrop-filter: blur(5px);
 }
 
@@ -269,7 +282,7 @@ nav {
 .quick-action-btn {
   width: 100%;
   padding: 18px 24px;
-  background: linear-gradient(90deg, #6d28d9, #a855f7);
+  background: var(--accent) !important;
   border: none;
   border-radius: 15px;
   color: white;
@@ -281,13 +294,11 @@ nav {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
 }
 
 .quick-action-btn:hover {
   filter: brightness(1.15);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(109, 40, 217, 0.5);
 }
 
 /* Grid & Cards System */
@@ -296,7 +307,7 @@ nav {
   margin: 20px 0 25px;
   font-size: 24px;
   font-weight: 800;
-  color: #c084fc;
+  color: var(--accent);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -312,8 +323,8 @@ nav {
 
 .game-card {
   position: relative;
-  background: var(--container-bg);
-  border: 1px solid rgba(139, 0, 255, 0.3);
+  background: var(--bg-sidebar) !important;
+  border: 1px solid var(--border-color) !important;
   border-radius: 20px;
   height: 170px;
   display: flex;
@@ -328,12 +339,12 @@ nav {
 
 .game-card:hover {
   transform: translateY(-12px);
-  border-color: #8b00ff;
+  border-color: var(--accent) !important;
   box-shadow: 0 15px 30px rgba(139, 0, 255, 0.25);
 }
 
 .game-card h3 {
-  color: white;
+  color: var(--text-main);
   font-size: 1.2rem;
   font-weight: 700;
   text-align: center;
@@ -343,7 +354,7 @@ nav {
 
 .game-card p {
   font-size: 0.85rem;
-  color: #b0a0ff;
+  color: var(--text-muted);
   margin-top: 8px;
   z-index: 2;
 }
@@ -354,8 +365,8 @@ nav {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(15, 10, 30, 0.98);
-  color: #e0e0ff;
+  background: var(--bg-dashboard);
+  color: var(--text-main);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -374,8 +385,8 @@ nav {
 
 /* Right Sidebar Sidebar */
 .right-sidebar {
-  background: #1a1433;
-  border-left: 1px solid #4b2e8a;
+  background: var(--bg-sidebar) !important;
+  border-left: 1px solid var(--border-color) !important;
   padding: 30px 20px;
   display: flex;
   flex-direction: column;
@@ -383,7 +394,8 @@ nav {
   height: 100vh;
   position: sticky;
   top: 0;
-  overflow: hidden; /* Stops right sidebar itself from creating double page-level scrollbars */
+  overflow: hidden;
+  transition: background 0.25s ease, border-color 0.25s ease;
 }
 
 .signin-btn, .settings-btn {
@@ -402,9 +414,8 @@ nav {
 }
 
 .signin-btn {
-  background: linear-gradient(90deg, #8b00ff, #c084fc);
+  background: var(--accent) !important;
   color: white;
-  box-shadow: 0 4px 12px rgba(139, 0, 255, 0.3);
 }
 
 .signin-btn:hover {
@@ -413,15 +424,15 @@ nav {
 }
 
 .settings-btn {
-  background: #2a1f4d;
-  color: #c0b0ff;
-  border: 1px solid #6b21a8;
+  background: var(--bg-dashboard) !important;
+  color: var(--text-muted);
+  border: 1px solid var(--border-color) !important;
 }
 
 .settings-btn:hover {
-  background: #3b2a66;
-  border-color: #8b00ff;
-  color: white;
+  filter: brightness(1.2);
+  border-color: var(--accent) !important;
+  color: var(--text-main);
 }
 
 /* Modal UI Components */
@@ -441,7 +452,7 @@ nav {
 }
 
 .modal-box {
-  background: #120e26;
+  background: var(--bg-sidebar) !important;
   border: 2px solid var(--accent);
   padding: 45px;
   border-radius: 28px;
@@ -455,7 +466,7 @@ nav {
 
 .glow {
   text-shadow: 0 0 15px var(--accent);
-  color: white;
+  color: var(--text-main);
   font-size: 2.8rem;
   font-weight: 900;
   margin-bottom: 8px;
@@ -463,7 +474,7 @@ nav {
 }
 
 .subtitle {
-  color: #b0a0ff;
+  color: var(--text-muted);
   text-align: center;
   margin-bottom: 35px;
   font-size: 16px;
@@ -471,7 +482,7 @@ nav {
 
 .settings-divider {
   border: 0;
-  border-top: 1px solid rgba(139, 0, 255, 0.2);
+  border-top: 1px solid var(--border-color);
   margin: 25px 0;
 }
 
@@ -483,7 +494,7 @@ nav {
 .setting-section h3 {
   font-size: 1.4rem;
   margin-bottom: 18px;
-  color: #c084fc;
+  color: var(--accent);
   font-weight: 700;
 }
 
@@ -491,16 +502,16 @@ nav {
   display: block;
   font-size: 15px;
   margin-bottom: 10px;
-  color: #e0e0ff;
+  color: var(--text-main);
   font-weight: 500;
 }
 
 .settings-input {
   width: 100%;
   padding: 14px;
-  background: #0a0a0a;
-  border: 1px solid #4b2e8a;
-  color: white;
+  background: var(--bg-dashboard) !important;
+  border: 1px solid var(--border-color);
+  color: var(--text-main);
   border-radius: 12px;
   outline: none;
   font-size: 15px;
@@ -519,17 +530,16 @@ nav {
 
 .theme-card {
   cursor: pointer;
-  border: 2px solid #2a1f4d;
+  border: 2px solid var(--border-color);
   padding: 18px;
   border-radius: 18px;
   transition: all 0.3s ease;
-  background: #1a1433;
+  background: var(--bg-dashboard) !important;
   text-align: center;
 }
 
 .theme-card:hover {
   border-color: var(--accent);
-  background: #251b45;
 }
 
 .preview {
@@ -585,14 +595,14 @@ nav {
 }
 
 .save-btn:hover {
-  background: #a020f0;
+  filter: brightness(1.2);
   box-shadow: 0 0 25px var(--accent);
   transform: translateY(-2px);
 }
 
 /* COMMUNICATIONS MODULE */
 .form-wrapper {
-  background: #0a0a0a; 
+  background: var(--bg-sidebar) !important; 
   border: 2px solid var(--accent); 
   border-radius: 25px;
   padding: 40px;
@@ -614,7 +624,7 @@ nav {
 
 .form-subtitle {
   text-align: center;
-  color: #999;
+  color: var(--text-muted);
   font-size: 17px;
   margin-bottom: 40px;
   font-weight: 500;
@@ -657,13 +667,13 @@ nav {
 }
 
 ::-webkit-scrollbar-track {
-  background: #0a0a0a;
+  background: var(--bg-dashboard);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #2a1f4d;
+  background: var(--border-color);
   border-radius: 10px;
-  border: 3px solid #0a0a0a;
+  border: 3px solid var(--bg-dashboard);
   transition: background 0.3s;
 }
 
@@ -698,7 +708,7 @@ nav {
 .mb-1 { margin-bottom: 10px; }
 .mb-2 { margin-bottom: 20px; }
 .text-accent { color: var(--accent); }
-.bg-dark { background: #0a0a0a; }
+.bg-dark { background: var(--bg-dashboard) !important; }
 
 /* -------------------------------------------------------------------------- */
 /* NEW FEATURES (NEWS SIDEBAR, STEALTH MODE, AND ANIMATIONS) */
@@ -710,7 +720,7 @@ nav {
   padding: 16px 20px;
   background: transparent;
   border: 1px solid var(--accent);
-  color: #fff;
+  color: var(--text-main);
   border-radius: 14px;
   font-size: 16px;
   font-weight: 700;
@@ -733,14 +743,12 @@ nav {
 .news-sidebar {
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  border-top: 1px solid var(--border-color);
   text-align: left;
-  
-  /* FORCE LAYOUT FLEXIBILITY INSIDE THE SIDEBAR MATRIX */
   display: flex;
   flex-direction: column;
   flex: 1;
-  min-height: 0; /* Critical CSS bug fix to let content compress and create internal scroll room */
+  min-height: 0; 
   max-height: calc(100vh - 200px); 
 }
 
@@ -748,7 +756,7 @@ nav {
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 2px;
-  color: #71717a;
+  color: var(--text-muted);
   margin-bottom: 20px;
   padding-left: 5px;
   display: flex;
@@ -760,7 +768,7 @@ nav {
   content: '';
   flex: 1;
   height: 1px;
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--border-color);
 }
 
 /* News Feed Container - STABILIZED TO SCROLL ON HOVER ONLY */
@@ -769,8 +777,6 @@ nav {
   flex-direction: column;
   gap: 15px;
   flex-grow: 1;
-  
-  /* FORCE INTERNAL WRAPPING EXCLUSIVELY */
   overflow-y: hidden !important; 
   overflow-x: hidden !important;
   padding-right: 5px;
@@ -778,7 +784,6 @@ nav {
   min-height: 0;
 }
 
-/* Activate functional scrolling specifically when hovering directly over the feed window */
 .news-feed:hover {
   overflow-y: auto !important;
 }
@@ -804,24 +809,23 @@ nav {
 
 /* Individual News Card */
 .news-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-dashboard) !important;
+  border: 1px solid var(--border-color) !important;
   padding: 18px;
   border-radius: 18px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  flex-shrink: 0; /* Prevents card templates from squishing under max-height restrictions */
+  flex-shrink: 0; 
 }
 
 .news-card:hover {
-  border-color: var(--accent);
-  background: rgba(139, 0, 255, 0.05);
+  border-color: var(--accent) !important;
+  background: var(--bg-sidebar) !important;
   transform: translateX(5px);
 }
 
 .news-tag {
-  font-size: 10px;
   background: var(--accent);
   color: white;
   padding: 3px 10px;
@@ -836,13 +840,13 @@ nav {
 .news-card p {
   font-size: 13.5px;
   margin-bottom: 12px;
-  color: #e4e4e7;
+  color: var(--text-main);
   line-height: 1.5;
 }
 
 .news-date {
   font-size: 11px;
-  color: #52525b;
+  color: var(--text-muted);
   font-weight: 600;
 }
 
@@ -976,6 +980,7 @@ nav {
 .educational-scroll-body::-webkit-scrollbar-thumb {
   background: #000000;                    /* Pure black scrollbar runner */
 }
+
 /* ==========================================================================
    Stealth Dropdown Styles
    ========================================================================== */
@@ -987,11 +992,11 @@ nav {
 
 .stealth-dropdown {
   position: absolute;
-  bottom: 105%; /* Positions the dropdown right above the button */
+  bottom: 105%; 
   left: 0;
   width: 100%;
-  background: #0a0a0a;
-  border: 1px solid #8b00ff; /* Matches your default purple accent */
+  background: var(--bg-dashboard) !important;
+  border: 1px solid var(--accent); 
   border-radius: 4px;
   z-index: 999;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
@@ -1000,7 +1005,7 @@ nav {
 
 .stealth-menu-item {
   padding: 10px;
-  color: #fff;
+  color: var(--text-main);
   cursor: pointer;
   font-size: 0.9rem;
   text-align: left;
@@ -1008,7 +1013,7 @@ nav {
 }
 
 .stealth-menu-item:hover {
-  background: rgba(139, 0, 255, 0.2); /* Subtle purple tint on hover */
+  background: var(--bg-sidebar) !important;
 }
 
 /* ==========================================================================
@@ -1018,12 +1023,3 @@ nav {
   margin-top: 10px;
   padding-left: 5px;
 }
-
-/* ==========================================================================
-   Functional Utility Classes
-   ========================================================================== */
-.hidden {
-  display: none !important;
-}
-
-/*End OF Master CSS*/
