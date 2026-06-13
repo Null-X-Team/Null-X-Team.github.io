@@ -1,27 +1,37 @@
-// Function to apply a selected theme string
+// Master Dynamic Theme Switcher Engine
 window.applyTheme = function(themeName) {
-  // Remove any previously configured custom themes
-  document.body.classList.remove('theme-midnight');
+  // Read all existing classes attached to the body tag
+  const classes = Array.from(document.body.classList);
   
-  if (themeName === 'midnight') {
-    document.body.classList.add('theme-midnight');
+  // Wipe out any old theme flags safely
+  classes.forEach(cls => {
+    if (cls.startsWith('theme-')) {
+      document.body.classList.remove(cls);
+    }
+  });
+  
+  // Apply requested theme profile layout
+  if (themeName !== 'default') {
+    document.body.classList.add(`theme-${themeName}`);
   }
   
-  // Save user preference locally
+  // Backup user configuration profile state
   localStorage.setItem('nullx-theme', themeName);
 };
 
-// Auto-load saved theme profile when the page boots up
+// Start system theme configurations on launch
 document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('nullx-theme') || 'default';
   window.applyTheme(savedTheme);
   
-  // Add interactive event listeners to your Settings panel grid cards
-  const themeCards = document.querySelectorAll('.theme-card');
-  themeCards.forEach(card => {
-    card.addEventListener('click', () => {
+  // Attach event handlers natively into layout click targets
+  document.addEventListener('click', (e) => {
+    const card = e.target.closest('.theme-card');
+    if (card) {
       const selectedTheme = card.getAttribute('data-theme');
-      window.applyTheme(selectedTheme);
-    });
+      if (selectedTheme) {
+        window.applyTheme(selectedTheme);
+      }
+    }
   });
 });
