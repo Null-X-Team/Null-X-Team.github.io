@@ -3,108 +3,108 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Favorites - Nx Dashboard</title>
-  <link rel="stylesheet" href="../style.css">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap">
+  <title>Null X - Favorites</title>
+  <link rel="stylesheet" href="../CSS/style.css">
+  <link rel="stylesheet" href="../themes/themes.css">
+  
+  <script src="../Games/GameSaveData/auto-save.js"></script>
 </head>
 <body>
 
   <div class="dashboard">
-    
+      
     <aside class="left-nav">
       <div class="logo">
-        <span>Nx</span>
+        <img src="../imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="Null_X Logo" class="site-logo">
       </div>
+       
       <nav>
-        <a href="../index.html" class="nav-item"><span>Home</span></a>
-        <a href="../games.html" class="nav-item"><span>Games</span></a>
-        <a href="favorites.html" class="nav-item active"><span>Favorites</span></a>
-        <a href="../unblockers.html" class="nav-item"><span>Unblockers</span></a>
-        <a href="../profile.html" class="nav-item"><span>Profile</span></a>
-        <a href="../communications.html" class="nav-item"><span>Communications</span></a>
+        <a href="../" id="nav-home" class="nav-item">Home</a>
+        <a href="../#games" id="nav-games" class="nav-item">Games</a>
+        <a href="favorites.html" id="nav-favorites" class="nav-item active">Favorites</a>
+        <a href="../unblockers/unblockers.html" id="nav-unblockers" class="nav-item">Unblockers</a>
+        <a href="../profile/profile.html" id="nav-profile" class="nav-item">Profile</a>
+        <a href="../#communications" id="nav-communications" class="nav-item">Communications</a>
+        <a href="../Terminal/terminal.html" id="nav-terminal" class="nav-item">Terminal</a>
       </nav>
-
-      <div class="terminal-container">
-        <div class="terminal-header">
-          <span class="terminal-circle red"></span>
-          <span class="terminal-circle yellow"></span>
-          <span class="terminal-circle green"></span>
-          <span class="terminal-title">bash</span>
-        </div>
-        <div class="terminal-body">
-          <div class="command-row">
-            <span class="terminal-prompt">user@nx:~$</span>
-            <input type="text" id="terminalInput" placeholder="Type help..." autocomplete="off">
-          </div>
-        </div>
-      </div>
     </aside>
 
     <main class="main-content">
+       
       <header class="top-bar">
-        <div class="greeting">
-          <h1>Your Favorites</h1>
-          <p>Quickly access the games you've marked.</p>
+        <div class="greeting" id="greeting">
+          <h1 id="welcome-text">Your Favorites</h1>
+          <p>Your saved collection of items.</p>
         </div>
+         
         <div class="search-bar">
-          <input type="text" placeholder="Search saved games...">
+          <input type="text" id="searchBar" placeholder="Search saved games...">
         </div>
       </header>
 
-      <section class="section-title">
-        <span>★</span> Favorited Games
+      <section class="section">
+        <div class="game-grid" id="favoritesGrid">
+          </div>
       </section>
-
-      <div class="games-grid" id="favorites-container">
-        <div class="game-card is-favorite">
-          <h3>Vex 8</h3>
-          <p>Platformer</p>
-          <div class="game-desc-overlay">Launch Vex 8 instantly.</div>
-        </div>
-
-        <div class="game-card is-favorite">
-          <h3>Cookie Clicker</h3>
-          <p>Idle Game</p>
-          <div class="game-desc-overlay">Click your cookies to build an empire.</div>
-        </div>
-      </div>
     </main>
 
     <aside class="right-sidebar">
-      <button class="cloak-btn">Stealth Mode</button>
-      <button class="signin-btn">Sign Out</button>
-      <button class="settings-btn">Settings</button>
+      <div class="stealth-menu-wrapper">
+        <button class="cloak-btn" id="stealthOpener">Stealth Mode</button>
+      </div>
+       
+      <button class="signin-btn" id="signInBtn">Sign In</button>
+      <button class="settings-btn" id="settingsBtn">Settings</button>
+
+      <div style="background: rgba(139, 0, 255, 0.03); border: 1px solid rgba(139, 0, 255, 0.12); padding: 10px; border-radius: 6px; margin: 10px 0; font-family: 'Segoe UI', sans-serif; color: white;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <div style="display: flex; align-items: center; gap: 4px;">
+            <span style="font-size: 0.85rem;">☁️</span>
+            <h4 style="margin: 0; color: #a033ff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px;">Cloud Sync</h4>
+          </div>
+          <div id="dashboard-sync-msg" style="font-size: 0.7rem; font-weight: bold; color: #888;"></div>
+        </div>
+         
+        <div style="display: flex; gap: 6px;">
+          <button onclick="window.cloudLoad('dashboard-sync-msg')" style="flex: 1; padding: 6px; background: rgba(255,255,255,0.02); color: #aaa; border: 1px solid #222; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+            Sync Cloud
+          </button>
+          <button onclick="window.cloudSave('dashboard-sync-msg')" style="flex: 1; padding: 6px; background: #8b00ff; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='#a033ff'" onmouseout="this.style.background='#8b00ff'">
+            Backup Save
+          </button>
+        </div>
+      </div>
 
       <div class="news-sidebar">
-        <div class="news-title">System News</div>
-        <div class="news-feed">
+        <h3 class="news-title">System News</h3>
+        <div class="news-feed" id="newsFeed">
           <div class="news-card">
             <span class="news-tag">Update</span>
-            <p>Favorites module linked and deployed.</p>
-            <div class="news-date">June 18</div>
+            <p>Favorites module linked and running.</p>
+            <span class="news-date">June 18</span>
           </div>
         </div>
       </div>
     </aside>
-
   </div>
 
-  <div id="custom-context-menu" class="hidden">
-    <div class="context-menu-item" id="ctx-favorite">Unfavorite Game</div>
-    <div class="context-menu-item" id="ctx-delete">Delete Game</div>
+  <div id="custom-context-menu" class="hidden" style="position: fixed; z-index: 10000; background: #12091c; border: 1px solid #8b00ff; border-radius: 6px; display: none;">
+    <div class="context-menu-item" id="ctx-favorite" style="padding: 10px 16px; color: white; cursor: pointer;">Unfavorite Game</div>
+    <div class="context-menu-item" id="ctx-delete" style="padding: 10px 16px; color: #ff3333; cursor: pointer;">Delete Game</div>
   </div>
 
-  <div id="delete-modal-overlay" class="modal-overlay">
-    <div class="modal-box">
-      <h2 class="glow mb-1">Are you sure?</h2>
-      <p class="subtitle mb-2">Do you really want to remove this game? This action cannot be undone.</p>
+  <div id="delete-modal-overlay" class="modal-overlay" style="display: none; position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); z-index:20000; align-items:center; justify-content:center;">
+    <div class="modal-box" style="text-align: center; background: #12091c; padding: 30px; border-radius: 8px; border: 1px solid #8b00ff;">
+      <h2 class="glow" style="margin-bottom: 10px; color: white;">Are you sure?</h2>
+      <p class="subtitle" style="margin-bottom: 20px; color: #aaa;">Do you really want to remove this game? This action cannot be undone.</p>
       <div style="display: flex; gap: 15px; justify-content: center;">
-        <button id="confirm-delete-btn" class="save-btn" style="margin: 0; background: #ff3333 !important;">Yes, Delete</button>
-        <button id="cancel-delete-btn" class="secondary-btn" style="padding: 15px 35px; border-radius: 14px;">No, Cancel</button>
+        <button id="confirm-delete-btn" style="padding: 10px 24px; background: #ff3333; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Yes, Delete</button>
+        <button id="cancel-delete-btn" style="padding: 10px 24px; background: #333; color: white; border: none; border-radius: 4px; cursor: pointer;">No, Cancel</button>
       </div>
     </div>
   </div>
 
   <script src="favorites.js"></script>
+  <script src="../themes/themes.js"></script>
 </body>
 </html>
