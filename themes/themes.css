@@ -25,7 +25,7 @@
 
 
 /* 1. DEFAULT PURPLE THEME */
-:root {
+:root, [data-theme="default"], body.theme-default {
   --bg-dashboard: #0b0813;
   --bg-sidebar: #110d22;
   --accent-color: #8b00ff;
@@ -36,7 +36,7 @@
 }
 
 /* 2. MIDNIGHT (Pitch Black, Grey Borders, White Text) */
-body.theme-midnight {
+[data-theme="midnight"], body.theme-midnight {
   --bg-dashboard: #000000;
   --bg-sidebar: #0a0a0a;
   --accent-color: #444444;
@@ -47,7 +47,7 @@ body.theme-midnight {
 }
 
 /* 3. VAMPIRE RED */
-body.theme-vampire {
+[data-theme="vampire"], body.theme-vampire {
   --bg-dashboard: #0d0202;
   --bg-sidebar: #160505;
   --accent-color: #ff0000;
@@ -58,7 +58,7 @@ body.theme-vampire {
 }
 
 /* 4. OCEAN DEEP */
-body.theme-ocean {
+[data-theme="ocean"], body.theme-ocean {
   --bg-dashboard: #020b14;
   --bg-sidebar: #051425;
   --accent-color: #0088ff;
@@ -69,7 +69,7 @@ body.theme-ocean {
 }
 
 /* 5. FOREST DRUID */
-body.theme-forest {
+[data-theme="forest"], body.theme-forest {
   --bg-dashboard: #030c05;
   --bg-sidebar: #08170b;
   --accent-color: #00cc44;
@@ -80,7 +80,7 @@ body.theme-forest {
 }
 
 /* 6. CYBERPUNK 2077 */
-body.theme-cyberpunk {
+[data-theme="cyberpunk"], body.theme-cyberpunk {
   --bg-dashboard: #1c0024;
   --bg-sidebar: #001219;
   --accent-color: #fcee0a;
@@ -91,7 +91,7 @@ body.theme-cyberpunk {
 }
 
 /* 7. TOXIC WASTELAND */
-body.theme-toxic {
+[data-theme="toxic"], body.theme-toxic {
   --bg-dashboard: #0f1402;
   --bg-sidebar: #192104;
   --accent-color: #a3ff00;
@@ -102,7 +102,7 @@ body.theme-toxic {
 }
 
 /* 8. SOLAR FLARE */
-body.theme-solar {
+[data-theme="solar"], body.theme-solar {
   --bg-dashboard: #140700;
   --bg-sidebar: #240d02;
   --accent-color: #ff5500;
@@ -113,7 +113,7 @@ body.theme-solar {
 }
 
 /* 9. ICE BLIZZARD */
-body.theme-ice {
+[data-theme="ice"], body.theme-ice {
   --bg-dashboard: #0f191c;
   --bg-sidebar: #17272c;
   --accent-color: #00f3ff;
@@ -124,7 +124,7 @@ body.theme-ice {
 }
 
 /* 10. RETRO ARCADE (80s Synth) */
-body.theme-arcade {
+[data-theme="arcade"], body.theme-arcade {
   --bg-dashboard: #120421;
   --bg-sidebar: #21022b;
   --accent-color: #ff007f;
@@ -135,7 +135,7 @@ body.theme-arcade {
 }
 
 /* 11. BUBBLEGUM PASTEL */
-body.theme-bubblegum {
+[data-theme="bubblegum"], body.theme-bubblegum {
   --bg-dashboard: #261c21;
   --bg-sidebar: #3d2b34;
   --accent-color: #ffb7b2;
@@ -146,7 +146,7 @@ body.theme-bubblegum {
 }
 
 /* 12. MILITARY DESERT STRIKE */
-body.theme-desert {
+[data-theme="desert"], body.theme-desert {
   --bg-dashboard: #14120c;
   --bg-sidebar: #211e14;
   --accent-color: #d4af37;
@@ -157,7 +157,7 @@ body.theme-desert {
 }
 
 /* 13. ROYAL LUXURY */
-body.theme-royal {
+[data-theme="royal"], body.theme-royal {
   --bg-dashboard: #0f0314;
   --bg-sidebar: #1b0a24;
   --accent-color: #ffd700;
@@ -168,7 +168,7 @@ body.theme-royal {
 }
 
 /* 14. GHOSTLY APPARITION */
-body.theme-ghost {
+[data-theme="ghost"], body.theme-ghost {
   --bg-dashboard: #11161a;
   --bg-sidebar: #1d242a;
   --accent-color: #708090;
@@ -179,7 +179,7 @@ body.theme-ghost {
 }
 
 /* 15. COCOA ESPRESSO */
-body.theme-espresso {
+[data-theme="espresso"], body.theme-espresso {
   --bg-dashboard: #0f0b08;
   --bg-sidebar: #1c140f;
   --accent-color: #875c36;
@@ -190,7 +190,7 @@ body.theme-espresso {
 }
 
 /* 16. CHRONO COPPER */
-body.theme-copper {
+[data-theme="copper"], body.theme-copper {
   --bg-dashboard: #140d0a;
   --bg-sidebar: #241610;
   --accent-color: #b87333;
@@ -201,7 +201,7 @@ body.theme-copper {
 }
 
 /* 17. CRIMSON ECLIPSE */
-body.theme-eclipse {
+[data-theme="eclipse"], body.theme-eclipse {
   --bg-dashboard: #050508;
   --bg-sidebar: #101017;
   --accent-color: #800020;
@@ -212,7 +212,7 @@ body.theme-eclipse {
 }
 
 /* 18. COTTON CANDY */
-body.theme-cotton {
+[data-theme="cotton"], body.theme-cotton {
   --bg-dashboard: #121a24;
   --bg-sidebar: #1b2836;
   --accent-color: #84dcc6;
@@ -226,7 +226,7 @@ body.theme-cotton {
 /* --- SPECIAL EFFECT THEMES --- */
 
 /* 19. ANIMATED CHROMA FADE (Dynamic RGB Engine Loop) */
-body.theme-rgb {
+[data-theme="rgb"], body.theme-rgb {
   --bg-dashboard: #030303;
   --bg-sidebar: #0f0f0f;
   --border-color: #222222;
@@ -236,7 +236,7 @@ body.theme-rgb {
 }
 
 /* 20. MATRIX DIGITAL RAIN (Glowing Text Pulse Effect) */
-body.theme-matrix {
+[data-theme="matrix"], body.theme-matrix {
   --bg-dashboard: #000000;
   --bg-sidebar: #050a05;
   --accent-color: #00ff00;
@@ -247,7 +247,7 @@ body.theme-matrix {
 }
 
 /* 21. NEON PULSE RUNNER (Blinking Glowing Borders) */
-body.theme-neon {
+[data-theme="neon"], body.theme-neon {
   --bg-dashboard: #020005;
   --bg-sidebar: #090314;
   --accent-color: #00ffef;
@@ -258,7 +258,7 @@ body.theme-neon {
 }
 
 /* 22. MOONLIGHT SHADOW */
-body.theme-moonlight {
+[data-theme="moonlight"], body.theme-moonlight {
   --bg-dashboard: #080a0f;
   --bg-sidebar: #101420;
   --accent-color: #7b92b5;
@@ -269,7 +269,7 @@ body.theme-moonlight {
 }
 
 /* 23. AMBER STEAMPUNK */
-body.theme-amber {
+[data-theme="amber"], body.theme-amber {
   --bg-dashboard: #120d06;
   --bg-sidebar: #1f160b;
   --accent-color: #ffbf00;
