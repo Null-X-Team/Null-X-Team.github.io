@@ -1,1 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Console</title>
+  <link rel="stylesheet" href="css/terminal.css">
+</head>
+<body>
+  <div class="terminal-fullscreen">
+    <div class="window-header">
+      <div class="window-controls">
+        <a href="index.html" class="control-btn close" title="Back to Dashboard"></a>
+        <span class="control-btn minimize"></span>
+        <span class="control-btn maximize"></span>
+      </div>
+      <div class="window-title">system_user@console: ~</div>
+    </div>
 
+    <div class="terminal-screen" id="terminalScreen">
+      <div class="output-line">Welcome to the Web Console interface.</div>
+      <div class="output-line text-muted">Type 'help' to see a list of available system commands.</div>
+      
+      <div class="input-line-wrapper">
+        <span class="prompt-prefix">guest@system:~$&nbsp;</span>
+        <input type="text" id="terminalConsoleInput" autofocus autocomplete="off" spellcheck="false">
+      </div>
+    </div>
+  </div>
+
+  <script src="js/terminal.js"></script>
+</body>
+</html>
