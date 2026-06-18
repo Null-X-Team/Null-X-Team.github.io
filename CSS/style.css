@@ -1,6 +1,7 @@
 :root {
   /* Dynamic Variable Fallbacks / Rich Deep Purple Configuration */
   --accent: #8b00ff;
+  --accent-hover: #a033ff;
   --bg-gradient: linear-gradient(135deg, #120024, #1a0033);
   --container-bg: rgba(26, 0, 51, 0.98);
   --text: #e0e0e0;
@@ -32,8 +33,8 @@ body {
 }
 
 .container { 
-  border: 2px solid var(--accent) !important; 
-  background: var(--container-bg) !important;
+  border: 2px solid var(--accent-color, var(--accent)) !important; 
+  background: var(--bg-sidebar) !important;
 }
 
 /* Dashboard Core Layout */
@@ -44,6 +45,7 @@ body {
   width: 100%;
   visibility: visible !important;
   position: relative;
+  background: var(--bg-dashboard);
 }
 
 /* Sidebar Navigation */
@@ -64,7 +66,7 @@ body {
   font-size: 28px;
   font-weight: 900;
   margin-bottom: 40px;
-  color: #d8b4fe;
+  color: var(--text-main);
   padding-left: 10px;
   display: flex;
   align-items: center;
@@ -76,7 +78,7 @@ body {
   height: auto;
   max-width: 100%;
   border-radius: 8px;
-  filter: drop-shadow(0 4px 12px rgba(139, 0, 255, 0.5));
+  filter: drop-shadow(0 4px 12px var(--border-color));
   transition: transform 0.3s ease;
 }
 
@@ -104,21 +106,21 @@ nav {
 }
 
 .nav-item:hover {
-  background: rgba(139, 0, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
-  border-color: var(--accent);
+  border-color: var(--accent-color, var(--accent));
   padding-left: 22px;
 }
 
 .nav-item.active {
-  background: #6b21a8;
-  color: white;
-  box-shadow: 0 4px 15px rgba(107, 33, 168, 0.6);
+  background: var(--accent-color, var(--accent));
+  color: #all-white, var(--text-main);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Main Content Area */
 .main-content {
-  background: transparent;
+  background: var(--bg-dashboard);
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -174,15 +176,15 @@ nav {
 
 .search-bar input:focus {
   background: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 15px rgba(139, 0, 255, 0.4);
-  border-color: var(--accent);
+  box-shadow: 0 0 15px var(--border-color);
+  border-color: var(--accent-color, var(--accent));
 }
 
 /* Hero Section Styles */
 .hero {
   margin: 30px;
   padding: 60px;
-  background: linear-gradient(135deg, #1a0033 0%, #0d001a 100%);
+  background: var(--bg-sidebar);
   border-radius: 24px;
   border: 1px solid var(--border-color);
   position: relative;
@@ -197,7 +199,7 @@ nav {
   bottom: -50px;
   width: 300px;
   height: 300px;
-  background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
+  background: radial-gradient(circle, var(--accent-color, var(--accent)) 0%, transparent 70%);
   opacity: 0.25;
   filter: blur(40px);
 }
@@ -208,7 +210,7 @@ nav {
 }
 
 .badge {
-  background: var(--accent);
+  background: var(--accent-color, var(--accent));
   color: white;
   padding: 6px 20px;
   border-radius: 50px;
@@ -218,7 +220,7 @@ nav {
   letter-spacing: 1px;
   display: inline-block;
   margin-bottom: 20px;
-  box-shadow: 0 4px 10px rgba(139, 0, 255, 0.4);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .hero h2 {
@@ -253,7 +255,7 @@ nav {
 }
 
 .play-btn {
-  background: var(--accent) !important;
+  background: var(--accent-color, var(--accent)) !important;
   color: white;
 }
 
@@ -272,7 +274,7 @@ nav {
 .secondary-btn:hover {
   background: rgba(255, 255, 255, 0.12);
   transform: translateY(-2px);
-  border-color: var(--accent) !important;
+  border-color: var(--accent-color, var(--accent)) !important;
 }
 
 /* Quick Action Row */
@@ -283,7 +285,7 @@ nav {
 .quick-action-btn {
   width: 100%;
   padding: 18px 24px;
-  background: var(--accent) !important;
+  background: var(--accent-color, var(--accent)) !important;
   border: none;
   border-radius: 15px;
   color: white;
@@ -300,7 +302,7 @@ nav {
 .quick-action-btn:hover {
   filter: brightness(1.15);
   transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(139, 0, 255, 0.4);
+  box-shadow: 0 0 20px var(--border-color);
 }
 
 /* Grid & Cards System */
@@ -309,7 +311,7 @@ nav {
   margin: 20px 0 25px;
   font-size: 24px;
   font-weight: 800;
-  color: #d8b4fe;
+  color: var(--text-main);
   display: flex;
   align-items: center;
   gap: 12px;
@@ -341,8 +343,8 @@ nav {
 
 .game-card:hover {
   transform: translateY(-12px);
-  border-color: var(--accent) !important;
-  box-shadow: 0 15px 30px rgba(139, 0, 255, 0.35);
+  border-color: var(--accent-color, var(--accent)) !important;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
 }
 
 .game-card h3 {
@@ -416,14 +418,14 @@ nav {
 }
 
 .signin-btn {
-  background: var(--accent) !important;
+  background: var(--accent-color, var(--accent)) !important;
   color: white;
 }
 
 .signin-btn:hover {
   transform: translateY(-2px);
   filter: brightness(1.1);
-  box-shadow: 0 0 15px rgba(139, 0, 255, 0.4);
+  box-shadow: 0 0 15px var(--border-color);
 }
 
 .settings-btn {
@@ -434,7 +436,7 @@ nav {
 
 .settings-btn:hover {
   filter: brightness(1.2);
-  border-color: var(--accent) !important;
+  border-color: var(--accent-color, var(--accent)) !important;
   color: var(--text-main);
 }
 
@@ -446,7 +448,7 @@ nav {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(18, 0, 36, 0.95);
+  background: rgba(0, 0, 0, 0.85);
   backdrop-filter: blur(12px);
   z-index: 9999;
   justify-content: center;
@@ -456,19 +458,19 @@ nav {
 
 .modal-box {
   background: var(--bg-sidebar) !important;
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-color, var(--accent));
   padding: 45px;
   border-radius: 28px;
   width: 100%;
   max-width: 600px;
   position: relative;
-  box-shadow: 0 0 60px rgba(139, 0, 255, 0.4);
+  box-shadow: 0 0 60px var(--border-color);
   max-height: 90vh;
   overflow-y: auto;
 }
 
 .glow {
-  text-shadow: 0 0 15px var(--accent);
+  text-shadow: 0 0 15px var(--accent-color, var(--accent));
   color: var(--text-main);
   font-size: 2.8rem;
   font-weight: 900;
@@ -497,7 +499,7 @@ nav {
 .setting-section h3 {
   font-size: 1.4rem;
   margin-bottom: 18px;
-  color: #d8b4fe;
+  color: var(--text-main);
   font-weight: 700;
 }
 
@@ -522,7 +524,7 @@ nav {
 }
 
 .settings-input:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-color, var(--accent));
 }
 
 .theme-grid {
@@ -542,7 +544,7 @@ nav {
 }
 
 .theme-card:hover {
-  border-color: var(--accent);
+  border-color: var(--accent-color, var(--accent));
 }
 
 .preview {
@@ -585,7 +587,7 @@ nav {
 }
 
 .save-btn {
-  background: var(--accent);
+  background: var(--accent-color, var(--accent));
   color: white;
   padding: 18px;
   border: none;
@@ -599,30 +601,30 @@ nav {
 
 .save-btn:hover {
   filter: brightness(1.2);
-  box-shadow: 0 0 25px var(--accent);
+  box-shadow: 0 0 25px var(--accent-color, var(--accent));
   transform: translateY(-2px);
 }
 
 /* COMMUNICATIONS MODULE */
 .form-wrapper {
   background: var(--bg-sidebar) !important; 
-  border: 2px solid var(--accent); 
+  border: 2px solid var(--accent-color, var(--accent)); 
   border-radius: 25px;
   padding: 40px;
-  box-shadow: 0 0 40px rgba(139, 0, 255, 0.3);
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.3);
   margin: 20px 30px 40px;
   position: relative;
 }
 
 .form-title {
-  color: var(--accent);
+  color: var(--accent-color, var(--accent));
   text-align: center;
   font-size: 2.5rem;
   font-weight: 900;
   margin-bottom: 10px;
   text-transform: uppercase;
   letter-spacing: 3px;
-  text-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
+  text-shadow: 0 0 10px var(--border-color);
 }
 
 .form-subtitle {
@@ -643,7 +645,7 @@ nav {
 
 /* Lockdown System */
 #lockdown-overlay {
-  background: #0d001a !important;
+  background: #000000 !important;
   z-index: 1000000 !important;
   position: fixed;
   top: 0;
@@ -681,7 +683,7 @@ nav {
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--accent);
+  background: var(--accent-color, var(--accent));
 }
 
 /* Responsive Breakpoints */
@@ -692,7 +694,7 @@ nav {
   .logo span, .nav-item span { display: none; }
   .logo { justify-content: center; padding: 0; }
   .nav-item { justify-content: center; padding: 15px; }
-  .terminal-container { display: none; } /* Hide compact terminal on collapsed width */
+  .terminal-container { display: none; }
 }
 
 @media (max-width: 900px) {
@@ -711,7 +713,7 @@ nav {
 .mt-2 { margin-top: 20px; }
 .mb-1 { margin-bottom: 10px; }
 .mb-2 { margin-bottom: 20px; }
-.text-accent { color: var(--accent); }
+.text-accent { color: var(--accent-color, var(--accent)); }
 .bg-dark { background: var(--bg-dashboard) !important; }
 
 /* -------------------------------------------------------------------------- */
@@ -723,7 +725,7 @@ nav {
   width: 100%;
   padding: 16px 20px;
   background: transparent;
-  border: 1px solid var(--accent);
+  border: 1px solid var(--accent-color, var(--accent));
   color: var(--text-main);
   border-radius: 14px;
   font-size: 16px;
@@ -738,8 +740,8 @@ nav {
 }
 
 .cloak-btn:hover {
-  background: var(--accent);
-  box-shadow: 0 0 20px rgba(139, 0, 255, 0.5);
+  background: var(--accent-color, var(--accent));
+  box-shadow: 0 0 20px var(--border-color);
   transform: translateY(-2px);
 }
 
@@ -775,7 +777,7 @@ nav {
   background: var(--border-color);
 }
 
-/* News Feed Container - STABILIZED TO SCROLL ON HOVER ONLY */
+/* News Feed Container */
 .news-feed {
   display: flex;
   flex-direction: column;
@@ -803,12 +805,12 @@ nav {
 }
 
 .news-feed::-webkit-scrollbar-thumb {
-  background: var(--accent);
+  background: var(--accent-color, var(--accent));
   border-radius: 4px;
 }
 
 .news-feed::-webkit-scrollbar-thumb:hover {
-  background: #d8b4fe;
+  background: var(--text-main);
 }
 
 /* Individual News Card */
@@ -824,13 +826,13 @@ nav {
 }
 
 .news-card:hover {
-  border-color: var(--accent) !important;
-  background: rgba(43, 10, 82, 0.4) !important;
+  border-color: var(--accent-color, var(--accent)) !important;
+  background: var(--bg-sidebar) !important;
   transform: translateX(5px);
 }
 
 .news-tag {
-  background: var(--accent);
+  background: var(--accent-color, var(--accent));
   color: white;
   padding: 3px 10px;
   border-radius: 6px;
@@ -906,7 +908,7 @@ nav {
 /* Master Academic Container Box */
 .educational-content-card {
   background: #ffffff !important;
-  border: 2px solid #000000;              
+  border: 2px solid #000000 !important;              
   box-shadow: none;                        
   width: 90%;
   max-width: 950px;                      
@@ -1000,7 +1002,7 @@ nav {
   left: 0;
   width: 100%;
   background: var(--bg-dashboard) !important;
-  border: 1px solid var(--accent); 
+  border: 1px solid var(--accent-color, var(--accent)); 
   border-radius: 4px;
   z-index: 999;
   box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
@@ -1032,8 +1034,8 @@ nav {
    LINUX SIDEBAR TERMINAL STRUCTURAL INTEGRATION
    ========================================================================== */
 .terminal-container {
-  margin-top: auto; /* Secure positioning directly below layout nav elements */
-  background: #090014 !important; 
+  margin-top: auto; 
+  background: var(--bg-dashboard) !important; 
   border: 1px solid var(--border-color);
   border-radius: 10px;
   overflow: hidden;
@@ -1043,7 +1045,7 @@ nav {
 }
 
 .terminal-header {
-  background: rgba(26, 0, 51, 0.8);
+  background: var(--bg-sidebar);
   padding: 8px 12px;
   display: flex;
   align-items: center;
@@ -1072,7 +1074,7 @@ nav {
   height: 130px; 
   overflow-y: auto;
   font-size: 11px;
-  color: #a855f7; 
+  color: var(--text-main); 
   display: flex;
   flex-direction: column;
   gap: 4px;
