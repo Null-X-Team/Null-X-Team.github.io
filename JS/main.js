@@ -36,7 +36,8 @@ const _0xData = [
   { id: "slice_master", title: "Slice Master", url: "Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
   { id: "skinwalker", title: "Skinwalker", url: "Games/skinwalker/index.html", desc: "Atmospheric survival horror centered around staying undetected outdoors.", popular: true },
   { id: "skib_shooter", title: "Skib Shooters", url: "Games/skibshooter/index.html", desc: "Dynamic target arena where waves of attackers stream in continuously.", popular: true },
-  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "Games/ragdrop/index.html", desc: "Drop your structural targets down pins to clear high score records.", popular: true }
+  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "Games/ragdrop/index.html", desc: "Drop your structural targets down pins to clear high score records.", popular: true },
+  { id: "g_spin", title: "Gun Spin", url: "Games/gunspin/gunspin.html", desc: "Launch your firearm through the air and use recoil strategically to travel the greatest distance possible.", popular: true }
 ];
 
 function launchStealthWindow(maskType, targetEnv) {
