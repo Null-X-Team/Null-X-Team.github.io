@@ -1,1 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Favorites - Nx Dashboard</title>
+  <link rel="stylesheet" href="../style.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800;900&display=swap">
+</head>
+<body>
 
+  <div class="dashboard">
+    
+    <aside class="left-nav">
+      <div class="logo">
+        <span>Nx</span>
+      </div>
+      <nav>
+        <a href="../index.html" class="nav-item"><span>Home</span></a>
+        <a href="../games.html" class="nav-item"><span>Games</span></a>
+        <a href="favorites.html" class="nav-item active"><span>Favorites</span></a>
+        <a href="../unblockers.html" class="nav-item"><span>Unblockers</span></a>
+        <a href="../profile.html" class="nav-item"><span>Profile</span></a>
+        <a href="../communications.html" class="nav-item"><span>Communications</span></a>
+      </nav>
+
+      <div class="terminal-container">
+        <div class="terminal-header">
+          <span class="terminal-circle red"></span>
+          <span class="terminal-circle yellow"></span>
+          <span class="terminal-circle green"></span>
+          <span class="terminal-title">bash</span>
+        </div>
+        <div class="terminal-body">
+          <div class="command-row">
+            <span class="terminal-prompt">user@nx:~$</span>
+            <input type="text" id="terminalInput" placeholder="Type help..." autocomplete="off">
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <header class="top-bar">
+        <div class="greeting">
+          <h1>Your Favorites</h1>
+          <p>Quickly access the games you've marked.</p>
+        </div>
+        <div class="search-bar">
+          <input type="text" placeholder="Search saved games...">
+        </div>
+      </header>
+
+      <section class="section-title">
+        <span>★</span> Favorited Games
+      </section>
+
+      <div class="games-grid" id="favorites-container">
+        <div class="game-card is-favorite">
+          <h3>Vex 8</h3>
+          <p>Platformer</p>
+          <div class="game-desc-overlay">Launch Vex 8 instantly.</div>
+        </div>
+
+        <div class="game-card is-favorite">
+          <h3>Cookie Clicker</h3>
+          <p>Idle Game</p>
+          <div class="game-desc-overlay">Click your cookies to build an empire.</div>
+        </div>
+      </div>
+    </main>
+
+    <aside class="right-sidebar">
+      <button class="cloak-btn">Stealth Mode</button>
+      <button class="signin-btn">Sign Out</button>
+      <button class="settings-btn">Settings</button>
+
+      <div class="news-sidebar">
+        <div class="news-title">System News</div>
+        <div class="news-feed">
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Favorites module linked and deployed.</p>
+            <div class="news-date">June 18</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+
+  <div id="custom-context-menu" class="hidden">
+    <div class="context-menu-item" id="ctx-favorite">Unfavorite Game</div>
+    <div class="context-menu-item" id="ctx-delete">Delete Game</div>
+  </div>
+
+  <div id="delete-modal-overlay" class="modal-overlay">
+    <div class="modal-box">
+      <h2 class="glow mb-1">Are you sure?</h2>
+      <p class="subtitle mb-2">Do you really want to remove this game? This action cannot be undone.</p>
+      <div style="display: flex; gap: 15px; justify-content: center;">
+        <button id="confirm-delete-btn" class="save-btn" style="margin: 0; background: #ff3333 !important;">Yes, Delete</button>
+        <button id="cancel-delete-btn" class="secondary-btn" style="padding: 15px 35px; border-radius: 14px;">No, Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="favorites.js"></script>
+</body>
+</html>
