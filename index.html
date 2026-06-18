@@ -47,6 +47,23 @@
         <a href="profile/profile.html" class="nav-item">Profile</a>
         <a href="#" id="nav-communications" class="nav-item">Communications</a>
       </nav>
+
+      <div class="terminal-container">
+        <div class="terminal-header">
+          <span class="terminal-circle red"></span>
+          <span class="terminal-circle yellow"></span>
+          <span class="terminal-circle green"></span>
+          <span class="terminal-title">bash — user@nullx:~</span>
+        </div>
+        <div class="terminal-body" id="terminalBody">
+          <div class="terminal-line">Null_X Core OS v2.6.0</div>
+          <div class="terminal-line" style="color: var(--text-muted);">Type 'help' for commands.</div>
+          <div class="command-row">
+            <span class="terminal-prompt">~$</span>
+            <input type="text" id="terminalInput" autocomplete="off" spellcheck="false">
+          </div>
+        </div>
+      </div>
     </aside>
 
     <main class="main-content">
@@ -66,7 +83,7 @@
         <div class="hero-content">
           <span class="badge">Featured</span>
           <h2 id="hero-title">Loading...</h2>
-          <p id="hero-desc">Please wait...</p>
+          <h3 id="hero-desc">Please wait...</h3>
            
           <div class="hero-actions">
             <button class="play-btn" id="playFeatured">Play Now</button>
@@ -412,5 +429,63 @@
 
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const termInput = document.getElementById('terminalInput');
+      const termBody = document.getElementById('terminalBody');
+
+      if(termInput && termBody) {
+        termInput.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') {
+            const command = this.value.trim();
+            if (command === '') return;
+
+            // Log Command Echo
+            const echoLine = document.createElement('div');
+            echoLine.className = 'terminal-line';
+            echoLine.innerHTML = `<span style="color: #10b981;">~$</span> ${command}`;
+            termBody.insertBefore(echoLine, termInput.parentElement);
+
+            // Process Command Output Response Logic
+            const replyLine = document.createElement('div');
+            replyLine.className = 'terminal-line';
+
+            switch(command.toLowerCase()) {
+              case 'help':
+                replyLine.innerHTML = 'Available: help, clear, ping, neofetch, theme';
+                break;
+              case 'clear':
+                const allLines = termBody.querySelectorAll('.terminal-line');
+                allLines.forEach(l => l.remove());
+                replyLine.innerHTML = '';
+                break;
+              case 'ping':
+                replyLine.innerHTML = '64 bytes from 127.0.0.1: seq=1 ttl=64 time=0.03 ms';
+                break;
+              case 'neofetch':
+                replyLine.innerHTML = `<span style="color:var(--accent);">Null_X OS</span><br>Kernel: WebTerm v1.0<br>Shell: bash<br>WM: Dashboard Grid`;
+                break;
+              case 'theme':
+                replyLine.innerHTML = 'Active Core: Deep Neon Purple Engine';
+                break;
+              default:
+                replyLine.innerHTML = `bash: command not found: ${command}`;
+            }
+
+            if(command.toLowerCase() !== 'clear' && replyLine.innerHTML !== '') {
+              termBody.insertBefore(replyLine, termInput.parentElement);
+            }
+
+            this.value = '';
+            termBody.scrollTop = termBody.scrollHeight;
+          }
+        });
+
+        // Click focus binder
+        termBody.addEventListener('click', () => termInput.focus());
+      }
+    });
+  </script>
 </body>
 </html>
