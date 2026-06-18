@@ -1102,3 +1102,46 @@ nav {
   padding: 0;
   margin: 0;
 }
+/* Custom Context Menu Styling */
+#custom-context-menu {
+  position: fixed;
+  background: var(--bg-sidebar) !important;
+  border: 1px solid var(--accent-color, var(--accent));
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  width: 160px;
+  padding: 6px 0;
+}
+
+.context-menu-item {
+  padding: 10px 16px;
+  color: var(--text-main);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.context-menu-item:hover {
+  background: var(--accent-color, var(--accent)) !important;
+  color: white !important;
+}
+
+#ctx-delete:hover {
+  background: #ff3333 !important;
+}
+
+/* Favorite Visual Accent on Game Cards */
+.game-card.is-favorite {
+  border-color: #ffd700 !important; /* Gold border for favorites */
+}
+.game-card.is-favorite::before {
+  content: '★';
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #ffd700;
+  font-size: 16px;
+  z-index: 5;
+}
