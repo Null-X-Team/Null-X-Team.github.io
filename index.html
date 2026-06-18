@@ -417,6 +417,22 @@
     </div>
   </div>
 
+  <div id="custom-context-menu" class="hidden">
+  <div class="context-menu-item" id="ctx-favorite">Favorite Game</div>
+  <div class="context-menu-item" id="ctx-delete">Delete Game</div>
+</div>
+
+<div id="delete-modal-overlay" class="modal-overlay">
+  <div class="modal-box text-center">
+    <h2 class="mb-1 text-accent">Are you sure?</h2>
+    <p class="subtitle mb-2">Do you really want to delete this game? This action cannot be undone.</p>
+    <div style="display: flex; gap: 15px; justify-content: center;">
+      <button id="confirm-delete-btn" class="save-btn" style="margin: 0; background: #ff3333 !important;">Yes, Delete</button>
+      <button id="cancel-delete-btn" class="secondary-btn" style="padding: 15px 35px; border-radius: 14px;">No, Cancel</button>
+    </div>
+  </div>
+</div>
+  
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
 </body>
