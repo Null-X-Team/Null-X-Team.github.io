@@ -8,7 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   let targetGameCard = null;
 
-  // 1. Listen for right-click on game cards
+  // 1. Right click detection on game cards
   document.addEventListener('contextmenu', (e) => {
     const gameCard = e.target.closest('.game-card');
     
@@ -16,55 +16,48 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       targetGameCard = gameCard;
 
-      // Update text menu text depending if it's already a favorite
-      if (gameCard.classList.contains('is-favorite')) {
-        ctxFavorite.textContent = 'Unfavorite Game';
-      } else {
-        ctxFavorite.textContent = 'Favorite Game';
-      }
-
-      // Position menu near cursor coordinates
+      // Position and show menu at exact cursor coordinates
       contextMenu.style.left = `${e.clientX}px`;
       contextMenu.style.top = `${e.clientY}px`;
-      contextMenu.classList.remove('hidden');
+      contextMenu.style.display = 'block';
     } else {
-      contextMenu.classList.add('hidden');
+      contextMenu.style.display = 'none';
     }
   });
 
-  // 2. Hide context menu when clicking elsewhere
-  document.addEventListener('click', () => {
-    contextMenu.classList.add('hidden');
+  // 2. Clear context menu clicking anywhere else
+  document.addEventListener('click', (e) => {
+    if (!contextMenu.contains(e.target)) {
+      contextMenu.style.display = 'none';
+    }
   });
 
-  // 3. Handle Favorite Action
+  // 3. Remove from Favorites link action
   ctxFavorite.addEventListener('click', () => {
     if (targetGameCard) {
-      targetGameCard.classList.toggle('is-favorite');
-      
-      // Optional: Save changes to localStorage here if persistence is active
-      const gameTitle = targetGameCard.querySelector('h3')?.textContent;
-      console.log(`${gameTitle} favorite status changed.`);
+      targetGameCard.remove(); // Removes visual item
+      contextMenu.style.display = 'none';
     }
   });
 
-  // 4. Handle Delete Request Action (Triggers Confirmation Prompt)
+  // 4. Delete Action trigger -> Shows modal overlay
   ctxDelete.addEventListener('click', () => {
+    contextMenu.style.display = 'none';
     if (targetGameCard) {
       deleteModal.style.display = 'flex';
     }
   });
 
-  // 5. Confirm Removal Confirmation Selection
+  // 5. Confirm Removal Click handler
   confirmDeleteBtn.addEventListener('click', () => {
     if (targetGameCard) {
-      targetGameCard.remove(); // Removes card directly from screen view
+      targetGameCard.remove();
       targetGameCard = null;
     }
     deleteModal.style.display = 'none';
   });
 
-  // 6. Cancel Action
+  // 6. Dismiss Modal Selection
   cancelDeleteBtn.addEventListener('click', () => {
     deleteModal.style.display = 'none';
     targetGameCard = null;
