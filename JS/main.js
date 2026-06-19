@@ -1,6 +1,6 @@
 import { applyCloak } from '../Cloaks/Cloaks.js';
 
-const _0xData = [
+let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "Games/brotatoAPNG/Brotato.html", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
   { id: "y_io", title: "Yohoho.io", url: "Games/yohoho/index.html", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
   { id: "s_lp", title: "Slope", url: "Games/slope/index.html", desc: "A fast-paced 3D platformer. Stay on the track!", popular: true },
@@ -41,8 +41,12 @@ const _0xData = [
   { id: "gm_1", title: "Gun Mayhem", url: "Games/GunMayhem/gunmayhem/gunmayhem.html", desc: "Fast-paced multiplayer arena shooter featuring powerful weapons, explosions, and chaotic battles.", popular: true },
   { id: "gm_2", title: "Gun Mayhem 2", url: "Games/GunMayhem/gunmayhem2/gunmayhem2.html", desc: "The sequel to Gun Mayhem with more weapons, maps, customization, and intense combat.", popular: true },
   { id: "gm_r", title: "Gun Mayhem Redux", url: "Games/GunMayhem/gunmayhemredux/gunmayhemredux.html", desc: "A remastered Gun Mayhem experience with improved gameplay, expanded content, and smoother action.", popular: true },
-    { id: "m_d", title: "Mutilate a Doll", url: "Games/mutilateadoll/mutilateadoll.html", desc: "A sandbox ragdoll simulation game where you can experiment with physics, weapons, and chaos.", popular: true },
+  { id: "m_d", title: "Mutilate a Doll", url: "Games/mutilateadoll/mutilateadoll.html", desc: "A sandbox ragdoll simulation game where you can experiment with physics, weapons, and chaos.", popular: true },
 ];
+
+// Context Management variables
+let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
+let contextTargetId = null;
 
 function launchStealthWindow(maskType, targetEnv) {
   const currentUrl = window.location.href;
@@ -145,10 +149,37 @@ function renderLibraryGrid(gamesArray) {
   gamesArray.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
+    card.setAttribute('data-game-id', game.id); // Tag card with dynamic id reference
     card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
     card.onclick = () => launchGame(game.id);
     gameGrid.appendChild(card);
   });
+}
+
+function renderFavoritesGrid() {
+  const favGrid = document.getElementById('favoritesGrid');
+  const emptyMsg = document.getElementById('favorites-empty-msg');
+  if (!favGrid) return;
+
+  // Clear existing items but preserve empty structural alert item
+  favGrid.querySelectorAll('.game-card').forEach(c => c.remove());
+
+  if (favoriteGamesList.length === 0) {
+    emptyMsg.style.display = 'block';
+  } else {
+    emptyMsg.style.display = 'none';
+    favoriteGamesList.forEach(gameId => {
+      const game = _0xData.find(g => g.id === gameId);
+      if (game) {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.setAttribute('data-game-id', game.id);
+        card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+        card.onclick = () => launchGame(game.id);
+        favGrid.appendChild(card);
+      }
+    });
+  }
 }
 
 function initFeaturedModule() {
@@ -166,24 +197,62 @@ function initFeaturedModule() {
   }
 }
 
+function updateNavActiveState(activeId) {
+  ['nav-home', 'nav-games', 'nav-favorites'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('active');
+  });
+  const currentActive = document.getElementById(activeId);
+  if (currentActive) currentActive.classList.add('active');
+}
+
 function showHomeView() {
+  updateNavActiveState('nav-home');
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
   
   const gameGrid = document.getElementById('gameGrid');
-  if (gameGrid) gameGrid.innerHTML = '';
+  if (gameGrid) gameGrid.style.display = 'grid';
   
+  const favGrid = document.getElementById('favoritesGrid');
+  if (favGrid) favGrid.style.display = 'none';
+  
+  if (gameGrid) gameGrid.innerHTML = '';
   initFeaturedModule();
 }
 
 function showAllGamesView() {
+  updateNavActiveState('nav-games');
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   if (heroSection) heroSection.style.display = 'none';
   if (randomSection) randomSection.style.display = 'none';
+  
+  const gameGrid = document.getElementById('gameGrid');
+  if (gameGrid) gameGrid.style.display = 'grid';
+  
+  const favGrid = document.getElementById('favoritesGrid');
+  if (favGrid) favGrid.style.display = 'none';
+  
   renderLibraryGrid(_0xData);
+}
+
+function showFavoritesView() {
+  updateNavActiveState('nav-favorites');
+  const heroSection = document.getElementById('heroSection');
+  const randomSection = document.querySelector('.random-section');
+  if (heroSection) heroSection.style.display = 'none';
+  if (randomSection) randomSection.style.display = 'none';
+  
+  const gameGrid = document.getElementById('gameGrid');
+  if (gameGrid) gameGrid.style.display = 'none';
+  
+  const favGrid = document.getElementById('favoritesGrid');
+  if (favGrid) favGrid.style.display = 'grid';
+  
+  renderFavoritesGrid();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -286,8 +355,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Bind Standard Menus
   if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
   if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+  
+  // Navigation Routing System Overrides
   if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
   if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
+  if (document.getElementById('nav-favorites')) document.getElementById('nav-favorites').onclick = (e) => { e.preventDefault(); showFavoritesView(); };
 
   if (document.getElementById('stealthOpener')) {
     document.getElementById('stealthOpener').onclick = (e) => {
@@ -313,6 +385,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!term) { showHomeView(); return; }
       document.getElementById('heroSection').style.display = 'none';
       document.querySelector('.random-section').style.display = 'none';
+      if (document.getElementById('favoritesGrid')) document.getElementById('favoritesGrid').style.display = 'none';
+      if (document.getElementById('gameGrid')) document.getElementById('gameGrid').style.display = 'grid';
       const hits = _0xData.filter(g => g.title.toLowerCase().includes(term) || g.desc.toLowerCase().includes(term));
       renderLibraryGrid(hits);
     });
@@ -324,4 +398,76 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.href = localStorage.getItem('panicUrl') || "https://classroom.google.com";
     }
   });
+
+  // --- RIGHT CLICK CONTROLLER LOGIC ---
+  const contextMenu = document.getElementById('custom-context-menu');
+  const deleteModal = document.getElementById('delete-modal-overlay');
+  const ctxFavorite = document.getElementById('ctx-favorite');
+  const ctxDelete = document.getElementById('ctx-delete');
+
+  document.addEventListener('contextmenu', (e) => {
+    const card = e.target.closest('.game-card');
+    if (card) {
+      e.preventDefault();
+      contextTargetId = card.getAttribute('data-game-id');
+      
+      // Toggle string text dynamically
+      if (favoriteGamesList.includes(contextTargetId)) {
+        ctxFavorite.textContent = "Unfavorite Game";
+      } else {
+        ctxFavorite.textContent = "Favorite Game";
+      }
+
+      contextMenu.style.left = `${e.clientX}px`;
+      contextMenu.style.top = `${e.clientY}px`;
+      contextMenu.style.display = 'block';
+    } else {
+      contextMenu.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('click', () => { if (contextMenu) contextMenu.style.display = 'none'; });
+
+  ctxFavorite.onclick = () => {
+    if (!contextTargetId) return;
+    if (favoriteGamesList.includes(contextTargetId)) {
+      favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
+    } else {
+      favoriteGamesList.push(contextTargetId);
+    }
+    localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
+    
+    // Auto update live content lookups if currently browsing favorites tab
+    if (document.getElementById('favoritesGrid').style.display === 'grid') {
+      renderFavoritesGrid();
+    }
+  };
+
+  ctxDelete.onclick = () => {
+    if (contextTargetId) deleteModal.style.display = 'flex';
+  };
+
+  document.getElementById('confirm-delete-btn').onclick = () => {
+    if (contextTargetId) {
+      // Clean up dataset entries completely from dashboard engine
+      _0xData = _0xData.filter(g => g.id !== contextTargetId);
+      favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
+      localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
+      
+      // Instantly clear out elements visually
+      const activeFavoritesTab = document.getElementById('favoritesGrid').style.display === 'grid';
+      if (activeFavoritesTab) {
+        renderFavoritesGrid();
+      } else {
+        renderLibraryGrid(_0xData);
+      }
+    }
+    deleteModal.style.display = 'none';
+    contextTargetId = null;
+  };
+
+  document.getElementById('cancel-delete-btn').onclick = () => {
+    deleteModal.style.display = 'none';
+    contextTargetId = null;
+  };
 });
