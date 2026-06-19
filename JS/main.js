@@ -41,7 +41,7 @@ let _0xData = [
   { id: "gm_1", title: "Gun Mayhem", url: "Games/GunMayhem/gunmayhem/gunmayhem.html", desc: "Fast-paced multiplayer arena shooter featuring powerful weapons, explosions, and chaotic battles.", popular: true },
   { id: "gm_2", title: "Gun Mayhem 2", url: "Games/GunMayhem/gunmayhem2/gunmayhem2.html", desc: "The sequel to Gun Mayhem with more weapons, maps, customization, and intense combat.", popular: true },
   { id: "gm_r", title: "Gun Mayhem Redux", url: "Games/GunMayhem/gunmayhemredux/gunmayhemredux.html", desc: "A remastered Gun Mayhem experience with improved gameplay, expanded content, and smoother action.", popular: true },
-  { id: "m_d", title: "Mutilate a Doll", url: "Games/mutilateadoll/mutilateadoll.html", desc: "A sandbox ragdoll simulation game where you can experiment with physics, weapons, and chaos.", popular: true },
+  { id: "m_d", title: "Mutilate a Doll", url: "Games/mutilateadoll/mutilateadoll.html", desc: "A sandbox ragdoll simulation game where you can experiment with physics, weapons, and chaos. (Will Cause Massive Lag)", popular: true },
 ];
 
 // Context Management variables
