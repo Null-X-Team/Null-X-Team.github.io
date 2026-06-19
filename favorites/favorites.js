@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
+  const favoritesGrid = document.getElementById('favoritesGrid');
+  const emptyMsg = document.getElementById('favorites-empty-msg');
   const contextMenu = document.getElementById('custom-context-menu');
   const deleteModal = document.getElementById('delete-modal-overlay');
   const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
@@ -6,17 +8,39 @@ document.addEventListener('DOMContentLoaded', () => {
   const ctxFavorite = document.getElementById('ctx-favorite');
   const ctxDelete = document.getElementById('ctx-delete');
 
-  let targetGameCard = null;
+  let selectedGameCard = null;
+  let favoriteGames = JSON.parse(localStorage.getItem('nullx_favorites')) || [];
 
-  // 1. Right click detection on game cards
+  // Function to build game cards on the favorites screen
+  function renderFavorites() {
+    // Clear old cards out (except the empty screen text template)
+    const cards = favoritesGrid.querySelectorAll('.game-card');
+    cards.forEach(c => c.remove());
+
+    if (favoriteGames.length === 0) {
+      emptyMsg.style.display = 'block';
+    } else {
+      emptyMsg.style.display = 'none';
+      
+      // Generate cards for saved items
+      favoriteGames.forEach(gameTitle => {
+        const card = document.createElement('div');
+        card.className = 'game-card';
+        card.style.position = 'relative';
+        card.style.cursor = 'pointer';
+        card.innerHTML = `<h3>${gameTitle}</h3><p>Saved Game</p>`;
+        favoritesGrid.appendChild(card);
+      });
+    }
+  }
+
+  // Right-click menu listener on this page
   document.addEventListener('contextmenu', (e) => {
-    const gameCard = e.target.closest('.game-card');
-    
-    if (gameCard) {
+    const card = e.target.closest('.game-card');
+    if (card) {
       e.preventDefault();
-      targetGameCard = gameCard;
+      selectedGameCard = card;
 
-      // Position and show menu at exact cursor coordinates
       contextMenu.style.left = `${e.clientX}px`;
       contextMenu.style.top = `${e.clientY}px`;
       contextMenu.style.display = 'block';
@@ -25,41 +49,41 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // 2. Clear context menu clicking anywhere else
-  document.addEventListener('click', (e) => {
-    if (!contextMenu.contains(e.target)) {
-      contextMenu.style.display = 'none';
-    }
-  });
+  // Hide popup on click away
+  document.addEventListener('click', () => { contextMenu.style.display = 'none'; });
 
-  // 3. Remove from Favorites link action
+  // "Unfavorite Game" Action
   ctxFavorite.addEventListener('click', () => {
-    if (targetGameCard) {
-      targetGameCard.remove(); // Removes visual item
-      contextMenu.style.display = 'none';
-    }
+    if (!selectedGameCard) return;
+    const title = selectedGameCard.querySelector('h3').textContent;
+    favoriteGames = favoriteGames.filter(g => g !== title);
+    localStorage.setItem('nullx_favorites', JSON.stringify(favoriteGames));
+    renderFavorites();
   });
 
-  // 4. Delete Action trigger -> Shows modal overlay
+  // "Delete Game" Action -> Launches Modal Prompt
   ctxDelete.addEventListener('click', () => {
-    contextMenu.style.display = 'none';
-    if (targetGameCard) {
+    if (selectedGameCard) {
       deleteModal.style.display = 'flex';
     }
   });
 
-  // 5. Confirm Removal Click handler
+  // Confirm delete button click
   confirmDeleteBtn.addEventListener('click', () => {
-    if (targetGameCard) {
-      targetGameCard.remove();
-      targetGameCard = null;
+    if (selectedGameCard) {
+      const title = selectedGameCard.querySelector('h3').textContent;
+      favoriteGames = favoriteGames.filter(g => g !== title);
+      localStorage.setItem('nullx_favorites', JSON.stringify(favoriteGames));
+      renderFavorites();
     }
     deleteModal.style.display = 'none';
   });
 
-  // 6. Dismiss Modal Selection
+  // Cancel delete button click
   cancelDeleteBtn.addEventListener('click', () => {
     deleteModal.style.display = 'none';
-    targetGameCard = null;
   });
+
+  // Initial render layout check
+  renderFavorites();
 });
