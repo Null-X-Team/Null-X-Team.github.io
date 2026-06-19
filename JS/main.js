@@ -156,6 +156,7 @@ function launchStealthWindow(maskType, targetEnv) {
     'CliffsNotes': { t: "CliffsNotes - Study Guides", r: "https://www.cliffsnotes.com/" },
     'Bartleby': { t: "Bartleby - Homework Help", r: "https://www.bartleby.com/" }
   };
+
   if (customCloaks[maskType]) {
     title = customCloaks[maskType].t;
     escapeRedirect = customCloaks[maskType].r;
@@ -246,9 +247,9 @@ function renderFavoritesGrid() {
   favGrid.querySelectorAll('.game-card').forEach(c => c.remove());
 
   if (favoriteGamesList.length === 0) {
-    emptyMsg.style.display = 'block';
+    if (emptyMsg) emptyMsg.style.display = 'block';
   } else {
-    emptyMsg.style.display = 'none';
+    if (emptyMsg) emptyMsg.style.display = 'none';
     favoriteGamesList.forEach(gameId => {
       const game = _0xData.find(g => g.id === gameId);
       if (game) {
@@ -288,15 +289,21 @@ function updateNavActiveState(activeId) {
 }
 
 function clearAllViews() {
-  const heroSection = document.getElementById('heroSection');
-  const randomSection = document.querySelector('.random-section');
-  const gameGrid = document.getElementById('gameGrid');
-  const favGrid = document.getElementById('favoritesGrid');
+  const viewElements = [
+    document.getElementById('heroSection'),
+    document.querySelector('.random-section'),
+    document.getElementById('gameGrid'),
+    document.getElementById('favoritesGrid'),
+    document.getElementById('unblockersSection'),
+    document.getElementById('profileSection'),
+    document.getElementById('terminalSection')
+  ];
 
-  if (heroSection) heroSection.style.display = 'none';
-  if (randomSection) randomSection.style.display = 'none';
-  if (gameGrid) gameGrid.style.display = 'none';
-  if (favGrid) favGrid.style.display = 'none';
+  viewElements.forEach(element => {
+    if (element) {
+      element.style.setProperty('display', 'none', 'important');
+    }
+  });
 }
 
 function showHomeView() {
@@ -311,6 +318,7 @@ function showHomeView() {
   if (randomSection) randomSection.style.display = 'block';
   if (gameGrid) {
     gameGrid.style.display = 'grid';
+    renderLibraryGrid(_0xData.filter(g => g.popular));
   }
   initFeaturedModule();
 }
@@ -320,9 +328,10 @@ function showAllGamesView() {
   updateNavActiveState('nav-games');
   
   const gameGrid = document.getElementById('gameGrid');
-  if (gameGrid) gameGrid.style.display = 'grid';
-  
-  renderLibraryGrid(_0xData);
+  if (gameGrid) {
+    gameGrid.style.display = 'grid';
+    renderLibraryGrid(_0xData);
+  }
 }
 
 function showFavoritesView() {
@@ -330,15 +339,23 @@ function showFavoritesView() {
   updateNavActiveState('nav-favorites');
   
   const favGrid = document.getElementById('favoritesGrid');
-  if (favGrid) favGrid.style.display = 'grid';
-  
-  renderFavoritesGrid();
+  if (favGrid) {
+    favGrid.style.display = 'grid';
+    renderFavoritesGrid();
+  }
 }
 
 function handlePlaceholderView(navId, viewName) {
   clearAllViews();
   updateNavActiveState(navId);
-  console.log(`${viewName} section is active on the same page structure.`);
+  
+  const targetSectionId = `${viewName.toLowerCase()}Section`;
+  const customSectionContainer = document.getElementById(targetSectionId);
+  if (customSectionContainer) {
+    customSectionContainer.style.display = 'block';
+  } else {
+    console.log(`${viewName} section is active on the same page structure.`);
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -360,7 +377,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Cloak Timer Script logic
   const cloakElement = document.getElementById('educational-cloak');
   const cloakTimerText = document.getElementById('cloak-timer');
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
@@ -396,7 +412,6 @@ document.addEventListener('DOMContentLoaded', () => {
     try { applyCloak(savedCloak); } catch(e) {}
   }
 
-  // --- Dynamic Greeting & Authentic Sign-In Updates ---
   const user = localStorage.getItem('chatUser');
   if (user) {
     if (document.getElementById('welcome-text')) {
@@ -425,21 +440,17 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Bind Standard Menus
   if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
   if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
   
-  // Navigation Routing System Overrides
   if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
   if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
   if (document.getElementById('nav-favorites')) document.getElementById('nav-favorites').onclick = (e) => { e.preventDefault(); showFavoritesView(); };
   
-  // Clean single-page dynamic links routing logic block
   if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
 
-  // --- Communications Shield Controller ---
   const commsNavBtn = document.getElementById('nav-communications');
   if (commsNavBtn) {
     commsNavBtn.onclick = (e) => {
@@ -484,14 +495,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Panic Button Key Triggers
   window.addEventListener('keydown', (e) => {
     if (e.key === localStorage.getItem('panicKey')) {
       window.location.href = localStorage.getItem('panicUrl') || "https://classroom.google.com";
     }
   });
 
-  // --- RIGHT CLICK CONTROLLER LOGIC ---
   const contextMenu = document.getElementById('custom-context-menu');
   const deleteModal = document.getElementById('delete-modal-overlay');
   const ctxFavorite = document.getElementById('ctx-favorite');
@@ -503,61 +512,73 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       contextTargetId = card.getAttribute('data-game-id');
       
-      // Toggle string text dynamically
       if (favoriteGamesList.includes(contextTargetId)) {
         ctxFavorite.textContent = "Unfavorite Game";
       } else {
         ctxFavorite.textContent = "Favorite Game";
       }
 
-      contextMenu.style.left = `${e.clientX}px`;
-      contextMenu.style.top = `${e.clientY}px`;
-      contextMenu.style.display = 'block';
+      if (contextMenu) {
+        contextMenu.style.left = `${e.clientX}px`;
+        contextMenu.style.top = `${e.clientY}px`;
+        contextMenu.style.display = 'block';
+      }
     } else {
-      contextMenu.style.display = 'none';
+      if (contextMenu) contextMenu.style.display = 'none';
     }
   });
 
   document.addEventListener('click', () => { if (contextMenu) contextMenu.style.display = 'none'; });
 
-  ctxFavorite.onclick = () => {
-    if (!contextTargetId) return;
-    if (favoriteGamesList.includes(contextTargetId)) {
-      favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
-    } else {
-      favoriteGamesList.push(contextTargetId);
-    }
-    localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
-    
-    // Auto update live content lookups if currently browsing favorites tab
-    if (document.getElementById('favoritesGrid').style.display === 'grid') {
-      renderFavoritesGrid();
-    }
-  };
-
-  ctxDelete.onclick = () => {
-    if (contextTargetId) deleteModal.style.display = 'flex';
-  };
-
-  document.getElementById('confirm-delete-btn').onclick = () => {
-    if (contextTargetId) {
-      _0xData = _0xData.filter(g => g.id !== contextTargetId);
-      favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
+  if (ctxFavorite) {
+    ctxFavorite.onclick = () => {
+      if (!contextTargetId) return;
+      if (favoriteGamesList.includes(contextTargetId)) {
+        favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
+      } else {
+        favoriteGamesList.push(contextTargetId);
+      }
       localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
       
-      const activeFavoritesTab = document.getElementById('favoritesGrid').style.display === 'grid';
-      if (activeFavoritesTab) {
+      const favoritesGrid = document.getElementById('favoritesGrid');
+      if (favoritesGrid && favoritesGrid.style.display === 'grid') {
         renderFavoritesGrid();
-      } else {
-        renderLibraryGrid(_0xData);
       }
-    }
-    deleteModal.style.display = 'none';
-    contextTargetId = null;
-  };
+    };
+  }
 
-  document.getElementById('cancel-delete-btn').onclick = () => {
-    deleteModal.style.display = 'none';
-    contextTargetId = null;
-  };
+  if (ctxDelete) {
+    ctxDelete.onclick = () => {
+      if (contextTargetId && deleteModal) deleteModal.style.display = 'flex';
+    };
+  }
+
+  const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+  if (confirmDeleteBtn) {
+    confirmDeleteBtn.onclick = () => {
+      if (contextTargetId) {
+        _0xData = _0xData.filter(g => g.id !== contextTargetId);
+        favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
+        localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
+        
+        const favoritesGrid = document.getElementById('favoritesGrid');
+        const activeFavoritesTab = favoritesGrid && favoritesGrid.style.display === 'grid';
+        if (activeFavoritesTab) {
+          renderFavoritesGrid();
+        } else {
+          renderLibraryGrid(_0xData);
+        }
+      }
+      if (deleteModal) deleteModal.style.display = 'none';
+      contextTargetId = null;
+    };
+  }
+
+  const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+  if (cancelDeleteBtn) {
+    cancelDeleteBtn.onclick = () => {
+      if (deleteModal) deleteModal.style.display = 'none';
+      contextTargetId = null;
+    };
+  }
 });
