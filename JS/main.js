@@ -149,7 +149,7 @@ function renderLibraryGrid(gamesArray) {
   gamesArray.forEach(game => {
     const card = document.createElement('div');
     card.className = 'game-card';
-    card.setAttribute('data-game-id', game.id); // Tag card with dynamic id reference
+    card.setAttribute('data-game-id', game.id);
     card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
     card.onclick = () => launchGame(game.id);
     gameGrid.appendChild(card);
@@ -161,7 +161,6 @@ function renderFavoritesGrid() {
   const emptyMsg = document.getElementById('favorites-empty-msg');
   if (!favGrid) return;
 
-  // Clear existing items but preserve empty structural alert item
   favGrid.querySelectorAll('.game-card').forEach(c => c.remove());
 
   if (favoriteGamesList.length === 0) {
@@ -198,7 +197,7 @@ function initFeaturedModule() {
 }
 
 function updateNavActiveState(activeId) {
-  ['nav-home', 'nav-games', 'nav-favorites'].forEach(id => {
+  ['nav-home', 'nav-games', 'nav-favorites', 'nav-unblockers', 'nav-profile', 'nav-communications', 'nav-terminal'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
@@ -206,53 +205,58 @@ function updateNavActiveState(activeId) {
   if (currentActive) currentActive.classList.add('active');
 }
 
-function showHomeView() {
-  updateNavActiveState('nav-home');
+function clearAllViews() {
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
+  const gameGrid = document.getElementById('gameGrid');
+  const favGrid = document.getElementById('favoritesGrid');
+
+  if (heroSection) heroSection.style.display = 'none';
+  if (randomSection) randomSection.style.display = 'none';
+  if (gameGrid) gameGrid.style.display = 'none';
+  if (favGrid) favGrid.style.display = 'none';
+}
+
+function showHomeView() {
+  clearAllViews();
+  updateNavActiveState('nav-home');
+  
+  const heroSection = document.getElementById('heroSection');
+  const randomSection = document.querySelector('.random-section');
+  const gameGrid = document.getElementById('gameGrid');
+  
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
-  
-  const gameGrid = document.getElementById('gameGrid');
-  if (gameGrid) gameGrid.style.display = 'grid';
-  
-  const favGrid = document.getElementById('favoritesGrid');
-  if (favGrid) favGrid.style.display = 'none';
-  
-  if (gameGrid) gameGrid.innerHTML = '';
+  if (gameGrid) {
+    gameGrid.style.display = 'grid';
+  }
   initFeaturedModule();
 }
 
 function showAllGamesView() {
+  clearAllViews();
   updateNavActiveState('nav-games');
-  const heroSection = document.getElementById('heroSection');
-  const randomSection = document.querySelector('.random-section');
-  if (heroSection) heroSection.style.display = 'none';
-  if (randomSection) randomSection.style.display = 'none';
   
   const gameGrid = document.getElementById('gameGrid');
   if (gameGrid) gameGrid.style.display = 'grid';
-  
-  const favGrid = document.getElementById('favoritesGrid');
-  if (favGrid) favGrid.style.display = 'none';
   
   renderLibraryGrid(_0xData);
 }
 
 function showFavoritesView() {
+  clearAllViews();
   updateNavActiveState('nav-favorites');
-  const heroSection = document.getElementById('heroSection');
-  const randomSection = document.querySelector('.random-section');
-  if (heroSection) heroSection.style.display = 'none';
-  if (randomSection) randomSection.style.display = 'none';
-  
-  const gameGrid = document.getElementById('gameGrid');
-  if (gameGrid) gameGrid.style.display = 'none';
   
   const favGrid = document.getElementById('favoritesGrid');
   if (favGrid) favGrid.style.display = 'grid';
   
   renderFavoritesGrid();
+}
+
+function handlePlaceholderView(navId, viewName) {
+  clearAllViews();
+  updateNavActiveState(navId);
+  console.log(`${viewName} section is active on the same page structure.`);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -339,11 +343,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // Bind Standard Menus
+  if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
+  if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
+  
+  // Navigation Routing System Overrides
+  if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
+  if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
+  if (document.getElementById('nav-favorites')) document.getElementById('nav-favorites').onclick = (e) => { e.preventDefault(); showFavoritesView(); };
+  
+  // Clean single-page dynamic links routing logic block
+  if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
+  if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
+  if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
+
   // --- Communications Shield Controller ---
   const commsNavBtn = document.getElementById('nav-communications');
   if (commsNavBtn) {
     commsNavBtn.onclick = (e) => {
       e.preventDefault();
+      updateNavActiveState('nav-communications');
       if (localStorage.getItem('chatUser')) {
         window.location.href = "chat/chat.html";
       } else {
@@ -351,15 +370,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
   }
-
-  // Bind Standard Menus
-  if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
-  if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
-  
-  // Navigation Routing System Overrides
-  if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
-  if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
-  if (document.getElementById('nav-favorites')) document.getElementById('nav-favorites').onclick = (e) => { e.preventDefault(); showFavoritesView(); };
 
   if (document.getElementById('stealthOpener')) {
     document.getElementById('stealthOpener').onclick = (e) => {
@@ -449,12 +459,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.getElementById('confirm-delete-btn').onclick = () => {
     if (contextTargetId) {
-      // Clean up dataset entries completely from dashboard engine
       _0xData = _0xData.filter(g => g.id !== contextTargetId);
       favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
       localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
       
-      // Instantly clear out elements visually
       const activeFavoritesTab = document.getElementById('favoritesGrid').style.display === 'grid';
       if (activeFavoritesTab) {
         renderFavoritesGrid();
