@@ -313,9 +313,11 @@ function showHomeView() {
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   const gameGrid = document.getElementById('gameGrid');
+  const favGrid = document.getElementById('favoritesGrid'); // Add this line
   
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
+  if (favGrid) favGrid.style.setProperty('display', 'none', 'important'); // Ensure favorites are hidden on Home
   if (gameGrid) {
     gameGrid.style.display = 'grid';
     renderLibraryGrid(_0xData.filter(g => g.popular));
@@ -328,6 +330,9 @@ function showAllGamesView() {
   updateNavActiveState('nav-games');
   
   const gameGrid = document.getElementById('gameGrid');
+  const favGrid = document.getElementById('favoritesGrid'); // Add this line
+  
+  if (favGrid) favGrid.style.setProperty('display', 'none', 'important'); // Hide favorites grid
   if (gameGrid) {
     gameGrid.style.display = 'grid';
     renderLibraryGrid(_0xData);
@@ -338,7 +343,10 @@ function showFavoritesView() {
   clearAllViews();
   updateNavActiveState('nav-favorites');
   
+  const gameGrid = document.getElementById('gameGrid'); // Add this line
   const favGrid = document.getElementById('favoritesGrid');
+  
+  if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important'); // Hide the standard game grid completely!
   if (favGrid) {
     favGrid.style.display = 'grid';
     renderFavoritesGrid();
