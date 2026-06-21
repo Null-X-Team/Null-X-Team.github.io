@@ -319,7 +319,6 @@ function showHomeView() {
   if (randomSection) randomSection.style.display = 'block';
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
   
-  // Grid container is hidden from the main screen dashboard view
   if (gameGrid) {
     gameGrid.style.setProperty('display', 'none', 'important');
   }
@@ -354,16 +353,50 @@ function showFavoritesView() {
   }
 }
 
-function handlePlaceholderView(navId, viewName) {
+// Rewritten asynchronous content parser engine
+async function handlePlaceholderView(navId, viewName) {
   clearAllViews();
   updateNavActiveState(navId);
   
-  const targetSectionId = `${viewName.toLowerCase()}Section`;
-  const customSectionContainer = document.getElementById(targetSectionId);
-  if (customSectionContainer) {
-    customSectionContainer.style.display = 'block';
-  } else {
-    console.log(`${viewName} section is active on the same page structure.`);
+  const viewLower = viewName.toLowerCase();
+  const targetSectionId = `${viewLower}Section`;
+  let customSectionContainer = document.getElementById(targetSectionId);
+  
+  // Create container section on the fly if index.html is missing it
+  if (!customSectionContainer) {
+    customSectionContainer = document.createElement('div');
+    customSectionContainer.id = targetSectionId;
+    customSectionContainer.className = 'custom-view-panel';
+    
+    // Attempt alignment target injection inside the central visual area wrapper
+    const mainSectionNode = document.querySelector('.main-content .section') || document.querySelector('.main-content');
+    if (mainSectionNode) {
+      mainSectionNode.appendChild(customSectionContainer);
+    }
+  }
+  
+  customSectionContainer.style.display = 'block';
+  customSectionContainer.innerHTML = `<p style="color: #8b00ff; padding: 20px; font-family: sans-serif; font-style: italic; animation: pulse 1.5s infinite;">Mounting filesystem directory node...</p>`;
+  
+  try {
+    // Dynamic matching: checks your exact root tree path logic (e.g. Terminal folder vs terminal.html)
+    const targetFolder = viewLower === 'terminal' ? 'Terminal' : viewLower;
+    const fetchPath = `${targetFolder}/${viewLower}.html`;
+    
+    const response = await fetch(fetchPath);
+    if (!response.ok) throw new Error(`Status error ${response.status}`);
+    
+    const dynamicCodeContent = await response.text();
+    customSectionContainer.innerHTML = dynamicCodeContent;
+  } catch (error) {
+    console.error(`[System Error] Failed routing structural data for ${viewName}:`, error);
+    customSectionContainer.innerHTML = `
+      <div style="padding: 20px; font-family: sans-serif; border: 1px dashed rgba(139,0,255,0.4); border-radius: 8px; max-width: 500px; margin: 20px auto; background: rgba(10,10,10,0.8);">
+        <h3 style="color: #ff3333; margin-top: 0;">Filesystem Mount Error</h3>
+        <p style="color: #ccc; font-size: 14px;">Could not verify source file configuration at location pathway: <code>/${viewLower === 'terminal' ? 'Terminal' : viewLower}/${viewLower}.html</code></p>
+        <p style="color: #666; font-size: 12px; margin-bottom: 0;">Verify repository spelling match definitions alignment protocols.</p>
+      </div>
+    `;
   }
 }
 
@@ -569,32 +602,13 @@ document.addEventListener('DOMContentLoaded', () => {
         _0xData = _0xData.filter(g => g.id !== contextTargetId);
         favoriteGamesList = favoriteGamesList.filter(id => id !== contextTargetId);
         localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
-        
-        const favoritesGrid = document.getElementById('favoritesGrid');
-        const activeFavoritesTab = favoritesGrid && favoritesGrid.style.display === 'grid';
-        
-        if (activeFavoritesTab) {
-          renderFavoritesGrid();
-        } else {
-          const activeTerm = searchBar ? searchBar.value.toLowerCase().trim() : '';
-          if (activeTerm) {
-            const hits = _0xData.filter(g => g.title.toLowerCase().includes(activeTerm) || g.desc.toLowerCase().includes(activeTerm));
-            renderLibraryGrid(hits);
-          } else {
-            const heroSection = document.getElementById('heroSection');
-            if (heroSection && heroSection.style.display === 'flex') {
-              // Standard check: home view active implies the grid shouldn't show anyway
-              renderLibraryGrid(_0xData.filter(g => g.popular));
-            } else {
-              renderLibraryGrid(_0xData);
-            }
-          }
-        }
+        if (document.getElementById('gameGrid').style.display === 'grid') renderLibraryGrid(_0xData);
+        if (document.getElementById('favoritesGrid').style.display === 'grid') renderFavoritesGrid();
         if (deleteModal) deleteModal.style.display = 'none';
       }
     };
   }
-
+  
   const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
   if (cancelDeleteBtn) {
     cancelDeleteBtn.onclick = () => {
