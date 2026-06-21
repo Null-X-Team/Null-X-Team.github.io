@@ -1,79 +1,42 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const terminalScreen = document.getElementById("terminalScreen");
-  const consoleInput = document.getElementById("terminalConsoleInput");
-
-  // State log to track active workspace environment values
-  const systemState = {
-    currentDir: "~",
-    user: "guest",
-    host: "system"
-  };
-
-  // Static Dictionary Mapping Recognized Core Interface Strings
-  const commands = {
-    help: () => `Available System Directives:
-  help       - Display command structure index configuration
-  clear      - Empty interface activity layout
-  about      - Display build distribution statistics
-  status     - Check current runtime environmental flags
-  exit       - Return to main dashboard application view`,
-    
-    about: () => `Web Console System Interface Shell [Version 2.4.1]
-Configured environment pipeline mapping structural parameters via JavaScript runtime.`,
-    
-    status: () => `[SYSTEM STATUS EXPORT]
-Host Status     : Online
-Network Link    : Secured
-Theme Workspace : Rich Deep Purple Node Configuration`,
-    
-    exit: () => {
-      window.location.href = "index.html";
-      return "Navigating out of console...";
+(function initLinuxSubsystem() {
+    // 1. Dynamic Injection of the stable WebAssembly v86 Emulation Core Layer via unpkg CDN
+    if (!window.V86Starter) {
+        const script = document.createElement("script");
+        script.src = "https://unpkg.com/v86@0.5.359/build/libv86.js";
+        script.onload = bootKernelInstance;
+        document.head.appendChild(script);
+    } else {
+        bootKernelInstance();
     }
-  };
 
-  // Event listener to maintain input element focus on clicking empty viewport canvas
-  terminalScreen.addEventListener("click", () => {
-    consoleInput.focus();
-  });
+    function bootKernelInstance() {
+        const screenContainer = document.getElementById("linux-terminal-screen");
+        if (!screenContainer) return;
+        
+        screenContainer.innerHTML = "Booting real Linux kernel from image over WASM architecture...\n\n";
 
-  consoleInput.addEventListener("keydown", (e) => {
-    if (e.key === "Enter") {
-      const inputVal = consoleInput.value.trim();
-      if (inputVal === "") return;
+        // 2. Initialize the Hardware Emulator State Instance
+        const emulator = new V86Starter({
+            memory_size: 32 * 1024 * 1024,      // Allocate a light 32MB RAM sandbox environment inside the tab
+            vga_memory_size: 2 * 1024 * 1024,
+            screen_container: screenContainer,  // Pipes the system output text directly here
+            boot_order: 0x312,
+            
+            // Fetch standard configuration binary system files directly from remote mirrors
+            bios: { url: "https://copy.sh/v86/bios/seabios.bin" },
+            vga_bios: { url: "https://copy.sh/v86/bios/vgabios.bin" },
+            
+            // A micro 4.9MB Linux Buildroot Operating System image containing standard busybox tools
+            fda: { url: "https://copy.sh/v86/images/linux.img" }, 
+            autostart: true,
+        });
 
-      // Parse instruction tokens split away from user args
-      const parts = inputVal.split(" ");
-      const cmd = parts[0].toLowerCase();
-
-      // Print the user command string back to terminal output
-      appendOutputRow(`${systemState.user}@${systemState.host}:${systemState.currentDir}$ ${inputVal}`, "text-muted");
-
-      if (cmd === "clear") {
-        clearTerminalCanvas();
-      } else if (commands[cmd]) {
-        const result = commands[cmd](parts.slice(1));
-        appendOutputRow(result);
-      } else {
-        appendOutputRow(`Command directive not recognized: '${cmd}'. Try typing 'help' to see active operations indices.`, "text-error");
-      }
-
-      // Reset text line content and shift window view viewport focus downwards
-      consoleInput.value = "";
-      terminalScreen.scrollTop = terminalScreen.scrollHeight;
+        // 3. Keep standard UI focus fixed into the console environment 
+        screenContainer.addEventListener("click", () => {
+            screenContainer.focus();
+        });
+        
+        // Push initial focus immediately upon tab loading sequence completion
+        setTimeout(() => screenContainer.focus(), 500);
     }
-  });
-
-  function appendOutputRow(text, className = "") {
-    const row = document.createElement("div");
-    row.className = `output-line ${className}`;
-    row.innerText = text;
-    // Insert output item directly ahead of input container layout reference
-    terminalScreen.insertBefore(row, consoleInput.closest(".input-line-wrapper"));
-  }
-
-  function clearTerminalCanvas() {
-    const lines = terminalScreen.querySelectorAll(".output-line");
-    lines.forEach(line => line.remove());
-  }
-});
+})();
