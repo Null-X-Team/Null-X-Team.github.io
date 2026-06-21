@@ -1,5 +1,12 @@
-<div class="terminal-view-container" style="box-sizing: border-box; width: 100%; min-height: 480px; background: #0c0a0a; border: 1px solid rgba(139, 0, 255, 0.25); border-radius: 12px; padding: 15px; position: relative;">
-    <div id="linux-terminal-screen" style="white-space: pre; font-family: 'Courier New', Courier, monospace; font-size: 14px; color: #fff; line-height: 1.4; overflow-y: auto; height: 450px; outline: none;" tabindex="0">
-        Loading WebAssembly Linux Architecture Kernel Subsystems...
+<div class="terminal-view-container">
+    <div id="terminal-screen" style="overflow-y: auto; height: 400px; margin-bottom: 15px;">
+        <div class="output-line text-success">NxOS Kernel Subsystems Initialized Successfully.</div>
+        <div class="output-line">Type 'help' to view available system binaries and commands.</div>
+        <div class="output-line" style="margin-bottom: 15px;">--------------------------------------------------</div>
+    </div>
+
+    <div class="terminal-input-line">
+        <span class="terminal-prompt" id="terminal-prompt-label">guest@nxos:~$&nbsp;</span>
+        <input type="text" id="terminal-console-input" autocomplete="off" autofocus />
     </div>
 </div>
