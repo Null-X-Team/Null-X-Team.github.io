@@ -43,3 +43,16 @@
     padding: 0;
     margin: 0;
 }
+#linux-terminal-screen {
+    white-space: pre-wrap !important; /* Prevents text from pushing off screen boundaries */
+    word-break: break-all;
+}
+
+#linux-terminal-screen::-webkit-scrollbar {
+    width: 6px;
+}
+
+#linux-terminal-screen::-webkit-scrollbar-thumb {
+    background: rgba(139, 0, 255, 0.3);
+    border-radius: 4px;
+}
