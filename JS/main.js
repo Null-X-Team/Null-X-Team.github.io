@@ -313,14 +313,15 @@ function showHomeView() {
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   const gameGrid = document.getElementById('gameGrid');
-  const favGrid = document.getElementById('favoritesGrid'); // Add this line
+  const favGrid = document.getElementById('favoritesGrid');
   
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
-  if (favGrid) favGrid.style.setProperty('display', 'none', 'important'); // Ensure favorites are hidden on Home
+  if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
+  
+  // Grid container is hidden from the main screen dashboard view
   if (gameGrid) {
-    gameGrid.style.display = 'grid';
-    renderLibraryGrid(_0xData.filter(g => g.popular));
+    gameGrid.style.setProperty('display', 'none', 'important');
   }
   initFeaturedModule();
 }
@@ -330,9 +331,9 @@ function showAllGamesView() {
   updateNavActiveState('nav-games');
   
   const gameGrid = document.getElementById('gameGrid');
-  const favGrid = document.getElementById('favoritesGrid'); // Add this line
+  const favGrid = document.getElementById('favoritesGrid');
   
-  if (favGrid) favGrid.style.setProperty('display', 'none', 'important'); // Hide favorites grid
+  if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
   if (gameGrid) {
     gameGrid.style.display = 'grid';
     renderLibraryGrid(_0xData);
@@ -343,10 +344,10 @@ function showFavoritesView() {
   clearAllViews();
   updateNavActiveState('nav-favorites');
   
-  const gameGrid = document.getElementById('gameGrid'); // Add this line
+  const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
   
-  if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important'); // Hide the standard game grid completely!
+  if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important');
   if (favGrid) {
     favGrid.style.display = 'grid';
     renderFavoritesGrid();
@@ -571,14 +572,26 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const favoritesGrid = document.getElementById('favoritesGrid');
         const activeFavoritesTab = favoritesGrid && favoritesGrid.style.display === 'grid';
+        
         if (activeFavoritesTab) {
           renderFavoritesGrid();
         } else {
-          renderLibraryGrid(_0xData);
+          const activeTerm = searchBar ? searchBar.value.toLowerCase().trim() : '';
+          if (activeTerm) {
+            const hits = _0xData.filter(g => g.title.toLowerCase().includes(activeTerm) || g.desc.toLowerCase().includes(activeTerm));
+            renderLibraryGrid(hits);
+          } else {
+            const heroSection = document.getElementById('heroSection');
+            if (heroSection && heroSection.style.display === 'flex') {
+              // Standard check: home view active implies the grid shouldn't show anyway
+              renderLibraryGrid(_0xData.filter(g => g.popular));
+            } else {
+              renderLibraryGrid(_0xData);
+            }
+          }
         }
+        if (deleteModal) deleteModal.style.display = 'none';
       }
-      if (deleteModal) deleteModal.style.display = 'none';
-      contextTargetId = null;
     };
   }
 
@@ -586,7 +599,6 @@ document.addEventListener('DOMContentLoaded', () => {
   if (cancelDeleteBtn) {
     cancelDeleteBtn.onclick = () => {
       if (deleteModal) deleteModal.style.display = 'none';
-      contextTargetId = null;
     };
   }
 });
