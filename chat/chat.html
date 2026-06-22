@@ -1,91 +1,116 @@
-<div class="chat-container">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Grades</h2>
-        </div>
-        
-        <div class="channel-list">
-            <div id="chan-general" class="channel active" onclick="switchTab('general')"># general</div>
-            <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
-            <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
-            <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grades</title>
+    <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+    <div class="chat-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Grades</h2>
+            </div>
+            
+            <div class="channel-list">
+                <div id="chan-general" class="channel active" onclick="switchTab('general')"># general</div>
+                <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
+                <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
+                <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
+            </div>
+
+            <div class="user-profile">
+                <a href="../profile/profile.html" class="user-avatar-link" title="View Profile Settings">
+                    <img id="current-user-avatar" class="avatar" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="My Profile">
+                </a>
+                <span id="username-display"></span>
+            </div>
         </div>
 
-        <div class="user-profile">
-            <a href="profile/profile.html" class="user-avatar-link" title="View Profile Settings">
-                <img id="current-user-avatar" class="avatar" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="My Profile">
-            </a>
-            <span id="username-display"></span>
-        </div>
-    </div>
 
-    <div class="main-chat">
-        <div id="chat-view">
-            <div id="chat-messages" class="messages-container"></div>
-            <form id="chat-form" class="input-area">
-                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
-                <button type="submit">Send</button>
-            </form>
-        </div>
+        <div class="main-chat">
+            <div id="chat-view">
+                <div id="chat-messages" class="messages-container"></div>
+                <form id="chat-form" class="input-area">
+                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                    <button type="submit">Send</button>
+                </form>
+            </div>
 
-        <div id="users-view" style="display:none; padding: 40px; height: 100%; overflow-y: auto;">
-            <h1 style="color: #cf7a3c; margin-bottom: 20px;">User Directory</h1>
-            <input type="text" id="directory-search" placeholder="Search for a user..." style="margin-bottom: 20px; width: 100%; padding: 12px; background: #140f0d; border: 1px solid rgba(207, 122, 60, 0.2); color: white; border-radius: 6px; outline: none;">
-            <div id="user-list-display" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
-        </div>
+            <div id="users-view" style="display:none; padding: 40px; height: 100%; overflow-y: auto;">
+                <h1 style="color: #8b00ff; margin-bottom: 20px;">User Directory</h1>
+                <input type="text" id="directory-search" placeholder="Search for a user..." style="margin-bottom: 20px; width: 100%; padding: 10px; background: #111; border: 1px solid #333; color: white;">
+                <div id="user-list-display" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
+            </div>
 
-        <div id="rules-view" class="rules-content" style="display:none; padding: 40px; overflow-y: auto;">
-            <h1 style="color: #cf7a3c; margin-bottom: 20px;">COMMUNITY RULES</h1>
-            <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 12px; color: #e0e0e0; font-size: 14px;">
-                <li><strong style="color: #cf7a3c;">1.</strong> No handing out personal information.</li>
-                <li><strong style="color: #cf7a3c;">2.</strong> No cussing.</li>
-                <li><strong style="color: #cf7a3c;">3.</strong> No pornographic images or videos.</li>
-                <li><strong style="color: #cf7a3c;">4.</strong> No spamming.</li>
-                <li><strong style="color: #cf7a3c;">5.</strong> No racism or hate speech.</li>
-            </ul>
-        </div>
+            <div id="rules-view" class="rules-content" style="display:none;">
+                <h1>COMMUNITY RULES</h1>
+                <ul>
+                    <li>1. No handing out personal information.</li>
+                    <li>2. No cussing.</li>
+                    <li>3. No pornographic images or videos.</li>
+                    <li>4. No spamming.</li>
+                    <li>5. No racism or hate speech.</li>
+                </ul>
+            </div>
 
-        <div id="admin-panel-view" style="display:none; padding: 40px; overflow-y: auto;">
-            <h1 style="margin-bottom:20px; color:#ff4444;">Admin Management</h1>
-            <div class="admin-grid">
-                <div class="admin-card">
-                    <h3>Warnings</h3>
-                    <div class="search-wrapper">
-                        <input type="text" id="warn-search" placeholder="Type @ to find user...">
+            <div id="admin-panel-view" style="display:none; padding: 40px; overflow-y: auto;">
+                <h1 style="margin-bottom:20px; color:#ff4444;">Admin Management</h1>
+                <div class="admin-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="admin-card">
+                        <h3>Warnings</h3>
+                        <div class="search-wrapper">
+                            <input type="text" id="warn-search" placeholder="Type @ to find user...">
+                        </div>
+                        <textarea id="bulk-warn" class="bulk-area" placeholder="user1, user2..."></textarea>
+                        <input type="text" id="warn-reason" placeholder="Reason...">
+                        <button class="admin-btn btn-warn" onclick="adminExecute('warn')">Issue Warning</button>
                     </div>
-                    <textarea id="bulk-warn" class="bulk-area" placeholder="user1, user2..."></textarea>
-                    <input type="text" id="warn-reason" placeholder="Reason...">
-                    <button class="admin-btn btn-warn" onclick="adminExecute('warn')">Issue Warning</button>
-                </div>
 
-                <div class="admin-card">
-                    <h3>Temporary Ban</h3>
-                    <div class="search-wrapper">
-                        <input type="text" id="temp-ban-search" placeholder="User to temp ban (@...)">
-                    </div>
-                    <select id="temp-ban-duration" style="width:100%; margin: 10px 0; padding: 10px; background: #140f0d; color: white; border: 1px solid rgba(207, 122, 60, 0.2); border-radius: 4px;">
-                        <option value="60">1 Hour</option>
-                        <option value="1440">24 Hours</option>
-                        <option value="10080">1 Week</option>
-                    </select>
-                    <textarea id="temp-ban-reason" placeholder="Reason for temp ban..." class="bulk-area"></textarea>
-                    <button class="admin-btn btn-ban" onclick="executeTempBan()">Apply Temp Ban</button>
-                </div>
 
-                <div class="admin-card">
-                    <h3>Bans & Unbans</h3>
-                    <div class="search-wrapper">
-                        <input type="text" id="ban-search" placeholder="Type @ to find user...">
+
+
+
+                    <div class="admin-card">
+                        <h3>Temporary Ban</h3>
+                        <div class="search-wrapper">
+                            <input type="text" id="temp-ban-search" placeholder="User to temp ban (@...)">
+                        </div>
+                        <select id="temp-ban-duration" style="width:100%; margin: 10px 0; padding: 10px; background: #000; color: white; border: 1px solid #333;">
+                            <option value="60">1 Hour</option>
+                            <option value="1440">24 Hours</option>
+                            <option value="10080">1 Week</option>
+                        </select>
+                        <textarea id="temp-ban-reason" placeholder="Reason for temp ban..." class="bulk-area"></textarea>
+                        <button class="admin-btn btn-ban" onclick="executeTempBan()">Apply Temp Ban</button>
                     </div>
-                    <input type="text" id="ban-reason" placeholder="Reason...">
-                    <select id="ban-category" style="width:100%; margin: 10px 0; padding: 10px; background: #140f0d; color: white; border: 1px solid rgba(207, 122, 60, 0.2); border-radius: 4px;">
-                        <option value="Both">Both</option>
-                        <option value="Chat">Chat</option>
-                    </select>
-                    <button class="admin-btn btn-ban" onclick="adminExecute('ban')">Execute Ban</button>
-                    <button class="admin-btn btn-unban" onclick="adminExecute('unban')">Unban User</button>
+
+
+
+
+
+
+
+
+
+                    <div class="admin-card">
+                        <h3>Bans & Unbans</h3>
+                        <div class="search-wrapper">
+                            <input type="text" id="ban-search" placeholder="Type @ to find user...">
+                        </div>
+                        <input type="text" id="ban-reason" placeholder="Reason...">
+                        <select id="ban-category" style="width:100%; margin: 10px 0; padding: 10px; background: #000; color: white; border: 1px solid #333;">
+                            <option value="Both">Both</option>
+                            <option value="Chat">Chat</option>
+                        </select>
+                        <button class="admin-btn btn-ban" onclick="adminExecute('ban')">Execute Ban</button>
+                        <button class="admin-btn btn-unban" onclick="adminExecute('unban')">Unban User</button>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-</div>
+    <script type="module" src="chat.js"></script>
+</body>
+</html>
