@@ -10,6 +10,7 @@ const ADMIN_NAME = "glaeesas";
 const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
 let lastMessageTime = 0;
+let chatPollingInterval = null; // Reference to prevent runaway background loops
 
 function containsCorePII(text) {
     const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -64,13 +65,17 @@ async function checkMessageWithAI(text, registeredUsers = []) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+// Global initialization hook exposed directly to main.js router
+window.initializeChatEngine = async function() {
     const user = localStorage.getItem('chatUser');
     
     if (!user) {
         window.location.href = "../Login/login.html";
         return;
     }
+
+    // Clear any pre-existing loops before establishing a fresh tracking session
+    if (chatPollingInterval) clearInterval(chatPollingInterval);
 
     try {
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
@@ -112,7 +117,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
             
-            // 🔥 FIXED: Populates image and sets redirection to user's profile view
             const systemFooterAvatar = document.getElementById('current-user-avatar');
             if (systemFooterAvatar) {
                 systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
@@ -123,7 +127,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const lowerUser = user.toLowerCase();
-    document.getElementById('username-display').textContent = user;
+    const usernameDisplay = document.getElementById('username-display');
+    if (usernameDisplay) usernameDisplay.textContent = user;
     
     if (lowerUser === ADMIN_NAME.toLowerCase()) {
         const adminTab = document.getElementById('admin-tab');
@@ -142,7 +147,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.querySelectorAll('.channel').forEach(c => c.classList.remove('active'));
         
         if (target === 'general' || target === 'dev-logs') {
-            document.getElementById('chat-view').style.display = 'flex';
+            const chatView = document.getElementById('chat-view');
+            if (chatView) chatView.style.display = 'flex';
             const tabId = target === 'general' ? 'chan-general' : 'chan-dev';
             const tabEl = document.getElementById(tabId);
             if (tabEl) tabEl.classList.add('active');
@@ -168,7 +174,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
 
     // --- USER DIRECTORY ---
-    const fetchAllUsers = async () => {
+    async function fetchAllUsers() {
         try {
             const rolesRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=*`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -193,27 +199,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             
             renderUserDirectory();
         } catch (err) { console.error(err); }
-    };
+    }
 
-    const renderUserDirectory = (filterTerm = "") => {
+    function renderUserDirectory(filterTerm = "") {
         const listContainer = document.getElementById('user-list-display');
         if (!listContainer) return;
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
         listContainer.innerHTML = filtered.map(u => `
             <div class="admin-card" style="text-align:center;">
-                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}">
+                <a href="profile/profile.html?user=${encodeURIComponent(u.username)}">
                     <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%;">
                 </a>
-                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
+                <a href="profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
                     ${u.username}
                 </a>
-                <div style="font-size:11px; color:#aaa; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
+                <div style="font-size:11px; color:#a0928d; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
             </div>
         `).join('');
-    };
+    }
 
     // --- MESSAGE ENGINE ---
     async function fetchMessages() {
+        if (!document.getElementById('chat-messages')) {
+            // Self-terminate polling loop if user has navigated away from the chat component
+            clearInterval(chatPollingInterval);
+            return;
+        }
         try {
             const mRes = await fetch(`${SUPABASE_URL}/rest/v1/messages?select=*&order=created_at.asc`, { 
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
@@ -243,14 +254,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const div = document.createElement('div');
                 div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 
-                // 🔥 FIXED: Links the text badge username and visual avatar image to user profile URLs
                 div.innerHTML = `
-                    <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}">
+                    <a href="profile/profile.html?user=${encodeURIComponent(msg.username)}">
                         <img src="${userPfp}" class="chat-pfp" alt="Avatar">
                     </a>
                     <div class="message-content-node">
                         <div class="message-meta-header">
-                            <a href="../Profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
+                            <a href="profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
                                 <strong>${msg.username}</strong>
                             </a>
                             ${tag}
@@ -268,42 +278,45 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) { console.error(e); }
     }
 
-    document.getElementById('chat-form').onsubmit = async (e) => {
-        e.preventDefault();
-        const now = Date.now();
-        const input = document.getElementById('message-input');
-        if (now - lastMessageTime < 2000 && lowerUser !== ADMIN_NAME) return alert("Please wait between messages.");
-        
-        const val = input.value.trim();
-        if (!val) return;
-        
-        if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-            const staticWarning = containsCorePII(val);
-            if (staticWarning) {
-                alert(`[SECURITY BLOCK] ${staticWarning}`);
-                return; 
+    const chatForm = document.getElementById('chat-form');
+    if (chatForm) {
+        chatForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const now = Date.now();
+            const input = document.getElementById('message-input');
+            if (now - lastMessageTime < 2000 && lowerUser !== ADMIN_NAME) return alert("Please wait between messages.");
+            
+            const val = input.value.trim();
+            if (!val) return;
+            
+            if (lowerUser !== ADMIN_NAME.toLowerCase()) {
+                const staticWarning = containsCorePII(val);
+                if (staticWarning) {
+                    alert(`[SECURITY BLOCK] ${staticWarning}`);
+                    return; 
+                }
             }
-        }
 
-        if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-            const stringUserList = allUsers.map(u => u.username);
-            const aiWarning = await checkMessageWithAI(val, stringUserList);
-            if (aiWarning) {
-                alert(`[SECURITY BLOCK] ${aiWarning}`);
-                return;
+            if (lowerUser !== ADMIN_NAME.toLowerCase()) {
+                const stringUserList = allUsers.map(u => u.username);
+                const aiWarning = await checkMessageWithAI(val, stringUserList);
+                if (aiWarning) {
+                    alert(`[SECURITY BLOCK] ${aiWarning}`);
+                    return;
+                }
             }
-        }
 
-        input.value = ""; 
-        lastMessageTime = now;
+            input.value = ""; 
+            lastMessageTime = now;
 
-        await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, content: val })
-        });
-        fetchMessages();
-    };
+            await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: user, content: val })
+            });
+            fetchMessages();
+        };
+    }
 
     window.adminExecute = async (action) => {
         let target = document.getElementById(action === 'warn' ? 'warn-search' : 'ban-search').value.trim();
@@ -362,6 +375,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         dirSearch.oninput = (e) => renderUserDirectory(e.target.value);
     }
 
-    setInterval(fetchMessages, 3000);
+    chatPollingInterval = setInterval(fetchMessages, 3000);
     fetchMessages();
-});
+};
+
+// Auto-run if the script is running in structural standalone isolation mode
+if (document.getElementById('chat-messages')) {
+    window.initializeChatEngine();
+}
