@@ -493,24 +493,18 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
 
-  // --- INTEGRATED COMMUNICATIONS NAV ROUTER ---
-  const commsNavBtn = document.getElementById('nav-communications');
+ const commsNavBtn = document.getElementById('nav-communications');
   if (commsNavBtn) {
-    commsNavBtn.onclick = async (e) => {
+    commsNavBtn.onclick = (e) => {
       e.preventDefault();
+      updateNavActiveState('nav-communications');
       
-      // Safety gate check: force login routing if identity token is absent
-      if (!localStorage.getItem('chatUser')) {
+      // Keep your login guard intact
+      if (localStorage.getItem('chatUser')) {
+        // This takes you directly to the full standalone chat page
+        window.location.href = "chat/chat.html";
+      } else {
         window.location.href = "Login/login.html";
-        return;
-      }
-
-      // Step 1: Use your existing core router engine to dynamically fetch and build chat.html
-      await handlePlaceholderView('nav-communications', 'Chat');
-
-      // Step 2: Auto-initialize the background database and script loops inside chat.js
-      if (typeof window.initializeChatEngine === 'function') {
-        window.initializeChatEngine();
       }
     };
   }
