@@ -237,7 +237,7 @@ window.initializeChatEngine = async function() {
             try {
                 // 2. Ping your real Vercel web address instead of the broken local path
                 if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-                    const modResponse = await fetch('https://your-vercel-project-name.vercel.app/api/moderate', {
+                    const modResponse = await fetch('https://glaxyias-github-gm0gj7bur-nullx.vercel.app/api/moderate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ text: val })
