@@ -8,19 +8,6 @@ let allUsers = [];
 let lastMessageTime = 0;
 let chatPollingInterval = null; // Reference to prevent runaway background loops
 
-function containsCorePII(text) {
-    const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
-    const phonePattern = /(?:\+?\d{1,3}[-.\s]?)?\(?\d{3}\)?[-.\s]?\d{3}[-.\s]?\d{4}/;
-    const addressKeywords = /\b(street|st|avenue|ave|drive|dr|road|rd|lane|ln|way|court|ct|zip|zipcode)\b/i;
-    const houseNumberPattern = /\d{3,5}\s+[a-zA-Z0-9\s]{3,}/;
-
-    if (emailPattern.test(text)) return "Emails are not allowed to be shared.";
-    if (phonePattern.test(text)) return "Phone numbers are not allowed to be shared.";
-    if (addressKeywords.test(text) && houseNumberPattern.test(text)) return "Physical addresses are not allowed to be shared.";
-    
-    return null;
-}
-
 // Global initialization hook exposed directly to main.js router
 window.initializeChatEngine = async function() {
     const user = localStorage.getItem('chatUser');
@@ -244,22 +231,13 @@ window.initializeChatEngine = async function() {
             const val = input.value.trim();
             if (!val) return;
             
-            // 1. Run local PII validation rule sets first
-            if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-                const staticWarning = containsCorePII(val);
-                if (staticWarning) {
-                    alert(`[SECURITY BLOCK] ${staticWarning}`);
-                    return; 
-                }
-            }
-
-            // 2. Lock UI interaction during serverless API evaluation
+            // 1. Lock UI interaction during serverless API evaluation
             input.disabled = true;
 
             try {
-                // 3. Ping your Vercel OpenAI Moderation endpoint
+                // 2. Ping your real Vercel web address instead of the broken local path
                 if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-                    const modResponse = await fetch('/api/moderate', {
+                    const modResponse = await fetch('https://your-vercel-project-name.vercel.app/api/moderate', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ text: val })
@@ -273,11 +251,11 @@ window.initializeChatEngine = async function() {
 
                     if (safetyCheck.flagged) {
                         alert(`[SECURITY BLOCK] Message blocked by AI filter! (${safetyCheck.reason})`);
-                        return; // Terminate execution layout path instantly
+                        return; // Stop execution layout path instantly
                     }
                 }
 
-                // 4. Success: Message is clean, proceed to push to Supabase
+                // 3. Success: Message is clean, proceed to push to Supabase
                 input.value = ""; 
                 lastMessageTime = now;
 
