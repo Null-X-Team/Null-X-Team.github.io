@@ -1,5 +1,14 @@
-// api/moderate.js
 export default async function handler(req, res) {
+  // --- ADDED THIS TO FIX THE GITHUB PAGES CONNECTION ---
+  res.setHeader("Access-Control-Allow-Origin", "*"); 
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+  // ------------------------------------------------------
+
   if (req.method !== "POST") {
     return res.status(405).json({ error: "Method Not Allowed" });
   }
@@ -17,7 +26,6 @@ export default async function handler(req, res) {
   let flagged = false;
   let reasons = [];
 
-  // 1. OpenAI Moderation (Toxicity, Hate, etc.)
   try {
     const modResponse = await fetch("https://api.openai.com/v1/moderations", {
       method: "POST",
@@ -42,39 +50,32 @@ export default async function handler(req, res) {
     console.error("Moderation API error:", err);
   }
 
-  // 2. Phone Number Detection
   const phoneRegex = /\+?\d{1,4}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}/g;
   if (phoneRegex.test(text)) {
     flagged = true;
     reasons.push("phone number");
   }
 
-  // 3. Email Detection
   const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;
   if (emailRegex.test(text)) {
     flagged = true;
     reasons.push("email address");
   }
 
-  // 4. Basic Address / Personal Info Detection
   const addressKeywords = /\b(\d+\s+[A-Za-z]+\s+(street|st|avenue|ave|road|rd|lane|ln|boulevard|blvd|drive|dr))\b/i;
   if (addressKeywords.test(text)) {
     flagged = true;
     reasons.push("address");
   }
 
-  // 5. Full Name Detection (Heuristic)
   const namePatterns = /\b([A-Z][a-z]+)\s+([A-Z][a-z]+)\b/g;
   const nameMatches = text.match(namePatterns) || [];
   if (nameMatches.length >= 1) {
-    // OPTION A: If you want to strictly BLOCK names, uncomment the line below:
-    // flagged = true; 
     reasons.push("possible personal name");
   }
 
   return res.status(200).json({
     flagged,
-    // If flagged is true, send the reasons. Otherwise, return "Clean"
     reason: flagged ? reasons.join(", ") : "Clean",
     message: flagged ? "Message blocked for safety" : "Message approved"
   });
