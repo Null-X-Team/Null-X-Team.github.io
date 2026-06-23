@@ -2,10 +2,6 @@
 const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
-// --- AI MODERATION CONFIGURATION ---
-const AI_MODERATION_ENDPOINT = 'https://api-inference.huggingface.co/models/beki/en_spacy_pii_distilbert';
-const AI_API_KEY = 'hf_YOUR_HUGGINGFACE_API_KEY_HERE'; 
-
 const ADMIN_NAME = "glaeesas";
 const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
@@ -23,46 +19,6 @@ function containsCorePII(text) {
     if (addressKeywords.test(text) && houseNumberPattern.test(text)) return "Physical addresses are not allowed to be shared.";
     
     return null;
-}
-
-async function checkMessageWithAI(text, registeredUsers = []) {
-    try {
-        if (AI_API_KEY.includes('YOUR_HUGGINGFACE')) {
-            const words = text.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()?"']/g, "").split(/\s+/);
-            const lowerCaseUsers = registeredUsers.map(u => u.toLowerCase());
-            const commonWords = ['i', 'you', 'he', 'she', 'they', 'we', 'it', 'the', 'a', 'an', 'and', 'but', 'or', 'if', 'is', 'am', 'are', 'was', 'were', 'be', 'been', 'to', 'for', 'with', 'in', 'on', 'at', 'by', 'of', 'up', 'do', 'go', 'can', 'will', 'no', 'yes', 'not', 'me', 'my', 'your', 'his', 'her', 'this', 'that'];
-            
-            for (let word of words) {
-                const clean = word.trim().toLowerCase();
-                if (clean.length > 2 && word[0] === word[0].toUpperCase() && !commonWords.includes(clean)) {
-                    if (!lowerCaseUsers.includes(clean)) {
-                        return `The name "${word}" is not a registered user. Privacy protection active.`;
-                    }
-                }
-            }
-            return null;
-        }
-
-        const response = await fetch(AI_MODERATION_ENDPOINT, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${AI_API_KEY}`, 'Content-Type': 'application/json' },
-            body: JSON.stringify({ inputs: text })
-        });
-
-        if (!response.ok) return null; 
-        const result = await response.json();
-        
-        if (result && result[0]) {
-            const topPrediction = result[0].sort((a, b) => b.score - a.score)[0];
-            if ((topPrediction.label === 'LABEL_1' || topPrediction.label === 'PII') && topPrediction.score > 0.85) {
-                return "Real-world names or personal details detected by system moderation.";
-            }
-        }
-        return null;
-    } catch (err) {
-        console.error("AI engine handshake failed:", err);
-        return null; 
-    }
 }
 
 // Global initialization hook exposed directly to main.js router
@@ -221,7 +177,6 @@ window.initializeChatEngine = async function() {
     // --- MESSAGE ENGINE ---
     async function fetchMessages() {
         if (!document.getElementById('chat-messages')) {
-            // Self-terminate polling loop if user has navigated away from the chat component
             clearInterval(chatPollingInterval);
             return;
         }
@@ -269,7 +224,7 @@ window.initializeChatEngine = async function() {
                         <div class="message-text-bubble ${msg.username === user ? 'my-bubble-color' : 'other-bubble-color'}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
                             ${msg.content}
                         </div>
-                        ${(lowerUser === ADMIN_NAME && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
+                         ${(lowerUser === ADMIN_NAME && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
                     </div>
                 `;
                 msgContainer.appendChild(div);
@@ -289,6 +244,7 @@ window.initializeChatEngine = async function() {
             const val = input.value.trim();
             if (!val) return;
             
+            // 1. Run local PII validation rule sets first
             if (lowerUser !== ADMIN_NAME.toLowerCase()) {
                 const staticWarning = containsCorePII(val);
                 if (staticWarning) {
@@ -297,24 +253,49 @@ window.initializeChatEngine = async function() {
                 }
             }
 
-            if (lowerUser !== ADMIN_NAME.toLowerCase()) {
-                const stringUserList = allUsers.map(u => u.username);
-                const aiWarning = await checkMessageWithAI(val, stringUserList);
-                if (aiWarning) {
-                    alert(`[SECURITY BLOCK] ${aiWarning}`);
-                    return;
+            // 2. Lock UI interaction during serverless API evaluation
+            input.disabled = true;
+
+            try {
+                // 3. Ping your Vercel OpenAI Moderation endpoint
+                if (lowerUser !== ADMIN_NAME.toLowerCase()) {
+                    const modResponse = await fetch('/api/moderate', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ text: val })
+                    });
+
+                    if (!modResponse.ok) {
+                        throw new Error("Compliance pipeline validation mismatch.");
+                    }
+
+                    const safetyCheck = await modResponse.json();
+
+                    if (safetyCheck.flagged) {
+                        alert(`[SECURITY BLOCK] Message blocked by AI filter! (${safetyCheck.reason})`);
+                        return; // Terminate execution layout path instantly
+                    }
                 }
+
+                // 4. Success: Message is clean, proceed to push to Supabase
+                input.value = ""; 
+                lastMessageTime = now;
+
+                await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+                    method: 'POST',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: user, content: val })
+                });
+                
+                fetchMessages();
+            } catch (err) {
+                console.error("Moderation pipeline threw exception:", err);
+                alert("System error tracking chat safety requirements. Please retry.");
+            } finally {
+                // Always restore text input capabilities
+                input.disabled = false;
+                input.focus();
             }
-
-            input.value = ""; 
-            lastMessageTime = now;
-
-            await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
-                method: 'POST',
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username: user, content: val })
-            });
-            fetchMessages();
         };
     }
 
