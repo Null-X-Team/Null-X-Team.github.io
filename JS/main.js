@@ -42,7 +42,10 @@ let _0xData = [
   { id: "gm_2", title: "Gun Mayhem 2", url: "Games/GunMayhem/gunmayhem2/gunmayhem2.html", desc: "The sequel to Gun Mayhem with more weapons, maps, customization, and intense combat.", popular: true },
   { id: "gm_r", title: "Gun Mayhem Redux", url: "Games/GunMayhem/gunmayhemredux/gunmayhemredux.html", desc: "A remastered Gun Mayhem experience with improved gameplay, expanded content, and smoother action.", popular: true },
   { id: "m_d", title: "Mutilate a Doll", url: "Games/mutilateadoll/mutilateadoll.html", desc: "A sandbox ragdoll simulation game where you can experiment with physics, weapons, and chaos. (Will Cause Massive Lag)", popular: true },
-    { id: "b_md", title: "Bacon May Die", url: "Games/bakonmaydie/index.html", desc: "Fast-paced side-scrolling brawler where a fearless pig battles endless enemy waves using melee attacks and powerful weapons.", popular: true },
+  { id: "b_md", title: "Bacon May Die", url: "Games/bakonmaydie/index.html", desc: "Fast-paced side-scrolling brawler where a fearless pig battles endless enemy waves using melee attacks and powerful weapons.", popular: true },
+  { id: "a_df", title: "A Dance of Fire and Ice", url: "Games/ADOFAI/index.html", desc: "Rhythm-based precision game where you guide two orbiting planets through challenging musical tracks.", popular: true },
+  { id: "a_sr", title: "Amazing Strange Rope Police", url: "Games/ASRP/index.html", desc: "Open-world action game where you use superhuman abilities, vehicles, and gadgets to fight crime across a massive city.", popular: true },
+  { id: "a_oc", title: "Ages of Conflict", url: "Games/AOC/index.html", desc: "Strategic world simulation where nations wage wars, form alliances, and reshape the map through dynamic conflicts.", popular: true },
 ];
 
 // Context Management variables
