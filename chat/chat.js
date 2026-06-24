@@ -177,6 +177,10 @@ window.initializeChatEngine = async function() {
             const messages = await mRes.json();
             const roles = await rRes.json();
 
+            // Check if user is scrolled near the bottom before shifting content layouts
+            // We give it a 100px threshold window padding zone
+            const isAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 100;
+
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
                 const isDel = msg.content === "Message Was Deleted By Owner";
@@ -216,7 +220,11 @@ window.initializeChatEngine = async function() {
                 `;
                 msgContainer.appendChild(div);
             });
-            msgContainer.scrollTop = msgContainer.scrollHeight;
+
+            // Only snap down if they were already viewing the baseline layout window layer
+            if (isAtBottom) {
+                msgContainer.scrollTop = msgContainer.scrollHeight;
+            }
         } catch (e) { console.error(e); }
     }
 
@@ -268,11 +276,13 @@ window.initializeChatEngine = async function() {
                     body: JSON.stringify({ username: user, content: val })
                 });
                 
-                fetchMessages();
+                // Force an absolute bottom snap since the user themselves explicitly sent this text node
+                fetchMessages().then(() => {
+                    msgContainer.scrollTop = msgContainer.scrollHeight;
+                });
             } catch (err) {
                 console.error("Moderation pipeline threw exception:", err);
                 alert("Safety verification offline. Message could not be processed safely.");
-                // Explicit return stops unvalidated falls through to Supabase insertion loops
                 return;
             } finally {
                 // Always restore text input capabilities safely
@@ -340,7 +350,10 @@ window.initializeChatEngine = async function() {
     }
 
     chatPollingInterval = setInterval(fetchMessages, 3000);
-    fetchMessages();
+    // Initial load forces baseline structural alignment layer instantly
+    fetchMessages().then(() => {
+        msgContainer.scrollTop = msgContainer.scrollHeight;
+    });
 };
 
 // Auto-run if the script is running in structural standalone isolation mode
