@@ -46,6 +46,12 @@ let _0xData = [
   { id: "a_df", title: "A Dance of Fire and Ice", url: "Games/ADOFAI/index.html", desc: "Rhythm-based precision game where you guide two orbiting planets through challenging musical tracks.", popular: true },
   { id: "a_sr", title: "Amazing Strange Rope Police", url: "Games/ASRP/index.html", desc: "Open-world action game where you use superhuman abilities, vehicles, and gadgets to fight crime across a massive city.", popular: true },
   { id: "a_oc", title: "Ages of Conflict", url: "Games/AOC/index.html", desc: "Strategic world simulation where nations wage wars, form alliances, and reshape the map through dynamic conflicts.", popular: true },
+  { id: "mx3", title: "Moto X3M", url: "Games/MotoX3m/MotoX3m/index.html", desc: "Race through explosive obstacle courses packed with ramps, traps, and high-speed motorcycle stunts.", popular: true },
+  { id: "mx3_2", title: "Moto X3M 2", url: "Games/MotoX3m/MotoX3m2/index.html", desc: "The sequel featuring tougher tracks, bigger jumps, and even more dangerous stunt challenges.", popular: true },
+  { id: "mx3_3", title: "Moto X3M 3", url: "Games/MotoX3m/MotoX3m3/index.html", desc: "Take on intense new levels filled with hazards, precision jumps, and fast-paced motorcycle action.", popular: true },
+  { id: "mx3_w", title: "Moto X3M Winter", url: "Games/MotoX3m/MotoX3m Winter/index.html", desc: "A festive winter-themed Moto X3M adventure featuring snowy tracks and holiday-inspired obstacles.", popular: true },
+  { id: "mx3_s", title: "Moto X3M Spooky Land", url: "Games/MotoX3m/MotoX3m Spooky Land/index.html", desc: "Halloween-themed motorcycle racing with haunted tracks, creepy decorations, and dangerous traps.", popular: true },
+  { id: "mx3_p", title: "Moto X3M Pool Party", url: "Games/MotoX3m/MotoX3m Pool Party/index.html", desc: "Splash through water-filled stunt courses packed with slides, loops, and summer-themed challenges.", popular: true },
 ];
 
 // Context Management variables
