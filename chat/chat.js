@@ -150,10 +150,10 @@ window.initializeChatEngine = async function() {
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
         listContainer.innerHTML = filtered.map(u => `
             <div class="admin-card" style="text-align:center;">
-                <a href="profile/profile.html?user=${encodeURIComponent(u.username)}">
+                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}">
                     <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%;">
                 </a>
-                <a href="profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
+                <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
                     ${u.username}
                 </a>
                 <div style="font-size:11px; color:#a0928d; margin-top:5px; text-transform:uppercase;">[${u.role_tag}]</div>
@@ -197,12 +197,12 @@ window.initializeChatEngine = async function() {
                 div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 
                 div.innerHTML = `
-                    <a href="profile/profile.html?user=${encodeURIComponent(msg.username)}">
+                    <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}">
                         <img src="${userPfp}" class="chat-pfp" alt="Avatar">
                     </a>
                     <div class="message-content-node">
                         <div class="message-meta-header">
-                            <a href="profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
+                            <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
                                 <strong>${msg.username}</strong>
                             </a>
                             ${tag}
