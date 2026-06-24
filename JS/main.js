@@ -53,6 +53,7 @@ let _0xData = [
   { id: "mx3_s", title: "Moto X3M Spooky Land", url: "Games/MotoX3m/MotoX3m Spooky Land/index.html", desc: "Halloween-themed motorcycle racing with haunted tracks, creepy decorations, and dangerous traps.", popular: true },
   { id: "mx3_p", title: "Moto X3M Pool Party", url: "Games/MotoX3m/MotoX3m Pool Party/index.html", desc: "Splash through water-filled stunt courses packed with slides, loops, and summer-themed challenges.", popular: true },
   { id: "dad", title: "Daddish", url: "Games/daddish/index.html", desc: "Charming platformer where a radish dad embarks on a journey to rescue his missing children through challenging levels.", popular: true },
+  { id: "eggy", title: "Eggy Car", url: "Games/eggy/index.html", desc: "Drive carefully across hilly terrain while balancing a fragile egg on your vehicle without letting it fall.", popular: true },
 ];
 
 // Context Management variables
