@@ -58,6 +58,7 @@ let _0xData = [
   { id: "er_2", title: "Escape Road 2", url: "Games/Escaperoad/Escape Road 2/index.html", desc: "The sequel expands the action with tougher chases, new vehicles, and more intense escape routes.", popular: true },
   { id: "er_3", title: "Escape Road 3", url: "Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
   { id: "erc_2", title: "Escape Road City 2", url: "Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
+  { id: "imt", title: "Idle Miner Tycoon", url: "Games/IMT/index.html", desc: "Build a mining empire from the ground up by managing resources, upgrading operations, and expanding your profits.", popular: true },
 ];
 
 // Context Management variables
