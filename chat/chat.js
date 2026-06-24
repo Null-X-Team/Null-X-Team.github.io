@@ -22,12 +22,14 @@ window.initializeChatEngine = async function() {
     if (chatPollingInterval) clearInterval(chatPollingInterval);
 
     try {
-        const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?username=eq.${encodeURIComponent(user)}&select=username`, {
+        // Safe global profile grab to completely avoid space encoding breaking backend REST paths
+        const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const verifyData = await verifyRes.json();
 
-        if (!verifyData || verifyData.length === 0) {
+        const userExists = verifyData && verifyData.some(u => u.username && u.username.trim().toLowerCase() === user.trim().toLowerCase());
+        if (!userExists) {
             localStorage.removeItem('chatUser');
             localStorage.clear();
             window.location.href = "../Login/login.html";
@@ -38,37 +40,39 @@ window.initializeChatEngine = async function() {
     }
 
     try {
-        // Querying permissions via database parameters directly
-        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}&select=is_banned,temp_ban_until,pfp_url,is_admin,role_tag`, {
+        // Querying all roles and filtering in JavaScript to ensure spaces inside names like 'TEST USER' process safely
+        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=username,is_banned,temp_ban_until,pfp_url,is_admin,role_tag`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const banData = await banRes.json();
         
-        if (banData && banData[0]) {
-            const profile = banData[0];
+        if (banData && Array.isArray(banData)) {
+            const profile = banData.find(r => r.username && r.username.trim().toLowerCase() === user.trim().toLowerCase());
             
-            // Sync your status cleanly with the row value 
-            currentUserIsAdmin = (profile.is_admin === true || profile.is_admin === 'TRUE');
+            if (profile) {
+                // Fail-safe permission mapping across raw boolean and uppercase text types
+                currentUserIsAdmin = (profile.is_admin === true || String(profile.is_admin).toLowerCase() === 'true' || String(profile.role_tag).toLowerCase() === 'admin');
 
-            if (profile.is_banned === true) {
-                alert("This account has been permanently banned from the server.");
-                localStorage.removeItem('chatUser');
-                window.location.href = "../Login/login.html";
-                return;
-            }
-            if (profile.temp_ban_until) {
-                const expiryTime = new Date(profile.temp_ban_until).getTime();
-                if (expiryTime > Date.now()) {
-                    alert(`You are temporarily banned until: ${new Date(profile.temp_ban_until).toLocaleString()}`);
+                if (profile.is_banned === true || String(profile.is_banned).toLowerCase() === 'true') {
+                    alert("This account has been permanently banned from the server.");
                     localStorage.removeItem('chatUser');
                     window.location.href = "../Login/login.html";
                     return;
                 }
-            }
-            
-            const systemFooterAvatar = document.getElementById('current-user-avatar');
-            if (systemFooterAvatar) {
-                systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
+                if (profile.temp_ban_until) {
+                    const expiryTime = new Date(profile.temp_ban_until).getTime();
+                    if (expiryTime > Date.now()) {
+                        alert(`You are temporarily banned until: ${new Date(profile.temp_ban_until).toLocaleString()}`);
+                        localStorage.removeItem('chatUser');
+                        window.location.href = "../Login/login.html";
+                        return;
+                    }
+                }
+                
+                const systemFooterAvatar = document.getElementById('current-user-avatar');
+                if (systemFooterAvatar) {
+                    systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
+                }
             }
         }
     } catch (banCheckErr) {
@@ -125,13 +129,11 @@ window.initializeChatEngine = async function() {
     // --- USER DIRECTORY ---
     async function fetchAllUsers() {
         try {
-            // Queries the core 'users' table directly to find everyone registered
             const usersRes = await fetch(`${SUPABASE_URL}/rest/v1/users?select=username`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const usersData = await usersRes.json();
 
-            // Fetches matching meta properties from your roles layout
             const rolesRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=*`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
@@ -141,11 +143,12 @@ window.initializeChatEngine = async function() {
             
             allUsers = uniqueNames.map(name => {
                 const foundProfile = rolesData.find(r => r.username === name);
+                const checkAdminStatus = foundProfile ? foundProfile.is_admin : false;
                 return {
                     username: name,
                     pfp_url: foundProfile ? foundProfile.pfp_url : DEFAULT_PFP,
                     role_tag: foundProfile ? foundProfile.role_tag : 'User',
-                    is_admin: foundProfile ? (foundProfile.is_admin === true || foundProfile.is_admin === 'TRUE') : false
+                    is_admin: (checkAdminStatus === true || String(checkAdminStatus).toLowerCase() === 'true' || (foundProfile && String(foundProfile.role_tag).toLowerCase() === 'admin'))
                 };
             });
             
@@ -200,7 +203,7 @@ window.initializeChatEngine = async function() {
                 
                 const userPfp = role && role.pfp_url ? role.pfp_url : DEFAULT_PFP;
                 const evaluatedRole = role && role.role_tag ? role.role_tag : 'User';
-                const isMsgSenderAdmin = role ? (role.is_admin === true || role.is_admin === 'TRUE') : false;
+                const isMsgSenderAdmin = role ? (role.is_admin === true || String(role.is_admin).toLowerCase() === 'true' || String(role.role_tag).toLowerCase() === 'admin') : false;
                 
                 let tag = "";
                 if (isMsgSenderAdmin || evaluatedRole.toLowerCase() === 'admin') {
@@ -258,7 +261,6 @@ window.initializeChatEngine = async function() {
             input.disabled = true;
 
             try {
-                // Safety filter processes message profiles perfectly
                 const modResponse = await fetch('https://project-qd4by.vercel.app/api/moderate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
