@@ -54,6 +54,10 @@ let _0xData = [
   { id: "mx3_p", title: "Moto X3M Pool Party", url: "Games/MotoX3m/MotoX3m Pool Party/index.html", desc: "Splash through water-filled stunt courses packed with slides, loops, and summer-themed challenges.", popular: true },
   { id: "dad", title: "Daddish", url: "Games/daddish/index.html", desc: "Charming platformer where a radish dad embarks on a journey to rescue his missing children through challenging levels.", popular: true },
   { id: "eggy", title: "Eggy Car", url: "Games/eggy/index.html", desc: "Drive carefully across hilly terrain while balancing a fragile egg on your vehicle without letting it fall.", popular: true },
+  { id: "er_1", title: "Escape Road", url: "Games/Escaperoad/Escape Road/index.html", desc: "Outrun relentless pursuers in this high-speed driving game packed with sharp turns and daring escapes.", popular: true },
+  { id: "er_2", title: "Escape Road 2", url: "Games/Escaperoad/Escape Road 2/index.html", desc: "The sequel expands the action with tougher chases, new vehicles, and more intense escape routes.", popular: true },
+  { id: "er_3", title: "Escape Road 3", url: "Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
+  { id: "erc_2", title: "Escape Road City 2", url: "Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
 ];
 
 // Context Management variables
