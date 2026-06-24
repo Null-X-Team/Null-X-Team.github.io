@@ -6,9 +6,28 @@ const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
 let lastMessageTime = 0;
 let chatPollingInterval = null; 
+let heartbeatInterval = null;
 
 // Track the live authorization status dynamically from Supabase
 let currentUserIsAdmin = false;
+
+// Globally scoped Quick Reply utility handler
+window.mentionUser = function(rawEncodedName) {
+    const input = document.getElementById('message-input');
+    if (!input) return;
+    
+    const targetName = decodeURIComponent(rawEncodedName).trim();
+    if (input.value.includes(`@${targetName}`)) return;
+    
+    input.value = input.value ? `${input.value.trim()} @${targetName} ` : `@${targetName} `;
+    input.focus();
+    
+    const counter = document.getElementById('char-counter');
+    if (counter) {
+        const len = input.value.length;
+        counter.textContent = `${len} / 250`;
+    }
+};
 
 // Global initialization hook exposed directly to main.js router
 window.initializeChatEngine = async function() {
@@ -20,6 +39,7 @@ window.initializeChatEngine = async function() {
     }
 
     if (chatPollingInterval) clearInterval(chatPollingInterval);
+    if (heartbeatInterval) clearInterval(heartbeatInterval);
 
     try {
         // Safe global profile grab to completely avoid space encoding breaking backend REST paths
@@ -39,9 +59,28 @@ window.initializeChatEngine = async function() {
         console.error("Security handshake failed:", authError);
     }
 
+    // Dynamic background online indicator loop
+    async function executePresenceHeartbeat() {
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ last_seen: new Date().toISOString() })
+            });
+        } catch (e) { console.error("Heartbeat sync lost:", e); }
+    }
+    
+    // Fire initial presence registration on connection, then loop every 10 seconds
+    executePresenceHeartbeat();
+    heartbeatInterval = setInterval(executePresenceHeartbeat, 10000);
+
     try {
         // Querying all roles and filtering in JavaScript to ensure spaces inside names like 'TEST USER' process safely
-        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=username,is_banned,temp_ban_until,pfp_url,is_admin,role_tag`, {
+        const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=username,is_banned,temp_ban_until,pfp_url,is_admin,role_tag,last_seen`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
         const banData = await banRes.json();
@@ -148,6 +187,7 @@ window.initializeChatEngine = async function() {
                     username: name,
                     pfp_url: foundProfile ? foundProfile.pfp_url : DEFAULT_PFP,
                     role_tag: foundProfile ? foundProfile.role_tag : 'User',
+                    last_seen: foundProfile ? foundProfile.last_seen : null,
                     is_admin: (checkAdminStatus === true || String(checkAdminStatus).toLowerCase() === 'true' || (foundProfile && String(foundProfile.role_tag).toLowerCase() === 'admin'))
                 };
             });
@@ -163,10 +203,25 @@ window.initializeChatEngine = async function() {
         
         listContainer.innerHTML = filtered.map(u => {
             const displayTag = u.is_admin ? 'ADMIN' : u.role_tag;
+            
+            // Check dynamic status threshold (Online within past 5 minutes)
+            let onlineDot = "rgba(160, 146, 141, 0.4)";
+            let statusLabel = "OFFLINE";
+            if (u.last_seen) {
+                const diff = Date.now() - new Date(u.last_seen).getTime();
+                if (diff < 5 * 60 * 1000) {
+                    onlineDot = "#22c55e";
+                    statusLabel = "ONLINE";
+                }
+            }
+
             return `
-                <div class="admin-card" style="text-align:center;">
+                <div class="admin-card" style="text-align:center; position: relative;">
+                    <div style="position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: bold; color: ${onlineDot}; border: 1px solid ${onlineDot}; padding: 1px 4px; border-radius: 3px;">
+                        ${statusLabel}
+                    </div>
                     <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}">
-                        <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%;">
+                        <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%; border: 2px solid ${onlineDot};">
                     </a>
                     <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
                         ${u.username}
@@ -181,6 +236,7 @@ window.initializeChatEngine = async function() {
     async function fetchMessages() {
         if (!document.getElementById('chat-messages')) {
             clearInterval(chatPollingInterval);
+            clearInterval(heartbeatInterval);
             return;
         }
         try {
@@ -192,6 +248,16 @@ window.initializeChatEngine = async function() {
             });
             const messages = await mRes.json();
             const roles = await rRes.json();
+
+            // Render matching room title indicator status safely from current tracking structures
+            const activeHeaderSpan = document.getElementById('room-status-indicator');
+            if (activeHeaderSpan && roles) {
+                const selfCheck = roles.find(r => r.username === user);
+                if (selfCheck) {
+                    activeHeaderSpan.textContent = "ONLINE";
+                    activeHeaderSpan.style.color = "#22c55e";
+                }
+            }
 
             const isAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 100;
 
@@ -212,18 +278,27 @@ window.initializeChatEngine = async function() {
                     tag = `<span class="badge custom-badge">[${evaluatedRole.toUpperCase()}]</span>`;
                 }
 
+                // Check sender status threshold for chat message avatar rings
+                let senderStatusColor = "transparent";
+                if (role && role.last_seen) {
+                    if (Date.now() - new Date(role.last_seen).getTime() < 5 * 60 * 1000) {
+                        senderStatusColor = "#22c55e";
+                    }
+                }
+
                 const div = document.createElement('div');
                 div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 
                 div.innerHTML = `
                     <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}">
-                        <img src="${userPfp}" class="chat-pfp" alt="Avatar">
+                        <img src="${userPfp}" class="chat-pfp" alt="Avatar" style="border: 2px solid ${senderStatusColor};">
                     </a>
                     <div class="message-content-node">
                         <div class="message-meta-header">
                             <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
                                 <strong>${msg.username}</strong>
                             </a>
+                            <span style="font-size:10px; color:#cf7a3c; cursor:pointer; margin-left:4px;" onclick="window.mentionUser('${encodeURIComponent(msg.username)}')">[reply]</span>
                             ${tag}
                             <span class="message-timestamp">${time}</span>
                         </div>
@@ -240,6 +315,23 @@ window.initializeChatEngine = async function() {
                 msgContainer.scrollTop = msgContainer.scrollHeight;
             }
         } catch (e) { console.error(e); }
+    }
+
+    // --- CHARACTER COUNTER LOGIC MOUNT ---
+    const msgInput = document.getElementById('message-input');
+    const charCounter = document.getElementById('char-counter');
+    if (msgInput && charCounter) {
+        msgInput.oninput = (e) => {
+            const len = e.target.value.length;
+            charCounter.textContent = `${len} / 250`;
+            if (len >= 230) {
+                charCounter.style.color = "#ff4444";
+            } else if (len >= 200) {
+                charCounter.style.color = "#cf7a3c";
+            } else {
+                charCounter.style.color = "#a0928d";
+            }
+        };
     }
 
     const chatForm = document.getElementById('chat-form');
@@ -281,6 +373,7 @@ window.initializeChatEngine = async function() {
                 }
 
                 input.value = ""; 
+                if (charCounter) charCounter.textContent = "0 / 250";
                 lastMessageTime = now;
 
                 await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
