@@ -26,6 +26,24 @@ export default async function handler(req, res) {
   let flagged = false;
   let reasons = [];
 
+  // 1. ADD LOCAL PROFANITY FILTER (To catch what OpenAI ignores)
+  const badWords = [
+    "fuck", "shit", "asshole", "bitch", "bastard", "cunt", "dick"
+  ];
+  
+  const cleanText = text.toLowerCase();
+  const containsSwear = badWords.some(word => {
+    // Uses word boundaries so it doesn't accidentally trigger on words like "assess"
+    const regex = new RegExp(`\\b${word}\\b`, "i");
+    return regex.test(cleanText);
+  });
+
+  if (containsSwear) {
+    flagged = true;
+    reasons.push("profanity detected");
+  }
+
+  // 2. RUN OPENAI AI ADVANCED MODERATION PIPELINE
   try {
     const modResponse = await fetch("https://api.openai.com/v1/moderations", {
       method: "POST",
@@ -50,6 +68,7 @@ export default async function handler(req, res) {
     console.error("Moderation API error:", err);
   }
 
+  // 3. RUN PII SAFETY REGEX CHECKS
   const phoneRegex = /\+?\d{1,4}[-.\s]?\(?\d{1,3}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}/g;
   if (phoneRegex.test(text)) {
     flagged = true;
@@ -71,9 +90,12 @@ export default async function handler(req, res) {
   const namePatterns = /\b([A-Z][a-z]+)\s+([A-Z][a-z]+)\b/g;
   const nameMatches = text.match(namePatterns) || [];
   if (nameMatches.length >= 1) {
+    // Optional: Flip flagged to true here if you want to block full names completely
+    // flagged = true;
     reasons.push("possible personal name");
   }
 
+  // RETURN COMPLIANCE RESULTS
   return res.status(200).json({
     flagged,
     reason: flagged ? reasons.join(", ") : "Clean",
