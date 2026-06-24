@@ -239,6 +239,12 @@ window.initializeChatEngine = async function() {
             const val = input.value.trim();
             if (!val) return;
             
+            // Client-Side 250 Character Limit Filter Check
+            if (val.length > 250) {
+                alert(`Your message is too long (${val.length}/250 characters). Please shorten it.`);
+                return;
+            }
+            
             // 1. Lock UI interaction during serverless API evaluation
             input.disabled = true;
 
