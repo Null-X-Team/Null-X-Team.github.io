@@ -387,6 +387,44 @@ nav {
   opacity: 1;
 }
 
+/* -------------------------------------------------------------------------- */
+/* NEW SPECIFIC STYLES: UNBLOCKERS LAYOUT INTEGRATION */
+/* -------------------------------------------------------------------------- */
+.unblocker-card {
+  background: var(--bg-sidebar) !important;
+  border: 1px solid var(--border-color) !important;
+  padding: 20px;
+  border-radius: 12px;
+  width: 180px;
+  cursor: pointer;
+  box-sizing: border-box;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.unblocker-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--accent-color, var(--accent)) !important;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.4), 0 0 15px rgba(139, 0, 255, 0.2);
+}
+
+.unblocker-card h4 {
+  color: var(--text-main);
+  margin: 0 0 10px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.unblocker-card span {
+  color: var(--accent-color, var(--accent));
+  font-weight: bold;
+  font-size: 14px;
+  transition: color 0.2s ease;
+}
+
+.unblocker-card:hover span {
+  color: var(--accent-hover);
+}
+
 /* Right Sidebar Sidebar */
 .right-sidebar {
   background: var(--bg-sidebar) !important;
@@ -909,13 +947,13 @@ nav {
 .educational-content-card {
   background: #ffffff !important;
   border: 2px solid #000000 !important;              
-  box-shadow: none;                        
+  box-shadow: none;                                        
   width: 90%;
-  max-width: 950px;                      
-  height: 85vh;                          
+  max-width: 950px;                                      
+  height: 85vh;                                          
   display: flex;
   flex-direction: column;
-  border-radius: 0px;                     
+  border-radius: 0px;                                     
 }
 
 /* Locked Header Elements */
@@ -944,7 +982,7 @@ nav {
 /* Scrollable Document Text Field */
 .educational-scroll-body {
   padding: 30px 35px;
-  overflow-y: auto;                      
+  overflow-y: auto;                                      
   flex-grow: 1;
   text-align: justify;
   line-height: 1.6;
@@ -959,7 +997,7 @@ nav {
 /* Locked Bottom Status Bar & Countdown Timer Container */
 .timer-subtext-sticky {
   padding: 15px 35px;
-  background: #ffffff;                    
+  background: #ffffff;                                    
   border-top: 2px solid #000000;          
   font-style: italic;
   font-size: 0.95rem;
