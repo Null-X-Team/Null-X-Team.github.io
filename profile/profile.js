@@ -60,9 +60,85 @@ document.addEventListener('DOMContentLoaded', async () => {
                     const joined = new Date(profile.created_at).toLocaleDateString();
                     document.getElementById('join-date').textContent = joined;
                 }
+
+                // Check and show admin controls if looking at someone else's profile
+                if (!isOwnProfile) {
+                    checkAndSetupAdminControls(profile.is_admin);
+                }
             }
         } catch (err) { 
             console.error("Error loading profile:", err); 
+        }
+    };
+
+    // Verifies if the viewer holds admin privileges and displays the action layout components
+    const checkAndSetupAdminControls = async (targetUserIsAdmin) => {
+        try {
+            // Fetch the logged-in viewer's boolean flag from user_roles
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}&select=is_admin`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await response.json();
+
+            // Check if current viewer has authorization access enabled (is_admin is true)
+            if (data && data[0] && data[0].is_admin === true) {
+                const adminContainer = document.getElementById('admin-actions-container');
+                const adminBtn = document.getElementById('toggle-admin-btn');
+
+                if (adminContainer && adminBtn) {
+                    adminContainer.style.display = 'block';
+                    updateAdminButtonUI(targetUserIsAdmin);
+
+                    adminBtn.onclick = async () => {
+                        const currentIsAdmin = adminBtn.getAttribute('data-is-admin') === 'true';
+                        const newAdminStatus = !currentIsAdmin;
+                        
+                        // Automatically flip role_tag label alongside your authorization flag
+                        const newRoleTag = newAdminStatus ? 'ADMIN' : 'User';
+
+                        adminBtn.textContent = "Updating...";
+                        adminBtn.disabled = true;
+
+                        const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}`, {
+                            method: 'PATCH',
+                            headers: { 
+                                'apikey': SUPABASE_KEY, 
+                                'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                                'Content-Type': 'application/json' 
+                            },
+                            body: JSON.stringify({ 
+                                is_admin: newAdminStatus,
+                                role_tag: newRoleTag 
+                            })
+                        });
+
+                        adminBtn.disabled = false;
+
+                        if (updateResponse.ok) {
+                            updateAdminButtonUI(newAdminStatus);
+                        } else {
+                            alert("Failed to modify database permissions.");
+                            updateAdminButtonUI(currentIsAdmin);
+                        }
+                    };
+                }
+            }
+        } catch (err) {
+            console.error("Error setting up admin controls:", err);
+        }
+    };
+
+    const updateAdminButtonUI = (isAdmin) => {
+        const adminBtn = document.getElementById('toggle-admin-btn');
+        if (!adminBtn) return;
+        
+        adminBtn.setAttribute('data-is-admin', isAdmin);
+        if (isAdmin) {
+            adminBtn.textContent = 'Revoke Admin Status';
+            adminBtn.style.background = '#333333';
+        } else {
+            adminBtn.textContent = 'Give Admin Status';
+            adminBtn.style.background = '#ff4444';
         }
     };
 
