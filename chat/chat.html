@@ -31,10 +31,14 @@
 
     <div class="main-chat">
         <div id="chat-view">
+            <div id="chat-view-header" style="padding: 10px 20px; background: #140f0d; border-bottom: 1px solid rgba(207, 122, 60, 0.1); color: #cf7a3c; font-size: 14px; font-weight: bold;">
+                # general &mdash; Status: <span id="room-status-indicator" style="color: #888;">Checking...</span>
+            </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
+                <span id="char-counter" style="font-size: 11px; color: #a0928d; margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
             </form>
         </div>
 
