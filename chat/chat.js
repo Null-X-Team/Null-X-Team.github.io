@@ -251,7 +251,10 @@ window.initializeChatEngine = async function() {
 
                     if (safetyCheck.flagged) {
                         alert(`[SECURITY BLOCK] Message blocked by AI filter! (${safetyCheck.reason})`);
-                        return; // Stop execution layout path instantly
+                        // Hard halt to block submission path entirely
+                        input.disabled = false;
+                        input.focus();
+                        return; 
                     }
                 }
 
@@ -268,9 +271,11 @@ window.initializeChatEngine = async function() {
                 fetchMessages();
             } catch (err) {
                 console.error("Moderation pipeline threw exception:", err);
-                alert("System error tracking chat safety requirements. Please retry.");
+                alert("Safety verification offline. Message could not be processed safely.");
+                // Explicit return stops unvalidated falls through to Supabase insertion loops
+                return;
             } finally {
-                // Always restore text input capabilities
+                // Always restore text input capabilities safely
                 input.disabled = false;
                 input.focus();
             }
