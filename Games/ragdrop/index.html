@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <base href="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/ragdoll-drop/">
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Ragdoll Drop</title>
@@ -12,7 +11,8 @@
       files: [
         { name: '410e5115a82fe21daf3dff2040631f21.wasm.unityweb', parts: 2 },
       ],
-      basePath: 'Build/',
+      // Hardcoded absolute CDN path for the file merger
+      basePath: 'https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/ragdoll-drop/Build/',
       debug: true
     };
   </script>
@@ -30,7 +30,8 @@
       numScreenshots: 3,
 
       unityVersion: '2022.3.62f3',
-      unityWebglBuildUrl: '',
+      // Explicitly point the Unity engine builder to the CDN folder
+      unityWebglBuildUrl: 'https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/ragdoll-drop/Build/',
 
       fileSize: 8,
       cachedDecompressedFileSizes: {
@@ -104,6 +105,6 @@
     <canvas id="unity-canvas"></canvas>
   </div>
 
-  <script src="JS/poki/master-loader.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/bubbls/UGS-Assets@main/ragdoll-drop/JS/poki/master-loader.js"></script>
 </body>
 </html>
