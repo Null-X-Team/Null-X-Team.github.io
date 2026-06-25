@@ -59,9 +59,10 @@ let _0xData = [
   { id: "er_3", title: "Escape Road 3", url: "Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
   { id: "erc_2", title: "Escape Road City 2", url: "Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
   { id: "imt", title: "Idle Miner Tycoon", url: "Games/IMT/index.html", desc: "Build a mining empire from the ground up by managing resources, upgrading operations, and expanding your profits.", popular: true },
-  { id: "ime_1", title: "Idle Mining Empire", url: "Games/IME/index.html", desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
+  { id: "ime_1", title: "Idle Mining Empire", url: "Games/IME/index.html", desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true }
 ];
 
+// Context Management variables
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
 
@@ -220,7 +221,7 @@ function launchGame(gameId) {
   if (game) {
     const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
     const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
-    
+
     document.open();
     document.write(`
       <!DOCTYPE html>
@@ -296,6 +297,7 @@ function initFeaturedModule() {
   }
 }
 
+// Global UI View Toggle Engines
 function updateNavActiveState(activeId) {
   ['nav-home', 'nav-games', 'nav-favorites', 'nav-unblockers', 'nav-profile', 'nav-communications', 'nav-terminal'].forEach(id => {
     const el = document.getElementById(id);
@@ -326,16 +328,16 @@ function clearAllViews() {
 function showHomeView() {
   clearAllViews();
   updateNavActiveState('nav-home');
-  
+
   const heroSection = document.getElementById('heroSection');
   const randomSection = document.querySelector('.random-section');
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
-  
+
   if (heroSection) heroSection.style.display = 'flex';
   if (randomSection) randomSection.style.display = 'block';
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
-  
+
   if (gameGrid) {
     gameGrid.style.setProperty('display', 'none', 'important');
   }
@@ -345,10 +347,10 @@ function showHomeView() {
 function showAllGamesView() {
   clearAllViews();
   updateNavActiveState('nav-games');
-  
+
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
-  
+
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
   if (gameGrid) {
     gameGrid.style.display = 'grid';
@@ -359,10 +361,10 @@ function showAllGamesView() {
 function showFavoritesView() {
   clearAllViews();
   updateNavActiveState('nav-favorites');
-  
+
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
-  
+
   if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important');
   if (favGrid) {
     favGrid.style.display = 'grid';
@@ -373,32 +375,32 @@ function showFavoritesView() {
 async function handlePlaceholderView(navId, viewName) {
   clearAllViews();
   updateNavActiveState(navId);
-  
+
   const viewLower = viewName.toLowerCase();
   const targetSectionId = `${viewLower}Section`;
   let customSectionContainer = document.getElementById(targetSectionId);
-  
+
   if (!customSectionContainer) {
     customSectionContainer = document.createElement('div');
     customSectionContainer.id = targetSectionId;
     customSectionContainer.className = 'custom-view-panel';
-    
+
     const mainSectionNode = document.querySelector('.main-content .section') || document.querySelector('.main-content');
     if (mainSectionNode) {
       mainSectionNode.appendChild(customSectionContainer);
     }
   }
-  
+
   customSectionContainer.style.display = 'block';
   customSectionContainer.innerHTML = `<p style="color: #8b00ff; padding: 20px; font-family: sans-serif; font-style: italic; animation: pulse 1.5s infinite;">Mounting filesystem directory node...</p>`;
-  
+
   try {
     const targetFolder = viewLower === 'terminal' ? 'Terminal' : viewLower;
     const fetchPath = `${targetFolder}/${viewLower}.html`;
-    
+
     const response = await fetch(fetchPath);
     if (!response.ok) throw new Error(`Status error ${response.status}`);
-    
+
     const dynamicCodeContent = await response.text();
     customSectionContainer.innerHTML = dynamicCodeContent;
   } catch (error) {
@@ -464,13 +466,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const savedCloak = localStorage.getItem('savedCloak');
   if (savedCloak && savedCloak !== "none") {
-    try {
-      if (typeof applyCloak === 'function') {
-        applyCloak(savedCloak);
-      }
-    } catch(e) {
-      console.warn("Cloak injection engine bypassed structural node standard checks.");
-    }
+    try { applyCloak(savedCloak); } catch(e) {}
   }
 
   const user = localStorage.getItem('chatUser');
@@ -503,11 +499,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
   if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
-  
+
   if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
   if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
   if (document.getElementById('nav-favorites')) document.getElementById('nav-favorites').onclick = (e) => { e.preventDefault(); showFavoritesView(); };
-  
+
   if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
@@ -517,6 +513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     commsNavBtn.onclick = (e) => {
       e.preventDefault();
       updateNavActiveState('nav-communications');
+
       if (localStorage.getItem('chatUser')) {
         window.location.href = "chat/chat.html";
       } else {
@@ -572,11 +569,13 @@ document.addEventListener('DOMContentLoaded', () => {
     if (card) {
       e.preventDefault();
       contextTargetId = card.getAttribute('data-game-id');
+
       if (favoriteGamesList.includes(contextTargetId)) {
         ctxFavorite.textContent = "Unfavorite Game";
       } else {
         ctxFavorite.textContent = "Favorite Game";
       }
+
       if (contextMenu) {
         contextMenu.style.left = `${e.clientX}px`;
         contextMenu.style.top = `${e.clientY}px`;
@@ -598,6 +597,7 @@ document.addEventListener('DOMContentLoaded', () => {
         favoriteGamesList.push(contextTargetId);
       }
       localStorage.setItem('nullx_favorites_arr', JSON.stringify(favoriteGamesList));
+
       const favoritesGrid = document.getElementById('favoritesGrid');
       if (favoritesGrid && favoritesGrid.style.display === 'grid') {
         renderFavoritesGrid();
@@ -624,10 +624,45 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
   }
-  
+
   const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
   if (cancelDeleteBtn) {
     cancelDeleteBtn.onclick = () => {
       if (deleteModal) deleteModal.style.display = 'none';
     };
   }
+
+  // ==========================================
+  // ADDED: Battery and Clock Tracker Module
+  // ==========================================
+  if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+      function updateBatteryDisplay() {
+        const batteryText = document.getElementById('battery-status');
+        if (batteryText) {
+          const level = Math.round(battery.level * 100);
+          const charging = battery.charging ? " (Charging)" : "";
+          batteryText.textContent = `Battery: ${level}%${charging}`;
+        }
+      }
+      updateBatteryDisplay();
+      battery.addEventListener('levelchange', updateBatteryDisplay);
+      battery.addEventListener('chargingchange', updateBatteryDisplay);
+    }).catch(err => console.error("Battery API access denied:", err));
+  }
+
+  function updateClockDisplay() {
+    const clockText = document.getElementById('digital-clock');
+    if (clockText) {
+      const options = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        timeZoneName: 'short' 
+      };
+      clockText.textContent = new Date().toLocaleTimeString(undefined, options);
+    }
+  }
+  updateClockDisplay();
+  setInterval(updateClockDisplay, 1000);
+});
