@@ -1,4 +1,115 @@
-/* Container separating left panel, center screen, and right panel */
+/* RESET & CORE BODY LAYOUT */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #141111; /* Dark theme tint */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   TOP HOVER-EXPANDING NAVIGATION BAR
+   ========================================================================== */
+.top-nav-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-top: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 15, 15, 0.75); /* Deep crimson transparent base */
+  border: 1px solid rgba(139, 0, 0, 0.25);
+  padding: 10px 18px;
+  border-radius: 30px;
+  backdrop-filter: blur(12px);
+  max-width: 65px; /* Keeps it compactly closed */
+  height: 36px;
+  transition: max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.nav-trigger-icon {
+  font-size: 18px;
+  color: #ff3b3b;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.nav-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  opacity: 0;
+  visibility: hidden;
+  margin-left: 0;
+  transition: opacity 0.2s ease, visibility 0.2s ease, margin-left 0.3s ease;
+}
+
+/* HOVER ANIMATION STATE EFFECTS */
+.nav-bar:hover {
+  max-width: 950px; /* Expands to show text + icons */
+  padding: 10px 25px;
+}
+
+.nav-bar:hover .nav-trigger-icon {
+  transform: scale(0) rotate(90deg);
+  width: 0;
+  margin: 0;
+}
+
+.nav-bar:hover .nav-tabs-wrapper {
+  opacity: 1;
+  visibility: visible;
+  margin-left: 10px;
+}
+
+/* NAVIGATION LINKS STYLING */
+.nav-tab-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.nav-tab-item:hover {
+  color: #ffffff;
+  background: rgba(255, 59, 59, 0.15);
+}
+
+.nav-tab-item.active {
+  color: #ffffff;
+  background: rgba(255, 30, 30, 0.3);
+  border: 1px solid rgba(255, 59, 59, 0.4);
+}
+
+.tab-icon {
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+/* ==========================================================================
+   DASHBOARD SIDE PANELS & FLEX ARRANGEMENT
+   ========================================================================== */
 .dashboard-wrapper {
   display: flex;
   justify-content: space-between;
@@ -6,101 +117,250 @@
   padding: 40px;
   box-sizing: border-box;
   width: 100%;
-  min-height: 100vh;
   gap: 30px;
 }
 
-/* Centralized focus area for main content elements */
-.main-hub {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  max-width: 800px;
-  text-align: center;
-}
-
-.site-title {
-  font-family: sans-serif;
-  color: #ffffff;
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  font-weight: 700;
-}
-
-/* Styled Search Box */
-.search-container input {
-  width: 450px;
-  max-width: 100%;
-  padding: 14px 20px;
-  background: rgba(20, 20, 20, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  color: #fff;
-  font-size: 16px;
-  outline: none;
-  backdrop-filter: blur(5px);
-}
-
-/* Glassmorphism side containers matching your theme */
 .side-panel {
-  width: 260px;
+  width: 280px;
   min-height: 220px;
-  background: rgba(20, 20, 20, 0.65); /* Translucent dark look */
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  padding: 20px;
-  color: #ffffff;
+  background: rgba(22, 14, 14, 0.7);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 22px;
   box-sizing: border-box;
-  font-family: sans-serif;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .widget-header {
   font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 1px;
-  color: rgba(255, 255, 255, 0.4);
-  margin-bottom: 15px;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;
   font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* WEATHER STYLING */
+.weather-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weather-temp {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.weather-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.weather-stats i {
+  color: #ff3b3b;
+  margin-right: 2px;
+}
+
+.location-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: rgba(255, 59, 59, 0.7);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   CENTRAL CONTENT AREA & INTERFACE
+   ========================================================================== */
+.main-hub {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 780px;
+}
+
+.site-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 10px 0 25px 0;
+  background: linear-gradient(135deg, #ffffff 30%, #ffaaaa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* REFINED SEARCH CONTAINER */
+.search-container {
+  position: relative;
+  width: 500px;
+  max-width: 100%;
+  margin-bottom: 45px;
+}
+
+.search-glass {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 15px 20px 15px 44px;
+  background: rgba(15, 10, 10, 0.6);
+  border: 1px solid rgba(255, 59, 59, 0.2);
+  border-radius: 28px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  backdrop-filter: blur(6px);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.search-container input:focus {
+  border-color: rgba(255, 59, 59, 0.6);
+  box-shadow: 0 0 15px rgba(255, 59, 59, 0.15);
+}
+
+/* ==========================================================================
+   SHORTCUT ICONS LAYOUT GRID
+   ========================================================================== */
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.app-card {
+  background: rgba(25, 20, 20, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.app-card:hover {
+  transform: translateY(-4px);
+  background: rgba(35, 22, 22, 0.7);
+  border-color: rgba(255, 59, 59, 0.25);
+}
+
+.app-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme color accents */
+.fn-bg { background: #3b1b1b; border: 1px solid rgba(255,59,59,0.3); color: #ff5555; }
+.gm-bg { background: #2b1b3b; border: 1px solid rgba(168,85,247,0.3); color: #b975ff; }
+.mv-bg { background: #1b2b3b; border: 1px solid rgba(59,130,246,0.3); color: #5599ff; }
+.ai-bg { background: #1b3b2b; border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+.ms-bg { background: #3b3b1b; border: 1px solid rgba(234,179,8,0.3); color: #facc15; }
+.rb-bg { background: #3b2b1b; border: 1px solid rgba(249,115,22,0.3); color: #fb923c; }
+
+.app-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+/* ==========================================================================
+   RIGHT SIDE FEATURED BOX INTERNALS
+   ========================================================================== */
+.featured-preview-box {
+  width: 100%;
+  height: 110px;
+  background: linear-gradient(135deg, #421111, #1f0808);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 59, 59, 0.15);
+}
+
+.preview-placeholder {
+  font-size: 32px;
+  color: rgba(255, 59, 59, 0.4);
 }
 
 .featured-content h3 {
-  margin: 10px 0 5px 0;
-  font-size: 18px;
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-weight: 600;
 }
 
 .featured-content p {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   margin: 0;
+  line-height: 1.4;
 }
 
 .widget-btn {
-  display: inline-block;
-  margin-top: 15px;
-  background: rgba(255, 255, 255, 0.1);
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  background: #ff3b3b;
   color: white;
   text-decoration: none;
-  padding: 8px 16px;
-  border-radius: 8px;
+  padding: 10px;
+  border-radius: 10px;
   font-size: 13px;
   font-weight: 600;
-  transition: background 0.2s ease;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(255, 59, 59, 0.25);
 }
 
 .widget-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #ff5555;
+  transform: scale(1.02);
 }
 
-/* Responsive collapse for small windows or phones */
-@media (max-width: 1100px) {
+/* ==========================================================================
+   RESPONSIVE LAYOUT OVERRIDES
+   ========================================================================== */
+@media (max-width: 1150px) {
   .dashboard-wrapper {
     flex-direction: column;
     align-items: center;
+    padding: 20px;
   }
   .side-panel {
     width: 100%;
     max-width: 500px;
+    min-height: auto;
+  }
+  .apps-grid {
+    grid-template-columns: repeat(3, 1fr);
   }
 }
