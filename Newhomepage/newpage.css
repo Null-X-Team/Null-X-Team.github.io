@@ -29,44 +29,45 @@ body {
   justify-content: center;
   background: rgba(30, 15, 15, 0.75); /* Crimson translucent tint */
   border: 1px solid rgba(139, 0, 0, 0.25); /* Dark crimson border line */
-  padding: 10px 18px;
+  padding: 10px 20px;
   border-radius: 30px;
   backdrop-filter: blur(12px);
-  max-width: 65px; /* Compact pill size when closed */
+  
+  /* Adjusted widths: Fits all 7 icons perfectly when resting */
+  min-width: 340px; 
+  max-width: 360px;
   height: 36px;
-  transition: max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), padding 0.3s ease;
+  
+  /* Smooth widening transition */
+  transition: max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              min-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              padding 0.3s ease;
   overflow: hidden;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
+/* Hide the old single trigger bolt since all icons show instantly now */
 .nav-trigger-icon {
-  font-size: 18px;
-  color: #ff3b3b;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.3s ease;
+  display: none;
 }
 
 .nav-tabs-wrapper {
   display: flex;
   align-items: center;
-  gap: 15px;
-  opacity: 0;
-  visibility: hidden;
-  margin-left: 0;
-  transition: opacity 0.2s ease, visibility 0.2s ease, margin-left 0.3s ease;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  transition: gap 0.3s ease;
 }
 
 /* NAVIGATION LINKS BASE STYLE */
 .nav-tab-item {
   display: flex;
   align-items: center;
-  gap: 0px; /* Snug when text is hidden */
+  gap: 0px; /* Snug up close when text labels are hidden */
   text-decoration: none;
   color: rgba(255, 255, 255, 0.65);
-  padding: 6px 12px;
+  padding: 8px 12px;
   border-radius: 20px;
   font-size: 14px;
   font-weight: 500;
@@ -74,41 +75,37 @@ body {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* HIDE LINK TEXT labels BY DEFAULT */
+/* HIDE LINK TEXT LABELS ENTIRELY BY DEFAULT */
 .nav-tab-item .tab-text {
   max-width: 0px;
   opacity: 0;
   display: inline-block;
   overflow: hidden;
-  transition: max-width 0.3s ease, opacity 0.2s ease, margin-left 0.3s ease;
   margin-left: 0px;
+  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.2s ease, 
+              margin-left 0.3s ease;
 }
 
-/* HOVER TRIGGERS: SMOOTHLY EXPAND BAR CONTAINER */
+/* ==========================================================================
+   HOVER TRIGGERS: SMOOTHLY WIDEN BAR & SLIDE OUT TEXT Labels
+   ========================================================================== */
 .nav-bar:hover {
-  max-width: 950px; /* Opens broad enough for whole row */
+  min-width: 850px; /* Expands wider to give room to the text */
+  max-width: 950px; 
   padding: 10px 25px;
 }
 
-.nav-bar:hover .nav-trigger-icon {
-  transform: scale(0) rotate(90deg);
-  width: 0;
-  margin: 0;
-}
-
 .nav-bar:hover .nav-tabs-wrapper {
-  opacity: 1;
-  visibility: visible;
-  margin-left: 10px;
+  gap: 14px; /* Spreads tabs apart cleanly when text is showing */
 }
 
-/* HOVER TRIGGERS: SLIDE OPEN LINK TEXT ITEMS */
 .nav-bar:hover .nav-tab-item {
-  gap: 8px; /* Restores layout gap between SVG icon and label */
+  gap: 8px; /* Creates space between the SVG icon graphic and the text string */
 }
 
 .nav-bar:hover .nav-tab-item .tab-text {
-  max-width: 150px; /* Reveals string text width */
+  max-width: 150px; /* Slides open the text wrapper smoothly */
   opacity: 1;
   margin-left: 2px;
 }
@@ -126,10 +123,12 @@ body {
 }
 
 .tab-icon {
-  font-size: 14px;
+  font-size: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 20px;
+  height: 20px;
 }
 
 /* ==========================================================================
