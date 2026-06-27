@@ -41,7 +41,7 @@
 
             if (response.ok) {
                 if (statusBox) {
-                    statusBox.textContent = "✅ Everything completely backed up to the cloud!";
+                    statusBox.textContent = "Backup successful";
                     statusBox.style.color = "#00c853";
                 }
             } else {
@@ -50,7 +50,7 @@
         } catch (err) {
             console.error(err);
             if (statusBox) {
-                statusBox.textContent = "❌ Upload failed. Check connection.";
+                statusBox.textContent = "Upload unsuccessful. Check connection.";
                 statusBox.style.color = "#ff4444";
             }
         }
@@ -80,7 +80,7 @@
                 localStorage.setItem('chatUser', loggedInUser); // Keep logged in
                 
                 if (statusBox) {
-                    statusBox.textContent = "✅ All data successfully restored from cloud!";
+                    statusBox.textContent = "All data successfully restored from cloud!";
                     statusBox.style.color = "#00c853";
                 }
             } else {
