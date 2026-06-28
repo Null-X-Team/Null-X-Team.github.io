@@ -4,72 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="profile.css">
 </head>
 <body>
     <div class="profile-container">
         <div class="sidebar">
             <div class="sidebar-header">
-                <h2>Settings</h2>
+                <h2>SETTINGS</h2>
             </div>
             <div class="sidebar-menu">
                 <a href="https://glaxyias.github.io" class="menu-item">
-                    <span class="icon">🏠</span> Home
+                    <i class="fas fa-home icon"></i> Home
                 </a>
                 <a href="../chat/chat.html" class="menu-item">
-                    <span class="icon">💬</span> Chat Server
+                    <i class="fas fa-comments icon"></i> Chat Server
                 </a>
-                <div class="menu-item active">
-                    <span class="icon">👤</span> Profile Card
-                </div>
+                <a href="#" class="menu-item active">
+                    <i class="fas fa-user-id icon"></i> Profile Card
+                </a>
             </div>
         </div>
 
         <div class="main-content">
-            <div class="profile-card">
-                <div class="avatar-upload-section">
-                    <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
-                    <div class="upload-inputs">
-                        <label for="pfp-file-input">Upload Profile Picture</label>
-                        <input type="file" id="pfp-file-input" accept="image/*">
+            <div class="settings-grid">
+                
+                <div class="profile-card upload-section">
+                    <h3>UPLOAD PROFILE PICTURE</h3>
+                    <div class="avatar-upload-container">
+                        <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                        <div class="upload-inputs">
+                            <label for="pfp-file-input" class="custom-file-upload">Choose File</label>
+                            <span class="file-name-fallback">No file chosen</span>
+                            <input type="file" id="pfp-file-input" accept="image/*">
+                        </div>
                     </div>
                 </div>
 
-                <div class="profile-details-section">
-                    <div class="input-group">
-                        <label>Username</label>
-                        <div class="username-static-display">
-                            <span id="display-username">Loading...</span>
-                        </div>
-                    </div>
+                <div class="profile-card input-group">
+                    <label for="display-username">USERNAME</label>
+                    <input type="text" id="display-username" value="Loading..." readonly class="styled-input">
+                </div>
 
-                    <div class="input-group">
-                        <label for="bio-input">About Me / Bio</label>
-                        <textarea id="bio-input" placeholder="Tell the community a little bit about yourself..." maxlength="250"></textarea>
-                    </div>
+                <div class="profile-card input-group">
+                    <label for="bio-input">ABOUT ME / BIO</label>
+                    <textarea id="bio-input" placeholder="Tell the community a little bit about yourself..." maxlength="250" class="styled-textarea"></textarea>
+                </div>
 
-                    <div class="meta-info">
-                        <div class="info-row">
-                            <span>Account Holder:</span>
-                            <strong id="info-username">-</strong>
-                        </div>
-                        <div class="info-row">
-                            <span>Joined Community:</span>
-                            <span id="join-date">-</span>
-                        </div>
+                <div class="profile-card meta-info">
+                    <div class="info-group">
+                        <span class="meta-label">ACCOUNT HOLDER:</span>
+                        <div id="info-username" class="meta-value">TEST USER</div>
                     </div>
-
-                    <div id="admin-actions-container" style="display: none; margin-top: 20px; padding-top: 15px; border-top: 1px dashed rgba(207, 122, 60, 0.2);">
-                        <button id="toggle-admin-btn" style="width: 100%; background: #ff4444; color: white; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer; transition: background 0.2s;">
-                            Give Admin Status
-                        </button>
-                    </div>
-
-                    <div class="actions-row" style="margin-top: 20px;">
-                        <button id="save-profile-btn" class="save-btn">Save Changes</button>
-                        <span id="save-status"></span>
+                    <div class="info-group">
+                        <span class="meta-label">JOINED COMMUNITY:</span>
+                        <div id="join-date" class="meta-value">-</div>
                     </div>
                 </div>
+
+                <div id="admin-actions-container" class="profile-card admin-section" style="display: none;">
+                    <button id="toggle-admin-btn" class="admin-btn">
+                        <i class="fas fa-user-shield"></i> Give Admin Status
+                    </button>
+                </div>
+
+                <div class="actions-container">
+                    <button id="save-profile-btn" class="save-btn">Save Changes</button>
+                    <span id="save-status"></span>
+                </div>
+
             </div>
         </div>
     </div>
