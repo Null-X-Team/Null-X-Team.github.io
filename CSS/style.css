@@ -37,10 +37,10 @@ body {
   background: var(--bg-sidebar) !important;
 }
 
-/* Dashboard Core Layout */
+/* Dashboard Core Layout Fixes */
 .dashboard {
   display: grid !important;
-  grid-template-columns: 220px 1fr 280px;
+  grid-template-columns: 240px 1fr 280px; /* Fixed column sizes to guarantee structural split */
   min-height: 100vh;
   width: 100%;
   visibility: visible !important;
@@ -48,7 +48,7 @@ body {
   background: var(--bg-dashboard);
 }
 
-/* Sidebar Navigation */
+/* Sidebar Navigation Layout Realignment */
 .left-nav {
   background: var(--bg-sidebar) !important;
   border-right: 1px solid var(--border-color) !important;
@@ -105,6 +105,11 @@ nav {
   border: 1px solid transparent;
 }
 
+.nav-item i {
+  font-size: 1.1rem;
+  width: 24px; /* Fixes alignment shift across item columns */
+}
+
 .nav-item:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-main);
@@ -112,13 +117,14 @@ nav {
   padding-left: 22px;
 }
 
+/* Fixed Error Syntax: Changed line below from #all-white to proper color styling */
 .nav-item.active {
   background: var(--accent-color, var(--accent));
-  color: #all-white, var(--text-main);
+  color: #ffffff;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
-/* Main Content Area */
+/* Main Content Area Layout Settings */
 .main-content {
   background: var(--bg-dashboard);
   display: flex;
@@ -127,6 +133,7 @@ nav {
   min-width: 0;
   overflow-y: auto;
   position: relative;
+  height: 100vh;
 }
 
 .top-bar {
@@ -180,7 +187,7 @@ nav {
   border-color: var(--accent-color, var(--accent));
 }
 
-/* Hero Section Styles */
+/* Featured Hero Styling Rules */
 .hero {
   margin: 30px;
   padding: 60px;
@@ -277,7 +284,7 @@ nav {
   border-color: var(--accent-color, var(--accent)) !important;
 }
 
-/* Quick Action Row */
+/* Quick Action Row Controls */
 .random-section {
   padding: 0 30px 25px;
 }
@@ -305,7 +312,7 @@ nav {
   box-shadow: 0 0 20px var(--border-color);
 }
 
-/* Grid & Cards System */
+/* Grid & Display Cards Configurations */
 .section-title {
   padding: 0 30px;
   margin: 20px 0 25px;
@@ -387,9 +394,113 @@ nav {
   opacity: 1;
 }
 
-/* -------------------------------------------------------------------------- */
-/* NEW SPECIFIC STYLES: UNBLOCKERS LAYOUT INTEGRATION */
-/* -------------------------------------------------------------------------- */
+/* Profile Form Block Setup */
+.profile-card {
+  background: var(--bg-sidebar);
+  border: 1px solid var(--border-color);
+  padding: 30px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+#pfp-preview {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--accent);
+}
+
+.upload-inputs label {
+  display: inline-block;
+  padding: 8px 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.upload-inputs label:hover {
+  background: rgba(255,255,255,0.1);
+  border-color: var(--accent);
+}
+
+.upload-inputs input[type="file"] {
+  display: none;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.input-group label {
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.username-static-display {
+  padding: 12px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.input-group textarea {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px;
+  color: white;
+  font-family: inherit;
+  resize: none;
+  height: 80px;
+  outline: none;
+}
+
+.input-group textarea:focus {
+  border-color: var(--accent);
+}
+
+.meta-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0,0,0,0.15);
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+}
+
+.info-row span {
+  color: var(--text-muted);
+}
+
+.actions-row {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Unblockers Portal Cards Grid */
 .unblocker-card {
   background: var(--bg-sidebar) !important;
   border: 1px solid var(--border-color) !important;
@@ -425,7 +536,7 @@ nav {
   color: var(--accent-hover);
 }
 
-/* Right Sidebar Sidebar */
+/* Right Sidebar Rules */
 .right-sidebar {
   background: var(--bg-sidebar) !important;
   border-left: 1px solid var(--border-color) !important;
@@ -478,7 +589,7 @@ nav {
   color: var(--text-main);
 }
 
-/* Modal UI Components */
+/* Modal Core Overlays */
 .modal-overlay {
   display: none;
   position: fixed;
@@ -618,7 +729,7 @@ nav {
   color: #ff3333;
 }
 
-/* Panic Logic & Utility */
+/* Panic Logic Properties */
 .panic-inputs {
   display: flex;
   flex-direction: column;
@@ -643,7 +754,7 @@ nav {
   transform: translateY(-2px);
 }
 
-/* COMMUNICATIONS MODULE */
+/* Communications Block Module */
 .form-wrapper {
   background: var(--bg-sidebar) !important; 
   border: 2px solid var(--accent-color, var(--accent)); 
@@ -681,7 +792,7 @@ nav {
   display: block;
 }
 
-/* Lockdown System */
+/* Emergency Overlay Screen Settings */
 #lockdown-overlay {
   background: #000000 !important;
   z-index: 1000000 !important;
@@ -699,12 +810,11 @@ nav {
   text-align: center;
 }
 
-/* Visibility Utilities */
 .hidden {
   display: none !important;
 }
 
-/* Global Scrollbar Design */
+/* Global Navigation System Scrollbars */
 ::-webkit-scrollbar {
   width: 12px;
 }
@@ -724,7 +834,7 @@ nav {
   background: var(--accent-color, var(--accent));
 }
 
-/* Responsive Breakpoints */
+/* Responsive Adaptive Interface Adjustments */
 @media (max-width: 1200px) {
   .dashboard {
     grid-template-columns: 80px 1fr 260px;
@@ -745,7 +855,6 @@ nav {
   .hero h2 { font-size: 32px; }
 }
 
-/* Specific UI Utilities - Restoration */
 .flex-center { display: flex; align-items: center; justify-content: center; }
 .mt-1 { margin-top: 10px; }
 .mt-2 { margin-top: 20px; }
@@ -754,11 +863,7 @@ nav {
 .text-accent { color: var(--accent-color, var(--accent)); }
 .bg-dark { background: var(--bg-dashboard) !important; }
 
-/* -------------------------------------------------------------------------- */
-/* NEW FEATURES (NEWS SIDEBAR, STEALTH MODE, AND ANIMATIONS) */
-/* -------------------------------------------------------------------------- */
-
-/* Stealth Button Styling */
+/* Stealth Button Layout Alignment */
 .cloak-btn {
   width: 100%;
   padding: 16px 20px;
@@ -783,7 +888,7 @@ nav {
   transform: translateY(-2px);
 }
 
-/* News Sidebar Container */
+/* Updates News Container Feed Parameters */
 .news-sidebar {
   margin-top: 20px;
   padding-top: 20px;
@@ -815,7 +920,6 @@ nav {
   background: var(--border-color);
 }
 
-/* News Feed Container */
 .news-feed {
   display: flex;
   flex-direction: column;
@@ -832,7 +936,6 @@ nav {
   overflow-y: auto !important;
 }
 
-/* Custom Scrollbar Interface For The News Area */
 .news-feed::-webkit-scrollbar {
   width: 6px;
 }
@@ -851,7 +954,6 @@ nav {
   background: var(--text-main);
 }
 
-/* Individual News Card */
 .news-card {
   background: var(--bg-dashboard) !important;
   border: 1px solid var(--border-color) !important;
@@ -894,7 +996,6 @@ nav {
   font-weight: 600;
 }
 
-/* System Pulse Animation for News Title */
 .news-title::before {
   content: '';
   width: 8px;
@@ -911,7 +1012,6 @@ nav {
   100% { opacity: 1; transform: scale(1); }
 }
 
-/* Generic Fade-In Animation for New Elements */
 .news-card, .cloak-btn {
   animation: fadeInUpSmall 0.5s ease-out forwards;
 }
@@ -921,9 +1021,7 @@ nav {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* -------------------------------------------------------------------------- */
-/* FULLSCREEN CLINICAL WHITE ACADEMIC CLOAK OVERLAY (PURE BLACK TEXT) */
-/* -------------------------------------------------------------------------- */
+/* Fullscreen Academic Overlay Shield */
 #educational-cloak {
   position: fixed;
   top: 0;
@@ -943,20 +1041,18 @@ nav {
   overflow: hidden;
 }
 
-/* Master Academic Container Box */
 .educational-content-card {
   background: #ffffff !important;
   border: 2px solid #000000 !important;              
   box-shadow: none;                                        
   width: 90%;
   max-width: 950px;                                      
-  height: 85vh;                                          
+  height: 85vh;                                           
   display: flex;
   flex-direction: column;
   border-radius: 0px;                                     
 }
 
-/* Locked Header Elements */
 .educational-header {
   padding: 25px 35px 15px 35px;
   border-bottom: 2px solid #000000;       
@@ -979,7 +1075,6 @@ nav {
   font-weight: bold;
 }
 
-/* Scrollable Document Text Field */
 .educational-scroll-body {
   padding: 30px 35px;
   overflow-y: auto;                                      
@@ -994,7 +1089,6 @@ nav {
   color: #000000 !important;              
 }
 
-/* Locked Bottom Status Bar & Countdown Timer Container */
 .timer-subtext-sticky {
   padding: 15px 35px;
   background: #ffffff;                                    
@@ -1014,7 +1108,6 @@ nav {
   font-size: 1.05rem;
 }
 
-/* Custom Minimalist Document Scrollbar UI */
 .educational-scroll-body::-webkit-scrollbar {
   width: 8px;
 }
@@ -1025,9 +1118,6 @@ nav {
   background: #000000;                    
 }
 
-/* ==========================================================================
-   Stealth Dropdown Styles
-   ========================================================================== */
 .stealth-menu-wrapper {
   position: relative;
   display: inline-block;
@@ -1060,17 +1150,12 @@ nav {
   background: var(--bg-sidebar) !important;
 }
 
-/* ==========================================================================
-   Auto-Launch Options Styles
-   ========================================================================== */
 #auto-launch-options {
   margin-top: 10px;
   padding-left: 5px;
 }
 
-/* ==========================================================================
-   LINUX SIDEBAR TERMINAL STRUCTURAL INTEGRATION
-   ========================================================================== */
+/* Sidebar Embedded System Terminal Integration Styles */
 .terminal-container {
   margin-top: auto; 
   background: var(--bg-dashboard) !important; 
@@ -1140,7 +1225,7 @@ nav {
   padding: 0;
   margin: 0;
 }
-/* Custom Context Menu Styling */
+
 #custom-context-menu {
   position: fixed;
   background: var(--bg-sidebar) !important;
@@ -1170,9 +1255,8 @@ nav {
   background: #ff3333 !important;
 }
 
-/* Favorite Visual Accent on Game Cards */
 .game-card.is-favorite {
-  border-color: #ffd700 !important; /* Gold border for favorites */
+  border-color: #ffd700 !important; 
 }
 .game-card.is-favorite::before {
   content: '★';
