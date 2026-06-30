@@ -1,5 +1,3 @@
-import { applyCloak } from '../Cloaks/Cloaks.js';
-
 let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "Games/brotatoAPNG/Brotato.html", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
   { id: "y_io", title: "Yohoho.io", url: "Games/yohoho/index.html", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
@@ -437,41 +435,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  const cloakElement = document.getElementById('educational-cloak');
-  const cloakTimerText = document.getElementById('cloak-timer');
-  const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
-
-  const toggleStudyCloakInput = document.getElementById('toggle-study-cloak');
-  if (toggleStudyCloakInput) {
-    toggleStudyCloakInput.checked = isSplashDisabled;
-    toggleStudyCloakInput.onchange = (e) => {
-      localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
-    };
-  }
-
-  if (isSplashDisabled) {
-    if (cloakElement) cloakElement.style.display = 'none';
-  } else {
-    let secs = 10; 
-    if (cloakTimerText) cloakTimerText.textContent = secs;
-    const loop = setInterval(() => {
-      secs--;
-      if (cloakTimerText) cloakTimerText.textContent = secs;
-      if (secs <= 0) {
-        clearInterval(loop);
-        if (cloakElement) {
-          cloakElement.style.opacity = '0';
-          setTimeout(() => cloakElement.style.display = 'none', 500);
-        }
-      }
-    }, 1000);
-  }
-
-  const savedCloak = localStorage.getItem('savedCloak');
-  if (savedCloak && savedCloak !== "none") {
-    try { applyCloak(savedCloak); } catch(e) {}
-  }
-
   const user = localStorage.getItem('chatUser');
   if (user) {
     if (document.getElementById('welcome-text')) {
@@ -499,9 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     };
   }
-
-  if (document.getElementById('settingsBtn')) document.getElementById('settingsBtn').onclick = () => document.getElementById('settingsModal').style.display = 'flex';
-  if (document.getElementById('closeSettings')) document.getElementById('closeSettings').onclick = () => document.getElementById('settingsModal').style.display = 'none';
 
   if (document.getElementById('nav-home')) document.getElementById('nav-home').onclick = (e) => { e.preventDefault(); showHomeView(); };
   if (document.getElementById('nav-games')) document.getElementById('nav-games').onclick = (e) => { e.preventDefault(); showAllGamesView(); };
@@ -532,16 +492,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  const cloakSelector = document.getElementById('cloakSelector');
-  if (cloakSelector) {
-    if (savedCloak) cloakSelector.value = savedCloak;
-    cloakSelector.onchange = (e) => {
-      if (e.target.value === "none") localStorage.removeItem('savedCloak');
-      else localStorage.setItem('savedCloak', e.target.value);
-      location.reload();
-    };
-  }
-
   const searchBar = document.getElementById('searchBar');
   if (searchBar) {
     searchBar.addEventListener('input', (e) => {
@@ -555,12 +505,6 @@ document.addEventListener('DOMContentLoaded', () => {
       renderLibraryGrid(hits);
     });
   }
-
-  window.addEventListener('keydown', (e) => {
-    if (e.key === localStorage.getItem('panicKey')) {
-      window.location.href = localStorage.getItem('panicUrl') || "https://classroom.google.com";
-    }
-  });
 
   const contextMenu = document.getElementById('custom-context-menu');
   const deleteModal = document.getElementById('delete-modal-overlay');
@@ -636,7 +580,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // ADDED: Battery and Clock Tracker Module
+  // Battery and Clock Tracker Module
   // ==========================================
   if (navigator.getBattery) {
     navigator.getBattery().then(battery => {
