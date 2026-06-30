@@ -420,25 +420,32 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // COVERSCREEN OVERLAY COUNTDOWN LOOP
   // ==========================================
+  const isSplashDisabled = localStorage.getItem('disableSplashScreen') === 'true';
   const cloakOverlay = document.getElementById("educational-cloak");
-  const timerDisplay = document.querySelector(".timer-subtext-sticky span");
 
   if (cloakOverlay) {
-    let timeLeft = 10;
-    if (timerDisplay) {
-      timerDisplay.textContent = `${timeLeft} seconds.`;
-    }
-
-    const countdownInterval = setInterval(() => {
-      timeLeft--;
-      if (timeLeft > 0) {
-        if (timerDisplay) timerDisplay.textContent = `${timeLeft} seconds.`;
-      } else {
-        clearInterval(countdownInterval);
-        cloakOverlay.classList.add("hidden");
-        console.log("Overlay container initialization cleared successfully.");
+    if (isSplashDisabled) {
+      // Short-circuit overlay immediately if preference matches true
+      cloakOverlay.style.display = 'none';
+      cloakOverlay.classList.add("hidden");
+    } else {
+      const timerDisplay = document.querySelector(".timer-subtext-sticky span");
+      let timeLeft = 10;
+      if (timerDisplay) {
+        timerDisplay.textContent = `${timeLeft} seconds.`;
       }
-    }, 1000);
+
+      const countdownInterval = setInterval(() => {
+        timeLeft--;
+        if (timeLeft > 0) {
+          if (timerDisplay) timerDisplay.textContent = `${timeLeft} seconds.`;
+        } else {
+          clearInterval(countdownInterval);
+          cloakOverlay.classList.add("hidden");
+          console.log("Overlay container initialization cleared successfully.");
+        }
+      }, 1000);
+    }
   }
 
   if (localStorage.getItem('autoLaunchStealth') === 'true') {
