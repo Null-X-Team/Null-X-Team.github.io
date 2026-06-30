@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
   // COVERSCREEN OVERLAY COUNTDOWN LOOP
   // ==========================================
-  const isSplashDisabled = localStorage.getItem('disableSplashScreen') === 'true';
+  const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
   const cloakOverlay = document.getElementById("educational-cloak");
 
   if (cloakOverlay) {
