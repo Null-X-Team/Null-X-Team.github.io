@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.style.display = 'flex';
 
       // Fetch settings content structure and execute inside the window context
-      fetch('settings/settings.html')
+      fetch('Settings/settings.html')
         .then(res => res.text())
         .then(html => {
           const contentDiv = document.getElementById('modal-settings-content');
