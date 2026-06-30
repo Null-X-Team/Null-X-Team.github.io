@@ -99,7 +99,7 @@ function launchStealthWindow(maskType, targetEnv) {
     'Clever': { t: "Clever | Single Sign-On for Education", r: "https://clever.com/" },
     'Blackboard': { t: "Blackboard | Education Delivery Platform", r: "https://www.blackboard.com/" },
     'Moodle': { t: "Moodle - Open-source learning platform", r: "https://moodle.org/" },
-    'Schoology': { t: "Schoology - Learning Management System", r: "https://www.schoology.com/" },
+    'Schoology': { t: "Schoology - Learning Management System", r: "https://www.scholology.com/" },
     'Google Docs': { t: "Google Docs", r: "https://docs.google.com/" },
     'Google Slides': { t: "Google Slides", r: "https://slides.google.com/" },
     'Google Sheets': { t: "Google Sheets", r: "https://sheets.google.com/" },
@@ -418,14 +418,13 @@ async function handlePlaceholderView(navId, viewName) {
 
 document.addEventListener('DOMContentLoaded', () => {
   // ==========================================
-  // COVERSCREEN OVERLAY COUNTDOWN LOOP
+  // COVERSCREEN OVERLAY COUNTDOWN LOOP (FIXED KEY)
   // ==========================================
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
   const cloakOverlay = document.getElementById("educational-cloak");
 
   if (cloakOverlay) {
     if (isSplashDisabled) {
-      // Short-circuit overlay immediately if preference matches true
       cloakOverlay.style.display = 'none';
       cloakOverlay.classList.add("hidden");
     } else {
@@ -446,6 +445,63 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }, 1000);
     }
+  }
+
+  // ==========================================
+  // INLINE MODAL SETTINGS LAUNCHER
+  // ==========================================
+  const settingsBtn = document.getElementById('settingsBtn');
+  if (settingsBtn) {
+    settingsBtn.onclick = (e) => {
+      e.preventDefault();
+      
+      // Make sure the modal overlay container exists in your index.html
+      let modal = document.getElementById('settingsModal');
+      if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'settingsModal';
+        modal.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:999999; display:none; align-items:center; justify-content:center;";
+        document.body.appendChild(modal);
+      }
+
+      // Load settings page dynamically directly inside the page view
+      modal.innerHTML = `
+        <div style="background:#111; border:2px solid #8b00ff; padding:25px; border-radius:12px; width:90%; max-width:500px; position:relative; box-shadow:0 0 20px rgba(139,0,255,0.4);">
+          <button id="closeSettings" style="position:absolute; top:15px; right:15px; background:none; border:none; color:#ff3333; font-size:20px; font-weight:bold; cursor:pointer;">&times;</button>
+          <div id="modal-settings-content">
+            <p style="color:#8b00ff;">Loading configuration modules...</p>
+          </div>
+        </div>
+      `;
+      modal.style.display = 'flex';
+
+      // Fetch settings content structure and execute inside the window context
+      fetch('settings/settings.html')
+        .then(res => res.text())
+        .then(html => {
+          const contentDiv = document.getElementById('modal-settings-content');
+          if (contentDiv) {
+            contentDiv.innerHTML = html;
+            
+            // Re-bind actions once elements land inside current DOM window context
+            const splashCheckbox = document.getElementById('toggle-study-cloak');
+            if (splashCheckbox) {
+              splashCheckbox.checked = localStorage.getItem('disableStudyCloak') === 'true';
+              splashCheckbox.onchange = (e) => {
+                localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
+              };
+            }
+
+            const modalCloseBtn = document.getElementById('closeSettings');
+            if (modalCloseBtn) {
+              modalCloseBtn.onclick = () => { modal.style.display = 'none'; };
+            }
+          }
+        })
+        .catch(err => {
+          console.error("Modal dynamic load failure:", err);
+        });
+    };
   }
 
   if (localStorage.getItem('autoLaunchStealth') === 'true') {
@@ -610,9 +666,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // ==========================================
-  // Battery and Clock Tracker Module
-  // ==========================================
+  // Battery and Clock tracker engine
   if (navigator.getBattery) {
     navigator.getBattery().then(battery => {
       function updateBatteryDisplay() {
@@ -626,18 +680,13 @@ document.addEventListener('DOMContentLoaded', () => {
       updateBatteryDisplay();
       battery.addEventListener('levelchange', updateBatteryDisplay);
       battery.addEventListener('chargingchange', updateBatteryDisplay);
-    }).catch(err => console.error("Battery API access denied:", err));
+    }).catch(err => console.error("Battery access denied:", err));
   }
 
   function updateClockDisplay() {
     const clockText = document.getElementById('digital-clock');
     if (clockText) {
-      const options = { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit', 
-        timeZoneName: 'short' 
-      };
+      const options = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
       clockText.textContent = new Date().toLocaleTimeString(undefined, options);
     }
   }
