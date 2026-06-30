@@ -108,13 +108,13 @@
       </section>
 
       <div id="unblockersSection" style="display: none; padding: 20px; font-family: sans-serif; color: white; width: 100%; box-sizing: border-box;">
-        <h2 style="margin-bottom: 10px;">Unblockers Portal</h2>
+        <h2>Unblockers Portal</h2>
         <p style="color: #aaa; margin-bottom: 20px;">Deploy your web proxies and private environments.</p>
       </div>
 
       <div id="profileSection" style="display: none; padding: 20px; font-family: sans-serif; color: white; width: 100%; box-sizing: border-box;">
         <div class="profile-card" style="margin: 0 auto; max-width: 520px; width: 100%;">
-          <h2 style="margin-bottom: 10px;">User Profile</h2>
+          <h2>User Profile</h2>
           <p style="color: #aaa; margin-bottom: 20px;">Manage your local account settings and save parameters.</p>
 
           <div class="avatar-upload-section">
@@ -158,7 +158,7 @@
       </div>
 
       <div id="terminalSection" style="display: none; padding: 20px; font-family: sans-serif; color: white; width: 100%; box-sizing: border-box;">
-        <h2 style="margin-bottom: 10px;">System Console</h2>
+        <h2>System Console</h2>
         <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); font-family: monospace; padding: 15px; border-radius: 6px; color: #00ff66;">
           <p>&gt; null_x dashboard core loaded successfully.</p>
           <p>&gt; waiting for local command sequence...</p>
@@ -172,7 +172,8 @@
       </div>
        
       <button class="signin-btn" id="signInBtn">Sign In</button>
-      <button class="settings-btn" id="settingsBtn">Settings</button>
+      
+      <a href="settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center;">Settings</a>
 
       <div style="background: rgba(139, 0, 255, 0.03); border: 1px solid rgba(139, 0, 255, 0.12); padding: 10px; border-radius: 6px; margin: 10px 0; font-family: 'Segoe UI', sans-serif; color: white;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
@@ -197,6 +198,12 @@
         <h3 class="news-title">System News</h3>
         <div class="news-feed" id="newsFeed">
 
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Working on fixing settIngs modal</p>
+            <span class="news-date">June 29</span>
+          </div>
+          
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Themes work 100% Try em out</p>
@@ -320,182 +327,6 @@
         </div>
       </div>
     </aside>
-  </div>
-
-  <div id="settingsModal" class="modal-overlay" style="display: none;">
-    <div class="modal-box">
-      <span class="close-x" id="closeSettings">&times;</span>
-
-      <h1 class="glow">Settings</h1>
-      <p class="subtitle">Personalize your Null_X dashboard</p>
-      <hr class="settings-divider">
-
-      <div class="setting-section">
-        <h3>Appearance</h3>
-        <p class="setting-label">Select Theme:</p>
-        <div class="theme-grid">
-          <div class="theme-card" data-theme="default">
-            <div class="preview purple-preview"></div>
-            <span>Default Purple</span>
-          </div>
-          <div class="theme-card" data-theme="midnight">
-            <div class="preview midnight-preview"></div>
-            <span>Midnight</span>
-          </div>
-          <div class="theme-card" data-theme="vampire">
-            <div class="preview" style="background: #160505; border-color: #ff0000;"></div>
-            <span>Vampire Red</span>
-          </div>
-          <div class="theme-card" data-theme="ocean">
-            <div class="preview" style="background: #051425; border-color: #0088ff;"></div>
-            <span>Ocean Deep</span>
-          </div>
-          <div class="theme-card" data-theme="forest">
-            <div class="preview" style="background: #08170b; border-color: #00cc44;"></div>
-            <span>Forest Druid</span>
-          </div>
-          <div class="theme-card" data-theme="cyberpunk">
-            <div class="preview" style="background: #001219; border-color: #fcee0a;"></div>
-            <span>Cyberpunk 2077</span>
-          </div>
-          <div class="theme-card" data-theme="toxic">
-            <div class="preview" style="background: #192104; border-color: #a3ff00;"></div>
-            <span>Toxic Waste</span>
-          </div>
-          <div class="theme-card" data-theme="solar">
-            <div class="preview" style="background: #240d02; border-color: #ff5500;"></div>
-            <span>Solar Flare</span>
-          </div>
-          <div class="theme-card" data-theme="ice">
-            <div class="preview" style="background: #17272c; border-color: #00f3ff;"></div>
-            <span>Ice Blizzard</span>
-          </div>
-          <div class="theme-card" data-theme="arcade">
-            <div class="preview" style="background: #21022b; border-color: #ff007f;"></div>
-            <span>80s Arcade</span>
-          </div>
-          <div class="theme-card" data-theme="bubblegum">
-            <div class="preview" style="background: #3d2b34; border-color: #ffb7b2;"></div>
-            <span>Bubblegum</span>
-          </div>
-          <div class="theme-card" data-theme="desert">
-            <div class="preview" style="background: #211e14; border-color: #d4af37;"></div>
-            <span>Desert Strike</span>
-          </div>
-          <div class="theme-card" data-theme="royal">
-            <div class="preview" style="background: #1b0a24; border-color: #ffd700;"></div>
-            <span>Royal Luxury</span>
-          </div>
-          <div class="theme-card" data-theme="ghost">
-            <div class="preview" style="background: #1d242a; border-color: #708090;"></div>
-            <span>Ghostly</span>
-          </div>
-          <div class="theme-card" data-theme="espresso">
-            <div class="preview" style="background: #1c140f; border-color: #875c36;"></div>
-            <span>Cocoa Espresso</span>
-          </div>
-          <div class="theme-card" data-theme="copper">
-            <div class="preview" style="background: #241610; border-color: #b87333;"></div>
-            <span>Chrono Copper</span>
-          </div>
-          <div class="theme-card" data-theme="eclipse">
-            <div class="preview" style="background: #101017; border-color: #800020;"></div>
-            <span>Crimson Eclipse</span>
-          </div>
-          <div class="theme-card" data-theme="cotton">
-            <div class="preview" style="background: #1b2836; border-color: #ffa6c9;"></div>
-            <span>Cotton Candy</span>
-          </div>
-          <div class="theme-card" data-theme="moonlight">
-            <div class="preview" style="background: #101420; border-color: #7b92b5;"></div>
-            <span>Moonlight</span>
-          </div>
-          <div class="theme-card" data-theme="amber">
-            <div class="preview" style="background: #1f160b; border-color: #ffbf00;"></div>
-            <span>Amber Steampunk</span>
-          </div>
-
-          <div class="theme-card" data-theme="rgb">
-            <div class="preview" style="background: linear-gradient(45deg, #ff0000, #00ff00, #0000ff);"></div>
-            <span>Fading RGB <i class="fas fa-bolt" style="font-size: 11px;"></i></span>
-          </div>
-          <div class="theme-card" data-theme="matrix">
-            <div class="preview" style="background: #000000; border: 1px solid #00ff00; box-shadow: inset 0 0 5px #00ff00;"></div>
-            <span>Matrix Rain <i class="fas fa-microchip" style="font-size: 11px;"></i></span>
-          </div>
-          <div class="theme-card" data-theme="neon">
-            <div class="preview" style="background: #090314; border: 1px solid #00ffef; box-shadow: 0 0 6px #ff007f;"></div>
-            <span>Neon Pulse <i class="fas fa-bolt-lightning" style="font-size: 11px;"></i></span>
-          </div>
-        </div>
-      </div>
-
-      <div class="setting-section">
-        <h3>Startup Environment</h3>
-        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-          <input type="checkbox" id="toggle-study-cloak" style="cursor: pointer; width: 18px; height: 18px;">
-          <label for="toggle-study-cloak" class="setting-label" style="margin: 0; cursor: pointer; font-size: 0.95rem;">
-            Disable Academic Splash Screen on Launch
-          </label>
-        </div>
-      </div>
-
-      <div class="setting-section">
-        <h3>Privacy</h3>
-        <label for="cloakSelector" class="setting-label">Tab Cloak:</label>
-        <select id="cloakSelector" class="settings-input">
-          <option value="none">None (Default)</option>
-          <option value="Google Classroom">Google Classroom</option>
-          <option value="Google Drive">Google Drive</option>
-          <option value="Gmail">Gmail</option>
-          <option value="Canvas">Canvas</option>
-          <option value="Canva">Canva</option>
-          <option value="Microsoft 365">Microsoft 365</option>
-          <option value="NoRedInk">NoRedInk</option>
-          <option value="Neptune Navigate">Neptune Navigate</option>
-          <option value="Pear Assessment">Pear Assessment</option>
-          <option value="Membean">Membean</option>
-          <option value="i-Ready Reading">i-Ready Reading</option>
-          <option value="i-Ready Math">i-Ready Math</option>
-          <option value="DeltaMath">DeltaMath</option>
-          <option value="ExploreLearning Gizmos">ExploreLearning Gizmos</option>
-          <option value="Progress Learning">Progress Learning</option>
-          <option value="Student Support Time">Student Support Time</option>
-          <option value="Kahoot">Kahoot</option>
-          <option value="Nearpod">Nearpod</option>
-        </select>
-      </div>
-
-      <div class="setting-section">
-        <h3>Auto-Launch</h3>
-        <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
-          <input type="checkbox" id="toggle-auto-launch" style="cursor: pointer; width: 18px; height: 18px;">
-          <label for="toggle-auto-launch" class="setting-label" style="margin: 0; cursor: pointer; font-size: 0.95rem;">
-            Automatically launch cloaked on next visit
-          </label>
-        </div>
-        <div id="auto-launch-options" class="hidden" style="margin-top: 10px;">
-          <p class="setting-label">Launch Type Target:</p>
-          <select id="auto-launch-environment" class="settings-input">
-            <option value="about:blank">about:blank</option>
-            <option value="blob">blob URL</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="setting-section">
-        <h3>Panic Button</h3>
-        <div class="panic-inputs">
-          <p class="setting-label">Custom Shortcut Key:</p>
-          <input type="text" id="panicShortcut" placeholder="Click and press a key..." readonly>
-          
-          <p class="setting-label">Redirect URL:</p>
-          <input type="text" id="panicLink" placeholder="https://classroom.google.com">
-          
-          <button id="savePanic" class="save-btn">Save Panic Settings</button>
-        </div>
-      </div>
-    </div>
   </div>
 
   <div id="custom-context-menu" style="display: none; position: fixed; z-index: 10000; background: #12091c; border: 1px solid #8b00ff; border-radius: 6px; width: 160px; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
