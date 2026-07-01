@@ -1047,3 +1047,396 @@ nav {
   font-size: 16px;
   z-index: 5;
 }
+/* ==========================================================================
+   RESET & CORE BODY LAYOUT
+   ========================================================================== */
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #141111; /* Clean deep slate-black tone */
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  min-height: 100vh;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+/* ==========================================================================
+   TOP HOVER-EXPANDING NAVIGATION BAR
+   ========================================================================== */
+.top-nav-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-top: 20px;
+  position: relative;
+  z-index: 100;
+}
+
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(30, 15, 15, 0.75); /* Crimson translucent tint */
+  border: 1px solid rgba(139, 0, 0, 0.25); /* Dark crimson border line */
+  padding: 10px 20px;
+  border-radius: 30px;
+  backdrop-filter: blur(12px);
+  
+  /* Adjusted widths: Fits all 7 icons perfectly when resting */
+  min-width: 340px; 
+  max-width: 360px;
+  height: 36px;
+  
+  /* Smooth widening transition */
+  transition: max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              min-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+              padding 0.3s ease;
+  overflow: hidden;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Hide the old single trigger bolt since all icons show instantly now */
+.nav-trigger-icon {
+  display: none;
+}
+
+.nav-tabs-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  justify-content: center;
+  transition: gap 0.3s ease;
+}
+
+/* NAVIGATION LINKS BASE STYLE */
+.nav-tab-item {
+  display: flex;
+  align-items: center;
+  gap: 0px; /* Snug up close when text labels are hidden */
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* HIDE LINK TEXT LABELS ENTIRELY BY DEFAULT */
+.nav-tab-item .tab-text {
+  max-width: 0px;
+  opacity: 0;
+  display: inline-block;
+  overflow: hidden;
+  margin-left: 0px;
+  transition: max-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.2s ease, 
+              margin-left 0.3s ease;
+}
+
+/* ==========================================================================
+   HOVER TRIGGERS: SMOOTHLY WIDEN BAR & SLIDE OUT TEXT Labels
+   ========================================================================== */
+.nav-bar:hover {
+  min-width: 850px; /* Expands wider to give room to the text */
+  max-width: 950px; 
+  padding: 10px 25px;
+}
+
+.nav-bar:hover .nav-tabs-wrapper {
+  gap: 14px; /* Spreads tabs apart cleanly when text is showing */
+}
+
+.nav-bar:hover .nav-tab-item {
+  gap: 8px; /* Creates space between the SVG icon graphic and the text string */
+}
+
+.nav-bar:hover .nav-tab-item .tab-text {
+  max-width: 150px; /* Slides open the text wrapper smoothly */
+  opacity: 1;
+  margin-left: 2px;
+}
+
+/* LINK BUTTON HIGHLIGHT EFFECTS */
+.nav-tab-item:hover {
+  color: #ffffff;
+  background: rgba(255, 59, 59, 0.15);
+}
+
+.nav-tab-item.active {
+  color: #ffffff;
+  background: rgba(255, 30, 30, 0.3);
+  border: 1px solid rgba(255, 59, 59, 0.4);
+}
+
+.tab-icon {
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+/* ==========================================================================
+   DASHBOARD SIDE PANELS & FLEX ARRANGEMENT
+   ========================================================================== */
+.dashboard-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 40px;
+  box-sizing: border-box;
+  width: 100%;
+  gap: 30px;
+}
+
+.side-panel {
+  width: 280px;
+  min-height: 220px;
+  background: rgba(22, 14, 14, 0.7); /* Translucent backing tint */
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 18px;
+  padding: 22px;
+  box-sizing: border-box;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.widget-header {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 20px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* WEATHER STYLING */
+.weather-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.weather-temp {
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -1px;
+}
+
+.weather-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.weather-stats i {
+  color: #ff3b3b;
+  margin-right: 2px;
+}
+
+.location-label {
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 1px;
+  color: rgba(255, 59, 59, 0.7);
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* ==========================================================================
+   CENTRAL CONTENT AREA & INTERFACE
+   ========================================================================== */
+.main-hub {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 780px;
+}
+
+.site-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  margin: 10px 0 25px 0;
+  background: linear-gradient(135deg, #ffffff 30%, #ffaaaa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* REFINED SEARCH CONTAINER */
+.search-container {
+  position: relative;
+  width: 500px;
+  max-width: 100%;
+  margin-bottom: 45px;
+}
+
+.search-glass {
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+}
+
+.search-container input {
+  width: 100%;
+  padding: 15px 20px 15px 44px;
+  background: rgba(15, 10, 10, 0.6);
+  border: 1px solid rgba(255, 59, 59, 0.2);
+  border-radius: 28px;
+  color: #fff;
+  font-size: 15px;
+  outline: none;
+  backdrop-filter: blur(6px);
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.search-container input:focus {
+  border-color: rgba(255, 59, 59, 0.6);
+  box-shadow: 0 0 15px rgba(255, 59, 59, 0.15);
+}
+
+/* ==========================================================================
+   SHORTCUT ICONS LAYOUT GRID
+   ========================================================================== */
+.apps-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  width: 100%;
+}
+
+.app-card {
+  background: rgba(25, 20, 20, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.app-card:hover {
+  transform: translateY(-4px);
+  background: rgba(35, 22, 22, 0.7);
+  border-color: rgba(255, 59, 59, 0.25);
+}
+
+.app-icon-box {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Theme color accents for grids */
+.fn-bg { background: #3b1b1b; border: 1px solid rgba(255,59,59,0.3); color: #ff5555; }
+.gm-bg { background: #2b1b3b; border: 1px solid rgba(168,85,247,0.3); color: #b975ff; }
+.mv-bg { background: #1b2b3b; border: 1px solid rgba(59,130,246,0.3); color: #5599ff; }
+.ai-bg { background: #1b3b2b; border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
+.ms-bg { background: #3b3b1b; border: 1px solid rgba(234,179,8,0.3); color: #facc15; }
+.rb-bg { background: #3b2b1b; border: 1px solid rgba(249,115,22,0.3); color: #fb923c; }
+
+.app-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  text-align: center;
+}
+
+/* ==========================================================================
+   RIGHT SIDE FEATURED BOX INTERNALS
+   ========================================================================== */
+.featured-preview-box {
+  width: 100%;
+  height: 110px;
+  background: linear-gradient(135deg, #421111, #1f0808);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 14px;
+  border: 1px solid rgba(255, 59, 59, 0.15);
+}
+
+.preview-placeholder {
+  font-size: 32px;
+  color: rgba(255, 59, 59, 0.4);
+}
+
+.featured-content h3 {
+  margin: 0 0 6px 0;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.featured-content p {
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.5);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.widget-btn {
+  display: block;
+  text-align: center;
+  margin-top: 18px;
+  background: #ff3b3b;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 4px 12px rgba(255, 59, 59, 0.25);
+}
+
+.widget-btn:hover {
+  background: #ff5555;
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   RESPONSIVE OVERRIDES
+   ========================================================================== */
+@media (max-width: 1150px) {
+  .dashboard-wrapper {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  .side-panel {
+    width: 100%;
+    max-width: 500px;
+    min-height: auto;
+  }
+  .apps-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+.hidden {
+    display: none !important;
+}
