@@ -448,7 +448,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ==========================================
-  // INLINE MODAL SETTINGS LAUNCHER (TABBED LAYOUT)
+  // INLINE MODAL SETTINGS LAUNCHER (SCROLLABLE VERTICAL FULL VIEW)
   // ==========================================
   const settingsBtn = document.getElementById('settingsBtn');
   if (settingsBtn) {
@@ -463,28 +463,24 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(modal);
       }
 
-      // Premium Full-Screen Tabbed Interface Blueprint
+      // Large full-layout container equipped with absolute scrolling mechanics
       modal.innerHTML = `
-        <div style="background:#0d0d0d; border:2px solid #8b00ff; border-radius:16px; width:90%; max-width:900px; height:80vh; display:flex; position:relative; overflow:hidden; box-shadow:0 0 30px rgba(139,0,255,0.3);">
+        <div style="background:#0d0d0d; border:2px solid #8b00ff; border-radius:16px; width:90%; max-width:900px; height:80vh; position:relative; box-shadow:0 0 30px rgba(139,0,255,0.3); display:flex; flex-direction:column;">
           
-          <button id="closeSettings" style="position:absolute; top:15px; right:20px; background:none; border:none; color:#ff3333; font-size:28px; font-weight:bold; cursor:pointer; z-index:10;">&times;</button>
-          
-          <div style="width:220px; background:#141414; border-right:1px solid rgba(139,0,255,0.2); padding:60px 10px 20px 10px; display:flex; flex-direction:column; gap:8px;">
-            <button class="settings-tab-btn active" data-target="tab-themes" style="background:rgba(139,0,255,0.1); color:#8b00ff; border:1px solid #8b00ff; padding:12px; border-radius:8px; text-align:left; font-weight:bold; cursor:pointer; transition:all 0.2s;">🎨 Background & Themes</button>
-            <button class="settings-tab-btn" data-target="tab-startup" style="background:none; color:#bbb; border:1px solid transparent; padding:12px; border-radius:8px; text-align:left; font-weight:bold; cursor:pointer; transition:all 0.2s;">⚡ Startup Settings</button>
-            <button class="settings-tab-btn" data-target="tab-privacy" style="background:none; color:#bbb; border:1px solid transparent; padding:12px; border-radius:8px; text-align:left; font-weight:bold; cursor:pointer; transition:all 0.2s;">👁️ Tab Cloaks</button>
-            <button class="settings-tab-btn" data-target="tab-automation" style="background:none; color:#bbb; border:1px solid transparent; padding:12px; border-radius:8px; text-align:left; font-weight:bold; cursor:pointer; transition:all 0.2s;">🚀 Auto-Launch Options</button>
+          <div style="padding: 20px 30px; border-bottom: 1px solid rgba(139,0,255,0.2); display:flex; justify-content:between; align-items:center;">
+            <h2 style="color:#8b00ff; margin:0;">Control Panel Configuration</h2>
+            <button id="closeSettings" style="background:none; border:none; color:#ff3333; font-size:28px; font-weight:bold; cursor:pointer; margin-left:auto;">&times;</button>
           </div>
 
-          <div id="modal-settings-content" style="flex:1; padding:40px; overflow-y:auto; color:#fff; background:#0d0d0d;">
-            <p style="color:#8b00ff; font-weight:bold;">Loading setting interface layers...</p>
+          <div id="modal-settings-content" style="flex:1; padding:30px; overflow-y:auto; color:#fff;">
+            <p style="color:#8b00ff; font-weight:bold;">Loading system template parameters...</p>
           </div>
 
         </div>
       `;
       modal.style.display = 'flex';
 
-      // Pull the original source file options inside the interface layout
+      // Pull setting file resources from repository directory paths
       fetch('Settings/settings.html')
         .then(res => {
           if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -492,126 +488,32 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(html => {
           const contentDiv = document.getElementById('modal-settings-content');
-          if (!contentDiv) return;
-
-          // Temporary DOM parser to slice your existing elements into independent clean sections
-          const parser = new DOMParser();
-          const doc = parser.parseFromString(html, 'text/html');
-
-          // Categorized segments sorted neatly based on your project requirements
-          contentDiv.innerHTML = `
-            <div id="tab-themes" class="settings-tab-panel" style="display:block;">
-              <h2 style="color:#8b00ff; margin-top:0; border-bottom:1px solid rgba(139,0,255,0.2); padding-bottom:10px;">Background Themes</h2>
-              <div id="themes-placeholder" style="margin-top:20px;"></div>
-            </div>
-
-            <div id="tab-startup" class="settings-tab-panel" style="display:none;">
-              <h2 style="color:#8b00ff; margin-top:0; border-bottom:1px solid rgba(139,0,255,0.2); padding-bottom:10px;">Startup Controls</h2>
-              <div id="startup-placeholder" style="margin-top:20px; display:flex; flex-direction:column; gap:15px;"></div>
-            </div>
-
-            <div id="tab-privacy" class="settings-tab-panel" style="display:none;">
-              <h2 style="color:#8b00ff; margin-top:0; border-bottom:1px solid rgba(139,0,255,0.2); padding-bottom:10px;">Privacy Masking</h2>
-              <div id="privacy-placeholder" style="margin-top:20px;"></div>
-            </div>
-
-            <div id="tab-automation" class="settings-tab-panel" style="display:none;">
-              <h2 style="color:#8b00ff; margin-top:0; border-bottom:1px solid rgba(139,0,255,0.2); padding-bottom:10px;">Automation Panels</h2>
-              <div id="automation-placeholder" style="margin-top:20px;"></div>
-            </div>
-          `;
-
-          // Dynamic relocation mapping: move your settings.html objects into their matching tabs safely
-          const themeList = doc.querySelector('ul, div') || doc.body; 
-          const startupHeader = Array.from(doc.querySelectorAll('div, h3, h4, p')).find(el => el.textContent.includes('Startup Environment'));
-          const privacyHeader = Array.from(doc.querySelectorAll('div, h3, h4, p')).find(el => el.textContent.includes('Privacy'));
-          const autoLaunchHeader = Array.from(doc.querySelectorAll('div, h3, h4, p')).find(el => el.textContent.includes('Auto-Launch'));
-
-          // Injecting your specific components cleanly into their new sidebar panels
-          if (startupHeader) {
-            let current = startupHeader;
-            while(current && current.nextElementSibling && !current.nextElementSibling.textContent.includes('Privacy') && !current.nextElementSibling.textContent.includes('Auto-Launch')) {
-              document.getElementById('startup-placeholder').appendChild(current.nextElementSibling.cloneNode(true));
-              current = current.nextElementSibling;
+          if (contentDiv) {
+            contentDiv.innerHTML = html;
+            
+            // Re-bind click state configurations back onto injected element layouts
+            const splashCheckbox = document.getElementById('toggle-study-cloak');
+            if (splashCheckbox) {
+              splashCheckbox.checked = localStorage.getItem('disableStudyCloak') === 'true';
+              splashCheckbox.onchange = (e) => {
+                localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
+              };
             }
-          } else {
-            // Fallback strategy if structured selectors break
-            const fallbackCheck = doc.getElementById('toggle-study-cloak') || doc.querySelector('input[type="checkbox"]');
-            if (fallbackCheck) {
-              const label = doc.querySelector(`label[for="${fallbackCheck.id}"]`) || fallbackCheck.parentElement;
-              document.getElementById('startup-placeholder').appendChild(fallbackCheck.cloneNode(true));
-              document.getElementById('startup-placeholder').appendChild(label.cloneNode(true));
+
+            // Re-bind selector functionality directly onto updated node layers
+            const cloakSelector = document.getElementById('cloakSelector');
+            if (cloakSelector) {
+              const savedCloak = localStorage.getItem('savedCloak');
+              if (savedCloak) cloakSelector.value = savedCloak;
+              cloakSelector.onchange = (e) => {
+                if (e.target.value === "none") {
+                  localStorage.removeItem('savedCloak');
+                } else {
+                  localStorage.setItem('savedCloak', e.target.value);
+                }
+                location.reload();
+              };
             }
-          }
-
-          if (privacyHeader) {
-            let current = privacyHeader;
-            while(current && current.nextElementSibling && !current.nextElementSibling.textContent.includes('Auto-Launch')) {
-              document.getElementById('privacy-placeholder').appendChild(current.nextElementSibling.cloneNode(true));
-              current = current.nextElementSibling;
-            }
-          } else {
-            const cloakSel = doc.getElementById('cloakSelector') || doc.querySelector('select');
-            if (cloakSel) document.getElementById('privacy-placeholder').appendChild(cloakSel.cloneNode(true));
-          }
-
-          if (autoLaunchHeader) {
-            let current = autoLaunchHeader;
-            while(current && current.nextElementSibling) {
-              document.getElementById('automation-placeholder').appendChild(current.nextElementSibling.cloneNode(true));
-              current = current.nextElementSibling;
-            }
-          }
-
-          // If everything else fails to map, keep your premium lists safe inside the primary Theme workspace tab
-          if(document.getElementById('themes-placeholder')) {
-            document.getElementById('themes-placeholder').innerHTML = html;
-            // Clean out redundant copies of controls placed into alternative panels earlier
-            const duplicateCheck = document.getElementById('themes-placeholder').getElementById ? document.getElementById('themes-placeholder').getElementById('toggle-study-cloak') : null;
-            if (duplicateCheck) duplicateCheck.parentElement.style.display = 'none';
-          }
-
-          // Active Listener: Handle live clicks swapping out viewports on tabs
-          const tabButtons = modal.querySelectorAll('.settings-tab-btn');
-          tabButtons.forEach(btn => {
-            btn.onclick = () => {
-              tabButtons.forEach(b => {
-                b.style.background = 'none';
-                b.style.color = '#bbb';
-                b.style.border = '1px solid transparent';
-              });
-              btn.style.background = 'rgba(139,0,255,0.1)';
-              btn.style.color = '#8b00ff';
-              btn.style.border = '1px solid #8b00ff';
-
-              modal.querySelectorAll('.settings-tab-panel').forEach(panel => panel.style.display = 'none');
-              const targetPanel = document.getElementById(btn.getAttribute('data-target'));
-              if (targetPanel) targetPanel.style.display = 'block';
-            };
-          });
-
-          // Rebind data events to the new checkbox element generated inside the DOM workflow
-          const splashCheckbox = document.getElementById('toggle-study-cloak');
-          if (splashCheckbox) {
-            splashCheckbox.checked = localStorage.getItem('disableStudyCloak') === 'true';
-            splashCheckbox.onchange = (e) => {
-              localStorage.setItem('disableStudyCloak', e.target.checked ? 'true' : 'false');
-            };
-          }
-
-          // Rebind select operations safely back to original selector functions
-          const cloakSelector = document.getElementById('cloakSelector');
-          if (cloakSelector) {
-            const savedCloak = localStorage.getItem('savedCloak');
-            if (savedCloak) cloakSelector.value = savedCloak;
-            cloakSelector.onchange = (e) => {
-              if (e.target.value === "none") {
-                localStorage.removeItem('savedCloak');
-              } else {
-                localStorage.setItem('savedCloak', e.target.value);
-              }
-              location.reload();
-            };
           }
 
           const modalCloseBtn = document.getElementById('closeSettings');
@@ -620,9 +522,11 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         })
         .catch(err => {
-          console.error("Modal compilation error breakdown:", err);
+          console.error("Modal operational crash trace:", err);
           const contentDiv = document.getElementById('modal-settings-content');
-          if (contentDiv) contentDiv.innerHTML = `<p style="color:#ff3333;">Failed to compile view parameters inside active framework nodes.</p>`;
+          if (contentDiv) {
+            contentDiv.innerHTML = `<p style="color:#ff3333;">Failed parsing setup resources within current active viewport.</p>`;
+          }
         });
     };
   }
