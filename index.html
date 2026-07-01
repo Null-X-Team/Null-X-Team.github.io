@@ -10,6 +10,123 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   
   <script src="Games/GameSaveData/auto-save.js"></script>
+
+  <style>
+    /* Absolute overlay positioning for the countdown clock container */
+    .countdown-overlay-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 5, 18, 0.9);
+      z-index: 100; /* Higher than the featured hero section contents */
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .countdown-title {
+      font-size: 1.5rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 25px;
+      color: #a033ff;
+      text-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
+      font-weight: bold;
+    }
+
+    /* Flip Clock Master Structure */
+    .flip-clock {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .flip-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .flip-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      color: #888;
+      margin-top: 8px;
+      letter-spacing: 1px;
+      font-weight: bold;
+    }
+
+    .flip-card-pair {
+      display: flex;
+      gap: 4px;
+    }
+
+    .flip-card {
+      position: relative;
+      width: 50px;
+      height: 75px;
+      font-size: 3rem;
+      font-weight: bold;
+      line-height: 75px;
+      text-align: center;
+      perspective: 200px;
+    }
+
+    /* Base segments sharing design variables */
+    .card-top, .card-bottom {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 50%;
+      overflow: hidden;
+      background: #190e28;
+      color: #fff;
+      border-left: 1px solid rgba(139, 0, 255, 0.2);
+      border-right: 1px solid rgba(139, 0, 255, 0.2);
+    }
+
+    .card-top {
+      top: 0;
+      border-top: 1px solid rgba(139, 0, 255, 0.3);
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    }
+
+    .card-bottom {
+      bottom: 0;
+      border-bottom: 1px solid rgba(139, 0, 255, 0.3);
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .card-bottom span {
+      transform: translateY(50%);
+    }
+
+    /* Animation frames applying transformations when classes trigger */
+    .flip-card.animate .card-top {
+      animation: flipTop 0.4s ease-in forwards;
+      transform-origin: bottom;
+    }
+
+    @keyframes flipTop {
+      0% { transform: rotateX(0deg); }
+      100% { transform: rotateX(-90deg); }
+    }
+  </style>
 </head>
 <body>
 
@@ -80,7 +197,54 @@
         </div>
       </header>
 
-      <section class="hero" id="heroSection">
+      <section class="hero" id="heroSection" style="position: relative;">
+        <div class="countdown-overlay-container">
+          <div class="countdown-title">SYSTEM ARRIVAL INBOUND</div>
+          <div class="flip-clock">
+            
+            <div class="flip-unit">
+              <div class="flip-card-pair" id="months-pair">
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+              </div>
+              <div class="flip-label">Months</div>
+            </div>
+
+            <div class="flip-unit">
+              <div class="flip-card-pair" id="days-pair">
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+              </div>
+              <div class="flip-label">Days</div>
+            </div>
+
+            <div class="flip-unit">
+              <div class="flip-card-pair" id="hours-pair">
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+              </div>
+              <div class="flip-label">Hours</div>
+            </div>
+
+            <div class="flip-unit">
+              <div class="flip-card-pair" id="minutes-pair">
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+              </div>
+              <div class="flip-label">Minutes</div>
+            </div>
+
+            <div class="flip-unit">
+              <div class="flip-card-pair" id="seconds-pair">
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+              </div>
+              <div class="flip-label">Seconds</div>
+            </div>
+
+          </div>
+        </div>
+
         <div class="hero-content">
           <span class="badge">Featured</span>
           <h2 id="hero-title">Loading...</h2>
@@ -344,6 +508,91 @@
       </div>
     </div>
   </div>
+
+  <script>
+    // Initialize ticking sound component
+    // If you host locally, change this source string to: "audio/soul_serenity_sounds-clock.mp3"
+    const audioUrl = "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"; 
+    const tickSound = new Audio(audioUrl);
+    tickSound.preload = "auto";
+
+    const targetDate = new Date("August 17, 2026 00:00:00");
+
+    function updateFlipCard(pairId, value) {
+      const pairContainer = document.getElementById(pairId);
+      if (!pairContainer) return;
+      
+      const paddedValue = String(value).padStart(2, '0');
+      const cards = pairContainer.querySelectorAll('.flip-card');
+
+      cards.forEach((card, index) => {
+        const topSegment = card.querySelector('.card-top');
+        const bottomSegment = card.querySelector('.card-bottom span');
+        const currentDigit = paddedValue[index];
+
+        if (topSegment.textContent !== currentDigit) {
+          card.classList.remove('animate');
+          void card.offsetWidth; // Force CSS animation repaint thread refresh
+          
+          topSegment.textContent = currentDigit;
+          bottomSegment.textContent = currentDigit;
+          card.classList.add('animate');
+        }
+      });
+    }
+
+    function runCountdown() {
+      const now = new Date();
+      let diff = targetDate - now;
+
+      if (diff <= 0) {
+        updateFlipCard('months-pair', 0);
+        updateFlipCard('days-pair', 0);
+        updateFlipCard('hours-pair', 0);
+        updateFlipCard('minutes-pair', 0);
+        updateFlipCard('seconds-pair', 0);
+        return;
+      }
+
+      // Advanced calendar-based calculation breakdown mechanics
+      let targetYear = targetDate.getFullYear();
+      let targetMonth = targetDate.getMonth();
+      let currentYear = now.getFullYear();
+      let currentMonth = now.getMonth();
+
+      let months = (targetYear - currentYear) * 12 + (targetMonth - currentMonth);
+      let tempNow = new Date(now.getTime());
+      tempNow.setMonth(tempNow.getMonth() + months);
+
+      // Handle day-overflow corrections
+      if (tempNow > targetDate) {
+        months--;
+        tempNow = new Date(now.getTime());
+        tempNow.setMonth(tempNow.getMonth() + months);
+      }
+
+      let remainderDiff = targetDate - tempNow;
+      
+      const days = Math.floor(remainderDiff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((remainderDiff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((remainderDiff % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((remainderDiff % (1000 * 60)) / 1000);
+
+      updateFlipCard('months-pair', months);
+      updateFlipCard('days-pair', days);
+      updateFlipCard('hours-pair', hours);
+      updateFlipCard('minutes-pair', minutes);
+      updateFlipCard('seconds-pair', seconds);
+
+      // Trigger standard clock tick sample pulse audio channel
+      tickSound.play().catch(() => {
+        // Safe catch frame handling for browser blockades before general body click handlers capture stream interaction state
+      });
+    }
+
+    setInterval(runCountdown, 1000);
+    runCountdown();
+  </script>
 
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
