@@ -19,35 +19,38 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(10, 5, 18, 0.9);
-      z-index: 100; /* Higher than the featured hero section contents */
+      background: rgba(12, 6, 20, 0.88);
+      backdrop-filter: blur(5px);
+      z-index: 100; /* Coordinated above featured section graphics */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: sans-serif;
+      font-family: system-ui, -apple-system, sans-serif;
       color: white;
       border-radius: 12px;
       padding: 20px;
       box-sizing: border-box;
+      user-select: none;
     }
 
     .countdown-title {
-      font-size: 1.5rem;
+      font-size: 1.25rem;
       text-transform: uppercase;
-      letter-spacing: 2px;
-      margin-bottom: 25px;
-      color: #a033ff;
-      text-shadow: 0 0 10px rgba(139, 0, 255, 0.5);
-      font-weight: bold;
+      letter-spacing: 3px;
+      margin-bottom: 22px;
+      color: #b056ff;
+      text-shadow: 0 0 12px rgba(139, 0, 255, 0.6);
+      font-weight: 700;
     }
 
-    /* Flip Clock Master Structure */
+    /* Flip Clock Container layout */
     .flip-clock {
       display: flex;
-      gap: 15px;
-      flex-wrap: wrap;
+      gap: 18px;
       justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
     }
 
     .flip-unit {
@@ -57,12 +60,12 @@
     }
 
     .flip-label {
-      font-size: 11px;
+      font-size: 10px;
       text-transform: uppercase;
-      color: #888;
-      margin-top: 8px;
-      letter-spacing: 1px;
-      font-weight: bold;
+      color: #928a9f;
+      margin-top: 10px;
+      letter-spacing: 1.5px;
+      font-weight: 600;
     }
 
     .flip-card-pair {
@@ -70,59 +73,60 @@
       gap: 4px;
     }
 
+    /* Standardized Card Node Dimensions */
     .flip-card {
       position: relative;
-      width: 50px;
-      height: 75px;
-      font-size: 3rem;
-      font-weight: bold;
-      line-height: 75px;
-      text-align: center;
-      perspective: 200px;
+      width: 46px;
+      height: 68px;
+      font-size: 2.8rem;
+      font-weight: 800;
+      perspective: 300px;
+      line-height: 68px; /* Serves as master scale baseline */
     }
 
-    /* Base segments sharing design variables */
+    /* Symmetrical split viewcards */
     .card-top, .card-bottom {
       position: absolute;
       left: 0;
       width: 100%;
       height: 50%;
       overflow: hidden;
-      background: #190e28;
+      background: #1e1131;
       color: #fff;
-      border-left: 1px solid rgba(139, 0, 255, 0.2);
-      border-right: 1px solid rgba(139, 0, 255, 0.2);
+      text-align: center;
+      border: 1px solid rgba(139, 0, 255, 0.25);
+      box-sizing: border-box;
     }
 
     .card-top {
       top: 0;
-      border-top: 1px solid rgba(139, 0, 255, 0.3);
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.4);
     }
+    .card-top span {
+      display: block;
+      transform: translateY(0px);
+    }
 
     .card-bottom {
       bottom: 0;
-      border-bottom: 1px solid rgba(139, 0, 255, 0.3);
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
-      display: flex;
-      align-items: flex-end;
-      justify-content: center;
+      border-top: none;
     }
-
     .card-bottom span {
-      transform: translateY(50%);
+      display: block;
+      transform: translateY(-50%); /* Pulls bottom half upward cleanly */
     }
 
-    /* Animation frames applying transformations when classes trigger */
+    /* Animation frames triggered via JS updates */
     .flip-card.animate .card-top {
-      animation: flipTop 0.4s ease-in forwards;
+      animation: flipTopCard 0.4s ease-in forwards;
       transform-origin: bottom;
     }
 
-    @keyframes flipTop {
+    @keyframes flipTopCard {
       0% { transform: rotateX(0deg); }
       100% { transform: rotateX(-90deg); }
     }
@@ -204,40 +208,40 @@
             
             <div class="flip-unit">
               <div class="flip-card-pair" id="months-pair">
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
               </div>
               <div class="flip-label">Months</div>
             </div>
 
             <div class="flip-unit">
               <div class="flip-card-pair" id="days-pair">
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
               </div>
               <div class="flip-label">Days</div>
             </div>
 
             <div class="flip-unit">
               <div class="flip-card-pair" id="hours-pair">
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
               </div>
               <div class="flip-label">Hours</div>
             </div>
 
             <div class="flip-unit">
               <div class="flip-card-pair" id="minutes-pair">
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
               </div>
               <div class="flip-label">Minutes</div>
             </div>
 
             <div class="flip-unit">
               <div class="flip-card-pair" id="seconds-pair">
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top">0</div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
               </div>
               <div class="flip-label">Seconds</div>
             </div>
@@ -510,10 +514,9 @@
   </div>
 
   <script>
-    // Initialize ticking sound component
-    // If you host locally, change this source string to: "audio/soul_serenity_sounds-clock.mp3"
-    const audioUrl = "https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg"; 
-    const tickSound = new Audio(audioUrl);
+    // Configured Audio Route Target
+    const audioPath = "audio/soul_serenity_sounds-clock-livingroom-soothing-hum-harmonizing-with-the-ticking-344187.mp3";
+    const tickSound = new Audio(audioPath);
     tickSound.preload = "auto";
 
     const targetDate = new Date("August 17, 2026 00:00:00");
@@ -526,16 +529,16 @@
       const cards = pairContainer.querySelectorAll('.flip-card');
 
       cards.forEach((card, index) => {
-        const topSegment = card.querySelector('.card-top');
-        const bottomSegment = card.querySelector('.card-bottom span');
+        const topInner = card.querySelector('.card-top span');
+        const bottomInner = card.querySelector('.card-bottom span');
         const currentDigit = paddedValue[index];
 
-        if (topSegment.textContent !== currentDigit) {
+        if (topInner.textContent !== currentDigit) {
           card.classList.remove('animate');
-          void card.offsetWidth; // Force CSS animation repaint thread refresh
+          void card.offsetWidth; // Force CSS structural layout recalculation refresh
           
-          topSegment.textContent = currentDigit;
-          bottomSegment.textContent = currentDigit;
+          topInner.textContent = currentDigit;
+          bottomInner.textContent = currentDigit;
           card.classList.add('animate');
         }
       });
@@ -543,7 +546,7 @@
 
     function runCountdown() {
       const now = new Date();
-      let diff = targetDate - now;
+      const diff = targetDate - now;
 
       if (diff <= 0) {
         updateFlipCard('months-pair', 0);
@@ -554,7 +557,7 @@
         return;
       }
 
-      // Advanced calendar-based calculation breakdown mechanics
+      // Breakdown dates dynamically by tracking calendar changes month to month
       let targetYear = targetDate.getFullYear();
       let targetMonth = targetDate.getMonth();
       let currentYear = now.getFullYear();
@@ -564,7 +567,6 @@
       let tempNow = new Date(now.getTime());
       tempNow.setMonth(tempNow.getMonth() + months);
 
-      // Handle day-overflow corrections
       if (tempNow > targetDate) {
         months--;
         tempNow = new Date(now.getTime());
@@ -584,9 +586,9 @@
       updateFlipCard('minutes-pair', minutes);
       updateFlipCard('seconds-pair', seconds);
 
-      // Trigger standard clock tick sample pulse audio channel
+      // Play audio sync track cleanly
       tickSound.play().catch(() => {
-        // Safe catch frame handling for browser blockades before general body click handlers capture stream interaction state
+        // Suppress automatic execution warnings if browser interaction blockades are active
       });
     }
 
