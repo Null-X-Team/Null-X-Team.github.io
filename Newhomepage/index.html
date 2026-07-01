@@ -6,6 +6,7 @@
     <title>Glaxyias Unblocked</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newpage.css">
+    <link rel="stylesheet" href="themes/themes.css">
     <script src="Games/GameSaveData/auto-save.js"></script>
 </head>
 <body>
@@ -17,31 +18,31 @@
             </div>
             
             <div class="nav-tabs-wrapper">
-                <a href="#" class="nav-tab-item" id="nav-home" data-tab="home">
+                <a href="#" class="nav-tab-item nav-item active" id="nav-home" data-tab="home">
                     <span class="tab-icon"><i class="fa-solid fa-crosshairs"></i></span>
                     <span class="tab-text">Home</span>
                 </a>
-                <a href="#" class="nav-tab-item active" id="nav-games" data-tab="games">
+                <a href="#" class="nav-tab-item nav-item" id="nav-games" data-tab="games">
                     <span class="tab-icon"><i class="fa-solid fa-gamepad"></i></span>
                     <span class="tab-text">Games</span>
                 </a>
-                <a href="#" class="nav-tab-item" id="nav-favorites" data-tab="favorites">
+                <a href="#" class="nav-tab-item nav-item" id="nav-favorites" data-tab="favorites">
                     <span class="tab-icon"><i class="fa-solid fa-star"></i></span>
                     <span class="tab-text">Favorites</span>
                 </a>
-                <a href="#" class="nav-tab-item" id="nav-unblockers" data-tab="unblockers">
+                <a href="#" class="nav-tab-item nav-item" id="nav-unblockers" data-tab="unblockers">
                     <span class="tab-icon"><i class="fa-solid fa-shield-halved"></i></span>
                     <span class="tab-text">Unblockers</span>
                 </a>
-                <a href="#" class="nav-tab-item" id="nav-profile" data-tab="profile">
+                <a href="#" class="nav-tab-item nav-item" id="nav-profile" data-tab="profile">
                     <span class="tab-icon"><i class="fa-solid fa-user"></i></span>
                     <span class="tab-text">Profile</span>
                 </a>
-                <a href="#" class="nav-tab-item" id="nav-communications" data-tab="communications">
+                <a href="#" class="nav-tab-item nav-item" id="nav-communications" data-tab="communications">
                     <span class="tab-icon"><i class="fa-solid fa-comments"></i></span>
                     <span class="tab-text">Communications</span>
                 </a>
-                <a href="#" class="nav-tab-item" id="nav-terminal" data-tab="terminal">
+                <a href="#" class="nav-tab-item nav-item" id="nav-terminal" data-tab="terminal">
                     <span class="tab-icon"><i class="fa-solid fa-terminal"></i></span>
                     <span class="tab-text">Terminal</span>
                 </a>
@@ -68,15 +69,17 @@
             <div class="widget-header" style="margin-top:20px;">
                 <i class="fa-solid fa-microchip"></i> Diagnostics
             </div>
-            <div class="weather-stats" style="padding:10px; font-family:monospace; display:flex; flex-direction:column; gap:8px;">
-                <span id="battery-status" style="color:#00ff66;">Battery: --%</span>
-                <span id="digital-clock" style="color:#b056ff;">00:00:00 AM</span>
+            <div id="battery-widget" class="weather-stats" style="padding:10px; font-family:monospace; display:flex; flex-direction:column; gap:8px;">
+                <span id="battery-status" style="color:#00ff66;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: --%</span>
+            </div>
+            <div id="ny-time-widget" class="weather-stats" style="padding:0 10px; font-family:monospace; display:flex; flex-direction:column;">
+                <span id="digital-clock" style="color:#b056ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
             </div>
             
             <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">
-                <button id="signInBtn" style="padding:10px; background:#8b00ff; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-family:sans-serif;">Sign In</button>
-                <a href="#" id="settingsBtn" style="padding:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; text-align:center; text-decoration:none; font-size:14px; font-family:sans-serif;">Settings</a>
-                <button id="stealthOpener" style="padding:10px; background:#221135; border:1px solid #8b00ff; color:#b056ff; border-radius:6px; cursor:pointer; font-weight:bold;">Stealth Mode</button>
+                <button id="signInBtn" class="signin-btn" style="padding:10px; background:#8b00ff; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-family:sans-serif;">Sign In</button>
+                <a href="../Settings/settings.html" class="settings-btn" id="settingsBtn" style="padding:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; text-align:center; text-decoration:none; font-size:14px; font-family:sans-serif;">Settings</a>
+                <button id="stealthOpener" class="cloak-btn" style="padding:10px; background:#221135; border:1px solid #8b00ff; color:#b056ff; border-radius:6px; cursor:pointer; font-weight:bold;">Stealth Mode</button>
             </div>
         </aside>
 
@@ -88,24 +91,38 @@
                 <input type="text" id="searchBar" placeholder="Search games...">
             </div>
 
-            <div class="main-content" style="display:contents;">
-                <div class="section" style="display:contents;">
+            <div class="main-content">
+                <div class="section">
                     
                     <div class="random-section" style="margin-bottom:15px; display:none;">
-                        <button id="randomBtn" style="padding:10px 20px; background:rgba(139,0,255,0.2); border:1px solid #8b00ff; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">Random Game</button>
+                        <button id="randomBtn" class="quick-action-btn" style="padding:10px 20px; background:rgba(139,0,255,0.2); border:1px solid #8b00ff; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">Random Game</button>
                     </div>
 
-                    <div id="gameGrid" class="apps-grid" style="display:none;">
-                        </div>
+                    <div id="gameGrid" class="game-grid apps-grid" style="display:none;"></div>
 
-                    <div id="favoritesGrid" class="apps-grid" style="display:none;">
+                    <div id="favoritesGrid" class="game-grid apps-grid" style="display:none;">
                         <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align:center; color:#888; padding:40px; font-family:sans-serif;">
                             <i class="fas fa-star" style="color:#8b00ff; margin-right:6px;"></i> This room is empty! Right-click games to fill it up.
                         </div>
                     </div>
 
                     <div id="unblockersSection" class="custom-view-panel" style="display:none;"></div>
-                    <div id="profileSection" class="custom-view-panel" style="display:none;"></div>
+                    
+                    <div id="profileSection" class="custom-view-panel" style="display:none;">
+                        <div class="profile-card">
+                            <div class="avatar-upload-section">
+                                <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                                <input type="file" id="pfp-file-input" accept="image/*">
+                            </div>
+                            <span id="display-username">Loading...</span>
+                            <textarea id="bio-input" maxlength="250"></textarea>
+                            <strong id="info-username">-</strong>
+                            <span id="join-date">-</span>
+                            <button id="save-profile-btn" class="save-btn">Save Changes</button>
+                            <span id="save-status"></span>
+                        </div>
+                    </div>
+
                     <div id="terminalSection" class="custom-view-panel" style="display:none;"></div>
 
                 </div>
@@ -122,7 +139,10 @@
                 </div>
                 <h3 id="hero-title">Featured Game</h3>
                 <p id="hero-desc">Play our top picked game of the week instantly.</p>
-                <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
+                <a href="#" class="widget-btn play-btn" id="playFeatured">Play Now</a>
+            </div>
+            <div class="news-sidebar" style="margin-top: 20px; display: none;">
+                <div class="news-feed" id="newsFeed"></div>
             </div>
         </aside>
 
