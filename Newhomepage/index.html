@@ -1,1 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glaxyias Unblocked</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="themes/themes.css">
+    <script src="Games/GameSaveData/auto-save.js"></script>
+</head>
+<body>
 
+    <div class="top-nav-container">
+        <nav class="nav-bar">
+            <div class="nav-trigger-icon">
+                <i class="fa-solid fa-bolt"></i>
+            </div>
+            
+            <div class="nav-tabs-wrapper">
+                <a href="#" class="nav-tab-item nav-item active" id="nav-home" data-tab="home">
+                    <span class="tab-icon"><i class="fa-solid fa-crosshairs"></i></span>
+                    <span class="tab-text">Home</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-games" data-tab="games">
+                    <span class="tab-icon"><i class="fa-solid fa-gamepad"></i></span>
+                    <span class="tab-text">Games</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-favorites" data-tab="favorites">
+                    <span class="tab-icon"><i class="fa-solid fa-star"></i></span>
+                    <span class="tab-text">Favorites</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-unblockers" data-tab="unblockers">
+                    <span class="tab-icon"><i class="fa-solid fa-shield-halved"></i></span>
+                    <span class="tab-text">Unblockers</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-profile" data-tab="profile">
+                    <span class="tab-icon"><i class="fa-solid fa-user"></i></span>
+                    <span class="tab-text">Profile</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-communications" data-tab="communications">
+                    <span class="tab-icon"><i class="fa-solid fa-comments"></i></span>
+                    <span class="tab-text">Communications</span>
+                </a>
+                <a href="#" class="nav-tab-item nav-item" id="nav-terminal" data-tab="terminal">
+                    <span class="tab-icon"><i class="fa-solid fa-terminal"></i></span>
+                    <span class="tab-text">Terminal</span>
+                </a>
+            </div>
+        </nav>
+    </div>
+
+    <div class="dashboard-wrapper">
+
+        <aside class="side-panel left-panel">
+            <div class="widget-header">
+                <i class="fa-solid fa-cloud-sun"></i> Weather
+            </div>
+            <div class="weather-row">
+                <div class="weather-main">
+                    <span class="weather-temp">77°</span>
+                </div>
+                <div class="weather-stats">
+                    <span><i class="fa-solid fa-droplet"></i> 2% Humidity</span>
+                    <span class="location-label">Atlanta</span>
+                </div>
+            </div>
+            
+            <div class="widget-header" style="margin-top:20px;">
+                <i class="fa-solid fa-microchip"></i> Diagnostics
+            </div>
+            <div id="battery-widget" class="weather-stats" style="padding:10px; font-family:monospace; display:flex; flex-direction:column; gap:8px;">
+                <span id="battery-status" style="color:#00ff66;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: --%</span>
+            </div>
+            <div id="ny-time-widget" class="weather-stats" style="padding:0 10px; font-family:monospace; display:flex; flex-direction:column;">
+                <span id="digital-clock" style="color:#b056ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
+            </div>
+            
+            <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">
+                <button id="signInBtn" class="signin-btn" style="padding:10px; background:#8b00ff; color:white; border:none; border-radius:6px; cursor:pointer; font-weight:bold; font-family:sans-serif;">Sign In</button>
+                <a href="../Settings/settings.html" class="settings-btn" id="settingsBtn" style="padding:10px; background:rgba(255,255,255,0.05); color:white; border:1px solid rgba(255,255,255,0.1); border-radius:6px; text-align:center; text-decoration:none; font-size:14px; font-family:sans-serif; display:block;">Settings</a>
+                <button id="stealthOpener" class="cloak-btn" style="padding:10px; background:#221135; border:1px solid #8b00ff; color:#b056ff; border-radius:6px; cursor:pointer; font-weight:bold;">Stealth Mode</button>
+            </div>
+        </aside>
+
+        <main class="main-hub">
+            <h1 class="site-title" id="welcome-text">Glaxyias Unblocked</h1>
+            
+            <div class="search-container">
+                <span class="search-glass"><i class="fa-solid fa-magnifying-glass"></i></span>
+                <input type="text" id="searchBar" placeholder="Search games...">
+            </div>
+
+            <div class="main-content">
+                <div class="section">
+                    
+                    <div class="random-section" style="margin-bottom:15px; display:none;">
+                        <button id="randomBtn" class="quick-action-btn" style="padding:10px 20px; background:rgba(139,0,255,0.2); border:1px solid #8b00ff; color:white; border-radius:6px; cursor:pointer; font-weight:bold;">Random Game</button>
+                    </div>
+
+                    <div id="gameGrid" class="game-grid apps-grid" style="display:none;"></div>
+
+                    <div id="favoritesGrid" class="game-grid apps-grid" style="display:none;">
+                        <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align:center; color:#888; padding:40px; font-family:sans-serif;">
+                            <i class="fas fa-star" style="color:#8b00ff; margin-right:6px;"></i> This room is empty! Right-click games to fill it up.
+                        </div>
+                    </div>
+
+                    <div id="unblockersSection" class="custom-view-panel" style="display:none;"></div>
+                    
+                    <div id="profileSection" class="custom-view-panel" style="display:none;">
+                        <div class="profile-card">
+                            <div class="avatar-upload-section">
+                                <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                                <input type="file" id="pfp-file-input" accept="image/*">
+                            </div>
+                            <span id="display-username">Loading...</span>
+                            <textarea id="bio-input" maxlength="250"></textarea>
+                            <strong id="info-username">-</strong>
+                            <span id="join-date">-</span>
+                            <button id="save-profile-btn" class="save-btn">Save Changes</button>
+                            <span id="save-status"></span>
+                        </div>
+                    </div>
+
+                    <div id="terminalSection" class="custom-view-panel" style="display:none;"></div>
+
+                </div>
+            </div>
+        </main>
+
+        <aside class="side-panel right-panel">
+            <div class="widget-header">
+                <i class="fa-solid fa-star"></i> Featured
+            </div>
+            <div class="featured-content" id="heroSection" style="display:flex; flex-direction:column;">
+                <div class="featured-preview-box">
+                    <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
+                </div>
+                <h3 id="hero-title">Featured Game</h3>
+                <p id="hero-desc">Play our top picked game of the week instantly.</p>
+                <a href="#" class="widget-btn play-btn" id="playFeatured">Play Now</a>
+            </div>
+            
+            <div class="news-sidebar" style="margin-top:20px; display:none;">
+                <div class="news-feed" id="newsFeed"></div>
+            </div>
+        </aside>
+
+    </div>
+
+    <div id="custom-context-menu" style="display:none; position:fixed; z-index:10000; background:#12091c; border:1px solid #8b00ff; border-radius:6px; width:160px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+        <div class="context-menu-item" id="ctx-favorite" style="padding:10px 14px; color:white; cursor:pointer; font-family:sans-serif; font-size:14px; user-select:none;">Favorite Game</div>
+        <div class="context-menu-item" id="ctx-delete" style="padding:10px 14px; color:#ff3333; cursor:pointer; font-family:sans-serif; font-size:14px; border-top:1px solid #221530; user-select:none;">Delete Game</div>
+    </div>
+
+    <div id="delete-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20000; align-items:center; justify-content:center;">
+        <div class="modal-box" style="text-align:center; background:#12091c; padding:30px; border-radius:8px; border:1px solid #8b00ff; max-width:400px; width:90%; font-family:sans-serif;">
+            <h2 style="margin-bottom:10px; color:white;">Are you sure?</h2>
+            <p style="margin-bottom:20px; color:#aaa; font-size:14px;">Do you really want to delete this game? This action cannot be undone.</p>
+            <div style="display:flex; gap:15px; justify-content:center;">
+                <button id="confirm-delete-btn" style="padding:10px 20px; background:#ff3333; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Yes, Delete</button>
+                <button id="cancel-delete-btn" style="padding:10px 20px; background:#333; color:white; border:none; border-radius:4px; cursor:pointer;">No, Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script type="module" src="JS/main.js"></script>
+    <script src="themes/themes.js"></script>
+</body>
+</html>
