@@ -11,6 +11,21 @@
 </head>
 <body>
 
+    <div id="educational-cloak">
+        <div class="educational-content-card">
+            <div class="educational-header">
+                <h1>Null_X: Interactive Cognitive Development Environment</h1>
+                <div class="academic-subheading">Institutional Research Document & Terms of Engagement</div>
+            </div>
+            <div class="educational-scroll-body">
+                <p>This platform is designed to support modern educational growth through interactive digital learning experiences and research-based technology integration...</p>
+            </div>
+            <div class="timer-subtext-sticky">
+                Initializing secure environment... Please wait <span id="cloak-timer">10</span> seconds.
+            </div>
+        </div>
+    </div>
+
     <div class="top-nav-container">
         <nav class="nav-bar">
             <div class="nav-trigger-icon">
@@ -70,10 +85,10 @@
                 <i class="fa-solid fa-microchip"></i> Diagnostics
             </div>
             <div id="battery-widget" class="weather-stats" style="padding:10px; font-family:monospace; display:flex; flex-direction:column; gap:8px;">
-                <span id="battery-status" style="color:#00ff66;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: --%</span>
+                <span style="color:#00ff66;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: <span id="battery-status">--%</span></span>
             </div>
             <div id="ny-time-widget" class="weather-stats" style="padding:0 10px; font-family:monospace; display:flex; flex-direction:column;">
-                <span id="digital-clock" style="color:#b056ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
+                <span style="color:#b056ff;"><i class="fas fa-clock"></i> <span id="digital-clock">00:00:00 AM</span></span>
             </div>
             
             <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">
@@ -108,11 +123,15 @@
 
                     <div id="unblockersSection" class="custom-view-panel" style="display:none;"></div>
                     
+                    <div id="communicationsSection" class="custom-view-panel" style="display:none;"></div>
+                    
                     <div id="profileSection" class="custom-view-panel" style="display:none;">
                         <div class="profile-card">
                             <div class="avatar-upload-section">
                                 <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
-                                <input type="file" id="pfp-file-input" accept="image/*">
+                                <div class="upload-inputs">
+                                    <input type="file" id="pfp-file-input" accept="image/*">
+                                </div>
                             </div>
                             <span id="display-username">Loading...</span>
                             <textarea id="bio-input" maxlength="250"></textarea>
@@ -141,7 +160,7 @@
                 <p id="hero-desc">Play our top picked game of the week instantly.</p>
                 <a href="#" class="widget-btn play-btn" id="playFeatured">Play Now</a>
             </div>
-            <div class="news-sidebar" style="margin-top: 20px; display: none;">
+            <div class="news-sidebar" style="margin-top: 20px;">
                 <div class="news-feed" id="newsFeed"></div>
             </div>
         </aside>
@@ -164,8 +183,8 @@
         </div>
     </div>
 
-<script src="script.js"></script>
+<script src="script.js" defer></script>
 <script type="module" src="JS/main.js"></script>
-<script src="themes/themes.js"></script>
+<script src="themes/themes.js" defer></script>
 </body>
 </html>
