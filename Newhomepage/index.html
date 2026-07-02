@@ -182,7 +182,7 @@
             <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
                 <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
                 <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                <a href="settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+                <a href="Settings/settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
             </div>
 
             <div class="news-sidebar">
@@ -206,57 +206,5 @@
 
     <script type="module" src="JS/main.js"></script>
     <script src="themes/themes.js"></script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            // 1. Live Digital Clock Component Fix
-            const clockDisplay = document.getElementById("digital-clock");
-            if (clockDisplay) {
-                setInterval(() => {
-                    const now = new Date();
-                    let hours = now.getHours();
-                    const minutes = String(now.getMinutes()).padStart(2, "0");
-                    const seconds = String(now.getSeconds()).padStart(2, "0");
-                    const ampm = hours >= 12 ? "PM" : "AM";
-                    hours = hours % 12 || 12;
-                    clockDisplay.innerHTML = `<i class="fas fa-clock"></i> ${String(hours).padStart(2, "0")}:${minutes}:${seconds} ${ampm}`;
-                }, 1000);
-            }
-
-            // 2. Click Navigation Handler Connection Backup
-            const tabs = document.querySelectorAll(".nav-tab-item");
-            const views = {
-                "Home": [document.getElementById("gameGrid"), document.getElementById("heroSection")?.parentElement],
-                "Games": [document.getElementById("gameGrid")],
-                "Favorites": [document.getElementById("favoritesGrid")],
-                "Unblockers": [document.getElementById("unblockersSection")],
-                "Profile": [document.getElementById("profileSection")],
-                "Communications": [document.getElementById("communicationsSection")],
-                "Terminal": [document.getElementById("terminalSection")]
-            };
-
-            tabs.forEach(tab => {
-                tab.addEventListener("click", (e) => {
-                    e.preventDefault();
-                    const targetTab = tab.getAttribute("data-tab");
-                    if (!targetTab || !views[targetTab]) return;
-
-                    // Switch active visual tab styles
-                    tabs.forEach(t => t.classList.remove("active"));
-                    tab.classList.add("active");
-
-                    // Hide all view elements
-                    Object.values(views).forEach(viewElements => {
-                        viewElements.forEach(el => { if (el) el.style.display = "none"; });
-                    });
-
-                    // Restore visibility layout values to selected views
-                    views[targetTab].forEach(el => {
-                        if (el) el.style.display = el.classList.contains("apps-grid") ? "grid" : "block";
-                    });
-                });
-            });
-        });
-    </script>
 </body>
 </html>
