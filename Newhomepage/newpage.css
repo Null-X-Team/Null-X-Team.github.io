@@ -11,6 +11,11 @@ body {
   overflow-x: hidden;
 }
 
+/* Core display modifier for script tab-switching mechanics */
+.hidden {
+  display: none !important;
+}
+
 /* ==========================================================================
    TOP HOVER-EXPANDING NAVIGATION BAR
    ========================================================================== */
@@ -20,7 +25,7 @@ body {
   width: 100%;
   padding-top: 20px;
   position: relative;
-  z-index: 100;
+  z-index: 1000; /* Keeps nav safely above content panels */
 }
 
 .nav-bar {
@@ -36,7 +41,7 @@ body {
   /* Adjusted widths: Fits all 7 icons perfectly when resting */
   min-width: 340px; 
   max-width: 360px;
-  height: 36px;
+  height: 42px;
   
   /* Smooth widening transition */
   transition: max-width 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
@@ -46,7 +51,6 @@ body {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
 }
 
-/* Hide the old single trigger bolt since all icons show instantly now */
 .nav-trigger-icon {
   display: none;
 }
@@ -64,7 +68,7 @@ body {
 .nav-tab-item {
   display: flex;
   align-items: center;
-  gap: 0px; /* Snug up close when text labels are hidden */
+  gap: 0px; 
   text-decoration: none;
   color: rgba(255, 255, 255, 0.65);
   padding: 8px 12px;
@@ -87,30 +91,27 @@ body {
               margin-left 0.3s ease;
 }
 
-/* ==========================================================================
-   HOVER TRIGGERS: SMOOTHLY WIDEN BAR & SLIDE OUT TEXT Labels
-   ========================================================================== */
+/* HOVER TRIGGERS */
 .nav-bar:hover {
-  min-width: 850px; /* Expands wider to give room to the text */
+  min-width: 850px; 
   max-width: 950px; 
   padding: 10px 25px;
 }
 
 .nav-bar:hover .nav-tabs-wrapper {
-  gap: 14px; /* Spreads tabs apart cleanly when text is showing */
+  gap: 14px; 
 }
 
 .nav-bar:hover .nav-tab-item {
-  gap: 8px; /* Creates space between the SVG icon graphic and the text string */
+  gap: 8px; 
 }
 
 .nav-bar:hover .nav-tab-item .tab-text {
-  max-width: 150px; /* Slides open the text wrapper smoothly */
+  max-width: 150px; 
   opacity: 1;
   margin-left: 2px;
 }
 
-/* LINK BUTTON HIGHLIGHT EFFECTS */
 .nav-tab-item:hover {
   color: #ffffff;
   background: rgba(255, 59, 59, 0.15);
@@ -142,12 +143,14 @@ body {
   box-sizing: border-box;
   width: 100%;
   gap: 30px;
+  position: relative;
+  z-index: 10;
 }
 
 .side-panel {
   width: 280px;
   min-height: 220px;
-  background: rgba(22, 14, 14, 0.7); /* Translucent backing tint */
+  background: rgba(22, 14, 14, 0.7); 
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 18px;
@@ -184,7 +187,7 @@ body {
 .weather-stats {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.6);
 }
@@ -224,7 +227,6 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-/* REFINED SEARCH CONTAINER */
 .search-container {
   position: relative;
   width: 500px;
@@ -262,17 +264,89 @@ body {
   box-shadow: 0 0 15px rgba(255, 59, 59, 0.15);
 }
 
+.main-content {
+  width: 100%;
+}
+
+.random-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
 /* ==========================================================================
-   SHORTCUT ICONS LAYOUT GRID
+   BUTTON STRUCTURAL FRAMEWORKS (Fixed Click Interceptors)
+   ========================================================================== */
+.quick-action-btn, .signin-btn, .cloak-btn, .widget-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  border: none;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.quick-action-btn, .signin-btn, .widget-btn {
+  background: #ff3b3b !important;
+  color: white !important;
+  box-shadow: 0 4px 12px rgba(255, 59, 59, 0.25);
+}
+
+.quick-action-btn:hover, .signin-btn:hover, .widget-btn:hover {
+  background: #ff5555 !important;
+  transform: translateY(-2px);
+}
+
+.cloak-btn {
+  background: transparent !important;
+  border: 1px solid rgba(255, 59, 59, 0.4) !important;
+  color: #fff !important;
+}
+
+.cloak-btn:hover {
+  background: rgba(255, 59, 59, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.settings-btn {
+  width: 100%;
+  padding: 12px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  transition: all 0.2s ease;
+}
+
+.settings-btn:hover {
+  border-color: rgba(255, 59, 59, 0.4) !important;
+  color: #fff;
+}
+
+/* ==========================================================================
+   DYNAMIC APP GRID & CARD STRUCTURES
    ========================================================================== */
 .apps-grid {
   display: grid;
-  grid-template-columns: repeat(6, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 16px;
   width: 100%;
 }
 
-.app-card {
+.game-card, .app-card {
   background: rgba(25, 20, 20, 0.45);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 16px;
@@ -280,38 +354,28 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
 }
 
-.app-card:hover {
+.game-card:hover, .app-card:hover {
   transform: translateY(-4px);
   background: rgba(35, 22, 22, 0.7);
   border-color: rgba(255, 59, 59, 0.25);
 }
 
-.app-icon-box {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 20px;
+.game-thumbnail, .app-icon-box {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  object-fit: cover;
+  background: #000;
   margin-bottom: 10px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
 }
 
-/* Theme color accents for grids */
-.fn-bg { background: #3b1b1b; border: 1px solid rgba(255,59,59,0.3); color: #ff5555; }
-.gm-bg { background: #2b1b3b; border: 1px solid rgba(168,85,247,0.3); color: #b975ff; }
-.mv-bg { background: #1b2b3b; border: 1px solid rgba(59,130,246,0.3); color: #5599ff; }
-.ai-bg { background: #1b3b2b; border: 1px solid rgba(34,197,94,0.3); color: #4ade80; }
-.ms-bg { background: #3b3b1b; border: 1px solid rgba(234,179,8,0.3); color: #facc15; }
-.rb-bg { background: #3b2b1b; border: 1px solid rgba(249,115,22,0.3); color: #fb923c; }
-
-.app-label {
-  font-size: 12px;
+.game-title, .app-label {
+  font-size: 13px;
   font-weight: 500;
   color: rgba(255, 255, 255, 0.85);
   text-align: center;
@@ -320,6 +384,13 @@ body {
 /* ==========================================================================
    RIGHT SIDE FEATURED BOX INTERNALS
    ========================================================================== */
+.featured-content {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 .featured-preview-box {
   width: 100%;
   height: 110px;
@@ -350,24 +421,278 @@ body {
   line-height: 1.4;
 }
 
-.widget-btn {
-  display: block;
-  text-align: center;
-  margin-top: 18px;
-  background: #ff3b3b;
-  color: white;
-  text-decoration: none;
-  padding: 10px;
+/* ==========================================================================
+   SYSTEM TERMINAL WIDGET 
+   ========================================================================== */
+.terminal-container {
+  background: #0b0808;
+  border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 10px;
-  font-size: 13px;
-  font-weight: 600;
-  transition: background 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 4px 12px rgba(255, 59, 59, 0.25);
+  overflow: hidden;
+  font-family: monospace;
 }
 
-.widget-btn:hover {
-  background: #ff5555;
-  transform: scale(1.02);
+.terminal-header {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.terminal-circle {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.terminal-circle.red { background: #ff5f56; }
+.terminal-circle.yellow { background: #ffbd2e; }
+.terminal-circle.green { background: #27c93f; }
+
+.terminal-title {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+}
+
+.terminal-body {
+  padding: 12px;
+  height: 110px;
+  font-size: 12px;
+}
+
+.command-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.terminal-prompt {
+  color: #27c93f;
+}
+
+#terminalInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-family: inherit;
+  flex: 1;
+}
+
+/* ==========================================================================
+   STEALTH CLOAK COVER OVERRIDES (Fixed Click Blocking Position)
+   ========================================================================== */
+#educational-cloak {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #ffffff !important;
+  z-index: 99999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Times New Roman', serif;
+  color: #000000 !important;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+.educational-content-card {
+  width: 100%;
+  max-width: 800px;
+  background: #fff;
+  border: 1px solid #000;
+  padding: 30px;
+}
+
+.educational-header h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+
+.academic-subheading {
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 12px;
+  border-bottom: 2px solid #000;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   SUB-PANELS (Profile Forms & Communications Iframe)
+   ========================================================================== */
+.profile-card {
+  background: rgba(22, 14, 14, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 24px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.avatar-upload-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+#pfp-preview {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ff3b3b;
+}
+
+.upload-inputs label {
+  padding: 6px 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+#pfp-file-input {
+  display: none;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: rgba(255,255,255,0.4);
+}
+
+.username-static-display {
+  padding: 10px;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+}
+
+.input-group textarea {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  resize: none;
+  height: 60px;
+  outline: none;
+}
+
+.meta-info {
+  font-size: 13px;
+  color: rgba(255,255,255,0.5);
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.form-wrapper {
+  background: rgba(22, 14, 14, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 25px;
+  border-radius: 16px;
+}
+
+.form-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.form-subtitle {
+  font-size: 13px;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 20px;
+}
+
+.google-form-iframe {
+  border: 1px solid rgba(255,255,255,0.05);
+  border-radius: 8px;
+  background: #fff;
+}
+
+/* ==========================================================================
+   SYSTEM NEWS FEED
+   ========================================================================== */
+.news-sidebar {
+  margin-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+  padding-top: 15px;
+}
+
+.news-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.4);
+  margin-bottom: 10px;
+}
+
+.news-card {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+  padding: 12px;
+  border-radius: 8px;
+}
+
+.news-tag {
+  background: #ff3b3b;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: bold;
+}
+
+.news-card p {
+  font-size: 13px;
+  margin: 6px 0;
+}
+
+.news-date {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+}
+
+/* ==========================================================================
+   CONTEXT MENUS
+   ========================================================================== */
+#custom-context-menu {
+  position: absolute;
+  background: #160e0e;
+  border: 1px solid rgba(255, 59, 59, 0.2);
+  border-radius: 8px;
+  padding: 5px 0;
+  z-index: 10000;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+}
+
+.context-menu-item {
+  padding: 8px 16px;
+  font-size: 13px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+}
+
+.context-menu-item:hover {
+  background: #ff3b3b;
 }
 
 /* ==========================================================================
@@ -387,7 +712,4 @@ body {
   .apps-grid {
     grid-template-columns: repeat(3, 1fr);
   }
-}
-.hidden {
-    display: none !important;
 }
