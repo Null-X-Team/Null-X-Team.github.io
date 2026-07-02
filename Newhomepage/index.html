@@ -27,31 +27,31 @@
     <div class="top-nav-container">
         <nav class="nav-bar">
             <div class="nav-tabs-wrapper">
-                <a href="#" class="nav-tab-item nav-item active" id="nav-home" data-tab="Home">
+                <a href="#" class="nav-tab-item nav-item" id="nav-home">
                     <span class="tab-icon"><i class="fa-solid fa-crosshairs"></i></span>
                     <span class="tab-text">Home</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-games" data-tab="Games">
+                <a href="#" class="nav-tab-item nav-item" id="nav-games">
                     <span class="tab-icon"><i class="fa-solid fa-gamepad"></i></span>
                     <span class="tab-text">Games</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-favorites" data-tab="Favorites">
+                <a href="#" class="nav-tab-item nav-item" id="nav-favorites">
                     <span class="tab-icon"><i class="fa-solid fa-star"></i></span>
                     <span class="tab-text">Favorites</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-unblockers" data-tab="Unblockers">
+                <a href="#" class="nav-tab-item nav-item" id="nav-unblockers">
                     <span class="tab-icon"><i class="fa-solid fa-shield-halved"></i></span>
                     <span class="tab-text">Unblockers</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-profile" data-tab="Profile">
+                <a href="#" class="nav-tab-item nav-item" id="nav-profile">
                     <span class="tab-icon"><i class="fa-solid fa-user"></i></span>
                     <span class="tab-text">Profile</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-communications" data-tab="Communications">
+                <a href="#" class="nav-tab-item nav-item" id="nav-communications">
                     <span class="tab-icon"><i class="fa-solid fa-comments"></i></span>
                     <span class="tab-text">Communications</span>
                 </a>
-                <a href="#" class="nav-tab-item nav-item" id="nav-terminal" data-tab="Terminal">
+                <a href="#" class="nav-tab-item nav-item" id="nav-terminal">
                     <span class="tab-icon"><i class="fa-solid fa-terminal"></i></span>
                     <span class="tab-text">Terminal</span>
                 </a>
@@ -79,28 +79,13 @@
                 <i class="fa-solid fa-microchip"></i> Diagnostics
             </div>
             <div class="weather-stats">
-                <span id="battery-status" style="color: #4ade80;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: 100%</span>
-                <span id="digital-clock" style="color: #b975ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
-            </div>
-
-            <div class="terminal-container" style="margin-top: 25px;">
-                <div class="terminal-header">
-                    <span class="terminal-circle red"></span>
-                    <span class="terminal-circle yellow"></span>
-                    <span class="terminal-circle green"></span>
-                    <span class="terminal-title">system_terminal.sh</span>
-                </div>
-                <div class="terminal-body" id="terminalViewOutput">
-                    <div class="command-row">
-                        <span class="terminal-prompt">glaxyias@core:~$</span>
-                        <input type="text" id="terminalInput" autocomplete="off" placeholder="Enter command...">
-                    </div>
-                </div>
+                <span id="battery-status" style="color: #4ade80;">Battery: 100%</span>
+                <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
             </div>
         </aside>
 
         <main class="main-hub">
-            <h1 class="site-title" id="welcome-text">Glaxyias Unblocked</h1>
+            <h1 class="site-title" id="welcome-text">Loading Identity...</h1>
             
             <div class="search-container">
                 <span class="search-glass"><i class="fa-solid fa-magnifying-glass"></i></span>
@@ -116,52 +101,16 @@
                 </div>
 
                 <div id="gameGrid" class="apps-grid"></div>
-
                 <div id="favoritesGrid" class="apps-grid" style="display: none;">
                     <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 40px;">
                         <i class="fas fa-star" style="color: #ff3b3b; margin-right: 6px;"></i> Your favorites catalog is currently empty.
                     </div>
                 </div>
 
-                <div id="unblockersSection" style="display: none;" class="apps-grid"></div>
-                
-                <div id="profileSection" style="display: none; width: 100%;">
-                    <div class="profile-card">
-                        <div class="avatar-upload-section">
-                            <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
-                            <div class="upload-inputs">
-                                <label for="pfp-file-input">Choose Image</label>
-                                <input type="file" id="pfp-file-input" accept="image/*">
-                            </div>
-                        </div>
-                        <div class="input-group">
-                            <label>Username Signature Identity</label>
-                            <div id="display-username" class="username-static-display">Loading User Identity...</div>
-                        </div>
-                        <div class="input-group">
-                            <label>Personal Biography Info Card</label>
-                            <textarea id="bio-input" maxlength="250" placeholder="Tell us something about yourself..."></textarea>
-                        </div>
-                        <div class="meta-info">
-                            <div class="info-row"><span>Verified ID:</span> <strong id="info-username">-</strong></div>
-                            <div class="info-row"><span>Creation Node Timestamp:</span> <span id="join-date">-</span></div>
-                        </div>
-                        <div class="actions-row">
-                            <button id="save-profile-btn" class="quick-action-btn" style="padding: 12px 24px; font-size: 14px;">Save Changes</button>
-                            <span id="save-status" style="font-size: 13px; color: #4ade80;"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="communicationsSection" style="display: none; width: 100%;">
-                    <div class="form-wrapper">
-                        <div class="form-title">Communications Hub</div>
-                        <div class="form-subtitle">Submit system request parameters or error bug logs directly</div>
-                        <iframe class="google-form-iframe" src="" width="100%" height="500">Loading Form Database Module...</iframe>
-                    </div>
-                </div>
-
-                <div id="terminalSection" style="display: none; width: 100%;"></div>
+                <div id="unblockersSection" style="display: none;"></div>
+                <div id="profileSection" style="display: none;"></div>
+                <div id="communicationsSection" style="display: none;"></div>
+                <div id="terminalSection" style="display: none;"></div>
 
             </div>
         </main>
@@ -175,33 +124,22 @@
                     <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
                 </div>
                 <h3 id="hero-title">Drive0ad</h3>
-                <p id="hero-desc">Challenge physics paths pacing parameters inside our layout matrix selection loop tracker.</p>
+                <p id="hero-desc">Loading parameters...</p>
                 <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
             </div>
             
             <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
                 <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
                 <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                <a href="Settings/settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
-            </div>
-
-            <div class="news-sidebar">
-                <div class="news-title">System News</div>
-                <div class="news-feed" id="newsFeed">
-                    <div class="news-card">
-                        <span class="news-tag">Update</span>
-                        <p>Working on fixing settings configuration modals and database local state values storage hooks.</p>
-                        <div class="news-date">June 29</div>
-                    </div>
-                </div>
+                <a href="#" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
             </div>
         </aside>
 
     </div>
 
-    <div id="custom-context-menu" style="display: none;">
-        <div class="context-menu-item" id="ctx-favorite"><i class="fa-solid fa-star"></i> Favorite Game</div>
-        <div class="context-menu-item" id="ctx-delete" style="color: #ff3333;"><i class="fa-solid fa-trash"></i> Delete Game</div>
+    <div id="custom-context-menu" style="display: none; position: absolute; background: #0a0a0a; border: 1px solid #8b00ff; border-radius: 4px; padding: 5px; z-index: 100000;">
+        <div class="context-menu-item" id="ctx-favorite" style="color: white; padding: 5px 10px; cursor: pointer;"><i class="fa-solid fa-star"></i> Favorite Game</div>
+        <div class="context-menu-item" id="ctx-delete" style="color: #ff3333; padding: 5px 10px; cursor: pointer;"><i class="fa-solid fa-trash"></i> Delete Game</div>
     </div>
 
     <script type="module" src="JS/main.js"></script>
