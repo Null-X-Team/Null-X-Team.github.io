@@ -92,20 +92,11 @@
       overflow: hidden;
       background: #1e1131;
       color: #fff;
-      text-align: center;
       border: 1px solid rgba(139, 0, 255, 0.25);
       box-sizing: border-box;
-    }
-
-    /* Ensures the spans inside perfectly render full size relative to the master dimensions */
-    .card-top span, .card-bottom span {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 100%;
-      height: 68px; /* Must match parent master .flip-card height */
-      line-height: 68px;
-      text-align: center;
+      /* Flex positioning anchors our inner numerals cleanly */
+      display: flex;
+      justify-content: center;
     }
 
     .card-top {
@@ -113,9 +104,10 @@
       border-top-left-radius: 6px;
       border-top-right-radius: 6px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+      align-items: flex-start; /* Aligns number to top edge */
     }
     .card-top span {
-      top: 0;
+      transform: translateY(14%); /* Shifts baseline down smoothly to clear font clipping boundaries */
     }
 
     .card-bottom {
@@ -123,9 +115,10 @@
       border-bottom-left-radius: 6px;
       border-bottom-right-radius: 6px;
       border-top: none;
+      align-items: flex-end; /* Aligns number to bottom edge */
     }
     .card-bottom span {
-      bottom: 0;
+      transform: translateY(-14%); /* Pulls baseline upward seamlessly */
     }
 
     /* Animation frames triggered via JS updates */
