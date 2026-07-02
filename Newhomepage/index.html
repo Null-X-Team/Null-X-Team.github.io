@@ -11,12 +11,21 @@
 </head>
 <body>
 
+    <div id="educational-cloak" class="hidden">
+        <div class="educational-content-card">
+            <div class="educational-header">
+                <h1>Academic Research Hub</h1>
+                <div class="academic-subheading">Database Connection Secured</div>
+            </div>
+            <div class="educational-scroll-body">
+                <p>This reference document outlines structural mechanics and runtime computational compilation metrics within isolated local sandbox parameters.</p>
+            </div>
+            <div class="timer-subtext-sticky">Session updates in: <span id="cloak-timer">00:00</span></div>
+        </div>
+    </div>
+
     <div class="top-nav-container">
         <nav class="nav-bar">
-            <div class="nav-trigger-icon">
-                <i class="fa-solid fa-bolt"></i>
-            </div>
-            
             <div class="nav-tabs-wrapper">
                 <a href="#" class="nav-tab-item nav-item active" id="nav-home" data-tab="home">
                     <span class="tab-icon"><i class="fa-solid fa-crosshairs"></i></span>
@@ -52,7 +61,7 @@
 
     <div class="dashboard-wrapper">
 
-        <aside class="side-panel left-panel">
+        <aside class="side-panel">
             <div class="widget-header">
                 <i class="fa-solid fa-cloud-sun"></i> Weather
             </div>
@@ -66,20 +75,27 @@
                 </div>
             </div>
             
-            <div class="widget-header" style="margin-top:20px;">
+            <div class="widget-header" style="margin-top: 25px;">
                 <i class="fa-solid fa-microchip"></i> Diagnostics
             </div>
-            <div id="battery-widget" class="weather-stats" style="padding:10px; display:flex; flex-direction:column; gap:8px;">
-                <span id="battery-status" style="color:#00ff66;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: --%</span>
+            <div class="weather-stats">
+                <span id="battery-status" style="color: #4ade80;"><i class="fas fa-battery-three-quarters" id="battery-icon"></i> Battery: 100%</span>
+                <span id="digital-clock" style="color: #b975ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
             </div>
-            <div id="ny-time-widget" class="weather-stats" style="padding:0 10px; display:flex; flex-direction:column;">
-                <span id="digital-clock" style="color:#b056ff;"><i class="fas fa-clock"></i> 00:00:00 AM</span>
-            </div>
-            
-            <div style="margin-top:auto; padding:10px; display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">
-                <button id="signInBtn" class="signin-btn">Sign In</button>
-                <a href="../Settings/settings.html" class="settings-btn" id="settingsBtn">Settings</a>
-                <button id="stealthOpener" class="cloak-btn">Stealth Mode</button>
+
+            <div class="terminal-container" style="margin-top: 25px;">
+                <div class="terminal-header">
+                    <span class="terminal-circle red"></span>
+                    <span class="terminal-circle yellow"></span>
+                    <span class="terminal-circle green"></span>
+                    <span class="terminal-title">system_terminal.sh</span>
+                </div>
+                <div class="terminal-body" id="terminalViewOutput">
+                    <div class="command-row">
+                        <span class="terminal-prompt">glaxyias@core:~$</span>
+                        <input type="text" id="terminalInput" autocomplete="off" placeholder="Enter command...">
+                    </div>
+                </div>
             </div>
         </aside>
 
@@ -92,77 +108,98 @@
             </div>
 
             <div class="main-content">
-                <div class="section">
-                    
-                    <div class="random-section" style="margin-bottom:15px;">
-                        <button id="randomBtn" class="quick-action-btn">Random Game</button>
+                
+                <div class="random-section">
+                    <button id="randomBtn" class="quick-action-btn">
+                        <i class="fa-solid fa-shuffle"></i> Random Game
+                    </button>
+                </div>
+
+                <div id="gameGrid" class="apps-grid"></div>
+
+                <div id="favoritesGrid" class="apps-grid" style="display: none;">
+                    <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 40px;">
+                        <i class="fas fa-star" style="color: #ff3b3b; margin-right: 6px;"></i> Your favorites catalog is currently empty.
                     </div>
+                </div>
 
-                    <div id="gameGrid" class="game-grid apps-grid"></div>
-
-                    <div id="favoritesGrid" class="game-grid apps-grid" style="display:none;">
-                        <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align:center; color:#888; padding:40px;">
-                            <i class="fas fa-star" style="color:#8b00ff; margin-right:6px;"></i> This room is empty! Right-click games to fill it up.
-                        </div>
-                    </div>
-
-                    <div id="unblockersSection" class="custom-view-panel" style="display:none;"></div>
-                    
-                    <div id="profileSection" class="custom-view-panel" style="display:none;">
-                        <div class="profile-card">
-                            <div class="avatar-upload-section">
-                                <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                <div id="unblockersSection" style="display: none;" class="apps-grid"></div>
+                
+                <div id="profileSection" style="display: none; width: 100%;">
+                    <div class="profile-card">
+                        <div class="avatar-upload-section">
+                            <img id="pfp-preview" src="https://Glaxyias.github.io/imgs/download.jpeg" alt="Profile Picture">
+                            <div class="upload-inputs">
+                                <label for="pfp-file-input">Choose Image</label>
                                 <input type="file" id="pfp-file-input" accept="image/*">
                             </div>
-                            <span id="display-username">Loading...</span>
-                            <textarea id="bio-input" maxlength="250"></textarea>
-                            <strong id="info-username">-</strong>
-                            <span id="join-date">-</span>
-                            <button id="save-profile-btn" class="save-btn">Save Changes</button>
-                            <span id="save-status"></span>
+                        </div>
+                        <div class="input-group">
+                            <label>Username Signature Identity</label>
+                            <div id="display-username" class="username-static-display">Loading User Identity...</div>
+                        </div>
+                        <div class="input-group">
+                            <label>Personal Biography Info Card</label>
+                            <textarea id="bio-input" maxlength="250" placeholder="Tell us something about yourself..."></textarea>
+                        </div>
+                        <div class="meta-info">
+                            <div class="info-row"><span>Verified ID:</span> <strong id="info-username">-</strong></div>
+                            <div class="info-row"><span>Creation Node Timestamp:</span> <span id="join-date">-</span></div>
+                        </div>
+                        <div class="actions-row">
+                            <button id="save-profile-btn" class="quick-action-btn" style="padding: 12px 24px; font-size: 14px;">Save Changes</button>
+                            <span id="save-status" style="font-size: 13px; color: #4ade80;"></span>
                         </div>
                     </div>
-
-                    <div id="terminalSection" class="custom-view-panel" style="display:none;"></div>
-
                 </div>
+
+                <div id="communicationsSection" style="display: none; width: 100%;">
+                    <div class="form-wrapper">
+                        <div class="form-title">Communications Hub</div>
+                        <div class="form-subtitle">Submit system request parameters or error bug logs directly</div>
+                        <iframe class="google-form-iframe" src="" width="100%" height="500">Loading Form Database Module...</iframe>
+                    </div>
+                </div>
+
             </div>
         </main>
 
-        <aside class="side-panel right-panel">
+        <aside class="side-panel">
             <div class="widget-header">
                 <i class="fa-solid fa-star"></i> Featured
             </div>
-            <div class="featured-content" id="heroSection" style="display:flex; flex-direction:column;">
+            <div class="featured-content" id="heroSection">
                 <div class="featured-preview-box">
                     <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
                 </div>
-                <h3 id="hero-title">Featured Game</h3>
-                <p id="hero-desc">Play our top picked game of the week instantly.</p>
-                <a href="#" class="widget-btn play-btn" id="playFeatured">Play Now</a>
+                <h3 id="hero-title">Drive0ad</h3>
+                <p id="hero-desc">Challenge physics paths pacing parameters inside our layout matrix selection loop tracker.</p>
+                <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
             </div>
             
-            <div class="news-sidebar" style="margin-top:20px; display:none;">
-                <div class="news-feed" id="newsFeed"></div>
+            <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+                <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
+                <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+                <a href="Settings/settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+            </div>
+
+            <div class="news-sidebar">
+                <div class="news-title">System News</div>
+                <div class="news-feed" id="newsFeed">
+                    <div class="news-card">
+                        <span class="news-tag">Update</span>
+                        <p>Working on fixing settings configuration modals and database local state values storage hooks.</p>
+                        <div class="news-date">June 29</div>
+                    </div>
+                </div>
             </div>
         </aside>
 
     </div>
 
-    <div id="custom-context-menu" style="display:none; position:fixed; z-index:10000; background:#12091c; border:1px solid #8b00ff; border-radius:6px; width:160px;">
-        <div class="context-menu-item" id="ctx-favorite" style="padding:10px 14px; color:white; cursor:pointer;">Favorite Game</div>
-        <div class="context-menu-item" id="ctx-delete" style="padding:10px 14px; color:#ff3333; cursor:pointer; border-top:1px solid #221530;">Delete Game</div>
-    </div>
-
-    <div id="delete-modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20000; align-items:center; justify-content:center;">
-        <div class="modal-box" style="text-align:center; background:#12091c; padding:30px; border-radius:8px; border:1px solid #8b00ff; max-width:400px; width:90%;">
-            <h2 style="margin-bottom:10px; color:white;">Are you sure?</h2>
-            <p style="margin-bottom:20px; color:#aaa; font-size:14px;">Do you really want to delete this game? This action cannot be undone.</p>
-            <div style="display:flex; gap:15px; justify-content:center;">
-                <button id="confirm-delete-btn" style="padding:10px 20px; background:#ff3333; color:white; border:none; border-radius:4px; cursor:pointer; font-weight:bold;">Yes, Delete</button>
-                <button id="cancel-delete-btn" style="padding:10px 20px; background:#333; color:white; border:none; border-radius:4px; cursor:pointer;">No, Cancel</button>
-            </div>
-        </div>
+    <div id="custom-context-menu" style="display: none;">
+        <div class="context-menu-item" id="ctx-favorite"><i class="fa-solid fa-star"></i> Favorite Game</div>
+        <div class="context-menu-item" id="ctx-delete" style="color: #ff3333;"><i class="fa-solid fa-trash"></i> Delete Game</div>
     </div>
 
     <script type="module" src="JS/main.js"></script>
