@@ -1,1 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service | Null X</title>
+    <link rel="stylesheet" href="CSS/style.css">
+    <link rel="stylesheet" href="newpage.css">
+    <link rel="stylesheet" href="../themes/themes.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="../Games/GameSaveData/auto-save.js"></script>
+</head>
+<body>
 
+    <div class="dashboard-wrapper">
+
+        <aside class="side-panel">
+            <div class="logo">
+                <img src="imgs/Screenshot 2026-01-27 8.17.07 PM.png" alt="Null_X Logo" class="site-logo" style="max-width: 100%; height: auto; margin-bottom: 15px;">
+            </div>
+            <nav style="display: flex; flex-direction: column; gap: 8px;">
+                <a href="index.html" class="nav-tab-item nav-item"><i class="fas fa-house" style="margin-right: 8px;"></i>Home</a>
+                <a href="index.html" class="nav-tab-item nav-item"><i class="fas fa-gamepad" style="margin-right: 8px;"></i>Games</a>
+                <a href="#" class="nav-tab-item nav-item active"><i class="fa-solid fa-scale-balanced" style="margin-right: 8px;"></i>Terms</a>
+            </nav>
+
+            <div class="widget-header" style="margin-top: 30px;">
+                <i class="fa-solid fa-microchip"></i> Diagnostics
+            </div>
+            <div class="weather-stats">
+                <span id="battery-status" style="color: #4ade80;">Battery: --%</span>
+                <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
+            </div>
+        </aside>
+
+        <main class="main-hub">
+            <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
+                <div class="greeting">
+                    <h1 class="site-title" style="margin: 0;">Legal Center</h1>
+                    <p style="margin: 5px 0 0 0; color: #888;">Review platform rules and policies.</p>
+                </div>
+            </header>
+
+            <div class="main-content">
+                <div style="padding: 30px; background: rgba(139, 0, 255, 0.02); border: 1px solid rgba(139, 0, 255, 0.1); border-radius: 8px; color: white; font-family: system-ui, -apple-system, sans-serif; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+                    
+                    <h2 style="color: #b975ff; border-bottom: 1px solid rgba(139, 0, 255, 0.2); padding-bottom: 12px; margin-bottom: 20px; font-size: 1.6rem; display: flex; align-items: center;">
+                        <i class="fa-solid fa-scale-balanced" style="margin-right: 12px;"></i> Terms of Service
+                    </h2>
+                    
+                    <p style="color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 30px;">Last Updated: July 2, 2026</p>
+                    
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-user-shield" style="margin-right: 8px;"></i> 1. Privacy & Data Protection</h3>
+                        <p style="color: #ccc; margin: 0 0 10px 0;"><strong>No Data Selling:</strong> We value your privacy. We explicitly guarantee that we do not sell, rent, lease, or trade your usage habits, personal settings, or local profile configurations to any third parties.</p>
+                        <p style="color: #ccc; margin: 0;"><strong>IP Address Logging:</strong> Your incoming network IP address is compiled automatically within secure connection tables. This parameter is recorded and maintained <strong>strictly for ban enforcement and safety measures</strong> to neutralize bad actors, exploits, or structural site abuse.</p>
+                    </div>
+
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-trash-can" style="margin-right: 8px;"></i> 2. DMCA & Content Takedown Rights</h3>
+                        <p style="color: #ccc; margin: 0;">We highly respect developer rights and independent creations. If you find any game or content integrated inside our application grids that you own or represent, and you want it taken down, let us know. We will process your notice and completely wipe it from our site directory immediately.</p>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-terminal" style="margin-right: 8px;"></i> 3. Platform Regulations</h3>
+                        <p style="color: #ccc; margin: 0;">Any hostile attempts to manipulate our network parameters, modify runtime configuration objects (`main.js`), or deploy malicious code loops into the localized sandbox terminals will result in an absolute and permanent IP infrastructure ban.</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </main>
+
+    </div>
+
+    <script>
+        if (navigator.getBattery) {
+            navigator.getBattery().then(battery => {
+                function updateBattery() {
+                    const statusText = document.getElementById('battery-status');
+                    if (statusText) {
+                        const lvl = Math.round(battery.level * 100);
+                        const state = battery.charging ? " (Charging)" : "";
+                        statusText.textContent = `Battery: ${lvl}%${state}`;
+                    }
+                }
+                updateBattery();
+                battery.addEventListener('levelchange', updateBattery);
+                battery.addEventListener('chargingchange', updateBattery);
+            }).catch(() => {});
+        }
+
+        function updateLiveClock() {
+            const clock = document.getElementById('digital-clock');
+            if (clock) {
+                const config = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
+                clock.textContent = new Date().toLocaleTimeString(undefined, config);
+            }
+        }
+        updateLiveClock();
+        setInterval(updateLiveClock, 1000);
+    </script>
+
+    <script type="module" src="../JS/main.js"></script>
+    <script src="../themes/themes.js"></script>
+</body>
+</html>
