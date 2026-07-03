@@ -5,6 +5,13 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const DEFAULT_PFP = 'https://Glaxyias.github.io/imgs/download.jpeg';
 
+// Global headers mapping
+const SUPABASE_HEADERS = {
+    'apikey': SUPABASE_KEY,
+    'Authorization': `Bearer ${SUPABASE_KEY}`,
+    'Content-Type': 'application/json'
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     const loggedInUser = localStorage.getItem('chatUser');
     if (!loggedInUser) { 
@@ -15,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Parse URL parameters to determine if we are looking at our own card or an external profile
     const urlParams = new URLSearchParams(window.location.search);
     const targetUser = urlParams.get('user') || loggedInUser;
-    const isOwnProfile = (targetUser.toLowerCase() === loggedInUser.toLowerCase());
+    const isOwnProfile = (targetUser.toLowerCase().trim() === loggedInUser.toLowerCase().trim());
 
     // Map UI layout fields
     const displayUsername = document.getElementById('display-username');
@@ -47,8 +54,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- FETCH CURRENT USER INFORMATION ---
     const loadProfile = async () => {
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}&select=*`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            // Using ilike for case-insensitive username targeting
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(targetUser)}&select=*`, {
+                headers: SUPABASE_HEADERS
             });
             const data = await response.json();
 
@@ -88,8 +96,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     // --- ADMINISTRATIVE CAPABILITIES MANAGER ---
     const checkAndSetupAdminControls = async (targetUserIsAdmin) => {
         try {
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}&select=is_admin`, {
-                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(loggedInUser)}&select=is_admin`, {
+                headers: SUPABASE_HEADERS
             });
             const data = await response.json();
 
@@ -109,13 +117,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         adminBtn.textContent = "Updating...";
                         adminBtn.disabled = true;
 
-                        const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}`, {
+                        const updateResponse = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(targetUser)}`, {
                             method: 'PATCH',
-                            headers: { 
-                                'apikey': SUPABASE_KEY, 
-                                'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                                'Content-Type': 'application/json' 
-                            },
+                            headers: SUPABASE_HEADERS,
                             body: JSON.stringify({ 
                                 is_admin: newAdminStatus,
                                 role_tag: newRoleTag 
@@ -134,7 +138,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } catch (err) {
-            console.error("Error configuration admin systems:", err);
+            console.error("Error configuring admin systems:", err);
         }
     };
 
@@ -186,16 +190,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             try {
-                // Update statement explicitly matching username rows inside user_roles
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}`, {
-                    method: 'PATCH',
+                // Using an upsert POST request so it auto-merges data to the matching username row
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles`, {
+                    method: 'POST',
                     headers: { 
-                        'apikey': SUPABASE_KEY, 
-                        'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                        'Content-Type': 'application/json',
-                        'Prefer': 'return=representation'
+                        ...SUPABASE_HEADERS,
+                        'Prefer': 'resolution=merge-duplicates,return=representation'
                     },
                     body: JSON.stringify({ 
+                        username: loggedInUser, // Strictly pairs with active session username
                         bio: bio, 
                         pfp_url: finalPfp
                     })
@@ -207,6 +210,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                         statusEl.style.color = "#00ff66";
                         setTimeout(() => { statusEl.textContent = ""; }, 3000);
                     }
+                    loadProfile(); // Refresh screen elements immediately
                 } else {
                     const errorDetails = await response.json().catch(() => ({}));
                     console.error("Database feedback:", errorDetails);
