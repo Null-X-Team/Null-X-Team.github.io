@@ -7,36 +7,44 @@ const DEFAULT_PFP = 'https://Glaxyias.github.io/imgs/download.jpeg';
 
 document.addEventListener('DOMContentLoaded', async () => {
     const loggedInUser = localStorage.getItem('chatUser');
-    if (!loggedInUser) { window.location.href = "../Login/login.html"; return; }
+    if (!loggedInUser) { 
+        window.location.href = "../Login/login.html"; 
+        return; 
+    }
 
-    // URL Parser: Check if we are viewing someone else or our own profile settings
+    // Parse URL parameters to determine if we are looking at our own card or an external profile
     const urlParams = new URLSearchParams(window.location.search);
     const targetUser = urlParams.get('user') || loggedInUser;
     const isOwnProfile = (targetUser.toLowerCase() === loggedInUser.toLowerCase());
 
-    document.getElementById('display-username').textContent = targetUser;
-    document.getElementById('info-username').textContent = targetUser;
+    // Map UI layout fields
+    const displayUsername = document.getElementById('display-username');
+    const infoUsername = document.getElementById('info-username');
+    
+    if (displayUsername) displayUsername.value = targetUser;
+    if (infoUsername) infoUsername.textContent = targetUser;
 
     const pfpPreview = document.getElementById('pfp-preview');
     const pfpFileInput = document.getElementById('pfp-file-input');
-    const uploadWrapper = document.getElementById('upload-wrapper');
+    const uploadSection = document.querySelector('.upload-section'); 
     const bioInput = document.getElementById('bio-input');
     const saveBtn = document.getElementById('save-profile-btn');
     const statusEl = document.getElementById('save-status');
 
-    // Holds updated base64 image data strings securely across actions
     let uploadedImageDataUrl = "";
 
-    // Hide editing elements if viewing another user's bio card
+    // Lock interactive fields down if this profile does not belong to the logged-in session user
     if (!isOwnProfile) {
-        if(uploadWrapper) uploadWrapper.style.display = 'none';
-        if(saveBtn) saveBtn.style.display = 'none';
-        bioInput.setAttribute('readonly', 'true');
-        bioInput.style.background = '#111';
-        bioInput.style.borderColor = '#222';
+        if (uploadSection) uploadSection.style.display = 'none';
+        if (saveBtn) saveBtn.style.display = 'none';
+        if (bioInput) {
+            bioInput.setAttribute('readonly', 'true');
+            bioInput.style.background = '#111';
+            bioInput.style.borderColor = '#222';
+        }
     }
 
-    // Load user bio profile properties data values from remote api table schema rows
+    // --- FETCH CURRENT USER INFORMATION ---
     const loadProfile = async () => {
         try {
             const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}&select=*`, {
@@ -47,40 +55,44 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data && data[0]) {
                 const profile = data[0];
                 
-                if (profile.bio) bioInput.value = profile.bio;
+                // Set the bio field value if it exists in the row
+                if (profile.bio && bioInput) {
+                    bioInput.value = profile.bio;
+                }
                 
-                if (profile.pfp_url) {
+                // Map the profile picture URL
+                if (profile.pfp_url && pfpPreview) {
                     pfpPreview.src = profile.pfp_url;
-                    uploadedImageDataUrl = profile.pfp_url; // Set baseline reference
-                } else {
+                    uploadedImageDataUrl = profile.pfp_url; 
+                } else if (pfpPreview) {
                     pfpPreview.src = DEFAULT_PFP;
                 }
                 
+                // Map joining metadata
                 if (profile.created_at) {
-                    const joined = new Date(profile.created_at).toLocaleDateString();
-                    document.getElementById('join-date').textContent = joined;
+                    const joined = new Date(profile.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                    const joinDateEl = document.getElementById('join-date');
+                    if (joinDateEl) joinDateEl.textContent = joined;
                 }
 
-                // Check and show admin controls if looking at someone else's profile
+                // Show admin panels if looking at another user account card
                 if (!isOwnProfile) {
                     checkAndSetupAdminControls(profile.is_admin);
                 }
             }
         } catch (err) { 
-            console.error("Error loading profile:", err); 
+            console.error("Error loading profile details:", err); 
         }
     };
 
-    // Verifies if the viewer holds admin privileges and displays the action layout components
+    // --- ADMINISTRATIVE CAPABILITIES MANAGER ---
     const checkAndSetupAdminControls = async (targetUserIsAdmin) => {
         try {
-            // Fetch the logged-in viewer's boolean flag from user_roles
             const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}&select=is_admin`, {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const data = await response.json();
 
-            // Check if current viewer has authorization access enabled (is_admin is true)
             if (data && data[0] && data[0].is_admin === true) {
                 const adminContainer = document.getElementById('admin-actions-container');
                 const adminBtn = document.getElementById('toggle-admin-btn');
@@ -92,8 +104,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                     adminBtn.onclick = async () => {
                         const currentIsAdmin = adminBtn.getAttribute('data-is-admin') === 'true';
                         const newAdminStatus = !currentIsAdmin;
-                        
-                        // Automatically flip role_tag label alongside your authorization flag
                         const newRoleTag = newAdminStatus ? 'ADMIN' : 'User';
 
                         adminBtn.textContent = "Updating...";
@@ -124,7 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
             }
         } catch (err) {
-            console.error("Error setting up admin controls:", err);
+            console.error("Error configuration admin systems:", err);
         }
     };
 
@@ -142,48 +152,48 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     };
 
-    // Monitor input changes to file-uploads to convert chosen desktop images immediately
+    // --- FILE INTERCEPT DATA WRAPPER ROUTINE ---
     if (isOwnProfile && pfpFileInput) {
         pfpFileInput.addEventListener('change', function(event) {
             const file = event.target.files[0];
             
             if (file) {
-                // Safeguard against large structural file conversions slowing database synchronization down
                 if (file.size > 2 * 1024 * 1024) {
-                    alert("This image is too large! Please select an image under 2MB.");
+                    alert("This image is too large! Please choose an image under 2MB.");
                     pfpFileInput.value = ""; 
                     return;
                 }
 
                 const reader = new FileReader();
-
                 reader.onload = function(e) {
-                    uploadedImageDataUrl = e.target.result; // Encodes directly to raw string layout
-                    pfpPreview.src = uploadedImageDataUrl;  // Refreshes view element instantly
+                    uploadedImageDataUrl = e.target.result; 
+                    if (pfpPreview) pfpPreview.src = uploadedImageDataUrl; 
                 };
-
                 reader.readAsDataURL(file);
             }
         });
     }
 
-    // Process patches data uploads back into your hosted live backend data table
+    // --- COMMITTING UPDATES TO SUPABASE ---
     if (isOwnProfile && saveBtn) {
         saveBtn.onclick = async () => {
-            const bio = bioInput.value;
-            // Keeps current base64 data string, fallback to default profile image template route
+            const bio = bioInput ? bioInput.value : "";
             const finalPfp = uploadedImageDataUrl || DEFAULT_PFP;
 
-            statusEl.textContent = "Saving...";
-            statusEl.style.color = "white";
+            if (statusEl) {
+                statusEl.textContent = "Saving...";
+                statusEl.style.color = "#b3a1cf";
+            }
 
             try {
+                // Update statement explicitly matching username rows inside user_roles
                 const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}`, {
                     method: 'PATCH',
                     headers: { 
                         'apikey': SUPABASE_KEY, 
                         'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                        'Content-Type': 'application/json' 
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
                     },
                     body: JSON.stringify({ 
                         bio: bio, 
@@ -192,14 +202,21 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (response.ok) {
-                    statusEl.textContent = "Profile Updated Successfully!";
-                    statusEl.style.color = "#00c853";
+                    if (statusEl) {
+                        statusEl.textContent = "Profile Updated Successfully!";
+                        statusEl.style.color = "#00ff66";
+                        setTimeout(() => { statusEl.textContent = ""; }, 3000);
+                    }
                 } else {
-                    throw new Error("Database rejected update request.");
+                    const errorDetails = await response.json().catch(() => ({}));
+                    console.error("Database feedback:", errorDetails);
+                    throw new Error("Database refused transaction.");
                 }
             } catch (err) {
-                statusEl.textContent = "Error saving profile. Try again.";
-                statusEl.style.color = "#ff4444";
+                if (statusEl) {
+                    statusEl.textContent = "Error saving profile. Try again.";
+                    statusEl.style.color = "#ff4a4a";
+                }
                 console.error(err);
             }
         };
