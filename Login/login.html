@@ -195,7 +195,6 @@
     <script>
         // --- CONFIGURATION ---
         const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
-        const BASE_URL = `${SUPABASE_PROJECT_URL}/rest/v1/users`;
         const RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/verify_user_login`;
         const SIGNUP_RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/register_user_hashed`;
         
@@ -255,19 +254,7 @@
         // --- HASHED SIGN UP ROUTINE ---
         async function handleSignUp(username, password) {
             try {
-                // 1. Check if username is already taken inside your users table
-                const checkUrl = `${BASE_URL}?username=eq.${encodeURIComponent(username)}&select=username`;
-                const checkRes = await fetch(checkUrl, { method: 'GET', headers: headers });
-                
-                if (!checkRes.ok) throw new Error(`Database validation failed.`);
-                const existingUsers = await checkRes.json();
-                
-                if (existingUsers.length > 0) {
-                    showMessage('Username is already taken!');
-                    return;
-                }
-
-                // 2. Call the secure signup backend RPC to handle crypto insertion
+                // Call the secure signup backend RPC to handle registration and duplicate checking
                 const response = await fetch(SIGNUP_RPC_URL, {
                     method: 'POST',
                     headers: headers,
@@ -277,12 +264,20 @@
                     })
                 });
 
-                if (response.ok) {
-                    showMessage('Account created successfully! Switching to login...', false);
-                    setTimeout(() => { setMode('login'); }, 2000);
-                } else {
-                    throw new Error(`Registration rejected by secure schema.`);
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    // Capture the custom error exception sent from our database trigger function
+                    if (errorData.message && errorData.message.includes('Username is already taken')) {
+                        showMessage('Username is already taken!');
+                    } else {
+                        showMessage('Registration failed. Please try a different username.');
+                    }
+                    return;
                 }
+
+                showMessage('Account created successfully! Switching to login...', false);
+                setTimeout(() => { setMode('login'); }, 2000);
+
             } catch (err) {
                 showMessage('Connection error: ' + err.message);
                 console.error(err);
@@ -292,7 +287,7 @@
         // --- HASHED LOGIN ROUTINE ---
         async function handleLogin(username, password) {
             try {
-                // Submit the credentials to the database RPC function to verify via crypt()
+                // Submit credentials to the database RPC to verify via crypt()
                 const response = await fetch(RPC_URL, {
                     method: 'POST',
                     headers: headers,
