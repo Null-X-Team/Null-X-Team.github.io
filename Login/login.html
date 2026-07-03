@@ -194,9 +194,11 @@
 
     <script>
         // --- CONFIGURATION ---
-        const BASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co/rest/v1/users';
+        const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
+        const BASE_URL = `${SUPABASE_PROJECT_URL}/rest/v1/users`;
+        const RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/verify_user_login`;
+        const SIGNUP_RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/register_user_hashed`;
         
-        // Exact cryptographic JWT Anon Token
         const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
         const headers = {
@@ -228,11 +230,7 @@
 
         function togglePasswordVis() {
             const passwordInput = document.getElementById('password');
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-            } else {
-                passwordInput.type = 'password';
-            }
+            passwordInput.type = (passwordInput.type === 'password') ? 'text' : 'password';
         }
 
         function showMessage(text, isError = true) {
@@ -254,14 +252,14 @@
             }
         }
 
-        // --- CLEANED UP SIGN UP (AUTOMATED BY SQL TRIGGER) ---
+        // --- HASHED SIGN UP ROUTINE ---
         async function handleSignUp(username, password) {
             try {
                 // 1. Check if username is already taken inside your users table
                 const checkUrl = `${BASE_URL}?username=eq.${encodeURIComponent(username)}&select=username`;
                 const checkRes = await fetch(checkUrl, { method: 'GET', headers: headers });
                 
-                if (!checkRes.ok) throw new Error(`Database rejected availability check. Status: ${checkRes.status}`);
+                if (!checkRes.ok) throw new Error(`Database validation failed.`);
                 const existingUsers = await checkRes.json();
                 
                 if (existingUsers.length > 0) {
@@ -269,19 +267,21 @@
                     return;
                 }
 
-                // 2. Insert new user credentials directly into your main 'users' table
-                // The database trigger handles building their profile inside user_roles instantly!
-                const insertRes = await fetch(BASE_URL, {
+                // 2. Call the secure signup backend RPC to handle crypto insertion
+                const response = await fetch(SIGNUP_RPC_URL, {
                     method: 'POST',
-                    headers: { ...headers, 'Prefer': 'return=representation' },
-                    body: JSON.stringify({ username: username, password: password })
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        new_username: username, 
+                        new_password: password 
+                    })
                 });
 
-                if (insertRes.ok) {
+                if (response.ok) {
                     showMessage('Account created successfully! Switching to login...', false);
                     setTimeout(() => { setMode('login'); }, 2000);
                 } else {
-                    throw new Error(`Registration failed in main table. Status: ${insertRes.status}`);
+                    throw new Error(`Registration rejected by secure schema.`);
                 }
             } catch (err) {
                 showMessage('Connection error: ' + err.message);
@@ -289,20 +289,24 @@
             }
         }
 
-        // --- USER LOGIN ---
+        // --- HASHED LOGIN ROUTINE ---
         async function handleLogin(username, password) {
             try {
-                // Verification against users credentials table 
-                const loginUrl = `${BASE_URL}?username=eq.${encodeURIComponent(username)}&password=eq.${encodeURIComponent(password)}&select=*`;
-                const res = await fetch(loginUrl, { method: 'GET', headers: headers });
+                // Submit the credentials to the database RPC function to verify via crypt()
+                const response = await fetch(RPC_URL, {
+                    method: 'POST',
+                    headers: headers,
+                    body: JSON.stringify({ 
+                        login_username: username, 
+                        login_password: password 
+                    })
+                });
                 
-                if (!res.ok) throw new Error(`Server returned status: ${res.status}`);
-                const userMatches = await res.json();
+                if (!response.ok) throw new Error(`Verification endpoint offline.`);
+                const isValid = await response.json();
 
-                if (userMatches.length > 0) {
+                if (isValid === true) {
                     showMessage('Login successful! Redirecting...', false);
-                    
-                    // Saves user token to local session cache
                     localStorage.setItem('chatUser', username);
                     
                     setTimeout(() => {
