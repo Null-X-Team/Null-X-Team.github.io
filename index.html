@@ -44,10 +44,10 @@
       font-weight: 700;
     }
 
-    /* Flip Clock Container layout */
+    /* Fixed Matrix Clock Grid Layout */
     .flip-clock {
       display: flex;
-      gap: 18px;
+      gap: 16px;
       justify-content: center;
       align-items: center;
       flex-wrap: wrap;
@@ -68,68 +68,52 @@
       font-weight: 600;
     }
 
-    .flip-card-pair {
-      display: flex;
-      gap: 4px;
-    }
-
-    /* Standardized Card Node Dimensions */
-    .flip-card {
+    /* Fixed unified segment card wrapper */
+    .matrix-card {
       position: relative;
-      width: 46px;
-      height: 68px;
-      font-size: 2.8rem;
-      font-weight: 800;
-      perspective: 300px;
+      background: #1e1131;
+      border: 1px solid rgba(139, 0, 255, 0.3);
+      border-radius: 6px;
+      width: 72px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
     }
 
-    /* Symmetrical split viewcards */
-    .card-top, .card-bottom {
+    /* Horizontal dividing line decoration over unified grid matrix */
+    .matrix-card::after {
+      content: '';
       position: absolute;
       left: 0;
+      top: 50%;
       width: 100%;
-      height: 50%;
-      overflow: hidden;
-      background: #1e1131;
-      color: #fff;
-      border: 1px solid rgba(139, 0, 255, 0.25);
-      box-sizing: border-box;
-      /* Flex positioning anchors our inner numerals cleanly */
-      display: flex;
-      justify-content: center;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 2;
     }
 
-    .card-top {
-      top: 0;
-      border-top-left-radius: 6px;
-      border-top-right-radius: 6px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.4);
-      align-items: flex-start; /* Aligns number to top edge */
-    }
-    .card-top span {
-      transform: translateY(14%); /* Shifts baseline down smoothly to clear font clipping boundaries */
-    }
-
-    .card-bottom {
-      bottom: 0;
-      border-bottom-left-radius: 6px;
-      border-bottom-right-radius: 6px;
-      border-top: none;
-      align-items: flex-end; /* Aligns number to bottom edge */
-    }
-    .card-bottom span {
-      transform: translateY(-14%); /* Pulls baseline upward seamlessly */
+    /* Single fluid text baseline container avoiding cuts */
+    .matrix-value {
+      font-family: monospace;
+      font-size: 2.3rem;
+      font-weight: 800;
+      color: #ffffff;
+      z-index: 1;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.15s ease-on;
     }
 
-    /* Animation frames triggered via JS updates */
-    .flip-card.animate .card-top {
-      animation: flipTopCard 0.4s ease-in forwards;
-      transform-origin: bottom;
+    /* Dynamic pulsing refresh keyframe */
+    .matrix-card.pulse .matrix-value {
+      animation: matrixPop 0.25s ease-out;
     }
 
-    @keyframes flipTopCard {
-      0% { transform: rotateX(0deg); }
-      100% { transform: rotateX(-90deg); }
+    @keyframes matrixPop {
+      0% { transform: scale(1); opacity: 0.7; }
+      50% { transform: scale(1.08); color: #b056ff; opacity: 1; }
+      100% { transform: scale(1); color: #ffffff; }
     }
   </style>
 </head>
@@ -141,7 +125,7 @@
         <h1>Null_X: Interactive Cognitive Development Environment</h1>
         <div class="academic-subheading">Institutional Research Document & Terms of Engagement</div>
       </div>
-       
+        
       <div class="educational-scroll-body">
         <p>This platform is designed to support modern educational growth through interactive digital learning experiences and research-based technology integration. By encouraging cognitive development through problem-solving, pattern recognition, and critical thinking activities, students are able to strengthen important academic and real-world skills in an engaging environment.</p>
         <p>Technological advancements in education have made it possible for learners to access information more efficiently than ever before, promoting creativity, adaptability, and digital literacy that are essential in today’s rapidly evolving society.</p>
@@ -157,12 +141,12 @@
   </div>
 
   <div class="dashboard">
-     
+      
     <aside class="left-nav">
       <div class="logo">
         <img src="imgs/Screenshot 2026-01-27 8.17.07 PM.png" alt="Null_X Logo" class="site-logo">
       </div>
-       
+        
       <nav>
         <a href="#" id="nav-home" class="nav-item active"><i class="fas fa-house" style="margin-right: 8px;"></i>Home</a>
         <a href="#" id="nav-games" class="nav-item"><i class="fas fa-gamepad" style="margin-right: 8px;"></i>Games</a>
@@ -175,13 +159,13 @@
     </aside>
 
     <main class="main-content">
-       
+        
       <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
         <div class="greeting" id="greeting">
           <h1 id="welcome-text">Hello, Guest</h1>
           <p>Find something fun to play.</p>
         </div>
-         
+          
         <div class="search-bar" style="display: flex; align-items: center; gap: 15px;">
           <input type="text" id="searchBar" placeholder="Search games...">
           
@@ -208,41 +192,36 @@
           <div class="flip-clock">
             
             <div class="flip-unit">
-              <div class="flip-card-pair" id="months-pair">
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+              <div class="matrix-card" id="months-card">
+                <span class="matrix-value">00</span>
               </div>
               <div class="flip-label">Months</div>
             </div>
 
             <div class="flip-unit">
-              <div class="flip-card-pair" id="days-pair">
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+              <div class="matrix-card" id="days-card">
+                <span class="matrix-value">00</span>
               </div>
               <div class="flip-label">Days</div>
             </div>
 
             <div class="flip-unit">
-              <div class="flip-card-pair" id="hours-pair">
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+              <div class="matrix-card" id="hours-card">
+                <span class="matrix-value">00</span>
               </div>
               <div class="flip-label">Hours</div>
             </div>
 
             <div class="flip-unit">
-              <div class="flip-card-pair" id="minutes-pair">
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+              <div class="matrix-card" id="minutes-card">
+                <span class="matrix-value">00</span>
               </div>
               <div class="flip-label">Minutes</div>
             </div>
 
             <div class="flip-unit">
-              <div class="flip-card-pair" id="seconds-pair">
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
-                <div class="flip-card"><div class="card-top"><span>0</span></div><div class="card-bottom"><span>0</span></div></div>
+              <div class="matrix-card" id="seconds-card">
+                <span class="matrix-value">00</span>
               </div>
               <div class="flip-label">Seconds</div>
             </div>
@@ -254,7 +233,7 @@
           <span class="badge">Featured</span>
           <h2 id="hero-title">Loading...</h2>
           <h3 id="hero-desc">Please wait...</h3>
-           
+            
           <div class="hero-actions">
             <button class="play-btn" id="playFeatured">Play Now</button>
             <button class="secondary-btn">Discover More</button>
@@ -339,7 +318,7 @@
       <div class="stealth-menu-wrapper">
         <button class="cloak-btn" id="stealthOpener">Stealth Mode</button>
       </div>
-       
+        
       <button class="signin-btn" id="signInBtn">Sign In</button>
       
       <a href="../Settings/settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center;">Settings</a>
@@ -515,34 +494,27 @@
   </div>
 
   <script>
-    // Configured Audio Route Target
     const audioPath = "audio/soul-serenity-sounds-clock-livingroom-soothing-hum-harmonizing-with-the-ticking_IaoowcM6.mp3";
     const tickSound = new Audio(audioPath);
     tickSound.preload = "auto";
 
     const targetDate = new Date("August 17, 2026 00:00:00");
 
-    function updateFlipCard(pairId, value) {
-      const pairContainer = document.getElementById(pairId);
-      if (!pairContainer) return;
+    function updateMatrixCard(cardId, value) {
+      const cardContainer = document.getElementById(cardId);
+      if (!cardContainer) return;
       
+      const targetTextNode = cardContainer.querySelector('.matrix-value');
       const paddedValue = String(value).padStart(2, '0');
-      const cards = pairContainer.querySelectorAll('.flip-card');
 
-      cards.forEach((card, index) => {
-        const topInner = card.querySelector('.card-top span');
-        const bottomInner = card.querySelector('.card-bottom span');
-        const currentDigit = paddedValue[index];
-
-        if (topInner.textContent !== currentDigit) {
-          card.classList.remove('animate');
-          void card.offsetWidth; // Force CSS structural layout recalculation refresh
-          
-          topInner.textContent = currentDigit;
-          bottomInner.textContent = currentDigit;
-          card.classList.add('animate');
-        }
-      });
+      if (targetTextNode.textContent !== paddedValue) {
+        targetTextNode.textContent = paddedValue;
+        
+        // Trigger micro-interaction animation loop cleanly
+        cardContainer.classList.remove('pulse');
+        void cardContainer.offsetWidth; // Force layout recalculation engine
+        cardContainer.add('pulse');
+      }
     }
 
     function runCountdown() {
@@ -550,15 +522,14 @@
       const diff = targetDate - now;
 
       if (diff <= 0) {
-        updateFlipCard('months-pair', 0);
-        updateFlipCard('days-pair', 0);
-        updateFlipCard('hours-pair', 0);
-        updateFlipCard('minutes-pair', 0);
-        updateFlipCard('seconds-pair', 0);
+        updateMatrixCard('months-card', 0);
+        updateMatrixCard('days-card', 0);
+        updateMatrixCard('hours-card', 0);
+        updateMatrixCard('minutes-card', 0);
+        updateMatrixCard('seconds-card', 0);
         return;
       }
 
-      // Breakdown dates dynamically by tracking calendar changes month to month
       let targetYear = targetDate.getFullYear();
       let targetMonth = targetDate.getMonth();
       let currentYear = now.getFullYear();
@@ -581,16 +552,13 @@
       const minutes = Math.floor((remainderDiff % (1000 * 60 * 60)) / (1000 * 60));
       const seconds = Math.floor((remainderDiff % (1000 * 60)) / 1000);
 
-      updateFlipCard('months-pair', months);
-      updateFlipCard('days-pair', days);
-      updateFlipCard('hours-pair', hours);
-      updateFlipCard('minutes-pair', minutes);
-      updateFlipCard('seconds-pair', seconds);
+      updateMatrixCard('months-card', months);
+      updateMatrixCard('days-card', days);
+      updateMatrixCard('hours-card', hours);
+      updateMatrixCard('minutes-card', minutes);
+      updateMatrixCard('seconds-card', seconds);
 
-      // Play audio sync track cleanly
-      tickSound.play().catch(() => {
-        // Suppress automatic execution warnings if browser interaction blockades are active
-      });
+      tickSound.play().catch(() => {});
     }
 
     setInterval(runCountdown, 1000);
