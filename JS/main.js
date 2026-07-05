@@ -467,7 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
       modal.innerHTML = `
         <div style="background:#0d0d0d; border:2px solid #8b00ff; border-radius:16px; width:90%; max-width:900px; height:80vh; position:relative; box-shadow:0 0 30px rgba(139,0,255,0.3); display:flex; flex-direction:column;">
           
-          <div style="padding: 20px 30px; border-bottom: 1px solid rgba(139,0,255,0.2); display:flex; justify-content:between; align-items:center;">
+          <div style="padding: 20px 30px; border-bottom: 1px solid rgba(139,0,255,0.2); display:flex; justify-content:space-between; align-items:center;">
             <h2 style="color:#8b00ff; margin:0;">Control Panel Configuration</h2>
             <button id="closeSettings" style="background:none; border:none; color:#ff3333; font-size:28px; font-weight:bold; cursor:pointer; margin-left:auto;">&times;</button>
           </div>
@@ -491,7 +491,29 @@ document.addEventListener('DOMContentLoaded', () => {
           if (contentDiv) {
             contentDiv.innerHTML = html;
             
-            // Re-bind click state configurations back onto injected element layouts
+            // --- 1. APPEARANCE (THEMES) ---
+            const currentTheme = localStorage.getItem('selectedTheme') || 'default';
+            const themeCards = contentDiv.querySelectorAll('.theme-card');
+            themeCards.forEach(card => {
+              if (card.getAttribute('data-theme') === currentTheme) {
+                card.style.borderColor = "#8b00ff";
+                card.style.background = "rgba(139, 0, 255, 0.15)";
+              }
+              card.onclick = () => {
+                themeCards.forEach(c => {
+                  c.style.borderColor = "transparent";
+                  c.style.background = "rgba(255,255,255,0.03)";
+                });
+                card.style.borderColor = "#8b00ff";
+                card.style.background = "rgba(139, 0, 255, 0.15)";
+                const selected = card.getAttribute('data-theme');
+                localStorage.setItem('selectedTheme', selected);
+                
+                if (typeof window.applyTheme === 'function') window.applyTheme(selected);
+              };
+            });
+
+            // --- 2. STARTUP ENVIRONMENTAL SPLASH ---
             const splashCheckbox = document.getElementById('toggle-study-cloak');
             if (splashCheckbox) {
               splashCheckbox.checked = localStorage.getItem('disableStudyCloak') === 'true';
@@ -500,7 +522,7 @@ document.addEventListener('DOMContentLoaded', () => {
               };
             }
 
-            // Re-bind selector functionality directly onto updated node layers
+            // --- 3. PRIVACY TAB CLOAK TARGET ---
             const cloakSelector = document.getElementById('cloakSelector');
             if (cloakSelector) {
               const savedCloak = localStorage.getItem('savedCloak');
@@ -511,7 +533,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else {
                   localStorage.setItem('savedCloak', e.target.value);
                 }
-                location.reload();
+              };
+            }
+
+            // --- 4. AUTO-LAUNCH SYSTEM ---
+            const autoLaunchCheckbox = document.getElementById('toggle-auto-launch');
+            const autoLaunchOptionsDiv = document.getElementById('auto-launch-options');
+            const autoLaunchEnvSelect = document.getElementById('auto-launch-environment');
+
+            if (autoLaunchCheckbox && autoLaunchOptionsDiv && autoLaunchEnvSelect) {
+              const isAutoLaunchOn = localStorage.getItem('autoLaunchEnabled') === 'true';
+              autoLaunchCheckbox.checked = isAutoLaunchOn;
+              autoLaunchEnvSelect.value = localStorage.getItem('autoLaunchEnv') || 'about:blank';
+              
+              if (isAutoLaunchOn) autoLaunchOptionsDiv.style.display = 'block';
+
+              autoLaunchCheckbox.onchange = (e) => {
+                localStorage.setItem('autoLaunchEnabled', e.target.checked ? 'true' : 'false');
+                autoLaunchOptionsDiv.style.display = e.target.checked ? 'block' : 'none';
+              };
+
+              autoLaunchEnvSelect.onchange = (e) => {
+                localStorage.setItem('autoLaunchEnv', e.target.value);
+              };
+            }
+
+            // --- 5. PANIC OVERRIDE BINDER ---
+            const shortcutInput = document.getElementById('panicShortcut');
+            const panicLinkInput = document.getElementById('panicLink');
+            const savePanicBtn = document.getElementById('savePanic');
+
+            if (shortcutInput && panicLinkInput && savePanicBtn) {
+              const savedPanicKey = localStorage.getItem('panicKey') || '';
+              shortcutInput.value = savedPanicKey ? `Key: ${savedPanicKey.toUpperCase()}` : '';
+              panicLinkInput.value = localStorage.getItem('panicUrl') || '';
+
+              let tempKey = savedPanicKey;
+              shortcutInput.onkeydown = (e) => {
+                e.preventDefault();
+                if (["Control", "Shift", "Alt", "Meta", "Escape"].includes(e.key)) return;
+                tempKey = e.key.toLowerCase();
+                shortcutInput.value = `Key: ${e.key.toUpperCase()}`;
+              };
+
+              savePanicBtn.onclick = () => {
+                localStorage.setItem('panicKey', tempKey);
+                localStorage.setItem('panicUrl', panicLinkInput.value.trim());
+                
+                savePanicBtn.textContent = "Saved Successfully!";
+                savePanicBtn.style.background = "#10b981";
+                setTimeout(() => {
+                  savePanicBtn.textContent = "Save Panic Settings";
+                  savePanicBtn.style.background = "#8b00ff";
+                }, 2000);
               };
             }
           }
@@ -529,14 +603,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         });
     };
-  }
-
-  if (localStorage.getItem('autoLaunchStealth') === 'true') {
-    localStorage.removeItem('autoLaunchStealth');
-    setTimeout(() => {
-      launchStealthWindow(localStorage.getItem('savedCloak') || 'Google Classroom', localStorage.getItem('autoLaunchEnv') || 'about:blank');
-    }, 300);
-    return;
   }
 
   showHomeView();
@@ -719,4 +785,26 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   updateClockDisplay();
   setInterval(updateClockDisplay, 1000);
+
+  // ==========================================
+  // RUN TIME ENGAGEMENT FOR AUTO-LAUNCH & PANIC
+  // ==========================================
+  if (localStorage.getItem('autoLaunchEnabled') === 'true' && !sessionStorage.getItem('launchedThisSession')) {
+    sessionStorage.setItem('launchedThisSession', 'true');
+    setTimeout(() => {
+      launchStealthWindow(localStorage.getItem('savedCloak') || 'Google Classroom', localStorage.getItem('autoLaunchEnv') || 'about:blank');
+    }, 500);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    const savedPanicKey = localStorage.getItem('panicKey');
+    const redirectUrl = localStorage.getItem('panicUrl') || 'https://classroom.google.com';
+    
+    if (document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
+
+    if (savedPanicKey && e.key.toLowerCase() === savedPanicKey.toLowerCase()) {
+      e.preventDefault();
+      window.location.replace(redirectUrl);
+    }
+  });
 });
