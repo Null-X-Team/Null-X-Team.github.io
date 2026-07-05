@@ -27,6 +27,7 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    timeout-minutes: 20  # FIXED: Prevents GitHub from abruptly canceling during heavy file uploads
     steps:
       - name: Checkout
         uses: actions/checkout@v4
