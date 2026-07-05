@@ -224,8 +224,8 @@ function launchStealthWindow(maskType, targetEnv) {
 function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
-    const baseHrefLocation = window.location.href.split('?')[0].split('#')[0];
-    const baseDir = baseHrefLocation.substring(0, baseHrefLocation.lastIndexOf('/') + 1);
+    // Force absolute layout to root domain to keep paths clean everywhere
+    const rootUrl = "https://glaxyias.github.io/";
 
     document.open();
     document.write(`
@@ -236,14 +236,18 @@ function launchGame(gameId) {
         <title>${game.title}</title>
         <style>body,html{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;}iframe{width:100%;height:100%;border:none;display:block;}</style>
       </head>
-      <body><iframe src="${baseDir + game.url}"></iframe></body>
+      <body><iframe src="${rootUrl + game.url}"></iframe></body>
       </html>
     `);
     document.close();
 
+    // Check if user is inside the new homepage layout directory structure
+    const isNewHomepage = window.location.pathname.includes('/newhomepage');
+    const returnDestination = isNewHomepage ? '/newhomepage/' : '/';
+
     const backNav = document.createElement('div');
     backNav.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-    backNav.innerHTML = `<button onclick="window.location.replace('/');" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
+    backNav.innerHTML = `<button onclick="window.location.replace('${returnDestination}');" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
     document.body.appendChild(backNav);
   }
 }
@@ -467,7 +471,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.appendChild(modal);
       }
 
-      // Large full-layout container equipped with absolute scrolling mechanics
       modal.innerHTML = `
         <div style="background:#0d0d0d; border:2px solid #8b00ff; border-radius:16px; width:90%; max-width:900px; height:80vh; position:relative; box-shadow:0 0 30px rgba(139,0,255,0.3); display:flex; flex-direction:column;">
           
@@ -484,7 +487,6 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       modal.style.display = 'flex';
 
-      // Pull setting file resources from repository directory paths
       fetch('Settings/settings.html')
         .then(res => {
           if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
