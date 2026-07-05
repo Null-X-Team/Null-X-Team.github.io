@@ -62,7 +62,8 @@ let _0xData = [
   { id: "dm_1", title: "Doge Miner", url: "Games/Dogeminer1/index.html", desc: "Mine Dogecoins, hire Shiba workers, and upgrade your operation to reach the moon in this idle clicker game.", popular: true },
   { id: "dm_2", title: "Doge Miner 2", url: "Games/Dogeminer2/index.html", desc: "The sequel expands the Dogecoin mining adventure with new upgrades, planets, and even more ways to grow your mining empire.", popular: true },
   { id: "babel_tower", title: "Babel Tower", url: "Games/babeltower/index.html", desc: "Build the legendary tower of Babel by managing resources, hiring workers, and upgrading your production lines in this strategic idle game.", popular: true },
-  { id: "baby_chicco", title: "Baby Chicco Adventure", url: "Games/bcadventure/index.html", desc: "Guide a cute little penguin through a dangerous world filled with obstacles, enemies, and platforming challenges in this classic side-scrolling adventure.", popular: true }
+  { id: "baby_chicco", title: "Baby Chicco Adventure", url: "Games/bcadventure/index.html", desc: "Guide a cute little penguin through a dangerous world filled with obstacles, enemies, and platforming challenges in this classic side-scrolling adventure.", popular: true },
+  { id: "baby_sniper_vietnam", title: "Baby Sniper in Vietnam", url: "Games/BSV/index.html", desc: "Take on critical missions, hone your long-range accuracy, and clear strategic targets under the cover of dense jungle terrain in this tactical sniping simulation.", popular: true }
 ];
 
 // Context Management variables
