@@ -64,7 +64,8 @@ let _0xData = [
   { id: "babel_tower", title: "Babel Tower", url: "Games/babeltower/index.html", desc: "Build the legendary tower of Babel by managing resources, hiring workers, and upgrading your production lines in this strategic idle game.", popular: true },
   { id: "baby_chicco", title: "Baby Chicco Adventure", url: "Games/bcadventure/index.html", desc: "Guide a cute little penguin through a dangerous world filled with obstacles, enemies, and platforming challenges in this classic side-scrolling adventure.", popular: true },
   { id: "baby_sniper_vietnam", title: "Baby Sniper in Vietnam", url: "Games/BSV/index.html", desc: "Take on critical missions, hone your long-range accuracy, and clear strategic targets under the cover of dense jungle terrain in this tactical sniping simulation.", popular: true },
-  { id: "backrooms", title: "The Backrooms", url: "Games/backrooms/index.html", desc: "Explore the eerie, endless yellow hallways of the Backrooms while trying to find an exit and avoid the terrifying entities lurking in the shadows.", popular: true }
+  { id: "backrooms", title: "The Backrooms", url: "Games/backrooms/index.html", desc: "Explore the eerie, endless yellow hallways of the Backrooms while trying to find an exit and avoid the terrifying entities lurking in the shadows.", popular: true },
+  { id: "bad_bodyguard", title: "Bad Bodyguard", url: "Games/badbodyguard/index.html", desc: "Navigate chaotic security situations, make split-second defensive decisions, and protect your high-profile clients from wild incoming hazards in this unpredictable simulation.", popular: true }
 ];
 
 // Context Management variables
