@@ -138,7 +138,7 @@ body {
 .dashboard-wrapper {
   display: flex;
   justify-content: space-between;
-  align-items: stretch; /* Stretch panels to matching identical heights */
+  align-items: flex-start; /* Reverted: Let panels grow naturally */
   padding: 40px;
   box-sizing: border-box;
   width: 100%;
@@ -147,9 +147,17 @@ body {
   z-index: 10;
 }
 
-.side-panel {
+/* Base class for left and right columns containing widgets */
+.panel-column {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
   width: 280px;
-  min-height: 480px; /* Set baseline profile constraint */
+}
+
+.side-panel {
+  width: 100%;
+  min-height: 220px; /* Reverted to short frame constraint */
   background: rgba(22, 14, 14, 0.7); 
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -157,15 +165,8 @@ body {
   padding: 22px;
   box-sizing: border-box;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-  
-  /* Added: Transform container into vertical space controller */
   display: flex;
   flex-direction: column;
-}
-
-/* Pins lower secondary utility structures cleanly downward */
-.side-panel > div[style*="margin-top: 25px"] {
-  margin-top: auto !important;
 }
 
 .widget-header {
@@ -283,7 +284,7 @@ body {
 }
 
 /* ==========================================================================
-   BUTTON STRUCTURAL FRAMEWORKS (Fixed Click Interceptors)
+   BUTTON STRUCTURAL FRAMEWORKS
    ========================================================================== */
 .quick-action-btn, .signin-btn, .cloak-btn, .widget-btn {
   width: 100%;
@@ -317,6 +318,7 @@ body {
   background: transparent !important;
   border: 1px solid rgba(255, 59, 59, 0.4) !important;
   color: #fff !important;
+  margin-top: 10px;
 }
 
 .cloak-btn:hover {
@@ -338,6 +340,7 @@ body {
   color: rgba(255, 255, 255, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.1) !important;
   transition: all 0.2s ease;
+  margin-top: 10px;
 }
 
 .settings-btn:hover {
@@ -391,15 +394,13 @@ body {
 }
 
 /* ==========================================================================
-   RIGHT SIDE FEATURED BOX INTERNALS (FIXED VERTICAL CRUSH)
+   RIGHT SIDE FEATURED BOX INTERNALS
    ========================================================================== */
 .featured-content {
   background: rgba(0, 0, 0, 0.2);
   padding: 15px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  
-  /* Added: Prevent block overflow scaling */
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -415,7 +416,7 @@ body {
   justify-content: center;
   margin-bottom: 6px;
   border: 1px solid rgba(255, 59, 59, 0.15);
-  flex-shrink: 0; /* Keep sizing fixed */
+  flex-shrink: 0;
 }
 
 .preview-placeholder {
@@ -429,7 +430,7 @@ body {
   font-weight: 600;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* Safely handles long game titles */
+  text-overflow: ellipsis;
 }
 
 .featured-content p {
@@ -438,7 +439,7 @@ body {
   margin: 0 0 4px 0;
   line-height: 1.4;
   
-  /* Line Clamping Rule: Halts scaling past 3 text lines */
+  /* Text Clamping: Stops random content from scaling past 3 lines */
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -455,6 +456,8 @@ body {
   border-radius: 10px;
   overflow: hidden;
   font-family: monospace;
+  width: 100%; /* Keep it cleanly fitted inside column wrappers */
+  box-sizing: border-box;
 }
 
 .terminal-header {
@@ -506,7 +509,7 @@ body {
 }
 
 /* ==========================================================================
-   STEALTH CLOAK COVER OVERRIDES (Fixed Click Blocking Position)
+   STEALTH CLOAK COVER OVERRIDES
    ========================================================================== */
 #educational-cloak {
   position: fixed;
@@ -729,9 +732,11 @@ body {
     align-items: center;
     padding: 20px;
   }
-  .side-panel {
+  .panel-column {
     width: 100%;
     max-width: 500px;
+  }
+  .side-panel {
     min-height: auto;
   }
   .apps-grid {
