@@ -1,12 +1,10 @@
-<div class="terminal-view-container">
-    <div id="terminal-screen" style="overflow-y: auto; height: 400px; margin-bottom: 15px;">
-        <div class="output-line text-success">NxOS Kernel Subsystems Initialized Successfully.</div>
-        <div class="output-line">Type 'help' to view available system binaries and commands.</div>
-        <div class="output-line" style="margin-bottom: 15px;">--------------------------------------------------</div>
+<div class="terminal-view-container" style="height: 100%; display: flex; flex-direction: column; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(139, 0, 255, 0.2);">
+    <div class="terminal-header" style="background: #111; padding: 10px 15px; color: #8b00ff; font-family: monospace; font-size: 13px; border-bottom: 1px solid rgba(139,0,255,0.15); display: flex; justify-content: space-between;">
+        <span>bash — guest@nxos-wasm-core</span>
+        <span style="color: #666;">[WebAssembly Sandbox Mode]</span>
     </div>
-
-    <div class="terminal-input-line">
-        <span class="terminal-prompt" id="terminal-prompt-label">guest@nxos:~$&nbsp;</span>
-        <input type="text" id="terminal-console-input" autocomplete="off" autofocus />
-    </div>
+    
+    <iframe src="https://bellard.org/jslinux/vm.html?url=alpine-x86.cfg&cpu=x86" 
+            style="width: 100%; height: 480px; border: none; background: #000;">
+    </iframe>
 </div>
