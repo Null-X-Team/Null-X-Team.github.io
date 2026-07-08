@@ -138,7 +138,7 @@ body {
 .dashboard-wrapper {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: stretch; /* Stretch panels to matching identical heights */
   padding: 40px;
   box-sizing: border-box;
   width: 100%;
@@ -149,7 +149,7 @@ body {
 
 .side-panel {
   width: 280px;
-  min-height: 220px;
+  min-height: 480px; /* Set baseline profile constraint */
   background: rgba(22, 14, 14, 0.7); 
   backdrop-filter: blur(15px);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -157,6 +157,15 @@ body {
   padding: 22px;
   box-sizing: border-box;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  
+  /* Added: Transform container into vertical space controller */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Pins lower secondary utility structures cleanly downward */
+.side-panel > div[style*="margin-top: 25px"] {
+  margin-top: auto !important;
 }
 
 .widget-header {
@@ -382,13 +391,18 @@ body {
 }
 
 /* ==========================================================================
-   RIGHT SIDE FEATURED BOX INTERNALS
+   RIGHT SIDE FEATURED BOX INTERNALS (FIXED VERTICAL CRUSH)
    ========================================================================== */
 .featured-content {
   background: rgba(0, 0, 0, 0.2);
   padding: 15px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
+  
+  /* Added: Prevent block overflow scaling */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .featured-preview-box {
@@ -399,8 +413,9 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 14px;
+  margin-bottom: 6px;
   border: 1px solid rgba(255, 59, 59, 0.15);
+  flex-shrink: 0; /* Keep sizing fixed */
 }
 
 .preview-placeholder {
@@ -409,16 +424,26 @@ body {
 }
 
 .featured-content h3 {
-  margin: 0 0 6px 0;
-  font-size: 17px;
+  margin: 0;
+  font-size: 16px;
   font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* Safely handles long game titles */
 }
 
 .featured-content p {
-  font-size: 13px;
+  font-size: 12px;
   color: rgba(255, 255, 255, 0.5);
-  margin: 0;
+  margin: 0 0 4px 0;
   line-height: 1.4;
+  
+  /* Line Clamping Rule: Halts scaling past 3 text lines */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* ==========================================================================
