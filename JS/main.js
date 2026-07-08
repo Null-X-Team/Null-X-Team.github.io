@@ -855,3 +855,110 @@ async function fetchLiveWeather() {
 
 // Execute on content baseline launch
 fetchLiveWeather();
+
+// --- NXOS LIVE DATA UPDATE DETECTION ENGINE ---
+(function initLiveUpdateChecker() {
+  // Store the version timestamp when the page first loads up
+  let currentVersion = null;
+  const CHECK_INTERVAL = 30000; // Checks for new pushed data every 30 seconds
+
+  // Fetch the version file from the server
+  async function checkServerVersion() {
+    try {
+      // Add a random timestamp query parameter to bypass browser caching
+      const response = await fetch(`./version.json?cache-bust=${Date.now()}`);
+      if (!response.ok) return;
+      
+      const data = await response.json();
+      const serverVersion = data.version;
+
+      // Initialize baseline on first check
+      if (!currentVersion) {
+        currentVersion = serverVersion;
+        return;
+      }
+
+      // If the server timestamp is newer than our current layout, data was pushed!
+      if (serverVersion > currentVersion) {
+        currentVersion = serverVersion; // update local tracking
+        showUpdateNotification();
+      }
+    } catch (err) {
+      console.log("[NxOS Sync] Live data stream polling paused.");
+    }
+  }
+
+  // Inject a styled modal pop-up into the screen layout dynamically
+  function showUpdateNotification() {
+    // Prevent duplicate popups if one is already visible
+    if (document.getElementById("nxos-update-popup")) return;
+
+    const popup = document.createElement("div");
+    popup.id = "nxos-update-popup";
+    popup.style.cssText = `
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: #0d0d13;
+      border: 1px solid #8b00ff;
+      border-radius: 8px;
+      padding: 18px 22px;
+      box-shadow: 0 0 25px rgba(139, 0, 255, 0.4);
+      z-index: 99999;
+      font-family: monospace;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      max-width: 320px;
+      animation: slideInNxOS 0.4s ease-out;
+    `;
+
+    popup.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <span style="color: #27c93f; animation: blink 1s infinite;">●</span>
+        <strong style="color: #8b00ff; letter-spacing: 0.5px;">SYSTEM UPDATE DETECTED</strong>
+      </div>
+      <div style="color: #aaa; font-size: 13px; line-height: 1.4;">
+        New live core files and data layouts have just been pushed to the site.
+      </div>
+      <div style="display: flex; gap: 10px; margin-top: 5px;">
+        <button id="nxos-reload-btn" style="flex: 1; background: #8b00ff; border: none; color: #fff; padding: 8px; border-radius: 4px; font-family: inherit; font-weight: bold; cursor: pointer; transition: 0.2s;">
+          Sync & Reload
+        </button>
+        <button id="nxos-dismiss-btn" style="background: #222; border: 1px solid #444; color: #aaa; padding: 8px 12px; border-radius: 4px; font-family: inherit; cursor: pointer;">
+          Dismiss
+        </button>
+      </div>
+    `;
+
+    // Add keyframe styles for smooth layout animation injections
+    const style = document.createElement("style");
+    style.innerHTML = `
+      @keyframes slideInNxOS {
+        from { transform: translateY(50px); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes blink {
+        0%, 100% { opacity: 0.3; }
+        50% { opacity: 1; }
+      }
+      #nxos-reload-btn:hover { background: #a333ff !important; box-shadow: 0 0 10px rgba(139,0,255,0.5); }
+    `;
+    document.head.appendChild(style);
+    document.body.appendChild(popup);
+
+    // Button event handlers
+    document.getElementById("nxos-reload-btn").addEventListener("click", () => {
+      window.location.reload();
+    });
+
+    document.getElementById("nxos-dismiss-btn").addEventListener("click", () => {
+      popup.remove();
+    });
+  }
+
+  // Run initial baseline check, then check repeatedly at intervals
+  checkServerVersion();
+  setInterval(checkServerVersion, CHECK_INTERVAL);
+})();
