@@ -1,10 +1,17 @@
-<div class="terminal-view-container" style="height: 100%; display: flex; flex-direction: column; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(139, 0, 255, 0.2);">
-    <div class="terminal-header" style="background: #111; padding: 10px 15px; color: #8b00ff; font-family: monospace; font-size: 13px; border-bottom: 1px solid rgba(139,0,255,0.15); display: flex; justify-content: space-between;">
-        <span>bash — guest@nxos-wasm-core</span>
-        <span style="color: #666;">[WebAssembly Sandbox Mode]</span>
+<div class="terminal-view-container" style="height: 100%; display: flex; flex-direction: column; background: #000; border-radius: 8px; overflow: hidden; box-shadow: 0 0 20px rgba(139, 0, 255, 0.2); font-family: monospace;">
+    <div class="terminal-header" style="background: #111; padding: 10px 15px; color: #8b00ff; font-size: 13px; border-bottom: 1px solid rgba(139,0,255,0.15); display: flex; justify-content: space-between; user-select: none;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: #ff5f56;">●</span>
+            <span style="color: #ffbd2e;">●</span>
+            <span style="color: #27c93f;">●</span>
+            <span style="margin-left: 5px; font-weight: bold; letter-spacing: 0.5px;">bash — guest@nxos-wasm-core</span>
+        </div>
+        <span style="color: #555; font-size: 11px;">[WebAssembly Sandbox Mode]</span>
     </div>
     
-    <iframe src="https://bellard.org/jslinux/vm.html?url=alpine-x86.cfg&cpu=x86" 
-            style="width: 100%; height: 480px; border: none; background: #000;">
-    </iframe>
+    <div class="terminal-body-wrapper" style="position: relative; background: #000; flex: 1;">
+        <iframe src="https://bellard.org/jslinux/vm.html?url=alpine-x86.cfg&cpu=x86" 
+                style="width: 100%; height: 480px; border: none; background: #000; display: block;">
+        </iframe>
+    </div>
 </div>
