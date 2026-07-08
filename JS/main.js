@@ -816,3 +816,39 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+// Live Weather Tracking Engine (No API Key Required)
+  async function fetchLiveWeather() {
+    try {
+      // Requests clean JSON layout for the user's current network location
+      const response = await fetch('https://wttr.in/?format=j1');
+      if (!response.ok) throw new Error("Weather stream dropped");
+      
+      const data = await response.json();
+      
+      const current = data.current_condition[0];
+      const area = data.nearest_area[0];
+      
+      // Pull parameters matching your current layout alignment
+      const tempF = current.temp_F;
+      const humidity = current.humidity;
+      const city = area.areaName[0].value;
+
+      // Safely inject parsed strings into the UI matching your layout IDs
+      const tempEl = document.getElementById('live-temp');
+      const humidEl = document.getElementById('live-humidity');
+      const cityEl = document.getElementById('live-city');
+
+      if (tempEl) tempEl.textContent = `${tempF}°`;
+      if (humidEl) humidEl.innerHTML = `<i class="fa-solid fa-droplet"></i> ${humidity}% Humidity`;
+      if (cityEl) cityEl.textContent = city;
+
+    } catch (err) {
+      console.error("[System Error] Live weather lookup stalled:", err);
+      // Fallback defaults if the network blocks the endpoint layout
+      const cityEl = document.getElementById('live-city');
+      if (cityEl) cityEl.textContent = "Offline Mode";
+    }
+  }
+
+  // Execute on content baseline launch
+  fetchLiveWeather();
