@@ -61,28 +61,47 @@
 
     <div class="dashboard-wrapper">
 
-        <aside class="side-panel">
-            <div class="widget-header">
-                <i class="fa-solid fa-cloud-sun"></i> Weather
-            </div>
-            <div class="weather-row">
-                <div class="weather-main">
-                    <span class="weather-temp" id="live-temp">--°</span>
+        <div class="panel-column">
+            
+            <aside class="side-panel">
+                <div class="widget-header">
+                    <i class="fa-solid fa-cloud-sun"></i> Weather
+                </div>
+                <div class="weather-row">
+                    <div class="weather-main">
+                        <span class="weather-temp" id="live-temp">--°</span>
+                    </div>
+                    <div class="weather-stats">
+                        <span id="live-humidity"><i class="fa-solid fa-droplet"></i> --% Humidity</span>
+                        <span class="location-label" id="live-city">Locating...</span>
+                    </div>
+                </div>
+                
+                <div class="widget-header" style="margin-top: 25px;">
+                    <i class="fa-solid fa-microchip"></i> Diagnostics
                 </div>
                 <div class="weather-stats">
-                    <span id="live-humidity"><i class="fa-solid fa-droplet"></i> --% Humidity</span>
-                    <span class="location-label" id="live-city">Locating...</span>
+                    <span id="battery-status" style="color: #4ade80;">Battery: 100%</span>
+                    <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
+                </div>
+            </aside>
+
+            <div class="terminal-container">
+                <div class="terminal-header">
+                    <div class="terminal-circle red"></div>
+                    <div class="terminal-circle yellow"></div>
+                    <div class="terminal-circle green"></div>
+                    <span class="terminal-title">bash - system_core_sh</span>
+                </div>
+                <div class="terminal-body">
+                    <div class="command-row">
+                        <span class="terminal-prompt">guest@hub:~$</span>
+                        <input type="text" id="terminalInput" placeholder="Type system help command..." autocomplete="off">
+                    </div>
                 </div>
             </div>
-            
-            <div class="widget-header" style="margin-top: 25px;">
-                <i class="fa-solid fa-microchip"></i> Diagnostics
-            </div>
-            <div class="weather-stats">
-                <span id="battery-status" style="color: #4ade80;">Battery: 100%</span>
-                <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
-            </div>
-        </aside>
+
+        </div>
 
         <main class="main-hub">
             <h1 class="site-title" id="welcome-text">Loading Identity...</h1>
@@ -115,25 +134,29 @@
             </div>
         </main>
 
-        <aside class="side-panel">
-            <div class="widget-header">
-                <i class="fa-solid fa-star"></i> Featured
-            </div>
-            <div class="featured-content" id="heroSection">
-                <div class="featured-preview-box">
-                    <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
-                </div>
-                <h3 id="hero-title">Drive0ad</h3>
-                <p id="hero-desc">Loading parameters...</p>
-                <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
-            </div>
+        <div class="panel-column">
             
-            <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
-                <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
-                <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                <a href="#" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
-            </div>
-        </aside>
+            <aside class="side-panel">
+                <div class="widget-header">
+                    <i class="fa-solid fa-star"></i> Featured
+                </div>
+                <div class="featured-content" id="heroSection">
+                    <div class="featured-preview-box">
+                        <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
+                    </div>
+                    <h3 id="hero-title">Drive0ad</h3>
+                    <p id="hero-desc">Loading parameters...</p>
+                    <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
+                </div>
+                
+                <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+                    <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
+                    <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+                    <a href="#" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+                </div>
+            </aside>
+
+        </div>
 
     </div>
 
