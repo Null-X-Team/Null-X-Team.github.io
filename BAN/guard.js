@@ -1,56 +1,60 @@
 // BAN/guard.js
-const DB_URL = 'https://ukwjojxutcjkvabnybtj.supabase.co'; 
-const DB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVrd2pvanh1dGNqa3ZhYm55YnRqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgyNzk5NDAsImV4cCI6MjA5Mzg1NTk0MH0.iLr9OrIZlRBrbcI1XDE0zl7t_wpwVg3ko3DgppxbUh8'; 
+(async function initSecurityGuard() {
+    // 1. Identify the current active session username from your local authentication layer
+    // (Adjust this string to match how your main.js tracks the logged-in user, e.g., localStorage.getItem("username"))
+    const currentUsername = localStorage.getItem("nxos_logged_user") || "TEST USER";
 
-async function runSecurityCheck() {
-    const user = localStorage.getItem('chatUser');
-    
-    // 1. Find or Create the overlay
-    let overlay = document.getElementById('lockdown-overlay');
-    if (!overlay) {
-        overlay = document.createElement('div');
-        overlay.id = 'lockdown-overlay';
-        // IMPORTANT: We set it to NONE immediately here
-        overlay.style.display = 'none'; 
-        document.body.appendChild(overlay);
-    }
-
-    // 2. If no user, hide and stop
-    if (!user) {
-        overlay.style.display = 'none';
-        return;
-    }
+    if (!currentUsername) return;
 
     try {
-        const res = await fetch(`${DB_URL}/rest/v1/user_roles?username=eq.${user}&select=*`, {
-            headers: { 'apikey': DB_KEY, 'Authorization': `Bearer ${DB_KEY}` }
-        });
-        const data = await res.json();
-        
-        // 3. Logic Gate
-        if (data && data.length > 0) {
-            const profile = data[0];
+        // 2. Query your Supabase database to check the ban state for this specific user
+        // Assumes your profiles/users table has a text column 'username' and a boolean column 'is_banned'
+        const { data, error } = await supabase
+            .from('profiles') 
+            .select('is_banned')
+            .eq('username', currentUsername)
+            .single();
 
-            if (profile.is_banned === true) {
-                overlay.style.display = 'flex'; // ONLY SHOW IF BANNED
-                overlay.innerHTML = `<h1 style="color:red;">BANNED</h1><p style="color:white;">${profile.last_action_reason || ""}</p>`;
-                return;
-            }
-
-            if (profile.temp_ban_until && new Date(profile.temp_ban_until) > new Date()) {
-                overlay.style.display = 'flex'; // ONLY SHOW IF TEMP BANNED
-                overlay.innerHTML = `<h1 style="color:red;">TEMP BAN</h1><div id="lockdown-timer" style="color:white;"></div>`;
-                return;
-            }
+        if (error) {
+            console.log("[Security System] Guard verification deferred.");
+            return;
         }
 
-        // 4. FORCE HIDE IF WE GET HERE
-        overlay.style.display = 'none';
-        console.log("Security Check: User is clean. Hiding overlay.");
+        // 3. If the ban flag is verified as true, trigger the overlay shield
+        if (data && data.is_banned === true) {
+            applySystemLockout();
+        }
 
     } catch (err) {
-        overlay.style.display = 'none';
-        console.error("Guard Error:", err);
+        console.error("[Security System] Guard execution fault:", err);
     }
-}
-runSecurityCheck();
+
+    // Function to generate and lock down the visual ban barrier
+    function applySystemLockout() {
+        // Prevent duplicates
+        if (document.getElementById("nxos-hard-lock")) return;
+
+        const overlay = document.createElement("div");
+        overlay.id = "nxos-hard-lock";
+        overlay.className = "nxos-ban-overlay";
+
+        overlay.innerHTML = `
+            <div class="nxos-ban-box">
+                <div class="nxos-ban-title">TERMINAL ACCESS RESTRICTED</div>
+                <p class="nxos-ban-msg">
+                    You're Banned.<br><br>
+                    This hardware configuration or profile identifier has been restricted from accessing the NxOS node matrix.
+                </p>
+            </div>
+        `;
+
+        // Intercept keyboard commands to block anyone trying to inspect element or refresh out of it easily
+        window.addEventListener("keydown", (e) => {
+            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
+                e.preventDefault();
+            }
+        });
+
+        document.body.appendChild(overlay);
+    }
+})();
