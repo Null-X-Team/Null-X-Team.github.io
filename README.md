@@ -46,7 +46,7 @@
 ## Interface Preview
 
 <p align="center">
-  <img src="gifs/bGOrl9.gif" width="650" style="border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(139, 0, 255, 0.2);" alt="Null_X Preview"/>
+  <img src="gifs/giphy.webp" width="650" style="border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.5); border: 1px solid rgba(139, 0, 255, 0.2);" alt="Null_X Preview"/>
 </p>
 
 ---
