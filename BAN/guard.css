@@ -6,7 +6,7 @@
     width: 100vw;
     height: 100vh;
     background: #000000;
-    z-index: 9999999; /* Higher than any other UI element */
+    z-index: 9999999; /* Covers everything on the page completely */
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -24,18 +24,45 @@
     background: #050505;
     box-shadow: 0 0 30px rgba(255, 95, 86, 0.3);
     border-radius: 8px;
-    max-width: 450px;
+    max-width: 480px;
+    width: 90%;
 }
 
 .nxos-ban-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: bold;
     letter-spacing: 2px;
     margin-bottom: 15px;
 }
 
 .nxos-ban-msg {
-    color: #888;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 25px;
+}
+
+.nxos-ban-reason-container {
+    background: #110505;
+    border: 1px solid rgba(255, 95, 86, 0.2);
+    border-radius: 6px;
+    padding: 15px;
+    text-align: left;
+}
+
+.nxos-ban-reason-label {
+    color: #ff5f56;
+    font-size: 12px;
+    font-weight: bold;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 5px;
+    letter-spacing: 1px;
+}
+
+.nxos-ban-reason-text {
+    color: #bbb;
     font-size: 14px;
-    line-height: 1.6;
+    line-height: 1.5;
+    margin: 0;
 }
