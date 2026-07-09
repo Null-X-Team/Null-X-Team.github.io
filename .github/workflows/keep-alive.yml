@@ -1,44 +1,55 @@
-name: NxOS Database Upkeep Bot
+name: NxOS Dual Database Upkeep Bot
 
 on:
   schedule:
-    # This tells GitHub to run this job automatically every 3 days at midnight
-    - cron: '0 0 */3 * *'
-  workflow_dispatch: # Allows you to press a button to test it manually
+    # Runs automatically every single day at midnight UTC
+    - cron: '0 0 * * *'
+  workflow_dispatch: # Lets you manually test it anytime from the Actions tab
 
 jobs:
-  ping-supabase:
+  ping-databases:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch Current Counter and Update Database
+      # --- DATABASE 1: MAIN SUBSYSTEM ---
+      - name: Update Main Database Subsystem
         env:
           SB_URL: ${{ secrets.SUPABASE_URL }}
           SB_KEY: ${{ secrets.SUPABASE_KEY }}
         run: |
-          echo "[Upkeep Bot] Connecting to NxOS Subsystem..."
-          
-          # 1. Fetch the row where id=1
-          RESPONSE=$(curl -s -X GET "$SB_URL/rest/v1/botupkeep?id=eq.1" \
-            -H "Authorization: Bearer $SB_KEY" \
-            -H "apikey: $SB_KEY")
-            
-          # 2. Parse out the current number using basic string extraction
+          echo "[Upkeep Bot] Pinging Main Database Subsystem..."
+          RESPONSE=$(curl -s -X GET "$SB_URL/rest/v1/botupkeep?id=eq.1" -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY")
           CURRENT_NUM=$(echo "$RESPONSE" | grep -o '"counter":[0-9]*' | cut -d: -f2)
           
-          if [ -z "$CURRENT_NUM" ]; then
-            echo "Error: Could not read counter. Make sure row id=1 exists in your table!"
-            exit 1
+          if [ ! -z "$CURRENT_NUM" ]; then
+            NEW_NUM=$((CURRENT_NUM + 1))
+            curl -s -X PATCH "$SB_URL/rest/v1/botupkeep?id=eq.1" \
+              -H "Authorization: Bearer $SB_KEY" \
+              -H "apikey: $SB_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"counter\": $NEW_NUM}"
+            echo "[Upkeep Bot] Main Subsystem updated to version $NEW_NUM."
+          else
+            echo "[Warning] Could not read Main Subsystem counter. Ensure table 'botupkeep' exists with id=1."
           fi
+
+      # --- DATABASE 2: GAME SAVE DATA ---
+      - name: Update Game Save Data Subsystem
+        env:
+          GSD_URL: ${{ secrets.GAMESAVEDATA_URL }}
+          GSD_KEY: ${{ secrets.GAMESAVEDATA_KEY }}
+        run: |
+          echo "[Upkeep Bot] Pinging Game Save Data Subsystem..."
+          RESPONSE=$(curl -s -X GET "$GSD_URL/rest/v1/botupkeep?id=eq.1" -H "Authorization: Bearer $GSD_KEY" -H "apikey: $GSD_KEY")
+          CURRENT_NUM=$(echo "$RESPONSE" | grep -o '"counter":[0-9]*' | cut -d: -f2)
           
-          # 3. Add 1 to the value
-          NEW_NUM=$((CURRENT_NUM + 1))
-          echo "[Upkeep Bot] Current counter is $CURRENT_NUM. Upgrading to $NEW_NUM."
-          
-          # 4. Update the table with the new value
-          curl -s -X PATCH "$SB_URL/rest/v1/botupkeep?id=eq.1" \
-            -H "Authorization: Bearer $SB_KEY" \
-            -H "apikey: $SB_KEY" \
-            -H "Content-Type: application/json" \
-            -d "{\"counter\": $NEW_NUM}"
-            
-          echo "[Upkeep Bot] Database transaction successful. Server refreshed."
+          if [ ! -z "$CURRENT_NUM" ]; then
+            NEW_NUM=$((CURRENT_NUM + 1))
+            curl -s -X PATCH "$GSD_URL/rest/v1/botupkeep?id=eq.1" \
+              -H "Authorization: Bearer $GSD_KEY" \
+              -H "apikey: $GSD_KEY" \
+              -H "Content-Type: application/json" \
+              -d "{\"counter\": $NEW_NUM}"
+            echo "[Upkeep Bot] Game Save Data Subsystem updated to version $NEW_NUM."
+          else
+            echo "[Warning] Could not read Game Save Data counter. Ensure table 'botupkeep' exists with id=1."
+          fi
