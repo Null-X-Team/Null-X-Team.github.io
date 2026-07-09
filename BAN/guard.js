@@ -1,17 +1,16 @@
 // BAN/guard.js
 (async function initSecurityGuard() {
-    // 1. Identify the current active session username from your local authentication layer
-    // (Adjust this string to match how your main.js tracks the logged-in user, e.g., localStorage.getItem("username"))
+    // 1. Identify the current active session username from your local storage authentication layer
+    // Based on your dashboard image, it reads "TEST USER"
     const currentUsername = localStorage.getItem("nxos_logged_user") || "TEST USER";
 
     if (!currentUsername) return;
 
     try {
-        // 2. Query your Supabase database to check the ban state for this specific user
-        // Assumes your profiles/users table has a text column 'username' and a boolean column 'is_banned'
+        // 2. Query your Supabase database to check the ban state and reason for this user
         const { data, error } = await supabase
             .from('profiles') 
-            .select('is_banned')
+            .select('is_banned, last_action_reason')
             .eq('username', currentUsername)
             .single();
 
@@ -20,9 +19,11 @@
             return;
         }
 
-        // 3. If the ban flag is verified as true, trigger the overlay shield
+        // 3. If the ban flag is verified as true, trigger the overlay shield with the reason
         if (data && data.is_banned === true) {
-            applySystemLockout();
+            // Fallback text if last_action_reason is empty or NULL in the database row
+            const banReason = data.last_action_reason || "No explicit reason specified by administration.";
+            applySystemLockout(banReason);
         }
 
     } catch (err) {
@@ -30,7 +31,7 @@
     }
 
     // Function to generate and lock down the visual ban barrier
-    function applySystemLockout() {
+    function applySystemLockout(reasonText) {
         // Prevent duplicates
         if (document.getElementById("nxos-hard-lock")) return;
 
@@ -41,14 +42,15 @@
         overlay.innerHTML = `
             <div class="nxos-ban-box">
                 <div class="nxos-ban-title">TERMINAL ACCESS RESTRICTED</div>
-                <p class="nxos-ban-msg">
-                    You're Banned.<br><br>
-                    This hardware configuration or profile identifier has been restricted from accessing the NxOS node matrix.
-                </p>
+                <p class="nxos-ban-msg">You're Banned.</p>
+                <div class="nxos-ban-reason-container">
+                    <span class="nxos-ban-reason-label">Reason:</span>
+                    <p class="nxos-ban-reason-text">${reasonText}</p>
+                </div>
             </div>
         `;
 
-        // Intercept keyboard commands to block anyone trying to inspect element or refresh out of it easily
+        // Intercept keyboard commands to block easy escapes (F12 / Inspect)
         window.addEventListener("keydown", (e) => {
             if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) {
                 e.preventDefault();
