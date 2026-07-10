@@ -648,7 +648,7 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('chatUser');
         location.reload();
       } else {
-        window.location.href = "Login/login.html";
+        window.location.href = "../Login/login.html";
       }
     };
   }
@@ -668,9 +668,9 @@ document.addEventListener('DOMContentLoaded', () => {
       updateNavActiveState('nav-communications');
 
       if (localStorage.getItem('chatUser')) {
-        window.location.href = "chat/chat.html";
+        window.location.href = "../chat/chat.html";
       } else {
-        window.location.href = "Login/login.html";
+        window.location.href = "../Login/login.html";
       }
     };
   }
