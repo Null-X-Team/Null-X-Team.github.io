@@ -1,1 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Error | 404</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@500;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-dark: #040406;
+      --accent-purple: #9d4edd;
+      --accent-neon: #e0aaff;
+      --accent-dim: rgba(157, 78, 221, 0.15);
+      --text-main: #f7f4f9;
+      --text-muted: #7b7585;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Share Tech Mono', monospace;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 40px;
+      position: relative;
+    }
+
+    /* Radar sweep animation background overlay */
+    body::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 150vmax;
+      height: 150vmax;
+      transform: translate(-50%, -50%);
+      background: conic-gradient(from 0deg, transparent 70%, var(--accent-dim) 100%);
+      z-index: 0;
+      pointer-events: none;
+      animation: radarSweep 8s linear infinite;
+    }
+
+    /* Outer ambient geometric grid lines */
+    .grid-lines {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        linear-gradient(to right, rgba(255,255,255,0.01) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.01) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+    }
+
+    /* Header Navbar Layout */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 1;
+      border-bottom: 1px solid rgba(157, 78, 221, 0.2);
+      padding-bottom: 20px;
+    }
+
+    .brand {
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand i {
+      color: var(--accent-purple);
+      animation: corePulse 2s infinite ease-in-out;
+    }
+
+    .system-clock {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    /* Central Giant Display Node */
+    main {
+      z-index: 1;
+      text-align: left;
+      max-width: 800px;
+      margin: auto 0;
+      align-self: center;
+      width: 100%;
+    }
+
+    .error-code {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 8rem;
+      font-weight: 900;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 2px var(--accent-purple);
+      margin-bottom: 10px;
+      display: inline-block;
+      letter-spacing: -2px;
+      position: relative;
+    }
+
+    .error-code::after {
+      content: '404';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      color: var(--text-main);
+      clip-path: inset(45% 0 0 0);
+      animation: glitchSplit 4s ease-in-out infinite alternate;
+    }
+
+    .terminal-output {
+      border-left: 2px solid var(--accent-purple);
+      padding-left: 25px;
+      margin-bottom: 40px;
+    }
+
+    .status-title {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 500;
+      color: var(--accent-neon);
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .log-line {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+
+    .log-line span.highlight {
+      color: var(--text-main);
+    }
+
+    /* Actions Layout */
+    .action-row {
+      display: flex;
+      gap: 20px;
+    }
+
+    .cyber-btn {
+      background: transparent;
+      color: var(--text-main);
+      border: 1px solid var(--accent-purple);
+      padding: 14px 30px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+
+    .cyber-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--accent-purple);
+      z-index: -1;
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.3s ease;
+    }
+
+    .cyber-btn:hover::before {
+      transform: scaleX(1);
+    }
+
+    .cyber-btn:hover {
+      box-shadow: 0 0 15px var(--accent-purple);
+      border-color: var(--accent-neon);
+    }
+
+    /* Bottom Status Bar */
+    footer {
+      display: flex;
+      justify-content: space-between;
+      z-index: 1;
+      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      padding-top: 20px;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      letter-spacing: 1px;
+    }
+
+    /* High-Performance Fluid Animations */
+    @keyframes radarSweep {
+      from { transform: translate(-50%, -50%) rotate(0deg); }
+      to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes corePulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.95); }
+      50% { opacity: 1; transform: scale(1.05); filter: drop-shadow(0 0 4px var(--accent-purple)); }
+    }
+
+    @keyframes glitchSplit {
+      0%, 80%, 100% { transform: translate(0, 0); }
+      85% { transform: translate(4px, -2px); color: var(--accent-neon); }
+      90% { transform: translate(-4px, 2px); }
+    }
+
+    @media (max-width: 600px) {
+      body { padding: 20px; }
+      .error-code { font-size: 5.5rem; }
+      .status-title { font-size: 1.3rem; }
+      .action-row { flex-direction: column; }
+      .cyber-btn { width: 100%; justify-content: center; }
+      footer { flex-direction: column; gap: 10px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="grid-lines"></div>
+
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-circle-nodes"></i> GLAXYIAS_HUB
+    </div>
+    <div class="system-clock" id="liveClock">SYS_TIME: 00:00:00</div>
+  </header>
+
+  <main>
+    <div class="error-code">404</div>
+    
+    <div class="terminal-output">
+      <div class="status-title">Target Node Missing</div>
+      <div class="log-line">> Requested asset layer could not be fetched by the host pipeline.</div>
+      <div class="log-line">> PATH_STRING: <span class="highlight" id="brokenPath">/unknown-node</span></div>
+      <div class="log-line">> SYSTEM_ACTION: Halting execution matrix safely.</div>
+    </div>
+
+    <div class="action-row">
+      <a href="https://glaxyias.github.io" class="cyber-btn">
+        <i class="fa-solid fa-arrow-left"></i> Return to Main Index
+      </a>
+    </div>
+  </main>
+
+  <footer>
+    <div>NETWORK_TYPE: DECENTRALIZED REPOSITORY</div>
+    <div>&copy; 2026 GLAXYIAS ECOSYSTEM</div>
+  </footer>
+
+  <script>
+    // Automatically scrape and display the exact broken link that brought the user here
+    document.getElementById('brokenPath').innerText = window.location.pathname;
+
+    // Run a clean real-time clock indicator in the upper corner
+    function updateClock() {
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0];
+      document.getElementById('liveClock').innerText = `SYS_TIME: ${timeStr}`;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+
+</body>
+</html>
