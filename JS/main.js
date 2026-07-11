@@ -581,7 +581,7 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
       modal.style.display = 'flex';
 
-      fetch('Settings/settings.html')
+      fetch('../Settings/settings.html')
         .then(res => {
           if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
           return res.text();
