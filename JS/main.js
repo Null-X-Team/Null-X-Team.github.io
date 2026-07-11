@@ -499,13 +499,32 @@ async function handlePlaceholderView(navId, viewName) {
 
   customSectionContainer.style.display = 'block';
 
-  // BRAND NEW SEPARATE RULE FOR ASSISTANT: Directly loads Base44 Workspace
+  // BRAND NEW SEPARATE RULE FOR ASSISTANT: Compiles full external site layout via local Blob compilation string
   if (viewLower === 'assistant') {
+    const virtualDocumentHTML = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="UTF-8">
+        <style>
+          html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+          iframe { width: 100%; height: 100%; border: none; }
+        </style>
+      </head>
+      <body>
+        <iframe src="https://nullai.base44.app" allow="clipboard-read; clipboard-write; microphone; camera"></iframe>
+      </body>
+      </html>
+    `;
+
+    const blobStream = new Blob([virtualDocumentHTML], { type: 'text/html' });
+    const localBlobURL = URL.createObjectURL(blobStream);
+
     customSectionContainer.innerHTML = `
-      <iframe src="https://nullai.base44.app" 
-              style="width: 100%; height: 78vh; border: 1px solid #8b00ff; border-radius: 12px; background: #000;" 
-              allow="clipboard-read; clipboard-write; microphone; camera">
-      </iframe>`;
+      <div class="iframe-container" style="width: 100%; height: 78vh; border-radius: 12px; overflow: hidden; border: 1px solid #8b00ff; box-shadow: 0 0 20px rgba(139,0,255,0.15);">
+        <iframe src="${localBlobURL}" style="width: 100%; height: 100%; border: none;"></iframe>
+      </div>
+    `;
     return; 
   }
 
