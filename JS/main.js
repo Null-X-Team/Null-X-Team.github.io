@@ -73,6 +73,103 @@ let _0xData = [
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
 
+// ==========================================
+// NULLAI BASE44 CORE INTERACTION SYSTEM
+// ==========================================
+const BASE44_BASE_URL = "https://nullai.base44.app";
+const BASE44_APP_ID = "6687ebfbbbaa7e8910eb4eb9";
+const BASE44_API_KEY = "c00d41eb8e5c8e44ebae08764a75";
+let activeChatSessionId = null;
+
+async function initializeBase44Chat() {
+    try {
+        const response = await fetch(`${BASE44_BASE_URL}/entities/Chat`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "x-app-id": BASE44_APP_ID,
+                "api_key": BASE44_API_KEY
+            },
+            body: JSON.stringify({
+                title: `Dashboard Session - ${new Date().toLocaleTimeString()}`,
+                chat_type: "saved"
+            })
+        });
+        if (!response.ok) throw new Error("Failed initialization link.");
+        const chatData = await response.json();
+        activeChatSessionId = chatData.id;
+        console.log("[NullAI] Connected Session ID:", activeChatSessionId);
+    } catch (err) {
+        console.error("[NullAI Setup Error]:", err);
+        activeChatSessionId = "fallback_" + Math.random().toString(36).substring(7);
+    }
+}
+
+async function sendChatMessage(userText) {
+    if (!activeChatSessionId) await initializeBase44Chat();
+    try {
+        const userMsgResponse = await fetch(`${BASE44_BASE_URL}/entities/Message`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "x-app-id": BASE44_APP_ID, "api_key": BASE44_API_KEY },
+            body: JSON.stringify({ role: "user", content: userText, chat_id: activeChatSessionId })
+        });
+        if (!userMsgResponse.ok) throw new Error("Failed to sync record.");
+
+        await new Promise(resolve => setTimeout(resolve, 1800));
+
+        const checkReplyResponse = await fetch(`${BASE44_BASE_URL}/entities/Message?chat_id=${activeChatSessionId}&sort=createdAt:desc&limit=2`, {
+            method: "GET",
+            headers: { "x-app-id": BASE44_APP_ID, "api_key": BASE44_API_KEY }
+        });
+        if (!checkReplyResponse.ok) throw new Error("Failed to pull response.");
+        const messages = await checkReplyResponse.json();
+        
+        if (messages && messages.length > 0 && (messages[0].role === "assistant" || messages[0].role === "agent")) {
+            return messages[0].content;
+        }
+        return "System processing query. Try asking again if the line remains idle.";
+    } catch (error) {
+        console.error("[NullAI Operational Fault]:", error);
+        return "Connection timed out. Check back momentarily.";
+    }
+}
+
+function attachChatEventListeners() {
+    const chatBox = document.getElementById("chatBox");
+    const chatInput = document.getElementById("chatInput");
+    const sendBtn = document.getElementById("sendBtn");
+
+    if (!chatBox || !chatInput) return;
+
+    async function handleTransmission() {
+        const queryText = chatInput.value.trim();
+        if (!queryText) return;
+
+        renderBubble(queryText, "user-bubble");
+        chatInput.value = "";
+
+        const waitIndicator = renderBubble("Analyzing input streams...", "assistant-bubble loading-state");
+        const replyString = await sendChatMessage(queryText);
+
+        waitIndicator.remove();
+        renderBubble(replyString, "assistant-bubble");
+    }
+
+    function renderBubble(contentStr, stylingClass) {
+        const element = document.createElement("div");
+        element.className = `chat-bubble ${stylingClass}`;
+        element.innerText = contentStr;
+        chatBox.appendChild(element);
+        chatBox.scrollTop = chatBox.scrollHeight;
+        return element;
+    }
+
+    sendBtn?.addEventListener("click", handleTransmission);
+    chatInput.addEventListener("keydown", (event) => {
+        if (event.key === "Enter") handleTransmission();
+    });
+}
+
 function launchStealthWindow(maskType, targetEnv) {
   const currentUrl = window.location.href;
   let title = "Google Docs";
@@ -226,7 +323,6 @@ function launchStealthWindow(maskType, targetEnv) {
 function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
-    // Force absolute layout to root domain to keep paths clean everywhere
     const rootUrl = "https://glaxyias.github.io/";
 
     document.open();
@@ -243,7 +339,6 @@ function launchGame(gameId) {
     `);
     document.close();
 
-    // Check if user is inside the new homepage layout directory structure
     const isNewHomepage = window.location.pathname.includes('/newhomepage');
     const returnDestination = isNewHomepage ? '/newhomepage/' : '/';
 
@@ -308,7 +403,6 @@ function initFeaturedModule() {
   }
 }
 
-// Global UI View Toggle Engines
 function updateNavActiveState(activeId) {
   ['nav-home', 'nav-games', 'nav-favorites', 'nav-unblockers', 'nav-profile', 'nav-communications', 'nav-terminal'].forEach(id => {
     const el = document.getElementById(id);
@@ -407,8 +501,6 @@ async function handlePlaceholderView(navId, viewName) {
 
   try {
     const targetFolder = viewLower === 'terminal' ? 'Terminal' : viewLower;
-    
-    // FIXED PATH WAY SYSTEM ROUTE: Step out of Newhomepage using '../'
     const fetchPath = `../${targetFolder}/${viewLower}.html`;
 
     const response = await fetch(fetchPath);
@@ -416,6 +508,10 @@ async function handlePlaceholderView(navId, viewName) {
 
     const dynamicCodeContent = await response.text();
     customSectionContainer.innerHTML = dynamicCodeContent;
+
+    // Trigger attachment layer immediately upon interface view mutation fulfillment
+    attachChatEventListeners();
+
   } catch (error) {
     console.error(`[System Error] Failed routing structural data for ${viewName}:`, error);
     customSectionContainer.innerHTML = `
@@ -429,9 +525,9 @@ async function handlePlaceholderView(navId, viewName) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ==========================================
-  // COVERSCREEN OVERLAY COUNTDOWN LOOP (FIXED KEY)
-  // ==========================================
+  // Establish the dynamic platform handshake immediately on boot
+  initializeBase44Chat();
+
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
   const cloakOverlay = document.getElementById("educational-cloak");
 
@@ -459,9 +555,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ==========================================
-  // INLINE MODAL SETTINGS LAUNCHER (SCROLLABLE VERTICAL FULL VIEW)
-  // ==========================================
   const settingsBtn = document.getElementById('settingsBtn');
   if (settingsBtn) {
     settingsBtn.onclick = (e) => {
@@ -477,16 +570,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
       modal.innerHTML = `
         <div style="background:#0d0d0d; border:2px solid #8b00ff; border-radius:16px; width:90%; max-width:900px; height:80vh; position:relative; box-shadow:0 0 30px rgba(139,0,255,0.3); display:flex; flex-direction:column;">
-          
           <div style="padding: 20px 30px; border-bottom: 1px solid rgba(139,0,255,0.2); display:flex; justify-content:space-between; align-items:center;">
             <h2 style="color:#8b00ff; margin:0;">Control Panel Configuration</h2>
             <button id="closeSettings" style="background:none; border:none; color:#ff3333; font-size:28px; font-weight:bold; cursor:pointer; margin-left:auto;">&times;</button>
           </div>
-
           <div id="modal-settings-content" style="flex:1; padding:30px; overflow-y:auto; color:#fff;">
             <p style="color:#8b00ff; font-weight:bold;">Loading system template parameters...</p>
           </div>
-
         </div>
       `;
       modal.style.display = 'flex';
@@ -501,7 +591,6 @@ document.addEventListener('DOMContentLoaded', () => {
           if (contentDiv) {
             contentDiv.innerHTML = html;
             
-            // --- 1. APPEARANCE (THEMES) ---
             const currentTheme = localStorage.getItem('selectedTheme') || 'default';
             const themeCards = contentDiv.querySelectorAll('.theme-card');
             themeCards.forEach(card => {
@@ -523,7 +612,6 @@ document.addEventListener('DOMContentLoaded', () => {
               };
             });
 
-            // --- 2. STARTUP ENVIRONMENTAL SPLASH ---
             const splashCheckbox = document.getElementById('toggle-study-cloak');
             if (splashCheckbox) {
               splashCheckbox.checked = localStorage.getItem('disableStudyCloak') === 'true';
@@ -532,7 +620,6 @@ document.addEventListener('DOMContentLoaded', () => {
               };
             }
 
-            // --- 3. PRIVACY TAB CLOAK TARGET ---
             const cloakSelector = document.getElementById('cloakSelector');
             if (cloakSelector) {
               const savedCloak = localStorage.getItem('savedCloak');
@@ -546,7 +633,6 @@ document.addEventListener('DOMContentLoaded', () => {
               };
             }
 
-            // --- 4. AUTO-LAUNCH SYSTEM ---
             const autoLaunchCheckbox = document.getElementById('toggle-auto-launch');
             const autoLaunchOptionsDiv = document.getElementById('auto-launch-options');
             const autoLaunchEnvSelect = document.getElementById('auto-launch-environment');
@@ -568,7 +654,6 @@ document.addEventListener('DOMContentLoaded', () => {
               };
             }
 
-            // --- 5. PANIC OVERRIDE BINDER ---
             const shortcutInput = document.getElementById('panicShortcut');
             const panicLinkInput = document.getElementById('panicLink');
             const savePanicBtn = document.getElementById('savePanic');
@@ -769,7 +854,6 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Battery and Clock tracker engine
   if (navigator.getBattery) {
     navigator.getBattery().then(battery => {
       function updateBatteryDisplay() {
@@ -796,9 +880,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateClockDisplay();
   setInterval(updateClockDisplay, 1000);
 
-  // ==========================================
-  // RUN TIME ENGAGEMENT FOR AUTO-LAUNCH & PANIC
-  // ==========================================
   if (localStorage.getItem('autoLaunchEnabled') === 'true' && !sessionStorage.getItem('launchedThisSession')) {
     sessionStorage.setItem('launchedThisSession', 'true');
     setTimeout(() => {
@@ -819,24 +900,19 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 });
 
-// Live Weather Tracking Engine (No API Key Required)
 async function fetchLiveWeather() {
   try {
-    // Requests clean JSON layout for the user's current network location
     const response = await fetch('https://wttr.in/?format=j1');
     if (!response.ok) throw new Error("Weather stream dropped");
     
     const data = await response.json();
-    
     const current = data.current_condition[0];
     const area = data.nearest_area[0];
     
-    // Pull parameters matching your current layout alignment
     const tempF = current.temp_F;
     const humidity = current.humidity;
     const city = area.areaName[0].value;
 
-    // Safely inject parsed strings into the UI matching your layout IDs
     const tempEl = document.getElementById('live-temp');
     const humidEl = document.getElementById('live-humidity');
     const cityEl = document.getElementById('live-city');
@@ -847,40 +923,32 @@ async function fetchLiveWeather() {
 
   } catch (err) {
     console.error("[System Error] Live weather lookup stalled:", err);
-    // Fallback defaults if the network blocks the endpoint layout
     const cityEl = document.getElementById('live-city');
     if (cityEl) cityEl.textContent = "Offline Mode";
   }
 }
 
-// Execute on content baseline launch
 fetchLiveWeather();
 
-// --- NXOS LIVE DATA UPDATE DETECTION ENGINE ---
 (function initLiveUpdateChecker() {
-  // Store the version timestamp when the page first loads up
   let currentVersion = null;
-  const CHECK_INTERVAL = 30000; // Checks for new pushed data every 30 seconds
+  const CHECK_INTERVAL = 30000;
 
-  // Fetch the version file from the server
   async function checkServerVersion() {
     try {
-      // Add a random timestamp query parameter to bypass browser caching
       const response = await fetch(`./version.json?cache-bust=${Date.now()}`);
       if (!response.ok) return;
       
       const data = await response.json();
       const serverVersion = data.version;
 
-      // Initialize baseline on first check
       if (!currentVersion) {
         currentVersion = serverVersion;
         return;
       }
 
-      // If the server timestamp is newer than our current layout, data was pushed!
       if (serverVersion > currentVersion) {
-        currentVersion = serverVersion; // update local tracking
+        currentVersion = serverVersion;
         showUpdateNotification();
       }
     } catch (err) {
@@ -888,9 +956,7 @@ fetchLiveWeather();
     }
   }
 
-  // Inject a styled modal pop-up into the screen layout dynamically
   function showUpdateNotification() {
-    // Prevent duplicate popups if one is already visible
     if (document.getElementById("nxos-update-popup")) return;
 
     const popup = document.createElement("div");
@@ -932,7 +998,6 @@ fetchLiveWeather();
       </div>
     `;
 
-    // Add keyframe styles for smooth layout animation injections
     const style = document.createElement("style");
     style.innerHTML = `
       @keyframes slideInNxOS {
@@ -948,7 +1013,6 @@ fetchLiveWeather();
     document.head.appendChild(style);
     document.body.appendChild(popup);
 
-    // Button event handlers
     document.getElementById("nxos-reload-btn").addEventListener("click", () => {
       window.location.reload();
     });
@@ -958,7 +1022,6 @@ fetchLiveWeather();
     });
   }
 
-  // Run initial baseline check, then check repeatedly at intervals
   checkServerVersion();
   setInterval(checkServerVersion, CHECK_INTERVAL);
 })();
