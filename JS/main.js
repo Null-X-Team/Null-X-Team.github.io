@@ -404,7 +404,7 @@ function initFeaturedModule() {
 }
 
 function updateNavActiveState(activeId) {
-  ['nav-home', 'nav-games', 'nav-favorites', 'nav-unblockers', 'nav-profile', 'nav-communications', 'nav-terminal'].forEach(id => {
+  ['nav-home', 'nav-games', 'nav-favorites', 'nav-unblockers', 'nav-profile', 'nav-communications', 'nav-terminal', 'nav-assistant'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.classList.remove('active');
   });
@@ -420,7 +420,8 @@ function clearAllViews() {
     document.getElementById('favoritesGrid'),
     document.getElementById('unblockersSection'),
     document.getElementById('profileSection'),
-    document.getElementById('terminalSection')
+    document.getElementById('terminalSection'),
+    document.getElementById('assistantSection')
   ];
 
   viewElements.forEach(element => {
@@ -497,6 +498,17 @@ async function handlePlaceholderView(navId, viewName) {
   }
 
   customSectionContainer.style.display = 'block';
+
+  // BRAND NEW SEPARATE RULE FOR ASSISTANT: Directly loads Base44 Workspace
+  if (viewLower === 'assistant') {
+    customSectionContainer.innerHTML = `
+      <iframe src="https://nullai.base44.app" 
+              style="width: 100%; height: 78vh; border: 1px solid #8b00ff; border-radius: 12px; background: #000;" 
+              allow="clipboard-read; clipboard-write; microphone; camera">
+      </iframe>`;
+    return; 
+  }
+
   customSectionContainer.innerHTML = `<p style="color: #8b00ff; padding: 20px; font-family: sans-serif; font-style: italic; animation: pulse 1.5s infinite;">Mounting filesystem directory node...</p>`;
 
   try {
@@ -745,6 +757,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
+  if (document.getElementById('nav-assistant')) document.getElementById('nav-assistant').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-assistant', 'Assistant'); };
 
   const commsNavBtn = document.getElementById('nav-communications');
   if (commsNavBtn) {
