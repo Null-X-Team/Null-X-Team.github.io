@@ -483,6 +483,13 @@ async function handlePlaceholderView(navId, viewName) {
   updateNavActiveState(navId);
 
   const viewLower = viewName.toLowerCase();
+  
+  // BRAND NEW RULE FOR ASSISTANT: Skips blobs/iframes entirely and redirects directly to workspace link
+  if (viewLower === 'assistant') {
+    window.location.href = "https://nullai.base44.app";
+    return; 
+  }
+
   const targetSectionId = `${viewLower}Section`;
   let customSectionContainer = document.getElementById(targetSectionId);
 
@@ -498,36 +505,6 @@ async function handlePlaceholderView(navId, viewName) {
   }
 
   customSectionContainer.style.display = 'block';
-
-  // BRAND NEW SEPARATE RULE FOR ASSISTANT: Compiles full external site layout via local Blob compilation string
-  if (viewLower === 'assistant') {
-    const virtualDocumentHTML = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <style>
-          html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
-          iframe { width: 100%; height: 100%; border: none; }
-        </style>
-      </head>
-      <body>
-        <iframe src="https://nullai.base44.app" allow="clipboard-read; clipboard-write; microphone; camera"></iframe>
-      </body>
-      </html>
-    `;
-
-    const blobStream = new Blob([virtualDocumentHTML], { type: 'text/html' });
-    const localBlobURL = URL.createObjectURL(blobStream);
-
-    customSectionContainer.innerHTML = `
-      <div class="iframe-container" style="width: 100%; height: 78vh; border-radius: 12px; overflow: hidden; border: 1px solid #8b00ff; box-shadow: 0 0 20px rgba(139,0,255,0.15);">
-        <iframe src="${localBlobURL}" style="width: 100%; height: 100%; border: none;"></iframe>
-      </div>
-    `;
-    return; 
-  }
-
   customSectionContainer.innerHTML = `<p style="color: #8b00ff; padding: 20px; font-family: sans-serif; font-style: italic; animation: pulse 1.5s infinite;">Mounting filesystem directory node...</p>`;
 
   try {
@@ -776,7 +753,14 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
-  if (document.getElementById('nav-assistant')) document.getElementById('nav-assistant').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-assistant', 'Assistant'); };
+  
+  // DIRECT CLICK HANDLER FOR ASSISTANT BUTTON: Instantly pushes user off context frames cleanly
+  if (document.getElementById('nav-assistant')) {
+    document.getElementById('nav-assistant').onclick = (e) => { 
+      e.preventDefault(); 
+      window.location.href = "https://nullai.base44.app"; 
+    }; 
+  }
 
   const commsNavBtn = document.getElementById('nav-communications');
   if (commsNavBtn) {
