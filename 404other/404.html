@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Axiom Exception // 404</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Syncopate:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-void: #020204;
+      --matrix-glow: #8b00ff;
+      --matrix-cyan: #00f0ff;
+      --text-clean: #ffffff;
+      --text-dark: #2d2d3f;
+      --border-flux: rgba(139, 0, 255, 0.2);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--text-clean);
+      font-family: 'Fira Code', monospace;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 50px;
+      position: relative;
+    }
+
+    /* Ambient Matrix Nodes Back-Layer */
+    .anomaly-backdrop {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 240, 255, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(139, 0, 255, 0.04) 0%, transparent 45%);
+      z-index: 0;
+    }
+
+    /* Moving scanline laser divider */
+    .scan-laser {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: linear-gradient(90deg, transparent, var(--matrix-cyan), var(--matrix-glow), transparent);
+      opacity: 0.3;
+      z-index: 1;
+      animation: laserSweep 6s infinite linear;
+      pointer-events: none;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+    }
+
+    .node-signature {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 0.85rem;
+      letter-spacing: 5px;
+      color: var(--matrix-cyan);
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+    }
+
+    .node-signature span {
+      width: 6px;
+      height: 6px;
+      background: var(--matrix-cyan);
+      display: inline-block;
+      border-radius: 50%;
+      animation: heartBeat 1s infinite alternate;
+    }
+
+    .build-manifest {
+      color: var(--text-dark);
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+    }
+
+    .vault-wrapper {
+      z-index: 2;
+      width: 100%;
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      gap: 60px;
+      align-items: center;
+    }
+
+    /* Geometric Abstract Error Array */
+    .geometry-cluster {
+      position: relative;
+      width: 320px;
+      height: 320px;
+      flex-shrink: 0;
+    }
+
+    .outer-flux-ring {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 1px dashed var(--border-flux);
+      border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+      animation: morphRing 12s infinite linear;
+    }
+
+    .inner-core-box {
+      position: absolute;
+      top: 25%;
+      left: 25%;
+      width: 50%;
+      height: 50%;
+      border: 2px solid var(--matrix-glow);
+      background: rgba(139, 0, 255, 0.03);
+      transform: rotate(45deg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(139, 0, 255, 0.15);
+      animation: spinCore 20s infinite linear;
+    }
+
+    .core-number {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 3.5rem;
+      font-weight: 700;
+      color: var(--text-clean);
+      transform: rotate(-45deg);
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
+    }
+
+    .content-block {
+      flex: 1;
+    }
+
+    .exception-tag {
+      font-size: 0.8rem;
+      background: rgba(0, 240, 255, 0.08);
+      color: var(--matrix-cyan);
+      padding: 6px 14px;
+      border-radius: 50px;
+      display: inline-block;
+      margin-bottom: 20px;
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      letter-spacing: 1px;
+    }
+
+    .primary-alert {
+      font-family: 'Syncopate', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: 25px;
+      letter-spacing: -1px;
+    }
+
+    .primary-alert em {
+      font-style: normal;
+      color: var(--matrix-glow);
+      text-shadow: 0 0 15px rgba(139, 0, 255, 0.3);
+    }
+
+    .diagnostic-readout {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 40px;
+      max-width: 600px;
+    }
+
+    .diagnostic-readout code {
+      color: var(--matrix-cyan);
+      background: rgba(0, 240, 255, 0.05);
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+
+    .interface-actions {
+      display: flex;
+      gap: 25px;
+    }
+
+    .nexus-link {
+      background: transparent;
+      color: var(--text-clean);
+      border: 1px solid var(--text-clean);
+      padding: 16px 36px;
+      font-family: 'Fira Code', monospace;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 0px;
+      transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+    }
+
+    .nexus-link:hover {
+      background: var(--text-clean);
+      color: var(--bg-void);
+      transform: translateX(5px);
+    }
+
+    .nexus-link.secondary {
+      border-color: var(--matrix-glow);
+      color: var(--matrix-glow);
+    }
+
+    .nexus-link.secondary:hover {
+      background: var(--matrix-glow);
+      color: var(--text-clean);
+    }
+
+    /* Immersive Input Request Module */
+    .vault-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #030306;
+      z-index: 100;
+      display: grid;
+      place-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+
+    .vault-overlay.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .console-manifest {
+      width: 700px;
+      max-width: 90%;
+      padding: 40px;
+      border: 1px solid var(--border-flux);
+      background: #06060c;
+    }
+
+    .console-prompt-line {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .console-output-history {
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 0.9rem;
+      line-height: 1.6;
+      margin-bottom: 25px;
+    }
+
+    .interactive-row {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      border-bottom: 1px solid var(--matrix-cyan);
+      padding-bottom: 10px;
+    }
+
+    .interactive-row span {
+      color: var(--matrix-cyan);
+    }
+
+    .console-field {
+      background: transparent;
+      border: none;
+      color: var(--text-clean);
+      font-family: 'Fira Code', monospace;
+      font-size: 1rem;
+      outline: none;
+      flex: 1;
+    }
+
+    footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 2;
+      font-size: 0.75rem;
+      color: var(--text-dark);
+      letter-spacing: 1px;
+    }
+
+    /* Keyframe Operational Matrix */
+    @keyframes laserSweep {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+
+    @keyframes heartBeat {
+      to { transform: scale(1.4); opacity: 0.3; }
+    }
+
+    @keyframes spinCore {
+      to { transform: rotate(405deg); }
+    }
+
+    @keyframes morphRing {
+      0%, 100% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+      34% { border-radius: 70% 30% 50% 50% / 30% 60% 40% 70%; }
+      67% { border-radius: 50% 60% 30% 70% / 60% 30% 70% 40%; }
+    }
+
+    @media (max-width: 850px) {
+      body { padding: 30px; overflow-y: auto; height: auto; min-height: 100vh; }
+      .vault-wrapper { flex-direction: column; gap: 40px; margin: 40px 0; }
+      .geometry-cluster { width: 220px; height: 220px; }
+      .primary-alert { font-size: 1.6rem; }
+      .interface-actions { flex-direction: column; gap: 15px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; margin-top: 40px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="anomaly-backdrop"></div>
+  <div class="scan-laser"></div>
+
+  <header>
+    <div class="node-signature">
+      <span></span> CORE_DISCONNECT_HANDLER
+    </div>
+    <div class="build-manifest" id="liveTicker">NODE_HASH: CONF-000</div>
+  </header>
+
+  <div class="vault-wrapper" id="coreContainer">
+    
+    <div class="geometry-cluster">
+      <div class="outer-flux-ring"></div>
+      <div class="inner-core-box">
+        <div class="core-number">404</div>
+      </div>
+    </div>
+
+    <div class="content-block">
+      <div class="exception-tag">// ERR_PATH_UNRESOLVED</div>
+      <h1 class="primary-alert">The targeted sector has completely <em>collapsed</em>.</h1>
+      
+      <p class="diagnostic-readout">
+        A structural memory exception occurred while analyzing <code id="badRoute">/unknown-node</code>. 
+        The filesystem addresses at this route location could not be compiled or routed within the current active index map.
+      </p>
+
+      <div class="interface-actions">
+        <a href="https://glaxyias.github.io" class="nexus-link">
+          <i class="fa-solid fa-chevron-left"></i> Escape to Index Hub
+        </a>
+        <button class="nexus-link secondary" id="triggerSuggest">
+          <i class="fa-solid fa-plus"></i> Suggest New Asset Node
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="vault-overlay" id="suggestConsole">
+    <div class="console-manifest">
+      <div class="console-prompt-line">
+        <div class="console-output-history" id="consoleHistory">
+          [METRIC]: Remote communication linkage initialized.<br>
+          [NOTICE]: Direct asset recommendation tunnel opened.<br><br>
+          SYSTEM: State game selection details or request criteria to clear verification sequence. (yes / no)
+        </div>
+        <div class="interactive-row" id="entryRow" style="display: none;">
+          <span>&lambda;_system></span>
+          <input type="text" class="console-field" id="consoleInputField" autocomplete="off">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div>METRIC_STATUS: DEVIANT_NODE</div>
+    <div>&copy; 2026 GLAXYIAS LABS. SHIELD_ACTIVE.</div>
+  </footer>
+
+  <script>
+    // Scrape missing route parameter cleanly
+    document.getElementById('badRoute').innerText = window.location.pathname;
+
+    // Generate changing node hash markers
+    function updateHash() {
+      const hex = Math.floor(Math.random() * 16777215).toString(16).toUpperCase().padStart(6, '0');
+      document.getElementById('liveTicker').innerText = `NODE_HASH: ${hex}`;
+    }
+    setInterval(updateHash, 4000);
+    updateHash();
+
+    // DOM Interaction Logic Engine
+    const triggerSuggest = document.getElementById('triggerSuggest');
+    const coreContainer = document.getElementById('coreContainer');
+    const suggestConsole = document.getElementById('suggestConsole');
+    const consoleHistory = document.getElementById('consoleHistory');
+    const entryRow = document.getElementById('entryRow');
+    const consoleInputField = document.getElementById('consoleInputField');
+
+    triggerSuggest.onclick = () => {
+      // Audio cue context link setup
+      try {
+        const aCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = aCtx.createOscillator();
+        const gain = aCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, aCtx.currentTime); // Fluid crisp entry chime
+        gain.gain.setValueAtTime(0.05, aCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, aCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(aCtx.destination);
+        osc.start();
+        osc.stop(aCtx.currentTime + 0.3);
+      } catch(e) {}
+
+      coreContainer.style.opacity = '0';
+      setTimeout(() => {
+        coreContainer.style.display = 'none';
+        suggestConsole.classList.add('visible');
+        initializeSequence();
+      }, 300);
+    };
+
+    function appendHistory(text) {
+      consoleHistory.innerHTML += `<br>${text}`;
+      suggestConsole.scrollTop = suggestConsole.scrollHeight;
+    }
+
+    function initializeSequence() {
+      setTimeout(() => {
+        appendHistory("<span style='color: var(--matrix-cyan);'>SYSTEM: Ready to sync recommendations to network repository database...</span>");
+        entryRow.style.display = 'flex';
+        consoleInputField.focus();
+      }, 1200);
+    }
+
+    consoleInputField.addEventListener('keydown', function(event) {
+      if (event.key === 'Enter') {
+        const promptInput = consoleInputField.value.trim().toLowerCase();
+        if (!promptInput) return;
+
+        appendHistory(`&lambda;_user> ${consoleInputField.value}`);
+        consoleInputField.value = '';
+        entryRow.style.display = 'none';
+
+        if (promptInput === 'yes') {
+          setTimeout(() => {
+            appendHistory("<span style='color: #22c55e;'>[SUCCESS]: Synchronizing repository environment matrices now...</span>");
+          }, 400);
+          setTimeout(() => { window.location.href = 'https://guthib.com/'; }, 1600);
+        } else if (promptInput === 'no') {
+          setTimeout(() => {
+            appendHistory("<span style='color: #ef4444;'>[ABORT]: Purging transaction cache. Falling back to emergency mirror...</span>");
+          }, 400);
+          setTimeout(() => { window.location.href = 'https://r33b.net/'; }, 1600);
+        } else {
+          setTimeout(() => {
+            appendHistory("SYSTEM: Argument parameter invalid. Please state clear intention: (yes / no)");
+            entryRow.style.display = 'flex';
+            consoleInputField.focus();
+          }, 400);
+        }
+      }
+    });
+  </script>
+
+</body>
+</html>
