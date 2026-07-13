@@ -7,7 +7,7 @@ let _0xData = [
   { id: "b_bb", title: "Baseball Bros", url: "../Games/baseballbros/Baseballbros.html", desc: "An arcade baseball game with fast-paced matches.", popular: true },
   { id: "b_kt", title: "BasketBros", url: "../Games/basketbros/Basketbros.html", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
   { id: "b_sts", title: "Basketball Stars", url: "../Games/basketballstars/Basketballstars.html", desc: "Fast-paced 1v1 street-style basketball matches.", popular: true },
-  { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookie clicker/Cookieclicker.html", desc: "Click cookies to build an industrial empire.", popular: true },
+  { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", desc: "Click cookies to build an industrial empire.", popular: true },
   { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
   { id: "r_bw", title: "Retro Bowl", url: "../Games/retrobowl/Retrobowl.html", desc: "Manage your team and lead them to gridiron glory.", popular: true },
   { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true },
