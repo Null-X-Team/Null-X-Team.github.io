@@ -291,13 +291,13 @@ function launchStealthWindow(maskType, targetEnv) {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>\${title}</title>
+        <title>${title}</title>
         <style>
           body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
           iframe { width:100%; height:100%; border:none; margin:0; padding:0; }
         </style>
       </head>
-      <body><iframe src="\${currentUrl}"></iframe></body>
+      <body><iframe src="${currentUrl}"></iframe></body>
       </html>
     `;
     const blob = new Blob([htmlPayload], { type: 'text/html' });
@@ -333,14 +333,14 @@ function launchGame(gameId) {
       // 2. Cloak the tab document title to look safe
       gameTab.document.title = "Google Docs";
 
-      // 3. Document payload layout setup containing the custom navigation layer
+      // 3. Document payload layout setup containing the fixed absolute destination navigation link
       gameTab.document.open();
       gameTab.document.write(`
         <!DOCTYPE html>
         <html lang="en">
         <head>
           <meta charset="UTF-8">
-          <title>\${game.title}</title>
+          <title>${game.title}</title>
           <style>
             body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
             iframe { width:100%; height:100%; border:none; display:block; }
@@ -354,9 +354,9 @@ function launchGame(gameId) {
           </style>
         </head>
         <body>
-          <a href="\${rootUrl}" class="back-btn">← Back to Games</a>
+          <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
           
-          <iframe src="\${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+          <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
         </body>
         </html>
       `);
@@ -379,7 +379,7 @@ function renderLibraryGrid(gamesArray) {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.setAttribute('data-game-id', game.id);
-    card.innerHTML = `<h3>\${game.title}</h3><div class="game-desc-overlay">\${game.desc}</div>`;
+    card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
     card.onclick = () => launchGame(game.id);
     gameGrid.appendChild(card);
   });
@@ -402,7 +402,7 @@ function renderFavoritesGrid() {
         const card = document.createElement('div');
         card.className = 'game-card';
         card.setAttribute('data-game-id', game.id);
-        card.innerHTML = `<h3>\${game.title}</h3><div class="game-desc-overlay">\${game.desc}</div>`;
+        card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
         card.onclick = () => launchGame(game.id);
         favGrid.appendChild(card);
       }
