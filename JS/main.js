@@ -291,13 +291,13 @@ function launchStealthWindow(maskType, targetEnv) {
       <html>
       <head>
         <meta charset="UTF-8">
-        <title>${title}</title>
+        <title>\${title}</title>
         <style>
           body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
           iframe { width:100%; height:100%; border:none; margin:0; padding:0; }
         </style>
       </head>
-      <body><iframe src="${currentUrl}"></iframe></body>
+      <body><iframe src="\${currentUrl}"></iframe></body>
       </html>
     `;
     const blob = new Blob([htmlPayload], { type: 'text/html' });
@@ -324,28 +324,50 @@ function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
     const rootUrl = "https://glaxyias.github.io/";
+    const gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, ""); 
 
-    document.open();
-    document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="UTF-8">
-        <title>${game.title}</title>
-        <style>body,html{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;}iframe{width:100%;height:100%;border:none;display:block;}</style>
-      </head>
-      <body><iframe src="${rootUrl + game.url}"></iframe></body>
-      </html>
-    `);
-    document.close();
+    // 1. Spawns an empty tab context wrapper
+    const gameTab = window.open('about:blank', '_blank');
+    
+    if (gameTab) {
+      // 2. Cloak the tab document title to look safe
+      gameTab.document.title = "Google Docs";
 
-    const isNewHomepage = window.location.pathname.includes('/newhomepage');
-    const returnDestination = isNewHomepage ? '/newhomepage/' : '/';
+      // 3. Document payload layout setup containing the custom navigation layer
+      gameTab.document.open();
+      gameTab.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>\${game.title}</title>
+          <style>
+            body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+            iframe { width:100%; height:100%; border:none; display:block; }
+            .back-btn {
+              position: fixed; top: 15px; left: 15px; z-index: 99999999;
+              background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
+              padding: 8px 14px; font-weight: bold; border-radius: 6px;
+              cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
+              font-family: sans-serif; text-decoration: none; display: inline-block;
+            }
+          </style>
+        </head>
+        <body>
+          <a href="\${rootUrl}" class="back-btn">← Back to Games</a>
+          
+          <iframe src="\${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+        </body>
+        </html>
+      `);
+      gameTab.document.close();
+    } else {
+      alert("Pop-up blocked! Please allow popup permissions to play games.");
+      return;
+    }
 
-    const backNav = document.createElement('div');
-    backNav.style = "position: fixed; top: 15px; left: 15px; z-index: 99999999; font-family: sans-serif;";
-    backNav.innerHTML = `<button onclick="window.location.replace('${returnDestination}');" style="background:#0a0a0a; color:#8b00ff; border:2px solid #8b00ff; padding:8px 14px; font-weight:bold; border-radius:6px; cursor:pointer; box-shadow:0 0 10px rgba(139,0,255,0.5);">← Back to Home</button>`;
-    document.body.appendChild(backNav);
+    // 4. Redirect the dashboard layout behind it instantly to a target decoy screen
+    window.location.replace("https://classroom.google.com");
   }
 }
 
@@ -357,7 +379,7 @@ function renderLibraryGrid(gamesArray) {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.setAttribute('data-game-id', game.id);
-    card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+    card.innerHTML = `<h3>\${game.title}</h3><div class="game-desc-overlay">\${game.desc}</div>`;
     card.onclick = () => launchGame(game.id);
     gameGrid.appendChild(card);
   });
@@ -380,7 +402,7 @@ function renderFavoritesGrid() {
         const card = document.createElement('div');
         card.className = 'game-card';
         card.setAttribute('data-game-id', game.id);
-        card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+        card.innerHTML = `<h3>\${game.title}</h3><div class="game-desc-overlay">\${game.desc}</div>`;
         card.onclick = () => launchGame(game.id);
         favGrid.appendChild(card);
       }
@@ -484,7 +506,6 @@ async function handlePlaceholderView(navId, viewName) {
 
   const viewLower = viewName.toLowerCase();
   
-  // BRAND NEW RULE FOR ASSISTANT: Skips blobs/iframes entirely and redirects directly to workspace link
   if (viewLower === 'assistant') {
     window.location.href = "https://nullai.base44.app";
     return; 
@@ -517,7 +538,6 @@ async function handlePlaceholderView(navId, viewName) {
     const dynamicCodeContent = await response.text();
     customSectionContainer.innerHTML = dynamicCodeContent;
 
-    // Trigger attachment layer immediately upon interface view mutation fulfillment
     attachChatEventListeners();
 
   } catch (error) {
@@ -533,7 +553,6 @@ async function handlePlaceholderView(navId, viewName) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Establish the dynamic platform handshake immediately on boot
   initializeBase44Chat();
 
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
@@ -754,11 +773,10 @@ document.addEventListener('DOMContentLoaded', () => {
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
   
-  // DIRECT CLICK HANDLER FOR ASSISTANT BUTTON: Instantly pushes user off context frames cleanly
   if (document.getElementById('nav-assistant')) {
-    document.getElementById('nav-assistant').onclick = (e) => { 
-      e.preventDefault(); 
-      window.location.href = "https://nullai.base44.app"; 
+    document.getElementById('nav-assistant').onclick = (e) => {
+      e.preventDefault();
+      window.location.href = "https://nullai.base44.app";
     }; 
   }
 
