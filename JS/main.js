@@ -1,6 +1,3 @@
-// ==========================================
-// ANTI-FRAMING & SECURITY AUTO-BREAKOUT LAYERS
-// ==========================================
 if (window.top !== window.self) {
   // LAYER 1: Primary attempt (Redirect out to external utility)
   try {
@@ -358,6 +355,9 @@ function launchStealthWindow(maskType, targetEnv) {
   window.location.replace(escapeRedirect);
 }
 
+// ========================================================
+// CORE GAME LAUNCH ENGINE WITH STABILIZED CONTROLS
+// ========================================================
 function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
@@ -369,6 +369,7 @@ function launchGame(gameId) {
       gameTab.document.open();
 
       if (game.isEmbedCode) {
+        // Enforcing sandbox security parameters to prevent escapes/top window redirect hijacking
         gameTab.document.write(`
           <!DOCTYPE html>
           <html lang="en">
@@ -377,7 +378,7 @@ function launchGame(gameId) {
             <title>${game.title}</title>
             <style>
               body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#fff; }
-              .jsbin-embed { width:100%; height:100vh; display:block; border:none; }
+              iframe { width:100%; height:100vh; display:block; border:none; }
               .back-btn {
                 position: fixed; top: 15px; left: 15px; z-index: 99999999;
                 background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
@@ -389,8 +390,7 @@ function launchGame(gameId) {
           </head>
           <body>
             <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
-            <a class="jsbin-embed" href="${game.jsbin}">JS Bin on jsbin.com</a>
-            <script src="https://jsbin.com/js/embed.js"></script>
+            <iframe src="${game.jsbin}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
           </body>
           </html>
         `);
@@ -416,7 +416,7 @@ function launchGame(gameId) {
           </head>
           <body>
             <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
-            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
           </body>
           </html>
         `);
