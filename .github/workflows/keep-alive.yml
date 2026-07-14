@@ -1,4 +1,4 @@
-name: NxOS Dual Database Upkeep Bot
+name: Nx Dual Database Upkeep Bot
 
 on:
   schedule:
