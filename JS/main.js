@@ -34,7 +34,7 @@ let _0xData = [
   { id: "slice_master", title: "Slice Master", url: "../Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
   { id: "skinwalker", title: "Skinwalker", url: "../Games/skinwalker/index.html", desc: "Atmospheric survival horror centered around staying undetected outdoors.", popular: true },
   { id: "skib_shooter", title: "Skib Shooters", url: "../Games/skibshooter/index.html", desc: "Dynamic target arena where waves of attackers stream in continuously.", popular: true },
-  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "../Games/ragdrop/index.html", jsbin: "https://jsbin.com/cavarud", desc: "Drop your structural targets down pins to clear high score records.", popular: true },
+  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "../Games/ragdrop/index.html", jsbin: "https://jsbin.com/cavarud/embed?html,output", isEmbedCode: true, desc: "Drop your structural targets down pins to clear high score records.", popular: true },
   { id: "g_spin", title: "Gun Spin", url: "../Games/gunspin/gunspin.html", desc: "Launch your firearm through the air and use recoil strategically to travel the greatest distance possible.", popular: true },
   { id: "gm_1", title: "Gun Mayhem", url: "../Games/GunMayhem/gunmayhem/gunmayhem.html", desc: "Fast-paced multiplayer arena shooter featuring powerful weapons, explosions, and chaotic battles.", popular: true },
   { id: "gm_2", title: "Gun Mayhem 2", url: "../Games/GunMayhem/gunmayhem2/gunmayhem2.html", desc: "The sequel to Gun Mayhem with more weapons, maps, customization, and intense combat.", popular: true },
@@ -57,7 +57,7 @@ let _0xData = [
   { id: "er_3", title: "Escape Road 3", url: "../Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
   { id: "erc_2", title: "Escape Road City 2", url: "../Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
   { id: "imt", title: "Idle Miner Tycoon", url: "../Games/IMT/index.html", desc: "Build a mining empire from the ground up by managing resources, upgrading operations, and expanding your profits.", popular: true },
-  { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", jsbin: "https://jsbin.com/xezetir", desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
+  { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", jsbin: "https://jsbin.com/xezetir/embed?html,output", isEmbedCode: true, desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
   { id: "dbs", title: "Double Barrel Sniper", url: "../Games/DBS/index.html", desc: "Sharpen your aim in this precision sniper game featuring challenging missions, long-range shots, and tactical gameplay.", popular: true },
   { id: "dm_1", title: "Doge Miner", url: "../Games/Dogeminer1/index.html", desc: "Mine Dogecoins, hire Shiba workers, and upgrade your operation to reach the moon in this idle clicker game.", popular: true },
   { id: "dm_2", title: "Doge Miner 2", url: "../Games/Dogeminer2/index.html", desc: "The sequel expands the Dogecoin mining adventure with new upgrades, planets, and even more ways to grow your mining empire.", popular: true },
@@ -323,56 +323,74 @@ function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
     const rootUrl = "https://glaxyias.github.io/";
-    
-    // Determine target URL destination (checks for standard layout array paths vs remote JSBin embeds)
-    let gameFullUrl;
-    if (game.jsbin) {
-      gameFullUrl = game.jsbin;
-    } else {
-      gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, "");
-    }
-
-    // 1. Spawns an empty tab context wrapper
     const gameTab = window.open('about:blank', '_blank');
     
     if (gameTab) {
-      // 2. Cloak the tab document title to look safe
       gameTab.document.title = "Google Docs";
-
-      // 3. Document payload layout setup containing the navigation link
       gameTab.document.open();
-      gameTab.document.write(`
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-          <meta charset="UTF-8">
-          <title>${game.title}</title>
-          <style>
-            body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
-            iframe { width:100%; height:100%; border:none; display:block; }
-            .back-btn {
-              position: fixed; top: 15px; left: 15px; z-index: 99999999;
-              background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
-              padding: 8px 14px; font-weight: bold; border-radius: 6px;
-              cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
-              font-family: sans-serif; text-decoration: none; display: inline-block;
-            }
-          </style>
-        </head>
-        <body>
-          <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
-          
-          <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
-        </body>
-        </html>
-      `);
+
+      // Check if it requires the direct JSBin Embed code format injection
+      if (game.isEmbedCode) {
+        gameTab.document.write(`
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>${game.title}</title>
+            <style>
+              body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#fff; }
+              .jsbin-embed { width:100%; height:100vh; display:block; border:none; }
+              .back-btn {
+                position: fixed; top: 15px; left: 15px; z-index: 99999999;
+                background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
+                padding: 8px 14px; font-weight: bold; border-radius: 6px;
+                cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
+                font-family: sans-serif; text-decoration: none; display: inline-block;
+              }
+            </style>
+          </head>
+          <body>
+            <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
+            <a class="jsbin-embed" href="${game.jsbin}">JS Bin on jsbin.com</a>
+            <script src="https://jsbin.com/js/embed.js"></script>
+          </body>
+          </html>
+        `);
+      } else {
+        // Standard game fallback method using direct iframe pathways
+        const gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, "");
+        gameTab.document.write(`
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="UTF-8">
+            <title>${game.title}</title>
+            <style>
+              body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
+              iframe { width:100%; height:100%; border:none; display:block; }
+              .back-btn {
+                position: fixed; top: 15px; left: 15px; z-index: 99999999;
+                background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
+                padding: 8px 14px; font-weight: bold; border-radius: 6px;
+                cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
+                font-family: sans-serif; text-decoration: none; display: inline-block;
+              }
+            </style>
+          </head>
+          <body>
+            <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
+            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+          </body>
+          </html>
+        `);
+      }
+      
       gameTab.document.close();
     } else {
       alert("Pop-up blocked! Please allow popup permissions to play games.");
       return;
     }
 
-    // 4. Instantly close out the main hub catalog layout view window clean
     window.close();
   }
 }
