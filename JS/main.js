@@ -19,7 +19,7 @@ let _0xData = [
   { id: "t_pa", title: "Throw a Potato", url: "../Games/TAPA/index.html", desc: "Physics arcade game where you launch a potato over complex obstacles.", popular: true },
   { id: "t_p2", title: "Throw a Potato 2", url: "../Games/TAPA2/index.html", desc: "The official sequel featuring refined launch engines and bigger stages.", popular: true },
   { id: "t_to", title: "Tung Tung Tung Sahur Obby", url: "../Games/T^3sahurobby/index.html", desc: "Meme-inspired obstacle map built to test jumping accuracy.", popular: true },
-  { id: "t_bb", title: "Tung Baldi Basics", url: "../Games/tungbaldibasics/index.html", desc: "Horror puzzle game featuring surreal environments and puzzle challenges.", popular: true },
+  { id: "t_to", title: "Tung Baldi Basics", url: "../Games/tungbaldibasics/index.html", desc: "Horror puzzle game featuring surreal environments and puzzle challenges.", popular: true },
   { id: "w_dl", title: "Wordle", url: "../Games/wordle/index.html", desc: "Figure out the daily hidden five-letter word within six attempts.", popular: true },
   { id: "v_3x", title: "Vex 3 Xmas", url: "../Games/Vex/Vex3Xmas/index.html", desc: "Festive holiday edition of the classic stickman parkour challenge.", popular: true },
   { id: "v_4", title: "Vex 4", url: "../Games/Vex/Vex4/index.html", desc: "Sprint, leap, and dodge deadly stage traps dynamically.", popular: true },
@@ -34,7 +34,7 @@ let _0xData = [
   { id: "slice_master", title: "Slice Master", url: "../Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
   { id: "skinwalker", title: "Skinwalker", url: "../Games/skinwalker/index.html", desc: "Atmospheric survival horror centered around staying undetected outdoors.", popular: true },
   { id: "skib_shooter", title: "Skib Shooters", url: "../Games/skibshooter/index.html", desc: "Dynamic target arena where waves of attackers stream in continuously.", popular: true },
-  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "..Games/ragdrop/jsbin.cavarud.1.html", desc: "Drop your structural targets down pins to clear high score records.", popular: true },
+  { id: "ragdoll_drop", title: "Ragdoll Drop", url: "../Games/ragdrop/index.html", jsbin: "https://jsbin.com/cavarud", desc: "Drop your structural targets down pins to clear high score records.", popular: true },
   { id: "g_spin", title: "Gun Spin", url: "../Games/gunspin/gunspin.html", desc: "Launch your firearm through the air and use recoil strategically to travel the greatest distance possible.", popular: true },
   { id: "gm_1", title: "Gun Mayhem", url: "../Games/GunMayhem/gunmayhem/gunmayhem.html", desc: "Fast-paced multiplayer arena shooter featuring powerful weapons, explosions, and chaotic battles.", popular: true },
   { id: "gm_2", title: "Gun Mayhem 2", url: "../Games/GunMayhem/gunmayhem2/gunmayhem2.html", desc: "The sequel to Gun Mayhem with more weapons, maps, customization, and intense combat.", popular: true },
@@ -57,7 +57,7 @@ let _0xData = [
   { id: "er_3", title: "Escape Road 3", url: "../Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
   { id: "erc_2", title: "Escape Road City 2", url: "../Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
   { id: "imt", title: "Idle Miner Tycoon", url: "../Games/IMT/index.html", desc: "Build a mining empire from the ground up by managing resources, upgrading operations, and expanding your profits.", popular: true },
-  { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
+  { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", jsbin: "https://jsbin.com/xezetir", desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
   { id: "dbs", title: "Double Barrel Sniper", url: "../Games/DBS/index.html", desc: "Sharpen your aim in this precision sniper game featuring challenging missions, long-range shots, and tactical gameplay.", popular: true },
   { id: "dm_1", title: "Doge Miner", url: "../Games/Dogeminer1/index.html", desc: "Mine Dogecoins, hire Shiba workers, and upgrade your operation to reach the moon in this idle clicker game.", popular: true },
   { id: "dm_2", title: "Doge Miner 2", url: "../Games/Dogeminer2/index.html", desc: "The sequel expands the Dogecoin mining adventure with new upgrades, planets, and even more ways to grow your mining empire.", popular: true },
@@ -69,7 +69,6 @@ let _0xData = [
   { id: "car_crash_3", title: "Car Crash 3", url: "../Games/carcrash3/index.html", desc: "Test the limits of high-speed structural physics, unleash vehicle destruction across sandbox stunt arenas, and watch realistic damage dynamics play out in this high-impact driving simulator.", popular: true }
 ];
 
-// Context Management variables
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
 
@@ -324,7 +323,14 @@ function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
     const rootUrl = "https://glaxyias.github.io/";
-    const gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, ""); 
+    
+    // Determine target URL destination (checks for standard layout array paths vs remote JSBin embeds)
+    let gameFullUrl;
+    if (game.jsbin) {
+      gameFullUrl = game.jsbin;
+    } else {
+      gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, "");
+    }
 
     // 1. Spawns an empty tab context wrapper
     const gameTab = window.open('about:blank', '_blank');
@@ -333,7 +339,7 @@ function launchGame(gameId) {
       // 2. Cloak the tab document title to look safe
       gameTab.document.title = "Google Docs";
 
-      // 3. Document payload layout setup containing the fixed absolute destination navigation link
+      // 3. Document payload layout setup containing the navigation link
       gameTab.document.open();
       gameTab.document.write(`
         <!DOCTYPE html>
@@ -366,8 +372,8 @@ function launchGame(gameId) {
       return;
     }
 
-    // 4. Redirect the dashboard layout behind it instantly to a target decoy screen
-    window.location.replace("https://classroom.google.com");
+    // 4. Instantly close out the main hub catalog layout view window clean
+    window.close();
   }
 }
 
