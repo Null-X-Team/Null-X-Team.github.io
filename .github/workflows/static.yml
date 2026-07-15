@@ -2,12 +2,9 @@
 name: Deploy static content to Pages
 
 on:
-  # Triggers only when the CodeQL Advanced workflow finishes running on the main branch
-  workflow_run:
-    workflows: ["CodeQL Advanced"]
+  # Triggers the deployment instantly every time you push to the main branch
+  push:
     branches: ["main"]
-    types:
-      - completed
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -27,8 +24,6 @@ concurrency:
 jobs:
   # Single deploy job, since we're just deploying; now handling automation tasks
   deploy:
-    # Only execute if the triggering CodeQL run was successful, OR if you manually started it
-    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
