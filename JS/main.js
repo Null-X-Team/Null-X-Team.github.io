@@ -93,7 +93,7 @@ let _0xData = [
   { id: "er_3", title: "Escape Road 3", url: "../Games/Escaperoad/Escape Road 3/index.html", desc: "Take on even greater challenges with faster pursuits, advanced obstacles, and nonstop driving action.", popular: true },
   { id: "erc_2", title: "Escape Road City 2", url: "../Games/Escaperoad/Escape Road City 2/index.html", desc: "Navigate a bustling city while evading capture through crowded streets, shortcuts, and dangerous intersections.", popular: true },
   { id: "imt", title: "Idle Miner Tycoon", url: "../Games/IMT/index.html", desc: "Build a mining empire from the ground up by managing resources, upgrading operations, and expanding your profits.", popular: true },
- { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", jsbin: "https://codepen.io/Glaeesas/embed/bNgMxpg?default-tab=result&theme-id=dark", isEmbedCode: true, desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
+  { id: "ime_1", title: "Idle Mining Empire", url: "../Games/IME/index.html", jsbin: "https://codepen.io/Glaeesas/embed/bNgMxpg?default-tab=result&theme-id=dark", isEmbedCode: true, desc: "Build your mining operation from the ground up, automate production, and expand your empire to earn massive profits even while idle.", popular: true },
   { id: "dbs", title: "Double Barrel Sniper", url: "../Games/DBS/index.html", desc: "Sharpen your aim in this precision sniper game featuring challenging missions, long-range shots, and tactical gameplay.", popular: true },
   { id: "dm_1", title: "Doge Miner", url: "../Games/Dogeminer1/index.html", desc: "Mine Dogecoins, hire Shiba workers, and upgrade your operation to reach the moon in this idle clicker game.", popular: true },
   { id: "dm_2", title: "Doge Miner 2", url: "../Games/Dogeminer2/index.html", desc: "The sequel expands the Dogecoin mining adventure with new upgrades, planets, and even more ways to grow your mining empire.", popular: true },
@@ -442,7 +442,17 @@ function renderLibraryGrid(gamesArray) {
     const card = document.createElement('div');
     card.className = 'game-card';
     card.setAttribute('data-game-id', game.id);
-    card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+
+    // Checks for image thumbnail, generates custom initials gradient placeholder as fallback
+    const imgHTML = game.image 
+      ? `<img src="${game.image}" class="game-card-img" alt="${game.title}">` 
+      : `<div class="game-card-img-placeholder"><span>${game.title.substring(0, 2).toUpperCase()}</span></div>`;
+
+    card.innerHTML = `
+      ${imgHTML}
+      <h3>${game.title}</h3>
+      <div class="game-desc-overlay">${game.desc}</div>
+    `;
     card.onclick = () => launchGame(game.id);
     gameGrid.appendChild(card);
   });
@@ -465,7 +475,17 @@ function renderFavoritesGrid() {
         const card = document.createElement('div');
         card.className = 'game-card';
         card.setAttribute('data-game-id', game.id);
-        card.innerHTML = `<h3>${game.title}</h3><div class="game-desc-overlay">${game.desc}</div>`;
+
+        // Checks for image thumbnail inside favorites list too!
+        const imgHTML = game.image 
+          ? `<img src="${game.image}" class="game-card-img" alt="${game.title}">` 
+          : `<div class="game-card-img-placeholder"><span>${game.title.substring(0, 2).toUpperCase()}</span></div>`;
+
+        card.innerHTML = `
+          ${imgHTML}
+          <h3>${game.title}</h3>
+          <div class="game-desc-overlay">${game.desc}</div>
+        `;
         card.onclick = () => launchGame(game.id);
         favGrid.appendChild(card);
       }
@@ -1121,4 +1141,44 @@ fetchLiveWeather();
 
   checkServerVersion();
   setInterval(checkServerVersion, CHECK_INTERVAL);
+})();
+
+// ==========================================
+// DYNAMIC CARD CSS INJECTOR 
+// ==========================================
+(function injectCardStyles() {
+  const style = document.createElement('style');
+  style.innerHTML = `
+    .game-card {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .game-card-img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 8px 8px 0 0;
+      margin-bottom: 8px;
+    }
+    .game-card-img-placeholder {
+      width: 100%;
+      height: 140px;
+      background: linear-gradient(135deg, #1f1f2e, #0d0d13);
+      border-radius: 8px 8px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #8b00ff;
+      font-weight: bold;
+      font-size: 24px;
+      border-bottom: 1px solid rgba(139, 0, 255, 0.2);
+      margin-bottom: 8px;
+    }
+    .game-card h3 {
+      margin-top: 4px;
+    }
+  `;
+  document.head.appendChild(style);
 })();
