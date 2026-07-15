@@ -423,12 +423,14 @@ function launchGame(gameId) {
       }
       
       gameTab.document.close();
+
+      // Executing parent page closure immediately after streaming DOM layout to prevent sandbox context blocks
+      window.close();
+      
     } else {
       alert("Pop-up blocked! Please allow popup permissions to play games.");
       return;
     }
-
-    window.close();
   }
 }
 
