@@ -20,43 +20,15 @@
       display: flex;
       flex-direction: column;
       opacity: 0;
-      animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      animation: pageFadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       overflow-x: hidden;
-      position: relative;
     }
 
-    /* --- Keyframe Animations --- */
     @keyframes pageFadeIn {
       to { opacity: 1; }
     }
 
-    @keyframes statusBlink {
-      0%, 100% { opacity: 0.3; }
-      50% { opacity: 1; }
-    }
-
-    @keyframes scanline {
-      0% { transform: translateY(-100%); }
-      100% { transform: translateY(100%); }
-    }
-
-    /* --- Background Grid Canvas --- */
-    body::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        linear-gradient(rgba(139, 0, 255, 0.015) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(139, 0, 255, 0.015) 1px, transparent 1px);
-      background-size: 30px 30px;
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    /* --- Layout Container --- */
+    /* --- Page Layout Container --- */
     .debug-container {
       max-width: 1000px;
       margin: 40px auto;
@@ -80,104 +52,122 @@
     }
 
     h1 {
-      font-size: 28px;
+      font-size: 26px;
       font-weight: bold;
       color: #000000;
       letter-spacing: -0.5px;
     }
 
-    /* --- Main Console Layout Grid --- */
+    /* --- Console Grid --- */
     .console-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr;
+      grid-template-columns: 1fr 320px;
       gap: 30px;
     }
 
-    @media (max-width: 768px) {
+    @media (max-width: 850px) {
       .console-grid {
         grid-template-columns: 1fr;
       }
     }
 
-    /* --- Cards & Panels --- */
     .console-card {
       background: #ffffff;
       border: 1px solid #e0e0e0;
       border-radius: 4px;
       padding: 25px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-      position: relative;
+      margin-bottom: 30px;
     }
 
     .console-card h2 {
-      font-size: 14px;
+      font-size: 13px;
       font-weight: bold;
       text-transform: uppercase;
       letter-spacing: 1.5px;
       margin-bottom: 20px;
       color: #8b00ff;
+      border-bottom: 1px solid #eeeeee;
+      padding-bottom: 8px;
+    }
+
+    /* --- Real Console Log Terminal --- */
+    .terminal-wrapper {
+      background: #111111;
+      border-radius: 4px;
+      border: 1px solid #222222;
+      overflow: hidden;
+    }
+
+    .terminal-header {
+      background: #1a1a1a;
+      padding: 8px 15px;
+      font-size: 11px;
+      color: #888888;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      border-bottom: 1px solid #222222;
     }
 
-    /* --- Oscilloscope Canvas Interface --- */
-    .oscilloscope-wrapper {
-      position: relative;
-      background: #fafafa;
-      border: 1px solid #eeeeee;
-      border-radius: 4px;
-      overflow: hidden;
-      height: 220px;
-      margin-bottom: 20px;
-    }
-
-    .oscilloscope-wrapper::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(rgba(139, 0, 255, 0.03) 50%, transparent 50%);
-      background-size: 100% 4px;
-      pointer-events: none;
-    }
-
-    #oscilloscopeCanvas {
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    /* --- Simulated Log Terminal --- */
     .log-stream {
-      background: #111111;
-      color: #a333ff;
+      color: #e0e0e0;
       font-size: 12px;
       line-height: 1.6;
       padding: 15px;
-      height: 180px;
+      height: 320px;
       overflow-y: auto;
-      border-radius: 4px;
-      border: 1px solid #333;
+      background-color: #0c0c0c;
     }
 
     .log-line {
-      margin-bottom: 4px;
-      white-space: nowrap;
+      margin-bottom: 6px;
+      word-break: break-all;
     }
 
     .log-line .timestamp {
-      color: #666666;
+      color: #555555;
       margin-right: 8px;
     }
 
-    .log-line .success {
-      color: #00ff66;
+    /* Type Specific Colors (Matches Real Browser Inspector Colors) */
+    .log-line.log-type-log .label { color: #8b00ff; font-weight: bold; }
+    .log-line.log-type-warn .label { color: #ffaa00; font-weight: bold; }
+    .log-line.log-type-error .label { color: #ff3333; font-weight: bold; }
+    .log-line.log-type-system .label { color: #00ff66; font-weight: bold; }
+
+    /* --- Diagnostic Testing Buttons --- */
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 15px;
     }
 
-    /* --- Stats Panel Grid --- */
+    .btn {
+      background: #ffffff;
+      border: 1px solid #cccccc;
+      color: #111111;
+      padding: 8px 14px;
+      font-size: 11px;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      border-color: #8b00ff;
+      color: #8b00ff;
+      background: #faf9ff;
+    }
+
+    .btn-danger:hover {
+      border-color: #ff3333;
+      color: #ff3333;
+      background: #fff9f9;
+    }
+
+    /* --- Stats / Specs Panel --- */
     .stats-table {
       width: 100%;
       border-collapse: collapse;
@@ -188,7 +178,7 @@
       justify-content: space-between;
       padding: 12px 0;
       border-bottom: 1px solid #eeeeee;
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .stats-row:last-child {
@@ -196,26 +186,18 @@
     }
 
     .stats-label {
-      color: #666666;
+      color: #888888;
       text-transform: uppercase;
-      font-size: 11px;
+      font-size: 10px;
       letter-spacing: 1px;
     }
 
     .stats-value {
       font-weight: bold;
       color: #111111;
-    }
-
-    .status-indicator {
-      display: inline-block;
-      width: 8px;
-      height: 8px;
-      background-color: #00ff66;
-      border-radius: 50%;
-      margin-right: 6px;
-      box-shadow: 0 0 8px #00ff66;
-      animation: statusBlink 1.5s infinite;
+      text-align: right;
+      max-width: 180px;
+      word-break: break-all;
     }
 
     /* --- Footer Signature --- */
@@ -246,62 +228,65 @@
   <div class="debug-container">
     
     <div class="header-panel">
-      <div class="system-path">Diagnostics // Core_Telemetry_Console</div>
-      <h1>System Telemetry & Waveform Analyzer</h1>
+      <div class="system-path">Diagnostics // Local_Console_Sync</div>
+      <h1>Active Node Debugger</h1>
     </div>
 
     <div class="console-grid">
       
-      <div class="column-left" style="display: flex; flex-direction: column; gap: 30px;">
-        
-        <div class="console-card">
-          <h2>
-            <span>Live System Latency Oscilloscope</span>
-            <span style="font-size: 11px; color: #888;">Active Node Analysis</span>
-          </h2>
-          <div class="oscilloscope-wrapper">
-            <canvas id="oscilloscopeCanvas"></canvas>
-          </div>
-          <div style="font-size: 12px; color: #666666; line-height: 1.5;">
-            The waveform maps real-time structural response lag. Spikes represent simulated cache compilation and local database write executions.
-          </div>
-        </div>
-
-        <div class="console-card">
-          <h2>Core Activity Streams</h2>
-          <div class="log-stream" id="logStream">
+      <div class="column-left">
+        <div class="console-card" style="padding: 0; overflow: hidden; border: none;">
+          <div class="terminal-wrapper">
+            <div class="terminal-header">
+              <span>OUTPUT STREAM // STDOUT & STDERR</span>
+              <span id="logCounter">0 events recorded</span>
             </div>
-        </div>
+            <div class="log-stream" id="terminalLogStream">
+              </div>
+          </div>
 
+          <div style="margin-top: 20px;">
+            <p style="font-size: 12px; color: #666666; margin-bottom: 10px;">
+              Trigger real events below to verify that the intercept engine captures live console and runtime exceptions perfectly.
+            </p>
+            <div class="button-row">
+              <button class="btn" onclick="triggerLog()">Console.log()</button>
+              <button class="btn" onclick="triggerWarning()">Console.warn()</button>
+              <button class="btn btn-danger" onclick="triggerError()">Console.error()</button>
+              <button class="btn btn-danger" onclick="triggerException()">Throw Runtime Exception</button>
+              <button class="btn" style="border-color: #8b00ff; color: #8b00ff;" onclick="clearLogs()">Clear Output</button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div class="column-right">
         <div class="console-card">
-          <h2>Active Hardware Metrics</h2>
+          <h2>Active Browser Spec</h2>
           <div class="stats-table">
             <div class="stats-row">
-              <span class="stats-label">Network Sync</span>
-              <span class="stats-value"><span class="status-indicator"></span>ONLINE</span>
+              <span class="stats-label">Protocol</span>
+              <span class="stats-value" style="color: #00ff66;">SECURE HTTPS</span>
             </div>
             <div class="stats-row">
-              <span class="stats-label">System Ping</span>
-              <span class="stats-value" id="pingValue">14 ms</span>
+              <span class="stats-label">User Agent</span>
+              <span class="stats-value" id="specUA" style="font-size: 10px;">Detecting...</span>
             </div>
             <div class="stats-row">
-              <span class="stats-label">CPU Core Load</span>
-              <span class="stats-value" id="cpuValue">4.2%</span>
+              <span class="stats-label">Viewport</span>
+              <span class="stats-value" id="specScreen">0 x 0</span>
             </div>
             <div class="stats-row">
-              <span class="stats-label">Memory Heap</span>
-              <span class="stats-value" id="memValue">42.4 MB</span>
+              <span class="stats-label">DOM Load Time</span>
+              <span class="stats-value" id="specLoad">Measuring...</span>
             </div>
             <div class="stats-row">
-              <span class="stats-label">Security Frame</span>
-              <span class="stats-value" style="color: #8b00ff;">SECURE</span>
+              <span class="stats-label">Online Status</span>
+              <span class="stats-value" id="specOnline">ONLINE</span>
             </div>
             <div class="stats-row">
-              <span class="stats-label">Registry Node</span>
-              <span class="stats-value">v1.1.0-MAIN</span>
+              <span class="stats-label">Language</span>
+              <span class="stats-value" id="specLang">Detecting...</span>
             </div>
           </div>
         </div>
@@ -312,105 +297,112 @@
   </div>
 
   <footer>
-    <div>Node Protocol: telemetry_1.1.0</div>
+    <div>Node Protocol: 1.2.0-PROD</div>
     <div class="signature">- Your Null_X Team</div>
   </footer>
 
   <script>
-    // --- Live Fluctuating Telemetry Values ---
-    const pingEl = document.getElementById('pingValue');
-    const cpuEl = document.getElementById('cpuValue');
-    const memEl = document.getElementById('memValue');
+    const stream = document.getElementById('terminalLogStream');
+    const logCounter = document.getElementById('logCounter');
+    let eventCount = 0;
 
-    setInterval(() => {
-      // Fluid, natural fluctuations
-      const randomPing = Math.floor(Math.random() * 12) + 12; // 12ms - 24ms
-      const randomCpu = (Math.random() * 6 + 2).toFixed(1);   // 2.0% - 8.0%
-      const randomMem = (42.1 + Math.random() * 0.9).toFixed(2); // 42.1MB - 43.0MB
+    // --- Core Log Interception Engine ---
+    function captureStream(type, message) {
+      eventCount++;
+      logCounter.textContent = `${eventCount} event${eventCount === 1 ? '' : 's'} recorded`;
 
-      pingEl.textContent = `${randomPing} ms`;
-      cpuEl.textContent = `${randomCpu}%`;
-      memEl.textContent = `${randomMem} MB`;
-    }, 1200);
-
-    // --- Dynamic Console Terminal Logs ---
-    const logStream = document.getElementById('logStream');
-    const systemEvents = [
-      "Cache buffers initialized successfully.",
-      "Syncing telemetry payload definitions.",
-      "Bypassing sandbox viewport escape sequences.",
-      "Flushing local settings memory blocks.",
-      "NullAI core communication socket established.",
-      "Query latency optimized: latency parameters normal.",
-      "Reload pipeline registered: holding idle state."
-    ];
-
-    function appendLog() {
       const timeStampStr = new Date().toLocaleTimeString();
-      const randomEvent = systemEvents[Math.floor(Math.random() * systemEvents.length)];
-      
       const line = document.createElement('div');
-      line.className = 'log-line';
-      line.innerHTML = `<span class="timestamp">[${timeStampStr}]</span> <span class="success">SYSTEM:</span> ${randomEvent}`;
+      line.className = `log-line log-type-${type.toLowerCase()}`;
+      line.innerHTML = `<span class="timestamp">[${timeStampStr}]</span><span class="label">[${type.toUpperCase()}]</span> ${message}`;
       
-      logStream.appendChild(line);
-      logStream.scrollTop = logStream.scrollHeight;
+      stream.appendChild(line);
+      stream.scrollTop = stream.scrollHeight;
     }
 
-    // Initialize with a few starting logs, then run on interval
-    for(let i=0; i<4; i++) { appendLog(); }
-    setInterval(appendLog, 4000);
+    // Overwrite native console behaviors
+    const _log = console.log;
+    const _warn = console.warn;
+    const _error = console.error;
 
+    console.log = function(...args) {
+      captureStream('LOG', args.join(' '));
+      _log.apply(console, args);
+    };
 
-    // --- High-Performance Oscilloscope Canvas Drawing ---
-    const canvas = document.getElementById('oscilloscopeCanvas');
-    const ctx = canvas.getContext('2d');
+    console.warn = function(...args) {
+      captureStream('WARN', args.join(' '));
+      _warn.apply(console, args);
+    };
 
-    function resizeCanvas() {
-      canvas.width = canvas.parentElement.clientWidth;
-      canvas.height = canvas.parentElement.clientHeight;
+    console.error = function(...args) {
+      captureStream('ERROR', args.join(' '));
+      _error.apply(console, args);
+    };
+
+    // Capture Unhandled Runtime Errors
+    window.onerror = function(message, source, lineno, colno, error) {
+      captureStream('ERROR', `Uncaught Exception: ${message} at line ${lineno}:${colno}`);
+      return false; // let the browser run its native logging too
+    };
+
+    // Capture Unhandled Promise Rejections
+    window.onunhandledrejection = function(event) {
+      captureStream('ERROR', `Unhandled Promise Rejection: ${event.reason}`);
+    };
+
+    // --- Trigger Action Methods ---
+    function triggerLog() {
+      console.log("Client initialization completed. Local database buffers stable.");
     }
-    resizeCanvas();
-    window.addEventListener('resize', resizeCanvas);
 
-    let phase = 0;
-    function drawWave() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    function triggerWarning() {
+      console.warn("Telemetry socket fallback system selected: system idle.");
+    }
 
-      // Draw light center alignment grid line
-      ctx.beginPath();
-      ctx.strokeStyle = 'rgba(139, 0, 255, 0.08)';
-      ctx.lineWidth = 1;
-      ctx.moveTo(0, canvas.height / 2);
-      ctx.lineTo(canvas.width, canvas.height / 2);
-      ctx.stroke();
+    function triggerError() {
+      console.error("Pipeline failure: localized database access denied.");
+    }
 
-      // Render Telemetry Wave
-      ctx.beginPath();
-      ctx.strokeStyle = '#8b00ff';
-      ctx.lineWidth = 2;
+    function triggerException() {
+      // Intentional error generation
+      throw new Error("Local thread interrupted via debug control command.");
+    }
 
-      for (let x = 0; x < canvas.width; x++) {
-        // Base sine wave layered with high frequency micro-harmonics
-        const baseSine = Math.sin(x * 0.015 + phase);
-        const fineNoise = Math.sin(x * 0.08 - phase * 1.5) * 0.15;
-        const amplitudeMod = Math.sin(x * 0.003) * 30 + 35; // creates natural swelling of wave
+    function clearLogs() {
+      stream.innerHTML = '';
+      eventCount = 0;
+      logCounter.textContent = '0 events recorded';
+      captureStream('SYSTEM', 'Log output stream flushed by developer directive.');
+    }
 
-        const y = (canvas.height / 2) + (baseSine + fineNoise) * amplitudeMod;
+    // --- Pull Genuine Browser Specs ---
+    document.getElementById('specUA').textContent = navigator.userAgent;
+    document.getElementById('specScreen').textContent = `${window.innerWidth}px x ${window.innerHeight}px`;
+    document.getElementById('specLang').textContent = navigator.language.toUpperCase();
+    document.getElementById('specOnline').textContent = navigator.onLine ? 'ONLINE' : 'OFFLINE';
 
-        if (x === 0) {
-          ctx.moveTo(x, y);
+    // Track viewport resizing
+    window.addEventListener('resize', () => {
+      document.getElementById('specScreen').textContent = `${window.innerWidth}px x ${window.innerHeight}px`;
+    });
+
+    // Record system startup log
+    captureStream('SYSTEM', 'Diagnostics console hook installed. Monitoring output...');
+
+    // Calculate Real DOM Load Speed
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const [entry] = performance.getEntriesByType('navigation');
+        if (entry) {
+          const loadTime = Math.round(entry.duration);
+          document.getElementById('specLoad').textContent = `${loadTime} ms`;
+          captureStream('SYSTEM', `Core layout mounted. Complete render completed in ${loadTime}ms.`);
         } else {
-          ctx.lineTo(x, y);
+          document.getElementById('specLoad').textContent = 'N/A';
         }
-      }
-
-      ctx.stroke();
-      phase += 0.05; // speed of wave motion
-      requestAnimationFrame(drawWave);
-    }
-
-    drawWave();
+      }, 100);
+    });
   </script>
 
 </body>
