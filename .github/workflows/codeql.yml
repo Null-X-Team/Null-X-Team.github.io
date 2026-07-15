@@ -12,12 +12,9 @@
 name: "CodeQL Advanced"
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
   schedule:
-    - cron: '24 3 * * 3'
+    - cron: '24 3 * * 3' # Runs silently in the background once a week
+  workflow_dispatch:      # Allows you to run it manually from the Actions tab
 
 jobs:
   analyze:
