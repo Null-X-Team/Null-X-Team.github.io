@@ -21,16 +21,18 @@
       flex-direction: column;
       opacity: 0;
       animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      overflow-x: hidden;
+      position: relative;
     }
 
-    /* --- Animations --- */
+    /* --- Animations & Effects --- */
     @keyframes pageFadeIn {
       to { opacity: 1; }
     }
 
-    @keyframes imageBorderGlow {
-      0%, 100% { border-color: rgba(139, 0, 255, 0.2); box-shadow: 0 0 0px rgba(139, 0, 255, 0); }
-      50% { border-color: rgba(139, 0, 255, 0.6); box-shadow: 0 0 15px rgba(139, 0, 255, 0.15); }
+    @keyframes gridPulse {
+      0%, 100% { border-color: rgba(139, 0, 255, 0.15); box-shadow: 0 0 10px rgba(139, 0, 255, 0.02); }
+      50% { border-color: rgba(139, 0, 255, 0.4); box-shadow: 0 0 20px rgba(139, 0, 255, 0.08); }
     }
 
     @keyframes textCursor {
@@ -38,71 +40,57 @@
       to { border-right-color: transparent; }
     }
 
-    /* --- Page Layout Split --- */
-    .about-container {
-      max-width: 1000px;
-      margin: 60px auto;
-      padding: 0 40px;
-      display: flex;
-      gap: 60px;
-      flex: 1;
+    @keyframes lineFlow {
+      0% { transform: scaleX(0); }
+      100% { transform: scaleX(1); }
     }
 
-    /* Left Column: Image (In the left hand corner of the container) */
-    .left-column {
-      flex: 0 0 220px;
+    @keyframes backgroundPan {
+      0% { background-position: 0 0; }
+      100% { background-position: 40px 40px; }
     }
 
-    .profile-image-container {
-      width: 220px;
-      height: 220px;
-      border: 1px solid #e0e0e0;
-      padding: 6px;
-      background: #ffffff;
-      animation: imageBorderGlow 4s infinite ease-in-out;
-      transition: all 0.4s ease;
-    }
-
-    .profile-image-container:hover {
-      transform: scale(1.02);
-      border-color: #8b00ff;
-      box-shadow: 0 0 20px rgba(139, 0, 255, 0.25);
-    }
-
-    .profile-image {
+    /* --- Subtle Animated Grid Canvas Background --- */
+    body::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      filter: grayscale(100%);
-      transition: filter 0.4s ease;
+      background: 
+        linear-gradient(rgba(139, 0, 255, 0.015) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139, 0, 255, 0.015) 1px, transparent 1px);
+      background-size: 30px 30px;
+      z-index: -1;
+      animation: backgroundPan 15s linear infinite;
+      pointer-events: none;
     }
 
-    .profile-image-container:hover .profile-image {
-      filter: grayscale(0%);
-    }
-
-    /* Right Column: Bio Content */
-    .right-column {
+    /* --- Page Layout Container --- */
+    .about-container {
+      max-width: 900px;
+      margin: 80px auto;
+      padding: 0 40px;
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
     }
 
     .system-path {
       font-size: 11px;
       color: #888888;
-      letter-spacing: 1.5px;
+      letter-spacing: 2px;
       margin-bottom: 15px;
       text-transform: uppercase;
     }
 
     h1 {
-      font-size: 32px;
+      font-size: 36px;
       font-weight: bold;
       color: #000000;
       letter-spacing: -0.5px;
-      margin-bottom: 25px;
+      margin-bottom: 5px;
       border-right: 2px solid #8b00ff;
       display: inline-block;
       white-space: nowrap;
@@ -111,21 +99,103 @@
       animation: textCursor 0.8s infinite step-end;
     }
 
-    .bio-text {
-      font-size: 14px;
-      line-height: 1.8;
-      color: #444444;
-      max-width: 650px;
+    /* Animated horizontal division line */
+    .divider-line {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, #8b00ff, #e0e0e0);
+      margin-bottom: 40px;
+      transform-origin: left;
+      animation: lineFlow 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* --- Information Grid Layout --- */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 30px;
+    }
+
+    .info-card {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+      padding: 30px;
+      animation: gridPulse 5s infinite ease-in-out;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .info-card:hover {
+      transform: translateY(-3px);
+      border-color: #8b00ff;
+      box-shadow: 0 5px 20px rgba(139, 0, 255, 0.08);
+    }
+
+    .info-card h2 {
+      font-size: 18px;
+      font-weight: bold;
+      color: #000000;
+      letter-spacing: 1px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      border-left: 3px solid #8b00ff;
+      padding-left: 10px;
     }
 
     .bio-text p {
-      margin-bottom: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+      color: #444444;
+      margin-bottom: 15px;
     }
 
+    .bio-text p:last-child {
+      margin-bottom: 0;
+    }
+
+    /* --- Ideology Block (Trump, MAGA, Republican Support) --- */
+    .ideology-block {
+      background: #fafafa;
+      border-left: 4px solid #8b00ff;
+      padding: 20px 25px;
+      margin-top: 15px;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .ideology-title {
+      font-size: 13px;
+      font-weight: bold;
+      color: #000000;
+      letter-spacing: 1.5px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+    }
+
+    .ideology-list {
+      list-style: none;
+    }
+
+    .ideology-list li {
+      font-size: 13px;
+      color: #333333;
+      margin-bottom: 8px;
+      padding-left: 15px;
+      position: relative;
+    }
+
+    .ideology-list li::before {
+      content: "[+]";
+      position: absolute;
+      left: 0;
+      color: #8b00ff;
+      font-weight: bold;
+    }
+
+    /* --- Metadata Details Table --- */
     .metadata-list {
-      margin-top: 30px;
       border-top: 1px solid #eeeeee;
       padding-top: 25px;
+      margin-top: 20px;
     }
 
     .metadata-row {
@@ -135,7 +205,7 @@
     }
 
     .metadata-label {
-      width: 120px;
+      width: 140px;
       color: #888888;
       text-transform: uppercase;
       font-size: 11px;
@@ -161,7 +231,7 @@
     footer {
       border-top: 1px solid #eeeeee;
       padding: 30px 40px;
-      max-width: 1000px;
+      max-width: 900px;
       width: 100%;
       margin: 0 auto;
       display: flex;
@@ -184,42 +254,60 @@
 
   <div class="about-container">
     
-    <div class="left-column">
-      <div class="profile-image-container">
-        <img src="https://glaxyias.github.io/imgs/IMG_20260707_201535.jpg" alt="Developer Core Image" class="profile-image">
-      </div>
-    </div>
-
-    <div class="right-column">
-      <div class="system-path">Identity Directory // Core_Developer</div>
-      <h1>About Me</h1>
+    <div class="system-path">Identity Directory // Core_Developer_Manifest</div>
+    <h1>About Me</h1>
+    <div class="divider-line"></div>
+    
+    <div class="content-grid">
       
-      <div class="bio-text">
-        <p>I am the lead architect and interface compiler representing the Null_X Team structure. Operating primarily through web development pipelines, I focus on assembling lightweight frontend codebases, modular local settings caches, and interactive browser portals.</p>
-        
-        <p>This repository registers my active operational configuration, functioning as a clean static node designed to manage database references, deploy live configurations, and host diagnostic terminals.</p>
+      <div class="info-card">
+        <h2>Developer Profile</h2>
+        <div class="bio-text">
+          <p>I am the principal developer and systems compiler behind the Null_X Team architecture. I deploy modular frontend configurations, integrate local settings arrays, and optimize web applications for absolute performance stability.</p>
+          <p>This network node operates continuously to maintain development pipelines and provide clear portal registry access for all active Null_X web builds.</p>
+        </div>
       </div>
 
-      <div class="metadata-list">
-        <div class="metadata-row">
-          <div class="metadata-label">Identity</div>
-          <div class="metadata-value">glaxyias</div>
+      <div class="info-card">
+        <h2>Political Affiliations & Directives</h2>
+        <div class="bio-text">
+          <p>In addition to web system engineering, I strongly advocate for the preservation of constitutional principles, traditional infrastructure growth, and economic independence.</p>
         </div>
-        <div class="metadata-row">
-          <div class="metadata-label">Organization</div>
-          <div class="metadata-value">The Null_X Team</div>
-        </div>
-        <div class="metadata-row">
-          <div class="metadata-label">Core Project</div>
-          <div class="metadata-value"><a href="https://glaxyias.github.io/" target="_blank">glaxyias.github.io</a></div>
+        
+        <div class="ideology-block">
+          <div class="ideology-title">Operational Principles Supported</div>
+          <ul class="ideology-list">
+            <li>Strong support for Donald Trump, the vision of Make America Great Again (MAGA), and the Republican Party.</li>
+            <li>Commitment to patriotic values, individual liberties, and free-market technological innovation.</li>
+            <li>Advocacy for energy independence, manufacturing revitalization, and strong border security policies.</li>
+          </ul>
         </div>
       </div>
+
+      <div class="info-card">
+        <h2>System Properties</h2>
+        <div class="metadata-list">
+          <div class="metadata-row">
+            <div class="metadata-label">Identity</div>
+            <div class="metadata-value">glaxyias</div>
+          </div>
+          <div class="metadata-row">
+            <div class="metadata-label">Affiliation</div>
+            <div class="metadata-value">The Null_X Team</div>
+          </div>
+          <div class="metadata-row">
+            <div class="metadata-label">Domain Node</div>
+            <div class="metadata-value"><a href="https://glaxyias.github.io/" target="_blank">glaxyias.github.io</a></div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
 
   <footer>
-    <div>Node Protocol: 1.0.0</div>
+    <div>Node Protocol: 1.1.0</div>
     <div class="signature">- Your Null_X Team</div>
   </footer>
 
