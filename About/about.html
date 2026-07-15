@@ -1,2 +1,227 @@
-So I am the creator of this site? Wow man, That's so cool! I am so excited that I am the creator! Do I make any money? Man I don't make any money me. This site that I created man is just like all the way
-free
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Null_X Registry Node</title>
+  <style>
+    /* --- Core Styling & Reset --- */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Courier New', Courier, monospace;
+    }
+
+    body {
+      background-color: #ffffff;
+      color: #111111;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      animation: pageFadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    /* --- Animations --- */
+    @keyframes pageFadeIn {
+      to { opacity: 1; }
+    }
+
+    @keyframes imageBorderGlow {
+      0%, 100% { border-color: rgba(139, 0, 255, 0.2); box-shadow: 0 0 0px rgba(139, 0, 255, 0); }
+      50% { border-color: rgba(139, 0, 255, 0.6); box-shadow: 0 0 15px rgba(139, 0, 255, 0.15); }
+    }
+
+    @keyframes textCursor {
+      from { border-right-color: #8b00ff; }
+      to { border-right-color: transparent; }
+    }
+
+    /* --- Page Layout Split --- */
+    .about-container {
+      max-width: 1000px;
+      margin: 60px auto;
+      padding: 0 40px;
+      display: flex;
+      gap: 60px;
+      flex: 1;
+    }
+
+    /* Left Column: Image (In the left hand corner of the container) */
+    .left-column {
+      flex: 0 0 220px;
+    }
+
+    .profile-image-container {
+      width: 220px;
+      height: 220px;
+      border: 1px solid #e0e0e0;
+      padding: 6px;
+      background: #ffffff;
+      animation: imageBorderGlow 4s infinite ease-in-out;
+      transition: all 0.4s ease;
+    }
+
+    .profile-image-container:hover {
+      transform: scale(1.02);
+      border-color: #8b00ff;
+      box-shadow: 0 0 20px rgba(139, 0, 255, 0.25);
+    }
+
+    .profile-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(100%);
+      transition: filter 0.4s ease;
+    }
+
+    .profile-image-container:hover .profile-image {
+      filter: grayscale(0%);
+    }
+
+    /* Right Column: Bio Content */
+    .right-column {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .system-path {
+      font-size: 11px;
+      color: #888888;
+      letter-spacing: 1.5px;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: bold;
+      color: #000000;
+      letter-spacing: -0.5px;
+      margin-bottom: 25px;
+      border-right: 2px solid #8b00ff;
+      display: inline-block;
+      white-space: nowrap;
+      width: fit-content;
+      padding-right: 8px;
+      animation: textCursor 0.8s infinite step-end;
+    }
+
+    .bio-text {
+      font-size: 14px;
+      line-height: 1.8;
+      color: #444444;
+      max-width: 650px;
+    }
+
+    .bio-text p {
+      margin-bottom: 20px;
+    }
+
+    .metadata-list {
+      margin-top: 30px;
+      border-top: 1px solid #eeeeee;
+      padding-top: 25px;
+    }
+
+    .metadata-row {
+      display: flex;
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
+
+    .metadata-label {
+      width: 120px;
+      color: #888888;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 1px;
+    }
+
+    .metadata-value {
+      color: #111111;
+    }
+
+    .metadata-value a {
+      color: #8b00ff;
+      text-decoration: none;
+      border-bottom: 1px solid transparent;
+      transition: border-color 0.2s;
+    }
+
+    .metadata-value a:hover {
+      border-color: #8b00ff;
+    }
+
+    /* --- Footer Signature --- */
+    footer {
+      border-top: 1px solid #eeeeee;
+      padding: 30px 40px;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #888888;
+    }
+
+    .signature {
+      font-size: 13px;
+      font-weight: bold;
+      letter-spacing: 2px;
+      color: #8b00ff;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="about-container">
+    
+    <div class="left-column">
+      <div class="profile-image-container">
+        <img src="https://glaxyias.github.io/imgs/IMG_20260707_201535.jpg" alt="Developer Core Image" class="profile-image">
+      </div>
+    </div>
+
+    <div class="right-column">
+      <div class="system-path">Identity Directory // Core_Developer</div>
+      <h1>About Me</h1>
+      
+      <div class="bio-text">
+        <p>I am the lead architect and interface compiler representing the Null_X Team structure. Operating primarily through web development pipelines, I focus on assembling lightweight frontend codebases, modular local settings caches, and interactive browser portals.</p>
+        
+        <p>This repository registers my active operational configuration, functioning as a clean static node designed to manage database references, deploy live configurations, and host diagnostic terminals.</p>
+      </div>
+
+      <div class="metadata-list">
+        <div class="metadata-row">
+          <div class="metadata-label">Identity</div>
+          <div class="metadata-value">glaxyias</div>
+        </div>
+        <div class="metadata-row">
+          <div class="metadata-label">Organization</div>
+          <div class="metadata-value">The Null_X Team</div>
+        </div>
+        <div class="metadata-row">
+          <div class="metadata-label">Core Project</div>
+          <div class="metadata-value"><a href="https://glaxyias.github.io/" target="_blank">glaxyias.github.io</a></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div>Node Protocol: 1.0.0</div>
+    <div class="signature">- Your Null_X Team</div>
+  </footer>
+
+</body>
+</html>
