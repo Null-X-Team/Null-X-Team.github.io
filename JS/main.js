@@ -41,7 +41,7 @@ let _0xData = [
   { id: "d_md", title: "DriveMad", url: "../Games/drivemad/index.html", image: "../Games/drivemad/images (26).jpeg", desc: "Challenging physics-based driving. Don't flip your truck!", popular: true },
   { id: "b_ft", title: "Bullet Force", url: "../Games/bulletforce/index.html", image: "../Games/bulletforce/images (27).jpeg", desc: "Action-packed multiplayer FPS. Dominate the battlefield.", popular: true },
   { id: "b_bb", title: "Baseball Bros", url: "../Games/baseballbros/Baseballbros.html", image: "../Games/baseballbros/images (28).jpeg", desc: "An arcade baseball game with fast-paced matches.", popular: true },
-  { id: "b_kt", title: "BasketBros", url: "../Games/basketbros/Basketbros.html", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
+  { id: "b_kt", title: "Basket Bros", url: "../Games/basketbros/Basketbros.html", image: "../Games/basketbros/images (29).jpeg", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
   { id: "b_sts", title: "Basketball Stars", url: "../Games/basketballstars/Basketballstars.html", desc: "Fast-paced 1v1 street-style basketball matches.", popular: true },
   { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", desc: "Click cookies to build an industrial empire.", popular: true },
   { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
