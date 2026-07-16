@@ -389,7 +389,7 @@ function launchGame(gameId) {
             </style>
           </head>
           <body>
-            <a href="https://glaxyias.github.io/" class="back-btn">← Back to Games</a>
+            <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
             <iframe src="${game.jsbin}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
           </body>
           </html>
