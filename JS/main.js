@@ -38,7 +38,7 @@ let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "../Games/brotatoAPNG/Brotato.html", image: "../Games/brotatoAPNG/images (23).jpeg", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
   { id: "y_io", title: "Yohoho.io", url: "../Games/yohoho/index.html", image: "../Games/yohoho/images (24).jpeg", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
   { id: "s_lp", title: "Slope", url: "../Games/slope/index.html", image: "../Games/slope/images (25).jpeg", desc: "A fast-paced 3D platformer. Stay on the track!", popular: true },
-  { id: "d_md", title: "DriveMad", url: "../Games/drivemad/index.html", desc: "Challenging physics-based driving. Don't flip your truck!", popular: true },
+  { id: "d_md", title: "DriveMad", url: "../Games/drivemad/index.html", image: "../Games/drivemad/images (26).jpeg", desc: "Challenging physics-based driving. Don't flip your truck!", popular: true },
   { id: "b_ft", title: "Bullet Force", url: "../Games/bulletforce/index.html", desc: "Action-packed multiplayer FPS. Dominate the battlefield.", popular: true },
   { id: "b_bb", title: "Baseball Bros", url: "../Games/baseballbros/Baseballbros.html", desc: "An arcade baseball game with fast-paced matches.", popular: true },
   { id: "b_kt", title: "BasketBros", url: "../Games/basketbros/Basketbros.html", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
