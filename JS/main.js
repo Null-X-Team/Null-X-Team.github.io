@@ -1131,7 +1131,11 @@ fetchLiveWeather();
     document.body.appendChild(popup);
 
     document.getElementById("nxos-reload-btn").addEventListener("click", () => {
-      window.location.reload();
+      // Clear any session memory
+      sessionStorage.clear();
+      
+      // Forces a hard reload by adding a unique timestamp to the URL, bypassing the browser cache completely
+      window.location.href = window.location.origin + window.location.pathname + '?update=' + Date.now();
     });
 
     document.getElementById("nxos-dismiss-btn").addEventListener("click", () => {
