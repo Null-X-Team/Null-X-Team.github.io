@@ -43,7 +43,7 @@ let _0xData = [
   { id: "b_bb", title: "Baseball Bros", url: "../Games/baseballbros/Baseballbros.html", image: "../Games/baseballbros/images (28).jpeg", desc: "An arcade baseball game with fast-paced matches.", popular: true },
   { id: "b_kt", title: "Basket Bros", url: "../Games/basketbros/Basketbros.html", image: "../Games/basketbros/images (29).jpeg", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
   { id: "b_sts", title: "Basketball Stars", url: "../Games/basketballstars/Basketballstars.html", image: "../Games/basketballstars/images (30).jpeg", desc: "Fast-paced 1v1 street-style basketball matches.", popular: true },
-  { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", desc: "Click cookies to build an industrial empire.", popular: true },
+  { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", image: "../Games/brotatoAPNG/images (23).jpeg", desc: "Click cookies to build an industrial empire.", popular: true },
   { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
   { id: "r_bw", title: "Retro Bowl", url: "../Games/retrobowl/Retrobowl.html", desc: "Manage your team and lead them to gridiron glory.", popular: true },
   { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true },
@@ -55,7 +55,7 @@ let _0xData = [
   { id: "t_pa", title: "Throw a Potato", url: "../Games/TAPA/index.html", image: "../Games/TAPA/images (20).jpeg", desc: "Physics arcade game where you launch a potato over complex obstacles.", popular: true },
   { id: "t_p2", title: "Throw a Potato 2", url: "../Games/TAPA2/index.html", image: "../Games/TAPA2/images.png", desc: "The official sequel featuring refined launch engines and bigger stages.", popular: true },
   { id: "t_to", title: "Tung Tung Tung Sahur Obby", url: "../Games/T^3sahurobby/index.html", image: "../Games/T^3sahurobby/images (21).jpeg", desc: "Meme-inspired obstacle map built to test jumping accuracy.", popular: true },
-  { id: "t_to2", title: "Tung Baldi Basics", url: "../Games/tungbaldibasics/index.html", desc: "Horror puzzle game featuring surreal environments and puzzle challenges.", popular: true },
+  { id: "t_to", title: "Tung Baldi Basics", url: "../Games/tungbaldibasics/index.html", desc: "Horror puzzle game featuring surreal environments and puzzle challenges.", popular: true },
   { id: "w_dl", title: "Wordle", url: "../Games/wordle/index.html", desc: "Figure out the daily hidden five-letter word within six attempts.", popular: true },
   { id: "v_3x", title: "Vex 3 Xmas", url: "../Games/Vex/Vex3Xmas/index.html", desc: "Festive holiday edition of the classic stickman parkour challenge.", popular: true },
   { id: "v_4", title: "Vex 4", url: "../Games/Vex/Vex4/index.html", desc: "Sprint, leap, and dodge deadly stage traps dynamically.", popular: true },
@@ -1130,11 +1130,34 @@ fetchLiveWeather();
     document.head.appendChild(style);
     document.body.appendChild(popup);
 
-    document.getElementById("nxos-reload-btn").addEventListener("click", () => {
+    document.getElementById("nxos-reload-btn").addEventListener("click", async () => {
       sessionStorage.clear();
-      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('FORCE_CLEAR_CACHE');
-      } else {
+      
+      const targetUrl = window.location.href;
+      
+      try {
+        // 1. Fetch the main HTML file with headers that instruct the server & browser to bypass cache
+        await fetch(targetUrl, {
+          headers: {
+            'Pragma': 'no-cache',
+            'Expires': '-1',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+          },
+        });
+        
+        // 2. Fetch version.json to clear the cache trace on your version tracking
+        await fetch('./version.json', {
+          headers: {
+            'Pragma': 'no-cache',
+            'Expires': '-1',
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+          },
+        });
+        
+        // 3. Perform the in-place page swap
+        window.location.replace(targetUrl);
+      } catch (e) {
+        // Fallback reload if network is interrupted
         window.location.reload();
       }
     });
@@ -1147,13 +1170,6 @@ fetchLiveWeather();
   checkServerVersion();
   setInterval(checkServerVersion, CHECK_INTERVAL);
 })();
-
-// Register Service Worker for programmatical cache busting
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('./sw.js')
-    .then(() => console.log('[NxOS] Service Worker Sync Interface Registered'))
-    .catch(err => console.warn('[NxOS] Cache sync setup failed:', err));
-}
 
 // ==========================================
 // DYNAMIC CARD CSS INJECTOR 
