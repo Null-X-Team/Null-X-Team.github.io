@@ -628,5 +628,25 @@
   <script src="themes/themes.js"></script>
   
   <script src="./BAN/guard.js"></script>
+  <script>
+  // 1. Fetch your automated version.json file (preventing this fetch from caching)
+  fetch('version.json', { cache: 'no-store' })
+    .then(response => response.json())
+    .then(data => {
+      const version = data.version || Date.now();
+      
+      // 2. Dynamically create and inject the script tag with the automated version query parameter
+      const script = document.createElement('script');
+      script.src = `main.js?v=${version}`;
+      document.body.appendChild(script);
+    })
+    .catch(err => {
+      console.warn("Could not load version.json, falling back to timestamp:", err);
+      // Fallback if version.json fails to load
+      const script = document.createElement('script');
+      script.src = `main.js?v=${Date.now()}`;
+      document.body.appendChild(script);
+    });
+</script>
 </body>
 </html>
