@@ -192,13 +192,12 @@
 
         .progress-bar-fill {
             height: 100%;
-            width: 35%;
+            width: 0%;
             background: linear-gradient(90deg, #ff3b3b, #ff7777);
             border-radius: 2px;
             position: absolute;
             left: 0;
             top: 0;
-            transition: width 0.1s linear;
         }
 
         /* Animated Audio Equalizer Visualizer Bars */
@@ -323,13 +322,15 @@
             </div>
 
             <div class="media-deck">
+                <audio id="main-audio-engine" preload="auto"></audio>
+
                 <div class="media-info-block">
                     <div class="media-art-placeholder">
                         <i class="fa-solid fa-compact-disc fa-spin" id="media-disc-icon" style="animation-duration: 4s; animation-play-state: paused;"></i>
                     </div>
                     <div class="media-text">
-                        <span class="track-title" id="player-title">Cybernetic Synthesis</span>
-                        <span class="track-artist" id="player-artist">SYSTEM_AUDIO.WAV</span>
+                        <span class="track-title" id="player-title">Loading track...</span>
+                        <span class="track-artist" id="player-artist">Artist</span>
                     </div>
                 </div>
 
@@ -342,9 +343,9 @@
                     <div class="timeline-container">
                         <span class="time-stamp" id="time-current">0:00</span>
                         <div class="progress-bar-bg" id="progress-timeline">
-                            <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+                            <div class="progress-bar-fill" id="progress-fill"></div>
                         </div>
-                        <span class="time-stamp" id="time-duration">2:45</span>
+                        <span class="time-stamp" id="time-duration">0:00</span>
                     </div>
                 </div>
 
@@ -474,20 +475,20 @@
             }
 
             // ----------------------------------------------------------------------
-            // SIMULATED SYSTEM JUKEBOX AUDIO PLAYER DIALECT
+            // NATIVE SYSTEM AUDIO MEDIA PLAYER LOGIC
             // ----------------------------------------------------------------------
             const trackList = [
-                { title: "Cybernetic Synthesis", artist: "SYSTEM_AUDIO.WAV", duration: 165 },
-                { title: "Neon Grid Runner", artist: "RETRO_WAVE.MP3", duration: 210 },
-                { title: "Matrix Overdrive", artist: "HACKER_CORE.FLAC", duration: 142 }
+                { 
+                    title: "Refugee", 
+                    artist: "Tom Petty and the Heartbreakers", 
+                    src: "Galethis/MISC/music/Refugee - Tom Petty And The Heartbreakers - with lyrics.mp4" 
+                }
             ];
 
             let currentTrackIndex = 0;
-            let isPlaying = false;
-            let currentSeconds = 0;
-            let playerInterval = null;
             let vizInterval = null;
 
+            const audio = document.getElementById("main-audio-engine");
             const playPauseBtn = document.getElementById("play-pause-btn");
             const playIcon = document.getElementById("play-icon");
             const discIcon = document.getElementById("media-disc-icon");
@@ -496,25 +497,30 @@
             const timeCurrentEl = document.getElementById("time-current");
             const timeDurationEl = document.getElementById("time-duration");
             const progressFillEl = document.getElementById("progress-fill");
+            const timelineBg = document.getElementById("progress-timeline");
             const vizBars = document.querySelectorAll(".viz-bar");
 
             function formatTime(secs) {
+                if (isNaN(secs)) return "0:00";
                 const mins = Math.floor(secs / 60);
-                const remainder = secs % 60;
+                const remainder = Math.floor(secs % 60);
                 return `${mins}:${remainder < 10 ? "0" : ""}${remainder}`;
             }
 
-            function updateTrackDisplay() {
-                const currentTrack = trackList[currentTrackIndex];
-                trackTitleEl.textContent = currentTrack.title;
-                trackArtistEl.textContent = currentTrack.artist;
-                timeDurationEl.textContent = formatTime(currentTrack.duration);
-                progressFillEl.style.width = `${(currentSeconds / currentTrack.duration) * 100}%`;
-                timeCurrentEl.textContent = formatTime(currentSeconds);
+            function loadTrack(index) {
+                const track = trackList[index];
+                trackTitleEl.textContent = track.title;
+                trackArtistEl.textContent = track.artist;
+                audio.src = track.src;
+                audio.load();
+                
+                progressFillEl.style.width = "0%";
+                timeCurrentEl.textContent = "0:00";
+                timeDurationEl.textContent = "0:00";
             }
 
             function triggerVisualizerAnimation() {
-                if (!isPlaying) {
+                if (audio.paused) {
                     vizBars.forEach(bar => bar.style.height = "3px");
                     return;
                 }
@@ -525,48 +531,66 @@
             }
 
             function togglePlayback() {
-                isPlaying = !isPlaying;
-                if (isPlaying) {
-                    playIcon.className = "fa-solid fa-pause";
-                    discIcon.style.animationPlayState = "running";
-                    
-                    // Main clock interval tick loop
-                    playerInterval = setInterval(() => {
-                        currentSeconds++;
-                        if (currentSeconds >= trackList[currentTrackIndex].duration) {
-                            changeTrack(1); // Auto-advance playlist
-                        } else {
-                            updateTrackDisplay();
-                        }
-                    }, 1000);
-
-                    // Equalizer frame loop
-                    vizInterval = setInterval(triggerVisualizerAnimation, 150);
+                if (audio.paused) {
+                    audio.play().then(() => {
+                        playIcon.className = "fa-solid fa-pause";
+                        discIcon.style.animationPlayState = "running";
+                        clearInterval(vizInterval);
+                        vizInterval = setInterval(triggerVisualizerAnimation, 120);
+                    }).catch(err => console.log("Playback interaction deferred:", err));
                 } else {
+                    audio.pause();
                     playIcon.className = "fa-solid fa-play";
                     discIcon.style.animationPlayState = "paused";
-                    clearInterval(playerInterval);
                     clearInterval(vizInterval);
                     triggerVisualizerAnimation();
                 }
             }
 
             function changeTrack(direction) {
-                currentSeconds = 0;
                 currentTrackIndex = (currentTrackIndex + direction + trackList.length) % trackList.length;
-                updateTrackDisplay();
-                
-                if (!isPlaying) {
-                    togglePlayback();
-                }
+                loadTrack(currentTrackIndex);
+                audio.play().then(() => {
+                    playIcon.className = "fa-solid fa-pause";
+                    discIcon.style.animationPlayState = "running";
+                    clearInterval(vizInterval);
+                    vizInterval = setInterval(triggerVisualizerAnimation, 120);
+                }).catch(() => {
+                    playIcon.className = "fa-solid fa-play";
+                    discIcon.style.animationPlayState = "paused";
+                });
             }
+
+            // Audio Runtime Listeners
+            audio.addEventListener("timeupdate", () => {
+                if (!audio.duration) return;
+                const percentage = (audio.currentTime / audio.duration) * 100;
+                progressFillEl.style.width = `${percentage}%`;
+                timeCurrentEl.textContent = formatTime(audio.currentTime);
+            });
+
+            audio.addEventListener("durationchange", () => {
+                timeDurationEl.textContent = formatTime(audio.duration);
+            });
+
+            audio.addEventListener("ended", () => {
+                changeTrack(1); // Auto-advance track playlist layout loop
+            });
+
+            // Interactive scrub tracking on the bar timeline canvas
+            timelineBg.addEventListener("click", (e) => {
+                if (!audio.duration) return;
+                const rect = timelineBg.getBoundingClientRect();
+                const clickPositionOffset = (e.clientX - rect.left) / rect.width;
+                audio.currentTime = clickPositionOffset * audio.duration;
+            });
 
             playPauseBtn.addEventListener("click", togglePlayback);
             document.getElementById("next-track-btn").addEventListener("click", () => changeTrack(1));
             document.getElementById("prev-track-btn").addEventListener("click", () => changeTrack(-1));
 
             // Setup display parameters instantly
-            updateTrackDisplay();
+            loadTrack(currentTrackIndex);
         });
     </script>
 </body>
