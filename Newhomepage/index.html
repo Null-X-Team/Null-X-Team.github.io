@@ -18,7 +18,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 25px;        /* Pushes it slightly away from grids above */
+            margin-top: auto;        
             padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             width: 100%;
@@ -35,19 +35,17 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #27c93f; /* Bright terminal green */
+            background: #27c93f; 
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
 
-        /* Pulse glow effect when actively moving around dashboard layout */
         .active-pulse {
             box-shadow: 0 0 8px #27c93f;
             animation: statusPulse 2s infinite ease-in-out;
         }
 
-        /* Idle layout when cursor remains stagnant */
         .idle-mode {
-            background: #ffbd2e !important; /* Warning yellow */
+            background: #ffbd2e !important; 
             box-shadow: none !important;
         }
 
@@ -55,6 +53,170 @@
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.15); opacity: 0.7; }
             100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* ==========================================================================
+           HACKER DECK MEDIA PLAYER STYLES
+           ========================================================================== */
+        .media-deck {
+            width: 100%;
+            background: rgba(25, 15, 15, 0.45);
+            border: 1px solid rgba(255, 59, 59, 0.15);
+            border-radius: 16px;
+            padding: 16px;
+            margin-bottom: 25px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        .media-info-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .media-art-placeholder {
+            width: 46px;
+            height: 46px;
+            background: rgba(255, 59, 59, 0.1);
+            border: 1px solid rgba(255, 59, 59, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ff3b3b;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .media-text {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            min-width: 0;
+            flex: 1;
+        }
+
+        .track-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .track-artist {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.4);
+            font-family: monospace;
+        }
+
+        .media-controls-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1.5;
+        }
+
+        .media-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .media-btn {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            padding: 4px;
+        }
+
+        .media-btn:hover {
+            color: #ff3b3b;
+            transform: scale(1.1);
+        }
+
+        .media-btn.play-toggle {
+            width: 32px;
+            height: 32px;
+            background: #ff3b3b;
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            box-shadow: 0 4px 12px rgba(255, 59, 59, 0.3);
+        }
+
+        .media-btn.play-toggle:hover {
+            background: #ff5555;
+            color: #fff;
+            transform: scale(1.05);
+        }
+
+        .timeline-container {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .time-stamp {
+            font-size: 10px;
+            font-family: monospace;
+            color: rgba(255, 255, 255, 0.3);
+            min-width: 30px;
+        }
+
+        .progress-bar-bg {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 2px;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 35%;
+            background: linear-gradient(90deg, #ff3b3b, #ff7777);
+            border-radius: 2px;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.1s linear;
+        }
+
+        /* Animated Audio Equalizer Visualizer Bars */
+        .visualizer-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 3px;
+            height: 24px;
+            width: 45px;
+            padding-right: 5px;
+        }
+
+        .viz-bar {
+            width: 3px;
+            height: 3px;
+            background: #ff3b3b;
+            border-radius: 1px;
+            transition: height 0.15s ease;
         }
     </style>
 </head>
@@ -160,6 +322,41 @@
                 <input type="text" id="searchBar" placeholder="Search games...">
             </div>
 
+            <div class="media-deck">
+                <div class="media-info-block">
+                    <div class="media-art-placeholder">
+                        <i class="fa-solid fa-compact-disc fa-spin" id="media-disc-icon" style="animation-duration: 4s; animation-play-state: paused;"></i>
+                    </div>
+                    <div class="media-text">
+                        <span class="track-title" id="player-title">Cybernetic Synthesis</span>
+                        <span class="track-artist" id="player-artist">SYSTEM_AUDIO.WAV</span>
+                    </div>
+                </div>
+
+                <div class="media-controls-wrapper">
+                    <div class="media-buttons">
+                        <button class="media-btn" id="prev-track-btn"><i class="fa-solid fa-backward-step"></i></button>
+                        <button class="media-btn play-toggle" id="play-pause-btn"><i class="fa-solid fa-play" id="play-icon"></i></button>
+                        <button class="media-btn" id="next-track-btn"><i class="fa-solid fa-forward-step"></i></button>
+                    </div>
+                    <div class="timeline-container">
+                        <span class="time-stamp" id="time-current">0:00</span>
+                        <div class="progress-bar-bg" id="progress-timeline">
+                            <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <span class="time-stamp" id="time-duration">2:45</span>
+                    </div>
+                </div>
+
+                <div class="visualizer-container">
+                    <div class="viz-bar"></div>
+                    <div class="viz-bar"></div>
+                    <div class="viz-bar"></div>
+                    <div class="viz-bar"></div>
+                    <div class="viz-bar"></div>
+                </div>
+            </div>
+
             <div class="main-content">
                 
                 <div class="random-section">
@@ -224,63 +421,152 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // ----------------------------------------------------------------------
+            // ACTIVITY STATUS ENGINE LOGIC
+            // ----------------------------------------------------------------------
             const statusText = document.getElementById("activity-status-text");
             const statusDot = document.querySelector(".status-indicator-dot");
             
-            if (!statusText || !statusDot) return;
+            if (statusText && statusDot) {
+                let idleTimer = null;
+                const IDLE_TIMEOUT_MS = 5000;
 
-            let idleTimer = null;
-            const IDLE_TIMEOUT_MS = 5000; // Returns back to 'Idle' after 5 seconds of stillness
+                function setAsActive(customText = "Status: User Active") {
+                    statusText.textContent = customText;
+                    statusDot.classList.remove("idle-mode");
+                    statusDot.classList.add("active-pulse");
 
-            function setAsActive(customText = "Status: User Active") {
-                statusText.textContent = customText;
-                statusDot.classList.remove("idle-mode");
-                statusDot.classList.add("active-pulse");
-
-                // Clear and restart the countdown clock for going idle
-                clearTimeout(idleTimer);
-                idleTimer = setTimeout(() => {
-                    statusText.textContent = "Status: Idle (No Input)";
-                    statusDot.classList.remove("active-pulse");
-                    statusDot.classList.add("idle-mode");
-                }, IDLE_TIMEOUT_MS);
-            }
-
-            // 1. Listen for global cursor pointer movements
-            window.addEventListener("mousemove", () => {
-                if (statusText.textContent.startsWith("Status: User Active") || statusText.textContent.includes("Idle")) {
-                    setAsActive("Status: User Active");
-                } else {
-                    setAsActive(statusText.textContent);
+                    clearTimeout(idleTimer);
+                    idleTimer = setTimeout(() => {
+                        statusText.textContent = "Status: Idle (No Input)";
+                        statusDot.classList.remove("active-pulse");
+                        statusDot.classList.add("idle-mode");
+                    }, IDLE_TIMEOUT_MS);
                 }
-            });
 
-            // 2. Listen specifically for hover actions on game card mutations inside the grid layout
-            const observer = new MutationObserver(() => {
-                document.querySelectorAll(".game-card, .app-card").forEach(card => {
-                    // Avoid attaching multiple duplicate event listeners
-                    if (card.dataset.tracked) return;
-                    card.dataset.tracked = "true";
-
-                    card.addEventListener("mouseenter", () => {
-                        const appName = card.querySelector(".game-title, .app-label")?.textContent || "Application";
-                        setAsActive(`Status: Active [Interacting with ${appName}]`);
-                    });
-                    
-                    card.addEventListener("mouseleave", () => {
+                window.addEventListener("mousemove", () => {
+                    if (statusText.textContent.startsWith("Status: User Active") || statusText.textContent.includes("Idle")) {
                         setAsActive("Status: User Active");
+                    } else {
+                        setAsActive(statusText.textContent);
+                    }
+                });
+
+                const observer = new MutationObserver(() => {
+                    document.querySelectorAll(".game-card, .app-card").forEach(card => {
+                        if (card.dataset.tracked) return;
+                        card.dataset.tracked = "true";
+
+                        card.addEventListener("mouseenter", () => {
+                            const appName = card.querySelector(".game-title, .app-label")?.textContent || "Application";
+                            setAsActive(`Status: Active [Interacting with ${appName}]`);
+                        });
+                        card.addEventListener("mouseleave", () => {
+                            setAsActive("Status: User Active");
+                        });
                     });
                 });
-            });
 
-            // Keep tracking elements even if game grid components load dynamically later
-            const gridTarget = document.getElementById("gameGrid");
-            if (gridTarget) {
-                observer.observe(gridTarget, { childList: true, subtree: true });
+                const gridTarget = document.getElementById("gameGrid");
+                if (gridTarget) observer.observe(gridTarget, { childList: true, subtree: true });
+
+                setAsActive("Status: Live Sync Online");
             }
 
-            // Start initialization sync setup
-            setAsActive("Status: Live Sync Online");
+            // ----------------------------------------------------------------------
+            // SIMULATED SYSTEM JUKEBOX AUDIO PLAYER DIALECT
+            // ----------------------------------------------------------------------
+            const trackList = [
+                { title: "Cybernetic Synthesis", artist: "SYSTEM_AUDIO.WAV", duration: 165 },
+                { title: "Neon Grid Runner", artist: "RETRO_WAVE.MP3", duration: 210 },
+                { title: "Matrix Overdrive", artist: "HACKER_CORE.FLAC", duration: 142 }
+            ];
+
+            let currentTrackIndex = 0;
+            let isPlaying = false;
+            let currentSeconds = 0;
+            let playerInterval = null;
+            let vizInterval = null;
+
+            const playPauseBtn = document.getElementById("play-pause-btn");
+            const playIcon = document.getElementById("play-icon");
+            const discIcon = document.getElementById("media-disc-icon");
+            const trackTitleEl = document.getElementById("player-title");
+            const trackArtistEl = document.getElementById("player-artist");
+            const timeCurrentEl = document.getElementById("time-current");
+            const timeDurationEl = document.getElementById("time-duration");
+            const progressFillEl = document.getElementById("progress-fill");
+            const vizBars = document.querySelectorAll(".viz-bar");
+
+            function formatTime(secs) {
+                const mins = Math.floor(secs / 60);
+                const remainder = secs % 60;
+                return `${mins}:${remainder < 10 ? "0" : ""}${remainder}`;
+            }
+
+            function updateTrackDisplay() {
+                const currentTrack = trackList[currentTrackIndex];
+                trackTitleEl.textContent = currentTrack.title;
+                trackArtistEl.textContent = currentTrack.artist;
+                timeDurationEl.textContent = formatTime(currentTrack.duration);
+                progressFillEl.style.width = `${(currentSeconds / currentTrack.duration) * 100}%`;
+                timeCurrentEl.textContent = formatTime(currentSeconds);
+            }
+
+            function triggerVisualizerAnimation() {
+                if (!isPlaying) {
+                    vizBars.forEach(bar => bar.style.height = "3px");
+                    return;
+                }
+                vizBars.forEach(bar => {
+                    const randomHeight = Math.floor(Math.random() * 22) + 4;
+                    bar.style.height = `${randomHeight}px`;
+                });
+            }
+
+            function togglePlayback() {
+                isPlaying = !isPlaying;
+                if (isPlaying) {
+                    playIcon.className = "fa-solid fa-pause";
+                    discIcon.style.animationPlayState = "running";
+                    
+                    // Main clock interval tick loop
+                    playerInterval = setInterval(() => {
+                        currentSeconds++;
+                        if (currentSeconds >= trackList[currentTrackIndex].duration) {
+                            changeTrack(1); // Auto-advance playlist
+                        } else {
+                            updateTrackDisplay();
+                        }
+                    }, 1000);
+
+                    // Equalizer frame loop
+                    vizInterval = setInterval(triggerVisualizerAnimation, 150);
+                } else {
+                    playIcon.className = "fa-solid fa-play";
+                    discIcon.style.animationPlayState = "paused";
+                    clearInterval(playerInterval);
+                    clearInterval(vizInterval);
+                    triggerVisualizerAnimation();
+                }
+            }
+
+            function changeTrack(direction) {
+                currentSeconds = 0;
+                currentTrackIndex = (currentTrackIndex + direction + trackList.length) % trackList.length;
+                updateTrackDisplay();
+                
+                if (!isPlaying) {
+                    togglePlayback();
+                }
+            }
+
+            playPauseBtn.addEventListener("click", togglePlayback);
+            document.getElementById("next-track-btn").addEventListener("click", () => changeTrack(1));
+            document.getElementById("prev-track-btn").addEventListener("click", () => changeTrack(-1));
+
+            // Setup display parameters instantly
+            updateTrackDisplay();
         });
     </script>
 </body>
