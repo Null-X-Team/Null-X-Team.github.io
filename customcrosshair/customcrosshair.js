@@ -1,110 +1,156 @@
 /**
- * Custom Gaming Crosshair Engine for UBG Hubs
- * Automatically creates styles and DOM markup to inject a neon tactical crosshair.
+ * Ultimate Unique Cyberpunk Crosshair Engine for UBG Hubs
+ * Self-contained file that dynamically injects high-end tracking visuals.
  */
 (function() {
-    // 1. Create and inject required CSS styles
+    // 1. Inject the custom UI styling
     const style = document.createElement('style');
     style.innerHTML = `
-        /* Hide default cursor on interactive site elements */
+        /* Hide the default boring desktop pointer everywhere */
         body, a, button, iframe, .game-card, .clickable {
             cursor: none !important;
         }
 
-        /* Container styling for the tactical cursor wrapper */
-        #custom-crosshair {
+        /* Root element wrapper setup */
+        #unique-crosshair {
             position: fixed;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             pointer-events: none;
             z-index: 999999;
             transform: translate(-50%, -50%);
-            transition: opacity 0.12s ease, transform 0.05s linear;
+            transition: opacity 0.2s ease, width 0.15s ease, height 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Auto-hide states */
+        /* Auto-hide when the pointer leaves the screen bounds */
         .crosshair-hidden {
             opacity: 0 !important;
         }
 
-        /* Center neon pixel dot */
-        .crosshair-dot {
+        /* Laser Core Diamond Center */
+        .crosshair-core {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 4px;
-            height: 4px;
-            background-color: #00ff9d;
+            width: 6px;
+            height: 6px;
+            background: #00ffcc;
+            transform: rotate(45deg);
+            box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+            transition: transform 0.1s ease, background 0.2s ease;
+        }
+
+        /* Rotating Animated Outer Tactical Ring */
+        .crosshair-ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed rgba(0, 255, 204, 0.4);
             border-radius: 50%;
-            transform: translate(-50%, -50%);
-            box-shadow: 0 0 6px #00ff9d;
+            box-shadow: 0 0 8px rgba(0, 255, 204, 0.2);
+            animation: crosshairSpin 8s linear infinite;
+            transition: border 0.2s ease;
         }
 
-        /* Generic shared properties for tactical hashmarks */
-        .crosshair-line {
+        /* Futuristic Bracket Corners */
+        .crosshair-bracket {
             position: absolute;
-            background-color: #00ff9d;
-            box-shadow: 0 0 6px #00ff9d;
+            width: 8px;
+            height: 8px;
+            border: 2px solid #00ffcc;
+            filter: drop-shadow(0 0 4px #00ffcc);
+            transition: all 0.15s ease;
+        }
+        .bracket-tl { top: 0; left: 0; border-right: none; border-bottom: none; }
+        .bracket-tr { top: 0; right: 0; border-left: none; border-bottom: none; }
+        .bracket-bl { bottom: 0; left: 0; border-right: none; border-top: none; }
+        .bracket-br { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        /* Continuous rotation animation for the outer elements */
+        @keyframes crosshairSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
-        /* Vertical axis alignments */
-        .crosshair-line.top, .crosshair-line.bottom {
-            width: 2px;
-            height: 10px;
-            left: calc(50% - 1px);
-        }
-        .crosshair-line.top { top: 4px; }
-        .crosshair-line.bottom { bottom: 4px; }
+        /* ========================================= */
+        /* INTERACTIVE STATE MODIFIERS               */
+        /* ========================================= */
 
-        /* Horizontal axis alignments */
-        .crosshair-line.left, .crosshair-line.right {
-            width: 10px;
-            height: 2px;
-            top: calc(50% - 1px);
+        /* 1. MOUSE CLICKING STATE: Brackets snap inward tight onto the core, color shifts to hot pink */
+        #unique-crosshair.clicking {
+            width: 30px;
+            height: 30px;
         }
-        .crosshair-line.left { left: 4px; }
-        .crosshair-line.right { right: 4px; }
+        #unique-crosshair.clicking .crosshair-core {
+            background: #ff0055;
+            transform: rotate(135deg) scale(1.4);
+            box-shadow: 0 0 12px #ff0055, 0 0 25px #ff0055;
+        }
+        #unique-crosshair.clicking .crosshair-ring {
+            border-color: rgba(255, 0, 85, 0.7);
+        }
+        #unique-crosshair.clicking .crosshair-bracket {
+            border-color: #ff0055;
+            filter: drop-shadow(0 0 6px #ff0055);
+        }
 
-        /* Scale boost animations upon holding mouse down clicks */
-        #custom-crosshair.clicking {
-            transform: translate(-50%, -50%) scale(1.35);
+        /* 2. HOVERING OVER GAME/BUTTON STATE: Brackets expand wide out to indicate "Ready to Lock" */
+        #unique-crosshair.targeting {
+            width: 65px;
+            height: 65px;
+        }
+        #unique-crosshair.targeting .crosshair-bracket {
+            width: 12px;
+            height: 12px;
+            border-color: #ffff00;
+            filter: drop-shadow(0 0 5px #ffff00);
+        }
+        #unique-crosshair.targeting .crosshair-core {
+            background: #ffff00;
+            box-shadow: 0 0 10px #ffff00;
+        }
+        #unique-crosshair.targeting .crosshair-ring {
+            border: 2px solid rgba(255, 255, 0, 0.15);
+            border-style: dotted;
         }
     `;
     document.head.appendChild(style);
 
-    // 2. Build DOM markup dynamically so you don't have to touch your HTML body
+    // 2. Build the structural overlay elements completely dynamically
     const crosshair = document.createElement('div');
-    crosshair.id = 'custom-crosshair';
+    crosshair.id = 'unique-crosshair';
     crosshair.className = 'crosshair-hidden';
     crosshair.innerHTML = `
-        <div class="crosshair-dot"></div>
-        <div class="crosshair-line top"></div>
-        <div class="crosshair-line right"></div>
-        <div class="crosshair-line bottom"></div>
-        <div class="crosshair-line left"></div>
+        <div class="crosshair-core"></div>
+        <div class="crosshair-ring"></div>
+        <div class="crosshair-bracket bracket-tl"></div>
+        <div class="crosshair-bracket bracket-tr"></div>
+        <div class="crosshair-bracket bracket-bl"></div>
+        <div class="crosshair-bracket bracket-br"></div>
     `;
     document.body.appendChild(crosshair);
 
-    // 3. Track coordinates and drive interface states
+    // 3. Automation tracking & state triggers
     window.addEventListener('mousemove', (e) => {
         crosshair.style.left = e.clientX + 'px';
         crosshair.style.top = e.clientY + 'px';
         crosshair.classList.remove('crosshair-hidden');
+        
+        // Dynamic detection: If the user passes their mouse over a button, link, or game container, activate target tracking mode!
+        const targetTag = e.target.tagName.toLowerCase();
+        if (targetTag === 'a' || targetTag === 'button' || e.target.classList.contains('game-card') || targetTag === 'iframe') {
+            crosshair.classList.add('targeting');
+        } else {
+            crosshair.classList.remove('targeting');
+        }
     });
 
-    document.addEventListener('mouseleave', () => {
-        crosshair.classList.add('crosshair-hidden');
-    });
+    // Auto-hiding configurations
+    document.addEventListener('mouseleave', () => crosshair.classList.add('crosshair-hidden'));
+    document.addEventListener('mouseenter', () => crosshair.classList.remove('crosshair-hidden'));
 
-    document.addEventListener('mouseenter', () => {
-        crosshair.classList.remove('crosshair-hidden');
-    });
-
-    window.addEventListener('mousedown', () => {
-        crosshair.classList.add('clicking');
-    });
-
-    window.addEventListener('mouseup', () => {
-        crosshair.classList.remove('clicking');
-    });
+    // Handle mouse click hold mechanics
+    window.addEventListener('mousedown', () => crosshair.classList.add('clicking'));
+    window.addEventListener('mouseup', () => crosshair.classList.remove('clicking'));
 })();
