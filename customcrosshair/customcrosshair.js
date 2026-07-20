@@ -1,6 +1,6 @@
 /**
  * Custom Dynamic Lock-and-Flare Crosshair Engine for UBG Hubs
- * Features a 360-flip lock-in on hover, and an outward flare explosion on click.
+ * FIXED: Automatically drops depth layer behind settings/modals to allow clicking.
  */
 (function() {
     // 1. Inject the updated UI styling
@@ -17,13 +17,17 @@
             width: 50px;
             height: 50px;
             pointer-events: none;
-            z-index: 999999;
+            z-index: 999999; /* Super high by default */
             transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Smoothly transitions size and general opacity changes */
             transition: opacity 0.2s ease, width 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* FIX: Class to drop crosshair depth when menus are open */
+        #unique-crosshair.behind-elements {
+            z-index: 1000 !important; /* Drops below high-level settings menus/modals */
         }
 
         /* Auto-hide when the pointer leaves the screen bounds */
@@ -47,7 +51,6 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            /* Controls the rotation flip speed */
             transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
@@ -69,7 +72,7 @@
         /* INTERACTIVE STATE MODIFIERS               */
         /* ========================================= */
 
-        /* 1. HOVERING STATE (Targeting): Shrinks down tightly to "lock in" and executes a 360-degree flip */
+        /* 1. HOVERING STATE: Shrinks down tightly to "lock in" and executes a 360-degree flip */
         #unique-crosshair.targeting {
             width: 26px;
             height: 26px;
@@ -92,7 +95,6 @@
             width: 70px;
             height: 70px;
         }
-        /* Maintain the 360-degree orientation if clicking while hovering, or default spin if clicked instantly */
         #unique-crosshair.clicking .crosshair-bracket-container {
             transform: rotate(360deg) scale(0.9);
         }
@@ -113,7 +115,6 @@
     crosshair.id = 'unique-crosshair';
     crosshair.className = 'crosshair-hidden';
     
-    // Nest brackets inside a container so we can cleanly spin them together
     crosshair.innerHTML = `
         <div class="crosshair-core"></div>
         <div class="crosshair-bracket-container">
@@ -131,9 +132,22 @@
         crosshair.style.top = e.clientY + 'px';
         crosshair.classList.remove('crosshair-hidden');
         
-        // Detect UI layout hover targets
-        const targetTag = e.target.tagName.toLowerCase();
-        if (targetTag === 'a' || targetTag === 'button' || e.target.classList.contains('game-card') || targetTag === 'iframe') {
+        // Find what element is currently under the cursor
+        const target = e.target;
+        if (!target) return;
+
+        const targetTag = target.tagName.toLowerCase();
+        
+        // FIX: Check if the cursor is inside a settings menu, modal, or panel
+        // (Adjust the class strings inside .closest() if your menu uses a different class name like '.settings-modal')
+        if (target.closest('#settings-menu') || target.closest('.modal') || target.closest('.settings-panel')) {
+            crosshair.classList.add('behind-elements');
+        } else {
+            crosshair.classList.remove('behind-elements');
+        }
+
+        // Detect UI layout hover targets for locking animation
+        if (targetTag === 'a' || targetTag === 'button' || target.classList.contains('game-card') || targetTag === 'iframe' || target.closest('button') || target.closest('a')) {
             crosshair.classList.add('targeting');
         } else {
             crosshair.classList.remove('targeting');
