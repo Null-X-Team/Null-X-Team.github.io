@@ -1,13 +1,14 @@
 /**
  * Custom Dynamic Lock-and-Flare Crosshair Engine for UBG Hubs
- * FIXED: Automatically drops depth layer behind settings/modals to allow clicking.
+ * FIXED: Removed the depth-dropping logic that caused the crosshair to vanish 
+ * under modal overlays, ensuring it stays visible and completely interactive.
  */
 (function() {
-    // 1. Inject the updated UI styling
+    // 1. Inject the optimized UI styling
     const style = document.createElement('style');
     style.innerHTML = `
         /* Hide the default desktop mouse pointer */
-        body, a, button, iframe, .game-card, .clickable {
+        body, a, button, iframe, .game-card, .clickable, [role="button"] {
             cursor: none !important;
         }
 
@@ -16,18 +17,14 @@
             position: fixed;
             width: 50px;
             height: 50px;
-            pointer-events: none;
-            z-index: 999999; /* Super high by default */
+            /* CRITICAL: Allows all clicks to pass cleanly through the crosshair to the underlying UI */
+            pointer-events: none !important; 
+            z-index: 2147483647 !important; /* Maximum possible z-index value to guarantee it stays on top */
             transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
             justify-content: center;
             transition: opacity 0.2s ease, width 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), height 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        /* FIX: Class to drop crosshair depth when menus are open */
-        #unique-crosshair.behind-elements {
-            z-index: 1000 !important; /* Drops below high-level settings menus/modals */
         }
 
         /* Auto-hide when the pointer leaves the screen bounds */
@@ -132,22 +129,21 @@
         crosshair.style.top = e.clientY + 'px';
         crosshair.classList.remove('crosshair-hidden');
         
-        // Find what element is currently under the cursor
         const target = e.target;
         if (!target) return;
 
         const targetTag = target.tagName.toLowerCase();
         
-        // FIX: Check if the cursor is inside a settings menu, modal, or panel
-        // (Adjust the class strings inside .closest() if your menu uses a different class name like '.settings-modal')
-        if (target.closest('#settings-menu') || target.closest('.modal') || target.closest('.settings-panel')) {
-            crosshair.classList.add('behind-elements');
-        } else {
-            crosshair.classList.remove('behind-elements');
-        }
-
-        // Detect UI layout hover targets for locking animation
-        if (targetTag === 'a' || targetTag === 'button' || target.classList.contains('game-card') || targetTag === 'iframe' || target.closest('button') || target.closest('a')) {
+        // Detect UI layout hover targets for locking animation (links, buttons, theme selection boxes)
+        if (targetTag === 'a' || 
+            targetTag === 'button' || 
+            target.classList.contains('game-card') || 
+            targetTag === 'iframe' || 
+            target.closest('button') || 
+            target.closest('a') ||
+            target.style.cursor === 'pointer' ||
+            target.id === 'close-modal' ||
+            target.getAttribute('role') === 'button') {
             crosshair.classList.add('targeting');
         } else {
             crosshair.classList.remove('targeting');
