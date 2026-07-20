@@ -1,7 +1,6 @@
 /**
  * Custom Dynamic Lock-and-Flare Crosshair Engine for UBG Hubs
- * FIXED: Removed the depth-dropping logic that caused the crosshair to vanish 
- * under modal overlays, ensuring it stays visible and completely interactive.
+ * MODIFIED: Slow 360 roll is now applied to all clickable UI targets across the site.
  */
 (function() {
     // 1. Inject the optimized UI styling
@@ -17,9 +16,8 @@
             position: fixed;
             width: 50px;
             height: 50px;
-            /* CRITICAL: Allows all clicks to pass cleanly through the crosshair to the underlying UI */
             pointer-events: none !important; 
-            z-index: 2147483647 !important; /* Maximum possible z-index value to guarantee it stays on top */
+            z-index: 2147483647 !important; /* Maximum possible z-index to stay above modal views */
             transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
@@ -48,7 +46,8 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            /* Smooth tracking roll rotation time constant */
+            transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
         /* Modern Corner Brackets */
@@ -69,7 +68,7 @@
         /* INTERACTIVE STATE MODIFIERS               */
         /* ========================================= */
 
-        /* 1. HOVERING STATE: Shrinks down tightly to "lock in" and executes a 360-degree flip */
+        /* 1. HOVERING STATE: Shrinks tightly and performs a smooth, satisfying 360 roll */
         #unique-crosshair.targeting {
             width: 26px;
             height: 26px;
@@ -131,19 +130,21 @@
         
         const target = e.target;
         if (!target) return;
-
+        
         const targetTag = target.tagName.toLowerCase();
         
-        // Detect UI layout hover targets for locking animation (links, buttons, theme selection boxes)
+        // Detect globally interactive triggers: standard links, action buttons, game wrappers, 
+        // iframe game systems, custom configuration options, or objects assigned a pointer layout style.
         if (targetTag === 'a' || 
             targetTag === 'button' || 
-            target.classList.contains('game-card') || 
             targetTag === 'iframe' || 
+            target.classList.contains('game-card') || 
+            target.closest('.game-card') ||
+            target.closest('.game-container') ||
             target.closest('button') || 
             target.closest('a') ||
-            target.style.cursor === 'pointer' ||
-            target.id === 'close-modal' ||
-            target.getAttribute('role') === 'button') {
+            target.closest('[role="button"]') ||
+            window.getComputedStyle(target).cursor === 'pointer') {
             crosshair.classList.add('targeting');
         } else {
             crosshair.classList.remove('targeting');
