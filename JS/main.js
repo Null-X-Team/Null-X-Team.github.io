@@ -105,7 +105,8 @@ let _0xData = [
   { id: "bad_bodyguard", title: "Bad Bodyguard", url: "../Games/badbodyguard/index.html", desc: "Navigate chaotic security situations, make split-second defensive decisions, and protect your high-profile clients from wild incoming hazards in this unpredictable simulation.", popular: true },
   { id: "car_crash_3", title: "Car Crash 3", url: "../Games/carcrash3/index.html", desc: "Test the limits of high-speed structural physics, unleash vehicle destruction across sandbox stunt arenas, and watch realistic damage dynamics play out in this high-impact driving simulator.", popular: true },
   { id: "stick_merge", title: "Stick Merge", url: "../Games/stickmerge/index.html", image: "../Games/stickmerge/images (31).jpeg", desc: "Merge various weapons together to create more powerful firearms and eliminate targets.", popular: true },
-  { id: "strike_force_kitty", title: "Strike Force Kitty", url: "../Games/strikeforcekitty/index.html", image: "../Games/strikeforcekitty/images (32).jpeg", desc: "Lead a squad of adorable kittens to rescue the princess, defeating enemies and collecting outfits along the way.", popular: true }
+  { id: "strike_force_kitty", title: "Strike Force Kitty", url: "../Games/strikeforcekitty/index.html", image: "../Games/strikeforcekitty/images (32).jpeg", desc: "Lead a squad of adorable kittens to rescue the princess, defeating enemies and collecting outfits along the way.", popular: true },
+  { id: "superhot", title: "SUPERHOT", url: "../Games/superhot/index.html", image: "../Games/superhot/images (33).jpeg", desc: "An innovative first-person shooter where time moves only when you move.", popular: true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
