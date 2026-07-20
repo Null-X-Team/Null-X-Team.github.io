@@ -1,6 +1,6 @@
 /**
  * Custom Dynamic Lock-and-Flare Crosshair Engine for UBG Hubs
- * MODIFIED: Slow 360 roll is now applied to all clickable UI targets across the site.
+ * MODIFIED: The outward flare animation now fires on both mouse clicks and touch/trackpad taps.
  */
 (function() {
     // 1. Inject the optimized UI styling
@@ -17,7 +17,7 @@
             width: 50px;
             height: 50px;
             pointer-events: none !important; 
-            z-index: 2147483647 !important; /* Maximum possible z-index to stay above modal views */
+            z-index: 2147483647 !important; /* Maximum z-index to stay above modal views */
             transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
@@ -46,7 +46,6 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            /* Smooth tracking roll rotation time constant */
             transition: transform 0.7s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
@@ -68,7 +67,7 @@
         /* INTERACTIVE STATE MODIFIERS               */
         /* ========================================= */
 
-        /* 1. HOVERING STATE: Shrinks tightly and performs a smooth, satisfying 360 roll */
+        /* 1. HOVERING STATE: Shrinks tightly and performs a smooth 360 roll */
         #unique-crosshair.targeting {
             width: 26px;
             height: 26px;
@@ -86,7 +85,7 @@
             transform: scale(1.5);
         }
 
-        /* 2. CLICKING STATE: Flares outward wide from the locked position and flashes vibrant red */
+        /* 2. CLICKING / TAPPING STATE: Flares outward wide and flashes vibrant red */
         #unique-crosshair.clicking {
             width: 70px;
             height: 70px;
@@ -122,6 +121,10 @@
     `;
     document.body.appendChild(crosshair);
 
+    // Helper functions to handle flare activation
+    const startFlare = () => crosshair.classList.add('clicking');
+    const stopFlare = () => crosshair.classList.remove('clicking');
+
     // 3. Automation tracking & state triggers
     window.addEventListener('mousemove', (e) => {
         crosshair.style.left = e.clientX + 'px';
@@ -133,8 +136,7 @@
         
         const targetTag = target.tagName.toLowerCase();
         
-        // Detect globally interactive triggers: standard links, action buttons, game wrappers, 
-        // iframe game systems, custom configuration options, or objects assigned a pointer layout style.
+        // Detect globally interactive triggers
         if (targetTag === 'a' || 
             targetTag === 'button' || 
             targetTag === 'iframe' || 
@@ -151,11 +153,24 @@
         }
     });
 
+    // Support tracking crosshair position on touchscreen drag movements
+    window.addEventListener('touchmove', (e) => {
+        if (e.touches.length > 0) {
+            crosshair.style.left = e.touches[0].clientX + 'px';
+            crosshair.style.top = e.touches[0].clientY + 'px';
+            crosshair.classList.remove('crosshair-hidden');
+        }
+    }, { passive: true });
+
     // Viewport bound safety checks
     document.addEventListener('mouseleave', () => crosshair.classList.add('crosshair-hidden'));
     document.addEventListener('mouseenter', () => crosshair.classList.remove('crosshair-hidden'));
 
-    // Handle mouse click hold mechanics (Outward Flare)
-    window.addEventListener('mousedown', () => crosshair.classList.add('clicking'));
-    window.addEventListener('mouseup', () => crosshair.classList.remove('clicking'));
+    // Handle traditional mouse clicks
+    window.addEventListener('mousedown', startFlare);
+    window.addEventListener('mouseup', stopFlare);
+
+    // Handle mobile/trackpad screen touch taps
+    window.addEventListener('touchstart', startFlare, { passive: true });
+    window.addEventListener('touchend', stopFlare, { passive: true });
 })();
