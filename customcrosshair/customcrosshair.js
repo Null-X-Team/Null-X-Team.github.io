@@ -1,7 +1,6 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
- * UPGRADED: True center-slam locking, shockwave tap effects, and optimized touch registration.
- * MODIFIED: Clicking triggers a weapon-recoil animation (45-degree rotation and outward flare).
+ * MODIFIED: Slower, heavier mechanical recoil with a fiery red muzzle flash.
  */
 (function() {
     // 1. Inject the highly detailed UI styling
@@ -183,60 +182,63 @@
         #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
 
-        /* 2. CLICKING / TAPPING STATE: Weapon Recoil & Flare */
+        /* 2. CLICKING / TAPPING STATE: Heavy Red Recoil & Flare */
         
-        /* 4 corners turn one click to the right (45deg) and push outward */
+        /* 4 corners turn one click (45deg), scale up slightly, and push outward */
         #unique-crosshair.clicking .xhair-bracket-container {
-            width: 90px;
-            height: 90px;
-            transform: rotate(45deg); 
-            transition: all 0.05s ease-out; /* Fast outward kick */
+            width: 95px;
+            height: 95px;
+            transform: rotate(45deg) scale(1.15); 
+            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1); /* Slower, punchy kick */
         }
         
-        /* Rings flare out and disappear */
+        /* Rings flare out massively in red and fade away */
         #unique-crosshair.clicking .xhair-ring-outer {
-            width: 70px;
-            height: 70px;
+            width: 80px;
+            height: 80px;
             opacity: 0;
+            border-color: #ff3333;
             border-width: 2px;
-            transform: scale(1.2);
-            transition: all 0.15s ease-out;
+            transform: scale(1.4);
+            transition: all 0.25s ease-out; /* Longer fade */
         }
         #unique-crosshair.clicking .xhair-ring-inner {
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             opacity: 0;
-            background: rgba(0, 255, 204, 0.5);
-            transform: scale(1.5);
-            transition: all 0.15s ease-out;
+            background: rgba(255, 0, 0, 0.4);
+            border-color: #ff0000;
+            box-shadow: 0 0 30px #ff0000;
+            transform: scale(1.8);
+            transition: all 0.25s ease-out;
         }
         
-        /* Core pulses */
+        /* Core pulses violently in red */
         #unique-crosshair.clicking .xhair-core {
-            background: #ffffff;
-            box-shadow: 0 0 20px #ffffff, 0 0 30px #00ffcc;
-            transform: rotate(225deg) scale(1.8);
-            transition: all 0.05s ease-out;
+            background: #ff3333;
+            box-shadow: 0 0 20px #ff0000, 0 0 40px #ff5555;
+            transform: rotate(225deg) scale(2.5);
+            transition: all 0.12s ease-out;
         }
         
-        /* Brackets light up */
+        /* Brackets light up red */
         #unique-crosshair.clicking .xhair-bracket {
-            border-color: #ffffff;
+            border-color: #ff3333;
             border-width: 3px;
-            filter: drop-shadow(0 0 8px #00ffcc);
+            filter: drop-shadow(0 0 10px #ff0000);
         }
         
-        /* The 4 lines push aggressively outwards to point directly into the newly rotated corners */
+        /* The 4 lines push aggressively outwards pointing into the corners */
         #unique-crosshair.clicking .xhair-axis {
             animation: none !important; 
-            background: #ffffff !important;
-            box-shadow: 0 0 10px #00ffcc !important;
-            transition: all 0.05s ease-out; /* Super fast outward snap */
+            background: #ff3333 !important;
+            box-shadow: 0 0 12px #ff0000 !important;
+            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1); /* Matched to container speed */
         }
-        #unique-crosshair.clicking .xhair-axis.top    { top: -10px !important; height: 16px !important; }
-        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -10px !important; height: 16px !important; }
-        #unique-crosshair.clicking .xhair-axis.left   { left: -10px !important; width: 16px !important; }
-        #unique-crosshair.clicking .xhair-axis.right  { right: -10px !important; width: 16px !important; }
+        #unique-crosshair.clicking .xhair-axis.top    { top: -14px !important; height: 18px !important; }
+        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -14px !important; height: 18px !important; }
+        #unique-crosshair.clicking .xhair-axis.left   { left: -14px !important; width: 18px !important; }
+        #unique-crosshair.clicking .xhair-axis.right  { right: -14px !important; width: 18px !important; }
     `;
     document.head.appendChild(style);
 
@@ -272,10 +274,10 @@
     };
     
     const stopFlare = () => {
-        // Enforces a minimum time the shockwave is displayed so fast finger taps look identical to slow mouse clicks
+        // Increased time to 200ms so the heavier animation has time to be seen fully
         flareTimeout = setTimeout(() => {
             crosshair.classList.remove('clicking');
-        }, 100); // Shortened slightly for a punchier video game recoil feel
+        }, 200); 
     };
 
     // 3. Automation tracking & state triggers
