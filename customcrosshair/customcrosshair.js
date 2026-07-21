@@ -1,6 +1,6 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
- * Features continuous idle rotation, intricate geometric layers, and dynamic state flaring.
+ * UPGRADED: Mechanical axis lines now push outward and snap inward during the lock-on sequence.
  */
 (function() {
     // 1. Inject the highly detailed UI styling
@@ -17,7 +17,7 @@
             width: 80px;
             height: 80px;
             pointer-events: none !important; 
-            z-index: 2147483647 !important; /* Maximum z-index */
+            z-index: 2147483647 !important; 
             transform: translate(-50%, -50%);
             display: flex;
             align-items: center;
@@ -80,10 +80,11 @@
             box-shadow: 0 0 5px #00ffcc;
             transition: all 0.3s ease;
         }
-        .xhair-axis.top    { width: 2px; height: 8px; top: 12px; }
-        .xhair-axis.bottom { width: 2px; height: 8px; bottom: 12px; }
-        .xhair-axis.left   { width: 8px; height: 2px; left: 12px; }
-        .xhair-axis.right  { width: 8px; height: 2px; right: 12px; }
+        /* Explicitly centering the axis lines perfectly with the core */
+        .xhair-axis.top    { width: 2px; height: 8px; top: 12px; left: calc(50% - 1px); }
+        .xhair-axis.bottom { width: 2px; height: 8px; bottom: 12px; left: calc(50% - 1px); }
+        .xhair-axis.left   { width: 8px; height: 2px; left: 12px; top: calc(50% - 1px); }
+        .xhair-axis.right  { width: 8px; height: 2px; right: 12px; top: calc(50% - 1px); }
 
         /* ========================================= */
         /* LAYER 5: Outer Corner Brackets            */
@@ -102,7 +103,6 @@
             filter: drop-shadow(0 0 4px #00ffcc);
             transition: border-color 0.3s ease;
         }
-        /* Intricate L-Shape cutouts for the corners */
         .bracket-tl { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 4px; }
         .bracket-tr { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 4px; }
         .bracket-bl { bottom: 0; left: 0; border-right: none; border-top: none; border-bottom-left-radius: 4px; }
@@ -115,10 +115,44 @@
         @keyframes spinReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
         /* ========================================= */
+        /* MECHANICAL LOCK-IN KEYFRAMES              */
+        /* ========================================= */
+        
+        /* Shoots out to make room, holds, then slams into the center */
+        @keyframes lockAxisTop {
+            0%   { top: 12px; }
+            30%  { top: -22px; height: 4px; } 
+            60%  { top: -22px; height: 4px; }
+            90%  { top: 4px; height: 14px; } /* Slams in tight with slight overshoot */
+            100% { top: 6px; height: 10px; }
+        }
+        @keyframes lockAxisBottom {
+            0%   { bottom: 12px; }
+            30%  { bottom: -22px; height: 4px; }
+            60%  { bottom: -22px; height: 4px; }
+            90%  { bottom: 4px; height: 14px; }
+            100% { bottom: 6px; height: 10px; }
+        }
+        @keyframes lockAxisLeft {
+            0%   { left: 12px; }
+            30%  { left: -22px; width: 4px; }
+            60%  { left: -22px; width: 4px; }
+            90%  { left: 4px; width: 14px; }
+            100% { left: 6px; width: 10px; }
+        }
+        @keyframes lockAxisRight {
+            0%   { right: 12px; }
+            30%  { right: -22px; width: 4px; }
+            60%  { right: -22px; width: 4px; }
+            90%  { right: 4px; width: 14px; }
+            100% { right: 6px; width: 10px; }
+        }
+
+        /* ========================================= */
         /* INTERACTIVE STATE MODIFIERS               */
         /* ========================================= */
 
-        /* 1. HOVERING STATE (Targeting): Shrinks tightly, turns Gold/Yellow, and rolls */
+        /* 1. HOVERING STATE (Targeting) */
         #unique-crosshair.targeting .xhair-bracket-container {
             width: 38px;
             height: 38px;
@@ -142,18 +176,19 @@
             border-color: #ffd700;
             filter: drop-shadow(0 0 6px #ffd700);
         }
+        
+        /* Triggers the mechanical axis slam animations */
         #unique-crosshair.targeting .xhair-axis {
             background: #ffd700;
-            box-shadow: 0 0 5px #ffd700;
+            box-shadow: 0 0 6px #ffd700;
         }
-        /* Push axes out slightly when locked on */
-        #unique-crosshair.targeting .xhair-axis.top { top: 6px; }
-        #unique-crosshair.targeting .xhair-axis.bottom { bottom: 6px; }
-        #unique-crosshair.targeting .xhair-axis.left { left: 6px; }
-        #unique-crosshair.targeting .xhair-axis.right { right: 6px; }
+        #unique-crosshair.targeting .xhair-axis.top    { animation: lockAxisTop 0.6s ease-in-out forwards; }
+        #unique-crosshair.targeting .xhair-axis.bottom { animation: lockAxisBottom 0.6s ease-in-out forwards; }
+        #unique-crosshair.targeting .xhair-axis.left   { animation: lockAxisLeft 0.6s ease-in-out forwards; }
+        #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s ease-in-out forwards; }
 
 
-        /* 2. CLICKING / TAPPING STATE: Flares outward violently, turns Crimson Red */
+        /* 2. CLICKING / TAPPING STATE: Overrides targeting lock, flares outward violently */
         #unique-crosshair.clicking .xhair-bracket-container {
             width: 85px;
             height: 85px;
@@ -169,7 +204,7 @@
             width: 40px;
             height: 40px;
             border-color: rgba(255, 0, 85, 0.9);
-            border-style: solid; /* Becomes solid on click */
+            border-style: solid;
             box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
         }
         #unique-crosshair.clicking .xhair-core {
@@ -182,15 +217,17 @@
             border-width: 3px;
             filter: drop-shadow(0 0 8px #ff0055);
         }
+        
+        /* Overrides the mechanical animation so the blast works immediately even if currently locking */
         #unique-crosshair.clicking .xhair-axis {
-            background: #ff0055;
-            box-shadow: 0 0 8px #ff0055;
+            animation: none !important; 
+            background: #ff0055 !important;
+            box-shadow: 0 0 10px #ff0055 !important;
         }
-        /* Pull axes way out on blast */
-        #unique-crosshair.clicking .xhair-axis.top { top: -2px; height: 14px;}
-        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -2px; height: 14px;}
-        #unique-crosshair.clicking .xhair-axis.left { left: -2px; width: 14px;}
-        #unique-crosshair.clicking .xhair-axis.right { right: -2px; width: 14px;}
+        #unique-crosshair.clicking .xhair-axis.top    { top: -8px !important; height: 18px !important;}
+        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -8px !important; height: 18px !important;}
+        #unique-crosshair.clicking .xhair-axis.left   { left: -8px !important; width: 18px !important;}
+        #unique-crosshair.clicking .xhair-axis.right  { right: -8px !important; width: 18px !important;}
     `;
     document.head.appendChild(style);
 
