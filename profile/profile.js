@@ -12,7 +12,7 @@ const SUPABASE_HEADERS = {
     'Content-Type': 'application/json'
 };
 
-document.addEventListener('DOMContentLoaded', async () => {
+window.initProfileSystem = async () => {
     const loggedInUser = localStorage.getItem('chatUser');
     if (!loggedInUser) { 
         window.location.href = "../Login/login.html"; 
