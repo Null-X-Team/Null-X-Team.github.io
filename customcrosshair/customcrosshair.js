@@ -1,6 +1,7 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
  * UPGRADED: True center-slam locking, shockwave tap effects, and optimized touch registration.
+ * MODIFIED: Clicking triggers a weapon-recoil animation (45-degree rotation and outward flare).
  */
 (function() {
     // 1. Inject the highly detailed UI styling
@@ -78,7 +79,7 @@
             position: absolute;
             background: rgba(0, 255, 204, 0.8);
             box-shadow: 0 0 5px #00ffcc;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         /* Explicitly centering the axis lines perfectly with the core */
         .xhair-axis.top    { width: 2px; height: 8px; top: 12px; left: calc(50% - 1px); }
@@ -93,7 +94,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.2, 1), width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
         }
         .xhair-bracket {
             position: absolute;
@@ -101,7 +102,7 @@
             height: 12px;
             border: 2px solid #00ffcc;
             filter: drop-shadow(0 0 4px #00ffcc);
-            transition: border-color 0.3s ease;
+            transition: border-color 0.3s ease, border-width 0.1s;
         }
         .bracket-tl { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 4px; }
         .bracket-tr { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 4px; }
@@ -118,7 +119,6 @@
         /* MECHANICAL SLAM-LOCK KEYFRAMES            */
         /* ========================================= */
         
-        /* Pulls back, violently slams into the absolute 40px center, then settles on the edge of the core */
         @keyframes lockAxisTop {
             0%   { top: 12px; }
             30%  { top: -20px; height: 4px; } 
@@ -173,7 +173,6 @@
             filter: drop-shadow(0 0 6px #ffd700);
         }
         
-        /* Triggers the mechanical axis slam animations */
         #unique-crosshair.targeting .xhair-axis {
             background: #ffd700;
             box-shadow: 0 0 6px #ffd700;
@@ -184,53 +183,60 @@
         #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
 
-        /* 2. CLICKING / TAPPING STATE: Overrides targeting lock, creates a massive shockwave burst */
+        /* 2. CLICKING / TAPPING STATE: Weapon Recoil & Flare */
+        
+        /* 4 corners turn one click to the right (45deg) and push outward */
         #unique-crosshair.clicking .xhair-bracket-container {
-            width: 140px;
-            height: 140px;
-            transform: rotate(90deg);
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
+            width: 90px;
+            height: 90px;
+            transform: rotate(45deg); 
+            transition: all 0.05s ease-out; /* Fast outward kick */
         }
+        
+        /* Rings flare out and disappear */
         #unique-crosshair.clicking .xhair-ring-outer {
-            width: 100px;
-            height: 100px;
-            border-color: #00ffcc;
+            width: 70px;
+            height: 70px;
             opacity: 0;
-            transition: all 0.3s ease-out;
+            border-width: 2px;
+            transform: scale(1.2);
+            transition: all 0.15s ease-out;
         }
         #unique-crosshair.clicking .xhair-ring-inner {
-            width: 50px;
-            height: 50px;
-            background: rgba(0, 255, 204, 0.3);
-            border-style: solid;
-            box-shadow: 0 0 25px #00ffcc;
-            transition: all 0.2s ease-out;
+            width: 40px;
+            height: 40px;
+            opacity: 0;
+            background: rgba(0, 255, 204, 0.5);
+            transform: scale(1.5);
+            transition: all 0.15s ease-out;
         }
+        
+        /* Core pulses */
         #unique-crosshair.clicking .xhair-core {
             background: #ffffff;
-            box-shadow: 0 0 30px #ffffff, 0 0 50px #00ffcc;
-            transform: rotate(225deg) scale(3.5);
-            transition: all 0.1s ease-out;
+            box-shadow: 0 0 20px #ffffff, 0 0 30px #00ffcc;
+            transform: rotate(225deg) scale(1.8);
+            transition: all 0.05s ease-out;
         }
+        
+        /* Brackets light up */
         #unique-crosshair.clicking .xhair-bracket {
             border-color: #ffffff;
             border-width: 3px;
             filter: drop-shadow(0 0 8px #00ffcc);
         }
         
-        /* Axis lines shoot completely out of the frame and fade away like sparks */
+        /* The 4 lines push aggressively outwards to point directly into the newly rotated corners */
         #unique-crosshair.clicking .xhair-axis {
             animation: none !important; 
             background: #ffffff !important;
-            box-shadow: 0 0 15px #00ffcc !important;
-            opacity: 0;
-            transition: all 0.3s ease-out;
+            box-shadow: 0 0 10px #00ffcc !important;
+            transition: all 0.05s ease-out; /* Super fast outward snap */
         }
-        #unique-crosshair.clicking .xhair-axis.top    { top: -50px !important; height: 30px !important;}
-        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -50px !important; height: 30px !important;}
-        #unique-crosshair.clicking .xhair-axis.left   { left: -50px !important; width: 30px !important;}
-        #unique-crosshair.clicking .xhair-axis.right  { right: -50px !important; width: 30px !important;}
+        #unique-crosshair.clicking .xhair-axis.top    { top: -10px !important; height: 16px !important; }
+        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -10px !important; height: 16px !important; }
+        #unique-crosshair.clicking .xhair-axis.left   { left: -10px !important; width: 16px !important; }
+        #unique-crosshair.clicking .xhair-axis.right  { right: -10px !important; width: 16px !important; }
     `;
     document.head.appendChild(style);
 
@@ -269,7 +275,7 @@
         // Enforces a minimum time the shockwave is displayed so fast finger taps look identical to slow mouse clicks
         flareTimeout = setTimeout(() => {
             crosshair.classList.remove('clicking');
-        }, 150);
+        }, 100); // Shortened slightly for a punchier video game recoil feel
     };
 
     // 3. Automation tracking & state triggers
