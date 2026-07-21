@@ -1,6 +1,6 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
- * UPGRADED: Mechanical axis lines now push outward and snap inward during the lock-on sequence.
+ * UPGRADED: True center-slam locking, shockwave tap effects, and optimized touch registration.
  */
 (function() {
     // 1. Inject the highly detailed UI styling
@@ -93,7 +93,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease, height 0.3s ease;
+            transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
         }
         .xhair-bracket {
             position: absolute;
@@ -115,37 +115,33 @@
         @keyframes spinReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
 
         /* ========================================= */
-        /* MECHANICAL LOCK-IN KEYFRAMES              */
+        /* MECHANICAL SLAM-LOCK KEYFRAMES            */
         /* ========================================= */
         
-        /* Shoots out to make room, holds, then slams into the center */
+        /* Pulls back, violently slams into the absolute 40px center, then settles on the edge of the core */
         @keyframes lockAxisTop {
             0%   { top: 12px; }
-            30%  { top: -22px; height: 4px; } 
-            60%  { top: -22px; height: 4px; }
-            90%  { top: 4px; height: 14px; } /* Slams in tight with slight overshoot */
-            100% { top: 6px; height: 10px; }
+            30%  { top: -20px; height: 4px; } 
+            70%  { top: 40px; height: 2px; } 
+            100% { top: 33px; height: 6px; } 
         }
         @keyframes lockAxisBottom {
             0%   { bottom: 12px; }
-            30%  { bottom: -22px; height: 4px; }
-            60%  { bottom: -22px; height: 4px; }
-            90%  { bottom: 4px; height: 14px; }
-            100% { bottom: 6px; height: 10px; }
+            30%  { bottom: -20px; height: 4px; }
+            70%  { bottom: 40px; height: 2px; }
+            100% { bottom: 33px; height: 6px; }
         }
         @keyframes lockAxisLeft {
             0%   { left: 12px; }
-            30%  { left: -22px; width: 4px; }
-            60%  { left: -22px; width: 4px; }
-            90%  { left: 4px; width: 14px; }
-            100% { left: 6px; width: 10px; }
+            30%  { left: -20px; width: 4px; }
+            70%  { left: 40px; width: 2px; }
+            100% { left: 33px; width: 6px; }
         }
         @keyframes lockAxisRight {
             0%   { right: 12px; }
-            30%  { right: -22px; width: 4px; }
-            60%  { right: -22px; width: 4px; }
-            90%  { right: 4px; width: 14px; }
-            100% { right: 6px; width: 10px; }
+            30%  { right: -20px; width: 4px; }
+            70%  { right: 40px; width: 2px; }
+            100% { right: 33px; width: 6px; }
         }
 
         /* ========================================= */
@@ -182,52 +178,59 @@
             background: #ffd700;
             box-shadow: 0 0 6px #ffd700;
         }
-        #unique-crosshair.targeting .xhair-axis.top    { animation: lockAxisTop 0.6s ease-in-out forwards; }
-        #unique-crosshair.targeting .xhair-axis.bottom { animation: lockAxisBottom 0.6s ease-in-out forwards; }
-        #unique-crosshair.targeting .xhair-axis.left   { animation: lockAxisLeft 0.6s ease-in-out forwards; }
-        #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s ease-in-out forwards; }
+        #unique-crosshair.targeting .xhair-axis.top    { animation: lockAxisTop 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        #unique-crosshair.targeting .xhair-axis.bottom { animation: lockAxisBottom 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        #unique-crosshair.targeting .xhair-axis.left   { animation: lockAxisLeft 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
+        #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
 
-        /* 2. CLICKING / TAPPING STATE: Overrides targeting lock, flares outward violently */
+        /* 2. CLICKING / TAPPING STATE: Overrides targeting lock, creates a massive shockwave burst */
         #unique-crosshair.clicking .xhair-bracket-container {
-            width: 85px;
-            height: 85px;
-            transform: rotate(45deg);
+            width: 140px;
+            height: 140px;
+            transform: rotate(90deg);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         #unique-crosshair.clicking .xhair-ring-outer {
-            width: 65px;
-            height: 65px;
-            border-color: rgba(255, 0, 85, 0.8);
-            border-width: 2px;
+            width: 100px;
+            height: 100px;
+            border-color: #00ffcc;
+            opacity: 0;
+            transition: all 0.3s ease-out;
         }
         #unique-crosshair.clicking .xhair-ring-inner {
-            width: 40px;
-            height: 40px;
-            border-color: rgba(255, 0, 85, 0.9);
+            width: 50px;
+            height: 50px;
+            background: rgba(0, 255, 204, 0.3);
             border-style: solid;
-            box-shadow: 0 0 20px rgba(255, 0, 85, 0.6);
+            box-shadow: 0 0 25px #00ffcc;
+            transition: all 0.2s ease-out;
         }
         #unique-crosshair.clicking .xhair-core {
-            background: #ff0055;
-            box-shadow: 0 0 20px #ff0055;
-            transform: rotate(225deg) scale(2);
+            background: #ffffff;
+            box-shadow: 0 0 30px #ffffff, 0 0 50px #00ffcc;
+            transform: rotate(225deg) scale(3.5);
+            transition: all 0.1s ease-out;
         }
         #unique-crosshair.clicking .xhair-bracket {
-            border-color: #ff0055;
+            border-color: #ffffff;
             border-width: 3px;
-            filter: drop-shadow(0 0 8px #ff0055);
+            filter: drop-shadow(0 0 8px #00ffcc);
         }
         
-        /* Overrides the mechanical animation so the blast works immediately even if currently locking */
+        /* Axis lines shoot completely out of the frame and fade away like sparks */
         #unique-crosshair.clicking .xhair-axis {
             animation: none !important; 
-            background: #ff0055 !important;
-            box-shadow: 0 0 10px #ff0055 !important;
+            background: #ffffff !important;
+            box-shadow: 0 0 15px #00ffcc !important;
+            opacity: 0;
+            transition: all 0.3s ease-out;
         }
-        #unique-crosshair.clicking .xhair-axis.top    { top: -8px !important; height: 18px !important;}
-        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -8px !important; height: 18px !important;}
-        #unique-crosshair.clicking .xhair-axis.left   { left: -8px !important; width: 18px !important;}
-        #unique-crosshair.clicking .xhair-axis.right  { right: -8px !important; width: 18px !important;}
+        #unique-crosshair.clicking .xhair-axis.top    { top: -50px !important; height: 30px !important;}
+        #unique-crosshair.clicking .xhair-axis.bottom { bottom: -50px !important; height: 30px !important;}
+        #unique-crosshair.clicking .xhair-axis.left   { left: -50px !important; width: 30px !important;}
+        #unique-crosshair.clicking .xhair-axis.right  { right: -50px !important; width: 30px !important;}
     `;
     document.head.appendChild(style);
 
@@ -255,9 +258,19 @@
     `;
     document.body.appendChild(crosshair);
 
-    // Helper functions to handle flare activation
-    const startFlare = () => crosshair.classList.add('clicking');
-    const stopFlare = () => crosshair.classList.remove('clicking');
+    // Helper functions to handle flare activation with tap-guarantee timers
+    let flareTimeout;
+    const startFlare = () => {
+        crosshair.classList.add('clicking');
+        clearTimeout(flareTimeout);
+    };
+    
+    const stopFlare = () => {
+        // Enforces a minimum time the shockwave is displayed so fast finger taps look identical to slow mouse clicks
+        flareTimeout = setTimeout(() => {
+            crosshair.classList.remove('clicking');
+        }, 150);
+    };
 
     // 3. Automation tracking & state triggers
     window.addEventListener('mousemove', (e) => {
