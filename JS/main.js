@@ -1137,35 +1137,37 @@ fetchLiveWeather();
     document.body.appendChild(popup);
 
     document.getElementById("nxos-reload-btn").addEventListener("click", async () => {
+      // 1. Clear session storage
       sessionStorage.clear();
       
-      const targetUrl = window.location.href;
-      
-      try {
-        // 1. Fetch the main HTML file with headers that instruct the server & browser to bypass cache
-        await fetch(targetUrl, {
-          headers: {
-            'Pragma': 'no-cache',
-            'Expires': '-1',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-          },
-        });
-        
-        // 2. Fetch version.json to clear the cache trace on your version tracking
-        await fetch('./version.json', {
-          headers: {
-            'Pragma': 'no-cache',
-            'Expires': '-1',
-            'Cache-Control': 'no-cache, no-store, must-revalidate',
-          },
-        });
-        
-        // 3. Perform the in-place page swap
-        window.location.replace(targetUrl);
-      } catch (e) {
-        // Fallback reload if network is interrupted
-        window.location.reload();
+      // 2. NEW: Delete all Service Worker Caches directly
+      if ('caches' in window) {
+        try {
+          const cacheKeys = await caches.keys();
+          await Promise.all(cacheKeys.map(key => caches.delete(key)));
+          console.log("[System] Local caches cleared.");
+        } catch (e) {
+          console.error("[System] Cache clear failed:", e);
+        }
       }
+
+      // 3. NEW: Unregister the Service Worker so it doesn't intercept the reload
+      if ('serviceWorker' in navigator) {
+        try {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          for (let registration of registrations) {
+            await registration.unregister();
+          }
+          console.log("[System] Service Worker unregistered.");
+        } catch (e) {
+          console.error("[System] SW unregister failed:", e);
+        }
+      }
+      
+      // 4. Force a clean reload by attaching a tiny timestamp to the URL
+      // This guarantees the browser ignores its own cache and asks GitHub for fresh files!
+      const cleanUrl = window.location.href.split('?')[0];
+      window.location.replace(cleanUrl + '?cacheBust=' + Date.now());
     });
 
     document.getElementById("nxos-dismiss-btn").addEventListener("click", () => {
