@@ -227,4 +227,7 @@ window.initProfileSystem = async () => {
     }
 
     loadProfile();
-});
+};
+
+// Run the script immediately when it is loaded
+window.initProfileSystem();
