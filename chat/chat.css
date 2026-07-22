@@ -153,7 +153,16 @@ body, html {
     opacity: 0.9;
 }
 
-/* Explicit styles for interactive username links */
+/* Dynamic Interactive User Click Nodes */
+.chat-clickable {
+    cursor: pointer;
+    transition: opacity 0.15s ease, color 0.15s ease;
+}
+
+.chat-clickable:hover {
+    opacity: 0.85;
+}
+
 .chat-username-link {
     color: white;
     text-decoration: none;
@@ -307,3 +316,81 @@ button:hover {
 .btn-warn { background: #ffaa00; color: black; }
 .btn-ban { background: #ff4444; color: white; }
 .btn-unban { background: #2a1f1a; color: #a0928d; border: 1px solid rgba(207, 122, 60, 0.1); }
+
+/* --- USER CONTEXT MENU STYLING --- */
+#chat-user-menu {
+    position: fixed;
+    background-color: #1e1613;
+    border: 1px solid rgba(207, 122, 60, 0.4);
+    border-radius: 8px;
+    width: 210px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8), 0 0 10px rgba(207, 122, 60, 0.2);
+    z-index: 100000;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#chat-user-menu.hidden {
+    display: none !important;
+}
+
+.user-menu-header {
+    padding: 12px 15px;
+    background: rgba(207, 122, 60, 0.12);
+    border-bottom: 1px solid rgba(207, 122, 60, 0.2);
+    display: flex;
+    flex-direction: column;
+}
+
+.user-menu-header strong {
+    color: #ffffff;
+    font-size: 0.95rem;
+    margin-bottom: 2px;
+}
+
+.user-menu-header span {
+    color: #cf7a3c;
+    font-size: 0.8rem;
+}
+
+.user-menu-actions {
+    display: flex;
+    flex-direction: column;
+    padding: 6px 0;
+}
+
+.user-menu-actions button {
+    background: none;
+    border: none;
+    color: #e0e0e0;
+    padding: 10px 15px;
+    text-align: left;
+    font-size: 0.88rem;
+    cursor: pointer;
+    border-radius: 0;
+    transition: background 0.15s, color 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.user-menu-actions button:hover {
+    background: rgba(207, 122, 60, 0.15);
+    color: #ffffff;
+}
+
+.user-menu-actions hr.menu-divider {
+    border: none;
+    border-top: 1px solid rgba(207, 122, 60, 0.15);
+    margin: 4px 0;
+}
+
+.user-menu-actions button.danger-btn {
+    color: #ff6666;
+}
+
+.user-menu-actions button.danger-btn:hover {
+    background: rgba(255, 68, 68, 0.15);
+    color: #ff8888;
+}
