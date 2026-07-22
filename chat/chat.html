@@ -31,8 +31,9 @@
 
     <div class="main-chat">
         <div id="chat-view">
-            <div id="chat-view-header" style="padding: 10px 20px; background: #140f0d; border-bottom: 1px solid rgba(207, 122, 60, 0.1); color: #cf7a3c; font-size: 14px; font-weight: bold;">
-                # general
+            <div id="chat-view-header" style="padding: 10px 20px; background: #140f0d; border-bottom: 1px solid rgba(207, 122, 60, 0.1); color: #cf7a3c; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+                <span># general</span>
+                <span id="room-status-indicator" style="font-size: 11px; color: #a0928d;">CONNECTING...</span>
             </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
@@ -125,6 +126,20 @@
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
+<div id="chat-user-menu" class="hidden">
+    <div class="user-menu-header">
+        <strong id="menu-username">Username</strong>
+        <span id="menu-handler">@handler</span>
+    </div>
+    <div class="user-menu-actions">
+        <button id="menu-btn-profile">👤 Profile</button>
+        <button id="menu-btn-pm">💬 Private Message</button>
+        <button id="menu-btn-friend">➕ Add Friend</button>
+        <hr class="menu-divider">
+        <button id="menu-btn-block" class="danger-btn">🚫 Block User</button>
     </div>
 </div>
 
