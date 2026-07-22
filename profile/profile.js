@@ -54,11 +54,17 @@ window.initProfileSystem = async () => {
     // --- FETCH CURRENT USER INFORMATION ---
     const loadProfile = async () => {
         try {
-            // Using ilike for case-insensitive username targeting
+            // 1. Fetch profile details (Bio, PFP, Admin status) from user_roles
             const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(targetUser)}&select=*`, {
                 headers: SUPABASE_HEADERS
             });
             const data = await response.json();
+
+            // 2. Fetch the join date from the original users table!
+            const userResponse = await fetch(`${SUPABASE_URL}/rest/v1/users?username=ilike.${encodeURIComponent(targetUser)}&select=created_at`, {
+                headers: SUPABASE_HEADERS
+            });
+            const userData = await userResponse.json();
 
             if (data && data[0]) {
                 const profile = data[0];
@@ -76,9 +82,13 @@ window.initProfileSystem = async () => {
                     pfpPreview.src = DEFAULT_PFP;
                 }
                 
-                // Map joining metadata
-                if (profile.created_at) {
-                    const joined = new Date(profile.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+                // Map joining metadata using our SECOND fetch result (userData)
+                if (userData && userData[0] && userData[0].created_at) {
+                    const joined = new Date(userData[0].created_at).toLocaleDateString(undefined, { 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    });
                     const joinDateEl = document.getElementById('join-date');
                     if (joinDateEl) joinDateEl.textContent = joined;
                 }
