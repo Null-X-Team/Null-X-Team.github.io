@@ -200,15 +200,11 @@ window.initProfileSystem = async () => {
             }
 
             try {
-                // Using an upsert POST request so it auto-merges data to the matching username row
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles`, {
-                    method: 'POST',
-                    headers: { 
-                        ...SUPABASE_HEADERS,
-                        'Prefer': 'resolution=merge-duplicates,return=representation'
-                    },
+                // We use a PATCH request to specifically update the row matching the logged-in user
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}`, {
+                    method: 'PATCH',
+                    headers: SUPABASE_HEADERS,
                     body: JSON.stringify({ 
-                        username: loggedInUser, // Strictly pairs with active session username
                         bio: bio, 
                         pfp_url: finalPfp
                     })
@@ -220,7 +216,8 @@ window.initProfileSystem = async () => {
                         statusEl.style.color = "#00ff66";
                         setTimeout(() => { statusEl.textContent = ""; }, 3000);
                     }
-                    loadProfile(); // Refresh screen elements immediately
+                    // We don't need to loadProfile() again unless we want to, but it's safe to keep
+                    loadProfile(); 
                 } else {
                     const errorDetails = await response.json().catch(() => ({}));
                     console.error("Database feedback:", errorDetails);
