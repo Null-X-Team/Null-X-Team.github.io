@@ -217,6 +217,80 @@
 
     .modal-msg-box.error { color: #ff4d4d; }
     .modal-msg-box.success { color: #00ff66; }
+
+    /* --- WARNING MODAL STYLING --- */
+    #warning-modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(20, 0, 0, 0.92);
+      backdrop-filter: blur(10px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 100000;
+      transition: opacity 0.3s ease;
+    }
+
+    #warning-modal-overlay.hidden {
+      display: none !important;
+    }
+
+    .warning-modal-content {
+      background-color: #1a0f0f;
+      border: 1px solid #ff4444;
+      border-radius: 12px;
+      padding: 30px;
+      width: 380px;
+      text-align: center;
+      color: white;
+      box-shadow: 0 0 50px rgba(255, 68, 68, 0.3);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .warning-modal-content h2 {
+      color: #ff4444;
+      margin-top: 0;
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .warning-modal-content p {
+      color: #ccc;
+      font-size: 0.9rem;
+      margin-bottom: 20px;
+      line-height: 1.5;
+    }
+
+    #warning-reason-text {
+      background: rgba(255, 68, 68, 0.1);
+      padding: 15px;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 68, 68, 0.3);
+      color: #ff8888;
+      font-weight: bold;
+      margin-bottom: 25px;
+      word-wrap: break-word;
+    }
+
+    .warning-ack-btn {
+      background: #ff4444;
+      color: white;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 1rem;
+    }
+
+    .warning-ack-btn:hover {
+      background: #ff6666;
+    }
   </style>
 </head>
 <body>
@@ -684,6 +758,20 @@
     </div>
   </div>
 
+  <div id="warning-modal-overlay" class="hidden">
+    <div class="warning-modal-content">
+      <svg viewBox="0 0 24 24" style="width: 48px; height: 48px; fill: #ff4444; margin-bottom: 10px;">
+          <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+      </svg>
+      <h2>Official Warning</h2>
+      <p>You have received a warning from the server administrators. Please review the reason below and adhere to the community rules to avoid account suspension.</p>
+      
+      <div id="warning-reason-text">No reason provided.</div>
+      
+      <button id="warning-ack-btn" class="warning-ack-btn">I Understand</button>
+    </div>
+  </div>
+
   <script>
     // THESE ARE YOUR ACTUAL CREDENTIALS FROM YOUR LOGIN HTML
     const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
@@ -839,11 +927,62 @@
       }
     }
 
+    // Check if user has an unacknowledged admin warning
+    async function checkForWarnings(username) {
+      if (!username || username === 'Guest') return;
+      try {
+        const authHeaders = {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`
+        };
+
+        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}&select=warned,last_action_reason`, {
+          method: 'GET',
+          headers: authHeaders
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        
+        // If a warning flag is active, lock the screen with the modal
+        if (data.length > 0 && data[0].warned === true) {
+          const overlay = document.getElementById('warning-modal-overlay');
+          const reasonBox = document.getElementById('warning-reason-text');
+          
+          reasonBox.textContent = data[0].last_action_reason || "Violation of community guidelines.";
+          overlay.classList.remove('hidden');
+
+          // Handle the acknowledgment click
+          document.getElementById('warning-ack-btn').onclick = async () => {
+            const btn = document.getElementById('warning-ack-btn');
+            btn.textContent = "Dismissing...";
+            btn.disabled = true;
+            
+            // Reset the warning flag in Supabase so it doesn't show up again next refresh
+            await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}`, {
+              method: 'PATCH',
+              headers: {
+                ...authHeaders,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ warned: false }) 
+            });
+            
+            overlay.classList.add('hidden');
+          };
+        }
+      } catch (err) {
+        console.error('Error checking warnings:', err);
+      }
+    }
+
     // Auto trigger check when page completes loading
     document.addEventListener('DOMContentLoaded', () => {
       const loggedUser = localStorage.getItem('chatUser');
       if (loggedUser) {
         checkForMissingHandler(loggedUser);
+        checkForWarnings(loggedUser);
       }
     });
   </script>
