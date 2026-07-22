@@ -8,6 +8,8 @@
 </head>
 <body>
 
+<datalist id="admin-user-suggestions"></datalist>
+
 <div class="chat-container">
     <div class="sidebar">
         <div class="sidebar-header">
@@ -19,6 +21,7 @@
             <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
             <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
             <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
+            <div id="pm-tab" class="channel" style="display:none; color: #cf7a3c; font-weight: bold;" onclick="switchTab('private-messages')"># private-msgs</div>
         </div>
 
         <div class="user-profile">
@@ -52,8 +55,9 @@
         <div id="rules-view" class="rules-content" style="display:none; padding: 40px; overflow-y: auto;">
             <h1 style="color: #cf7a3c; margin-bottom: 20px;">COMMUNITY RULES</h1>
             
-            <div style="background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 15px; border-radius: 6px; margin-bottom: 25px; color: #ff8888; font-size: 14px; font-weight: bold;">
-                ⚠️ NOTICE: Private messages are NOT private. Admins have complete access to view all private messages at any time. And for security reasons, passwords for accounts are saved and only owner can see them.
+            <div style="background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 15px; border-radius: 6px; margin-bottom: 25px; color: #ff8888; font-size: 14px; font-weight: bold; display: flex; align-items: flex-start; gap: 8px;">
+                <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0; fill: currentColor;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+                <div>NOTICE: Private messages are NOT private. Admins have complete access to view all private messages at any time. And for security reasons, passwords for accounts are saved and only owner can see them.</div>
             </div>
 
             <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 16px; color: #e0e0e0; font-size: 14px;">
@@ -100,7 +104,7 @@
                 <div class="admin-card">
                     <h3>Temporary Ban</h3>
                     <div class="search-wrapper">
-                        <input type="text" id="temp-ban-search" placeholder="User to temp ban (@...)">
+                        <input type="text" id="temp-ban-search" placeholder="Type @ to find user...">
                     </div>
                     <select id="temp-ban-duration" style="width:100%; margin: 10px 0; padding: 10px; background: #140f0d; color: white; border: 1px solid rgba(207, 122, 60, 0.2); border-radius: 4px;">
                         <option value="60">1 Hour</option>
@@ -126,6 +130,13 @@
                 </div>
             </div>
         </div>
+
+        <div id="private-messages-view" style="display:none; padding: 40px; overflow-y: auto; height: 100%;">
+            <h1 style="color: #cf7a3c; margin-bottom: 20px;">Master Private Message Log</h1>
+            <p style="color: #a0928d; font-size: 14px; margin-bottom: 20px;">Live log of all direct communications across the server.</p>
+            <div id="admin-pm-container" style="display: flex; flex-direction: column; gap: 15px; background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px;"></div>
+        </div>
+
     </div>
 </div>
 
@@ -135,11 +146,23 @@
         <span id="menu-handler">@handler</span>
     </div>
     <div class="user-menu-actions">
-        <button id="menu-btn-profile">👤 Profile</button>
-        <button id="menu-btn-pm">💬 Private Message</button>
-        <button id="menu-btn-friend">➕ Add Friend</button>
+        <button id="menu-btn-profile">
+            <svg class="menu-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Profile
+        </button>
+        <button id="menu-btn-pm">
+            <svg class="menu-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+            Private Message
+        </button>
+        <button id="menu-btn-friend">
+            <svg class="menu-icon" viewBox="0 0 24 24"><path d="M15 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm-9-2V7H4v3H1v2h3v3h2v-3h3v-2H6zm9 4c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Add Friend
+        </button>
         <hr class="menu-divider">
-        <button id="menu-btn-block" class="danger-btn">🚫 Block User</button>
+        <button id="menu-btn-block" class="danger-btn">
+            <svg class="menu-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM4 12c0-4.42 3.58-8 8-8 1.85 0 3.55.63 4.9 1.69L5.69 16.9C4.63 15.55 4 13.85 4 12zm8 8c-1.85 0-3.55-.63-4.9-1.69L18.31 7.1C19.37 8.45 20 10.15 20 12c0 4.42-3.58 8-8 8z"/></svg>
+            Block User
+        </button>
     </div>
 </div>
 
