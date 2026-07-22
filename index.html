@@ -118,6 +118,105 @@
       50% { transform: scale(1.08); color: #b056ff; opacity: 1; }
       100% { transform: scale(1); color: #ffffff; }
     }
+
+    /* Custom Handler Modal Styling */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(11, 3, 20, 0.88);
+      backdrop-filter: blur(8px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 99999;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal-content {
+      background-color: #12091c;
+      border: 1px solid #8b00ff;
+      border-radius: 16px;
+      padding: 30px;
+      width: 320px;
+      box-shadow: 0 0 35px rgba(139, 0, 255, 0.45);
+      text-align: center;
+      color: #ffffff;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    .modal-content h2 {
+      margin-top: 0;
+      font-size: 1.4rem;
+      color: #ffffff;
+    }
+
+    .modal-content p {
+      color: #aaa;
+      font-size: 0.85rem;
+      line-height: 1.4;
+      margin-bottom: 20px;
+    }
+
+    .modal-form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      text-align: left;
+      margin-bottom: 18px;
+    }
+
+    .modal-form-group label {
+      font-size: 0.8rem;
+      color: #b056ff;
+      font-weight: bold;
+    }
+
+    .modal-form-group input {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(139, 0, 255, 0.3);
+      padding: 10px;
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .modal-form-group input:focus {
+      border-color: #8b00ff;
+      box-shadow: 0 0 8px rgba(139, 0, 255, 0.5);
+    }
+
+    .modal-submit-btn {
+      width: 100%;
+      padding: 11px;
+      background: #8b00ff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .modal-submit-btn:hover {
+      background: #a033ff;
+    }
+
+    .modal-msg-box {
+      margin-top: 12px;
+      font-size: 0.8rem;
+      min-height: 18px;
+    }
+
+    .modal-msg-box.error { color: #ff4d4d; }
+    .modal-msg-box.success { color: #00ff66; }
   </style>
 </head>
 <body>
@@ -334,7 +433,7 @@
           </div>
           <div id="dashboard-sync-msg" style="font-size: 0.7rem; font-weight: bold; color: #888;"></div>
         </div>
-         
+          
         <div style="display: flex; gap: 6px;">
           <button onclick="window.cloudLoad('dashboard-sync-msg')" style="flex: 1; padding: 6px; background: rgba(255,255,255,0.02); color: #aaa; border: 1px solid #222; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
             Import Save
@@ -438,43 +537,43 @@
             <p>New Themes, Working on perfecting them but there are new themes that work!</p>
             <span class="news-date">June 13</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Adding in THEMES! (that actually work)</p>
             <span class="news-date">June 13</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Did a bunch of stuff that has improved the site</p>
             <span class="news-date">June 9</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Fixed login</p>
             <span class="news-date">June 4</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Removed Baldi's Basics in Education and Learning</p>
             <span class="news-date">May 28</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Added Baldi's Basics in Education and Learning</p>
             <span class="news-date">May 22</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Issue for where for your first time opening a game it takes a while to load, and then it loads fine opening it the second time</p>
             <span class="news-date">May 22</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Over The summer I am going to add many new games!</p>
@@ -486,7 +585,7 @@
             <p>Grok broke the code, don't worry, I had a backup. ;]</p>
             <span class="news-date">May 22 8:06</span>
           </div>
-           
+            
           <div class="news-card">
             <span class="news-tag">Update</span>
             <p>Fixed login!</p>
@@ -568,6 +667,23 @@
     </div>
   </div>
 
+  <div id="handlerModal" class="modal-overlay hidden">
+    <div class="modal-content">
+      <h2>Set Your Handler</h2>
+      <p>Since you joined before handlers were introduced, please choose your unique @handler to continue!</p>
+      
+      <form onsubmit="submitNewHandler(event)">
+        <div class="modal-form-group">
+          <label for="modalHandlerInput">Choose Handler</label>
+          <input type="text" id="modalHandlerInput" placeholder="@username" required maxlength="20">
+        </div>
+        <button type="submit" class="modal-submit-btn" id="modalSubmitBtn">Save Handler</button>
+      </form>
+      
+      <div class="modal-msg-box" id="modalMessageBox"></div>
+    </div>
+  </div>
+
   <script>
     const targetDate = new Date("August 17, 2026 00:00:00");
 
@@ -584,7 +700,7 @@
         // Trigger micro-interaction animation loop cleanly
         cardContainer.classList.remove('pulse');
         void cardContainer.offsetWidth; // Force layout recalculation engine
-        cardContainer.add('pulse');
+        cardContainer.classList.add('pulse');
       }
     }
 
@@ -628,15 +744,106 @@
       updateMatrixCard('hours-card', hours);
       updateMatrixCard('minutes-card', minutes);
       updateMatrixCard('seconds-card', seconds);
-
-      tickSound.play().catch(() => {});
     }
 
     setInterval(runCountdown, 1000);
     runCountdown();
+
+    // Check if current user is missing a handler
+    async function checkForMissingHandler(username) {
+      if (!username || username === 'Guest') return;
+      try {
+        const authHeaders = typeof headers !== 'undefined' ? headers : {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`
+        };
+
+        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/users?username=eq.${encodeURIComponent(username)}&select=handler`, {
+          method: 'GET',
+          headers: authHeaders
+        });
+
+        if (!response.ok) return;
+
+        const data = await response.json();
+        
+        if (data.length > 0 && (!data[0].handler || data[0].handler.trim() === '')) {
+          document.getElementById('handlerModal').classList.remove('hidden');
+        }
+      } catch (err) {
+        console.error('Error checking user handler:', err);
+      }
+    }
+
+    // Submit user handler update from custom modal
+    async function submitNewHandler(event) {
+      event.preventDefault();
+      
+      const currentUsername = localStorage.getItem('chatUser');
+      let handlerVal = document.getElementById('modalHandlerInput').value.trim();
+      const msgBox = document.getElementById('modalMessageBox');
+      
+      if (!handlerVal.startsWith('@')) {
+        handlerVal = '@' + handlerVal;
+      }
+
+      if (handlerVal.length < 3) {
+        msgBox.textContent = 'Handler must be at least 2 characters long.';
+        msgBox.className = 'modal-msg-box error';
+        return;
+      }
+
+      try {
+        const authHeaders = typeof headers !== 'undefined' ? headers : {
+          'apikey': ANON_KEY,
+          'Authorization': `Bearer ${ANON_KEY}`,
+          'Content-Type': 'application/json'
+        };
+
+        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/users?username=eq.${encodeURIComponent(currentUsername)}`, {
+          method: 'PATCH',
+          headers: {
+            ...authHeaders,
+            'Prefer': 'return=minimal'
+          },
+          body: JSON.stringify({ handler: handlerVal })
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          if (errorData.message && errorData.message.includes('duplicate key value')) {
+            msgBox.textContent = 'That handler is already taken!';
+          } else {
+            msgBox.textContent = 'Failed to save handler. Try another one.';
+          }
+          msgBox.className = 'modal-msg-box error';
+          return;
+        }
+
+        msgBox.textContent = 'Handler saved successfully!';
+        msgBox.className = 'modal-msg-box success';
+
+        setTimeout(() => {
+          document.getElementById('handlerModal').classList.add('hidden');
+          window.location.reload();
+        }, 1200);
+
+      } catch (err) {
+        msgBox.textContent = 'Connection error: ' + err.message;
+        msgBox.className = 'modal-msg-box error';
+      }
+    }
+
+    // Auto trigger check when page completes loading
+    document.addEventListener('DOMContentLoaded', () => {
+      const loggedUser = localStorage.getItem('chatUser');
+      if (loggedUser) {
+        checkForMissingHandler(loggedUser);
+      }
+    });
   </script>
   
-<script type="module" src="JS/main.js"></script>
+  <script type="module" src="JS/main.js"></script>
   
   <script src="customcrosshair/customcrosshair.js"></script>
 
@@ -644,24 +851,22 @@
   
   <script src="./BAN/guard.js"></script>
   <script>
-  // 1. Fetch your automated version.json file (preventing this fetch from caching)
-  fetch('version.json', { cache: 'no-store' })
-    .then(response => response.json())
-    .then(data => {
-      const version = data.version || Date.now();
-      
-      // 2. Dynamically create and inject the script tag with the automated version query parameter
-      const script = document.createElement('script');
-      script.src = `main.js?v=${version}`;
-      document.body.appendChild(script);
-    })
-    .catch(err => {
-      console.warn("Could not load version.json, falling back to timestamp:", err);
-      // Fallback if version.json fails to load
-      const script = document.createElement('script');
-      script.src = `main.js?v=${Date.now()}`;
-      document.body.appendChild(script);
-    });
-</script>
+    // Fetch automated version.json file (preventing cache)
+    fetch('version.json', { cache: 'no-store' })
+      .then(response => response.json())
+      .then(data => {
+        const version = data.version || Date.now();
+        
+        const script = document.createElement('script');
+        script.src = `main.js?v=${version}`;
+        document.body.appendChild(script);
+      })
+      .catch(err => {
+        console.warn("Could not load version.json, falling back to timestamp:", err);
+        const script = document.createElement('script');
+        script.src = `main.js?v=${Date.now()}`;
+        document.body.appendChild(script);
+      });
+  </script>
 </body>
 </html>
