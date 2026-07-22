@@ -685,6 +685,10 @@
   </div>
 
   <script>
+    // INJECTED FROM GITHUB SECRETS
+    const SUPABASE_PROJECT_URL = 'SUPABASE_URL';
+    const ANON_KEY = 'SUPABASE_KEY';
+
     const targetDate = new Date("August 17, 2026 00:00:00");
 
     function updateMatrixCard(cardId, value) {
@@ -767,7 +771,8 @@
 
         const data = await response.json();
         
-        if (data.length > 0 && (!data[0].handler || data[0].handler.trim() === '')) {
+        // This checks if handler is strictly null (from the DB) or completely empty
+        if (data.length > 0 && (data[0].handler === null || data[0].handler.trim() === '')) {
           document.getElementById('handlerModal').classList.remove('hidden');
         }
       } catch (err) {
