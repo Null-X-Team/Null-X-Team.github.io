@@ -685,9 +685,9 @@
   </div>
 
   <script>
-    // INJECTED FROM GITHUB SECRETS
-    const SUPABASE_PROJECT_URL = 'SUPABASE_URL';
-    const ANON_KEY = 'SUPABASE_KEY';
+    // THESE ARE YOUR ACTUAL CREDENTIALS FROM YOUR LOGIN HTML
+    const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
+    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
     const targetDate = new Date("August 17, 2026 00:00:00");
 
@@ -757,7 +757,7 @@
     async function checkForMissingHandler(username) {
       if (!username || username === 'Guest') return;
       try {
-        const authHeaders = typeof headers !== 'undefined' ? headers : {
+        const authHeaders = {
           'apikey': ANON_KEY,
           'Authorization': `Bearer ${ANON_KEY}`
         };
@@ -771,7 +771,7 @@
 
         const data = await response.json();
         
-        // This checks if handler is strictly null (from the DB) or completely empty
+        // This targets the null field directly from your database
         if (data.length > 0 && (data[0].handler === null || data[0].handler.trim() === '')) {
           document.getElementById('handlerModal').classList.remove('hidden');
         }
@@ -799,7 +799,7 @@
       }
 
       try {
-        const authHeaders = typeof headers !== 'undefined' ? headers : {
+        const authHeaders = {
           'apikey': ANON_KEY,
           'Authorization': `Bearer ${ANON_KEY}`,
           'Content-Type': 'application/json'
