@@ -74,8 +74,8 @@
 
         overlay.innerHTML = `
             <div class="nxos-ban-box">
-                <div class="nxos-ban-title">TERMINAL ACCESS RESTRICTED</div>
-                <p class="nxos-ban-msg">You're Banned.</p>
+                <div class="nxos-ban-title">ACCESS RESTRICTED</div>
+                <p class="nxos-ban-msg">You've Been BANNED.</p>
                 <div class="nxos-ban-reason-container">
                     <span class="nxos-ban-reason-label">Reason:</span>
                     <p class="nxos-ban-reason-text">${reasonText}</p>
