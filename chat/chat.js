@@ -534,8 +534,17 @@ window.initializeChatEngine = async function() {
             input.disabled = true;
 
             try {
-                // --- MODERATION TEMPORARILY BYPASSED ---
-                // We are skipping the fetch to project-qd4by.vercel.app
+                // --- CLIENT-SIDE BAD WORD FILTER INTEGRATION ---
+                // Checks if badword.js has loaded successfully and runs the filter
+                if (typeof filterBadWords === 'function') {
+                    const cleanText = filterBadWords(val);
+                    if (cleanText !== val) {
+                        alert("Message blocked by filter! Please remove inappropriate language before sending.");
+                        input.disabled = false;
+                        input.focus();
+                        return;
+                    }
+                }
                 
                 input.value = ""; 
                 if (charCounter) charCounter.textContent = "0 / 250";
