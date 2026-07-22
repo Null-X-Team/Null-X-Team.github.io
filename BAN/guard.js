@@ -6,25 +6,6 @@
     const SUPABASE_URL = "https://ldojzaikkolrxkiwyqvq.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw";
 
-    let localSupabase;
-    
-    // Connect to the database instantly via global windows context or Cdn backup
-    if (typeof supabase !== 'undefined' && supabase.createClient) {
-        localSupabase = supabase;
-    } else if (typeof window.Supabase !== 'undefined' && window.Supabase.createClient) {
-        localSupabase = window.Supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    } else {
-        await new Promise((resolve) => {
-            const script = document.createElement("script");
-            script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
-            script.onload = () => {
-                localSupabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                resolve();
-            };
-            document.head.appendChild(script);
-        });
-    }
-
     // Capture the logged-in username directly from your header elements
     let currentUsername = null;
     const welcomeEl = document.getElementById("welcome-text");
@@ -33,30 +14,52 @@
         currentUsername = welcomeEl.innerText.replace("Hello,", "").trim();
     }
     
+    // FIX: Look for 'chatUser' because that is what your site actually uses!
     if (!currentUsername || currentUsername === "Guest") {
-        currentUsername = localStorage.getItem("nxos_logged_user") || localStorage.getItem("username");
+        currentUsername = localStorage.getItem("chatUser") || localStorage.getItem("nxos_logged_user") || localStorage.getItem("username");
     }
 
     console.log("[Security System] Checking access status for:", currentUsername);
     if (!currentUsername || currentUsername === "Guest") return;
 
     try {
-        // CHANGED: Querying 'user_roles' instead of 'profiles' to match your actual schema
-        const { data, error } = await localSupabase
-            .from('user_roles') 
-            .select('is_banned, last_action_reason')
-            .eq('username', currentUsername)
-            .maybeSingle();
+        // FIX: Using fast REST API instead of waiting for a slow CDN script to load
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(currentUsername)}&select=is_banned,temp_ban_until,last_action_reason`, {
+            method: 'GET',
+            headers: {
+                'apikey': SUPABASE_KEY,
+                'Authorization': `Bearer ${SUPABASE_KEY}`
+            }
+        });
 
-        if (error) {
-            console.error("[Security System] Query fault:", error.message);
-            return;
-        }
+        if (!response.ok) throw new Error("Query fault");
+        
+        const data = await response.json();
 
-        if (data) {
-            const statusString = String(data.is_banned).toUpperCase();
-            if (data.is_banned === true || statusString === "TRUE") {
-                const banReason = data.last_action_reason || "Access restricted by administration.";
+        if (data && data.length > 0) {
+            const userStatus = data[0];
+            const statusString = String(userStatus.is_banned).toUpperCase();
+            const isPermanentlyBanned = (userStatus.is_banned === true || statusString === "TRUE");
+            
+            // Check for temporary bans
+            let isTemporarilyBanned = false;
+            if (userStatus.temp_ban_until) {
+                const expiryTime = new Date(userStatus.temp_ban_until).getTime();
+                if (expiryTime > Date.now()) {
+                    isTemporarilyBanned = true;
+                }
+            }
+
+            // If they are banned in any way, lock them out
+            if (isPermanentlyBanned || isTemporarilyBanned) {
+                let banReason = userStatus.last_action_reason || "Access restricted by administration.";
+                
+                // Add expiry date to the screen if it's a temp ban
+                if (isTemporarilyBanned && !isPermanentlyBanned) {
+                    const expiryDate = new Date(userStatus.temp_ban_until).toLocaleString();
+                    banReason = `${banReason} <br><br><span style="color:#ffaa00;">Ban expires at: ${expiryDate}</span>`;
+                }
+
                 applySystemLockout(banReason);
             }
         }
