@@ -92,6 +92,11 @@
             margin-bottom: 20px;
         }
 
+        /* Utility class to hide elements smoothly */
+        .hidden {
+            display: none;
+        }
+
         label {
             display: block;
             color: var(--text-secondary);
@@ -111,12 +116,15 @@
             border: 1px solid var(--input-border);
             border-radius: 8px;
             padding: 12px;
-            padding-right: 40px;
             color: var(--text-color);
             font-size: 1rem;
             box-sizing: border-box;
             outline: none;
             transition: border-color 0.3s ease;
+        }
+        
+        .password-input {
+            padding-right: 40px;
         }
 
         input:focus {
@@ -183,15 +191,20 @@
         </div>
 
         <form id="authForm" onsubmit="handleSubmit(event)">
+            <div class="form-group" id="handlerGroup">
+                <label for="handler">Handler</label>
+                <input type="text" id="handler" placeholder="@your_handler" autocomplete="off" maxlength="20">
+            </div>
+
             <div class="form-group">
-                <label for="username">Username (NOT EMAIL)</label>
+                <label id="usernameLabel" for="username">Display Name</label>
                 <input type="text" id="username" required autocomplete="username" maxlength="22">
             </div>
 
             <div class="form-group">
                 <label for="password">Password</label>
                 <div class="input-wrapper">
-                    <input type="password" id="password" required autocomplete="current-password">
+                    <input type="password" id="password" class="password-input" required autocomplete="current-password">
                     <span class="toggle-password" onclick="togglePasswordVis()">
                         <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -229,16 +242,30 @@
             const tabCreate = document.getElementById('tabCreate');
             const tabLogin = document.getElementById('tabLogin');
             const submitBtn = document.getElementById('submitBtn');
+            const handlerGroup = document.getElementById('handlerGroup');
+            const handlerInput = document.getElementById('handler');
+            const usernameLabel = document.getElementById('usernameLabel');
+            
             document.getElementById('messageBox').textContent = '';
 
             if (mode === 'signup') {
                 tabCreate.classList.add('active');
                 tabLogin.classList.remove('active');
                 submitBtn.textContent = 'Create Account';
+                
+                // Show handler field for signup
+                handlerGroup.classList.remove('hidden');
+                handlerInput.required = true;
+                usernameLabel.textContent = 'Display Name';
             } else {
                 tabLogin.classList.add('active');
                 tabCreate.classList.remove('active');
                 submitBtn.textContent = 'Login';
+                
+                // Hide handler field for login (assume they log in with Display Name or you can change to Handler)
+                handlerGroup.classList.add('hidden');
+                handlerInput.required = false;
+                usernameLabel.textContent = 'Display Name or Handler';
             }
         }
 
@@ -264,45 +291,63 @@
         function handleSubmit(event) {
             event.preventDefault();
             const userVal = document.getElementById('username').value.trim();
+            let handlerVal = document.getElementById('handler').value.trim();
             const passVal = document.getElementById('password').value;
 
             if (userVal.length > 22) {
-                showMessage('Username cannot exceed 22 characters.');
+                showMessage('Display name cannot exceed 22 characters.');
                 return;
             }
 
             if (currentMode === 'signup') {
-                handleSignUp(userVal, passVal);
+                // Format handler to ensure it starts with @
+                if (!handlerVal.startsWith('@')) {
+                    handlerVal = '@' + handlerVal;
+                }
+                
+                if (handlerVal.length < 3) {
+                    showMessage('Handler must be at least 2 characters long.');
+                    return;
+                }
+                
+                handleSignUp(userVal, handlerVal, passVal);
             } else {
+                // For login, we just pass what they typed into the username box 
+                // (which could be a handler or a username depending on your backend setup)
                 handleLogin(userVal, passVal);
             }
         }
 
         // --- HASHED SIGN UP ROUTINE ---
-        async function handleSignUp(username, password) {
+        async function handleSignUp(username, handler, password) {
             try {
-                // Call the secure signup backend RPC to handle registration and duplicate checking
+                // Payload now includes new_handler
                 const response = await fetch(SIGNUP_RPC_URL, {
                     method: 'POST',
                     headers: headers,
                     body: JSON.stringify({ 
                         new_username: username, 
+                        new_handler: handler,
                         new_password: password 
                     })
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
+                    
+                    // Catch unique constraint errors based on Supabase RPC feedback
                     if (errorData.message && errorData.message.includes('Username is already taken')) {
-                        showMessage('Username is already taken!');
+                        showMessage('Display Name is already taken!');
+                    } else if (errorData.message && errorData.message.includes('Handler is already taken')) {
+                        showMessage('That Handler is already in use!');
                     } else {
-                        showMessage('Registration failed. Please try a different username.');
+                        showMessage('Registration failed. Name or Handler might be taken.');
                     }
                     return;
                 }
 
-                // Automatically set session user and redirect upon successful creation
-                localStorage.setItem('chatUser', username);
+                // Store handler instead of display name for chat logic if you prefer
+                localStorage.setItem('chatUser', handler);
                 showMessage('Account created successfully! Logging you in...', false);
                 
                 setTimeout(() => {
@@ -318,7 +363,6 @@
         // --- HASHED LOGIN ROUTINE ---
         async function handleLogin(username, password) {
             try {
-                // Submit credentials to the database RPC to verify via crypt()
                 const response = await fetch(RPC_URL, {
                     method: 'POST',
                     headers: headers,
@@ -339,7 +383,7 @@
                         window.location.href = '../index.html';
                     }, 1500);
                 } else {
-                    showMessage('Incorrect username or password.');
+                    showMessage('Incorrect credentials.');
                 }
             } catch (err) {
                 showMessage('Connection error: ' + err.message);
