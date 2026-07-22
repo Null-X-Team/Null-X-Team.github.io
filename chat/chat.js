@@ -8,6 +8,9 @@ let lastMessageTime = 0;
 let chatPollingInterval = null; 
 let heartbeatInterval = null;
 
+// Track active menu state
+let selectedChatUser = { username: '', handler: '' };
+
 // Track the live authorization status dynamically from Supabase
 let currentUserIsAdmin = false;
 
@@ -29,6 +32,102 @@ window.mentionUser = function(rawEncodedName) {
     }
 };
 
+// --- USER CONTEXT MENU LOGIC ---
+window.openUserMenu = function(event, targetUsername) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    selectedChatUser = { 
+        username: targetUsername, 
+        handler: `@${targetUsername.toLowerCase().replace(/\s+/g, '_')}` 
+    };
+
+    const menu = document.getElementById('chat-user-menu');
+    const usernameEl = document.getElementById('menu-username');
+    const handlerEl = document.getElementById('menu-handler');
+
+    if (usernameEl) usernameEl.textContent = selectedChatUser.username;
+    if (handlerEl) handlerEl.textContent = selectedChatUser.handler;
+
+    if (menu) {
+        // Prevent overflowing outside screen edges
+        let posX = event.clientX;
+        let posY = event.clientY;
+
+        const menuWidth = 220;
+        const menuHeight = 180;
+
+        if (posX + menuWidth > window.innerWidth) {
+            posX = window.innerWidth - menuWidth - 10;
+        }
+        if (posY + menuHeight > window.innerHeight) {
+            posY = window.innerHeight - menuHeight - 10;
+        }
+
+        menu.style.left = `${posX}px`;
+        menu.style.top = `${posY}px`;
+        menu.classList.remove('hidden');
+    }
+};
+
+// Global click event to dismiss context menu when clicking elsewhere
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('chat-user-menu');
+    if (menu && !e.target.closest('#chat-user-menu') && !e.target.closest('.chat-clickable')) {
+        menu.classList.add('hidden');
+    }
+});
+
+// Menu Action Button Bindings
+document.addEventListener('DOMContentLoaded', () => {
+    const profileBtn = document.getElementById('menu-btn-profile');
+    const pmBtn = document.getElementById('menu-btn-pm');
+    const friendBtn = document.getElementById('menu-btn-friend');
+    const blockBtn = document.getElementById('menu-btn-block');
+
+    if (profileBtn) {
+        profileBtn.addEventListener('click', () => {
+            if (selectedChatUser.username) {
+                window.location.href = `../profile/profile.html?user=${encodeURIComponent(selectedChatUser.username)}`;
+            }
+            document.getElementById('chat-user-menu')?.classList.add('hidden');
+        });
+    }
+
+    if (pmBtn) {
+        pmBtn.addEventListener('click', () => {
+            alert(`Opening private conversation with ${selectedChatUser.username}... (Database table required)`);
+            document.getElementById('chat-user-menu')?.classList.add('hidden');
+        });
+    }
+
+    if (friendBtn) {
+        friendBtn.addEventListener('click', () => {
+            alert(`Friend request sent to ${selectedChatUser.username}!`);
+            document.getElementById('chat-user-menu')?.classList.add('hidden');
+        });
+    }
+
+    if (blockBtn) {
+        blockBtn.addEventListener('click', () => {
+            if (!selectedChatUser.username) return;
+            
+            if (confirm(`Are you sure you want to block ${selectedChatUser.username}? You won't see their messages in chat.`)) {
+                let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
+                if (!blockedUsers.includes(selectedChatUser.username)) {
+                    blockedUsers.push(selectedChatUser.username);
+                    localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
+                }
+                alert(`${selectedChatUser.username} has been blocked.`);
+                document.getElementById('chat-user-menu')?.classList.add('hidden');
+                
+                // Trigger refresh to immediately hide messages from blocked user
+                if (window.refreshChatMessages) window.refreshChatMessages();
+            }
+        });
+    }
+});
+
 // Global initialization hook exposed directly to main.js router
 window.initializeChatEngine = async function() {
     const user = localStorage.getItem('chatUser');
@@ -42,7 +141,6 @@ window.initializeChatEngine = async function() {
     if (heartbeatInterval) clearInterval(heartbeatInterval);
 
     try {
-        // Safe global profile grab to completely avoid space encoding breaking backend REST paths
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?select=username`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
@@ -74,12 +172,10 @@ window.initializeChatEngine = async function() {
         } catch (e) { console.error("Heartbeat sync lost:", e); }
     }
     
-    // Fire initial presence registration on connection, then loop every 10 seconds
     executePresenceHeartbeat();
     heartbeatInterval = setInterval(executePresenceHeartbeat, 10000);
 
     try {
-        // Querying all roles and filtering in JavaScript to ensure spaces inside names like 'TEST USER' process safely
         const banRes = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?select=username,is_banned,temp_ban_until,pfp_url,is_admin,role_tag,last_seen`, {
             headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
         });
@@ -89,7 +185,6 @@ window.initializeChatEngine = async function() {
             const profile = banData.find(r => r.username && r.username.trim().toLowerCase() === user.trim().toLowerCase());
             
             if (profile) {
-                // Fail-safe permission mapping across raw boolean and uppercase text types
                 currentUserIsAdmin = (profile.is_admin === true || String(profile.is_admin).toLowerCase() === 'true' || String(profile.role_tag).toLowerCase() === 'admin');
 
                 if (profile.is_banned === true || String(profile.is_banned).toLowerCase() === 'true') {
@@ -121,7 +216,6 @@ window.initializeChatEngine = async function() {
     const usernameDisplay = document.getElementById('username-display');
     if (usernameDisplay) usernameDisplay.textContent = user;
     
-    // UI layout visibility adapts dynamically using your permission variable 
     if (currentUserIsAdmin) {
         const adminTab = document.getElementById('admin-tab');
         if (adminTab) adminTab.style.display = 'block';
@@ -204,7 +298,6 @@ window.initializeChatEngine = async function() {
         listContainer.innerHTML = filtered.map(u => {
             const displayTag = u.is_admin ? 'ADMIN' : u.role_tag;
             
-            // Check dynamic status threshold (Online within past 5 minutes)
             let onlineDot = "rgba(160, 146, 141, 0.4)";
             let statusLabel = "OFFLINE";
             if (u.last_seen) {
@@ -220,12 +313,10 @@ window.initializeChatEngine = async function() {
                     <div style="position: absolute; top: 10px; right: 10px; font-size: 9px; font-weight: bold; color: ${onlineDot}; border: 1px solid ${onlineDot}; padding: 1px 4px; border-radius: 3px;">
                         ${statusLabel}
                     </div>
-                    <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}">
-                        <img class="avatar" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%; border: 2px solid ${onlineDot};">
-                    </a>
-                    <a href="../profile/profile.html?user=${encodeURIComponent(u.username)}" style="color:white; text-decoration:none; font-weight:bold;">
+                    <img class="avatar chat-clickable" src="${u.pfp_url || DEFAULT_PFP}" style="margin: 0 auto 10px; width:50px; height:50px; display:block; object-fit:cover; border-radius:50%; border: 2px solid ${onlineDot};" onclick="openUserMenu(event, '${u.username}')">
+                    <span class="chat-clickable" style="color:white; font-weight:bold; cursor:pointer;" onclick="openUserMenu(event, '${u.username}')">
                         ${u.username}
-                    </a>
+                    </span>
                     <div style="font-size:11px; color:#a0928d; margin-top:5px; text-transform:uppercase;">[${displayTag}]</div>
                 </div>
             `;
@@ -249,7 +340,6 @@ window.initializeChatEngine = async function() {
             const messages = await mRes.json();
             const roles = await rRes.json();
 
-            // Render matching room title indicator status safely from current tracking structures
             const activeHeaderSpan = document.getElementById('room-status-indicator');
             if (activeHeaderSpan && roles) {
                 const selfCheck = roles.find(r => r.username === user);
@@ -260,9 +350,13 @@ window.initializeChatEngine = async function() {
             }
 
             const isAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 100;
+            const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
 
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
+                // Ignore messages sent by blocked users
+                if (blockedUsers.includes(msg.username)) return;
+
                 const isDel = msg.content === "Message Was Deleted By Owner";
                 const role = roles && roles.find ? roles.find(r => r.username === msg.username) : null;
                 const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -278,7 +372,6 @@ window.initializeChatEngine = async function() {
                     tag = `<span class="badge custom-badge">[${evaluatedRole.toUpperCase()}]</span>`;
                 }
 
-                // Check sender status threshold for chat message avatar rings
                 let senderStatusColor = "transparent";
                 if (role && role.last_seen) {
                     if (Date.now() - new Date(role.last_seen).getTime() < 5 * 60 * 1000) {
@@ -290,14 +383,12 @@ window.initializeChatEngine = async function() {
                 div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 
                 div.innerHTML = `
-                    <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}">
-                        <img src="${userPfp}" class="chat-pfp" alt="Avatar" style="border: 2px solid ${senderStatusColor};">
-                    </a>
+                    <img src="${userPfp}" class="chat-pfp chat-clickable" alt="Avatar" style="border: 2px solid ${senderStatusColor};" onclick="openUserMenu(event, '${msg.username}')">
                     <div class="message-content-node">
                         <div class="message-meta-header">
-                            <a href="../profile/profile.html?user=${encodeURIComponent(msg.username)}" class="chat-username-link">
+                            <span class="chat-username-link chat-clickable" onclick="openUserMenu(event, '${msg.username}')">
                                 <strong>${msg.username}</strong>
-                            </a>
+                            </span>
                             <span style="font-size:10px; color:#cf7a3c; cursor:pointer; margin-left:4px;" onclick="window.mentionUser('${encodeURIComponent(msg.username)}')">[reply]</span>
                             ${tag}
                             <span class="message-timestamp">${time}</span>
@@ -316,6 +407,8 @@ window.initializeChatEngine = async function() {
             }
         } catch (e) { console.error(e); }
     }
+
+    window.refreshChatMessages = fetchMessages;
 
     // --- CHARACTER COUNTER LOGIC MOUNT ---
     const msgInput = document.getElementById('message-input');
