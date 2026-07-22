@@ -39,7 +39,7 @@ window.openUserMenu = function(event, targetUsername) {
 
     selectedChatUser = { 
         username: targetUsername, 
-        handler: `@${targetUsername.toLowerCase().replace(/\s+/g, '_')}` 
+        handler: `@${targetUsername.toLowerCase().replace(/\\s+/g, '_')}` 
     };
 
     const menu = document.getElementById('chat-user-menu');
@@ -577,6 +577,7 @@ window.initializeChatEngine = async function() {
         };
     }
 
+    // --- FIX: ADMIN ACTIONS USING PATCH TO UPDATE EXISTING ROWS ---
     window.adminExecute = async (action) => {
         let target = document.getElementById(action === 'warn' ? 'warn-search' : 'ban-search').value.trim();
         const reason = document.getElementById(action === 'warn' ? 'warn-reason' : 'ban-reason').value.trim();
@@ -585,39 +586,66 @@ window.initializeChatEngine = async function() {
         if (!target) return alert("Enter a username.");
         if (target.startsWith('@')) target = target.substring(1);
 
-        let data = { username: target, last_action_reason: reason, last_action_type: action, last_action_category: cat };
+        // Define what we are updating
+        let data = { last_action_reason: reason, last_action_type: action, last_action_category: cat };
         if (action === 'ban') { data.is_banned = true; }
         else if (action === 'unban') { data.is_banned = false; data.warned = false; data.temp_ban_until = null; }
         else if (action === 'warn') data.warned = true;
 
-        await fetch(`${SUPABASE_URL}/rest/v1/user_roles`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-            body: JSON.stringify(data)
-        });
-        alert("Action completed.");
+        try {
+            // Using PATCH to UPDATE the existing row where username matches
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(target)}`, {
+                method: 'PATCH',
+                headers: { 
+                    'apikey': SUPABASE_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify(data)
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+            alert("Action completed successfully!");
+            
+        } catch (err) {
+            console.error("Database update failed:", err);
+            alert("Failed to update user. Check console for details.");
+        }
     };
 
     window.executeTempBan = async () => {
         let target = document.getElementById('temp-ban-search').value.trim();
         if (target.startsWith('@')) target = target.substring(1);
+        if (!target) return alert("Enter a username.");
         
         const duration = parseInt(document.getElementById('temp-ban-duration').value);
         const reason = document.getElementById('temp-ban-reason').value.trim();
         const expiry = new Date(); 
         expiry.setMinutes(expiry.getMinutes() + duration);
 
-        await fetch(`${SUPABASE_URL}/rest/v1/user_roles`, {
-            method: 'POST',
-            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates' },
-            body: JSON.stringify({ 
-                username: target, 
-                last_action_type: 'temp_ban', 
-                last_action_reason: reason,
-                temp_ban_until: expiry.toISOString() 
-            })
-        });
-        alert("Temporary ban applied.");
+        try {
+            // Using PATCH to UPDATE the existing row
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(target)}`, {
+                method: 'PATCH',
+                headers: { 
+                    'apikey': SUPABASE_KEY, 
+                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
+                    'Content-Type': 'application/json' 
+                },
+                body: JSON.stringify({ 
+                    last_action_type: 'temp_ban', 
+                    last_action_reason: reason,
+                    temp_ban_until: expiry.toISOString() 
+                })
+            });
+
+            if (!res.ok) throw new Error(await res.text());
+            alert("Temporary ban applied successfully!");
+
+        } catch (err) {
+            console.error("Temp ban failed:", err);
+            alert("Failed to apply temp ban.");
+        }
     };
 
     window.deleteMsg = async (id) => {
