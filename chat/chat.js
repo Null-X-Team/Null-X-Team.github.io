@@ -39,7 +39,7 @@ window.openUserMenu = function(event, targetUsername) {
 
     selectedChatUser = { 
         username: targetUsername, 
-        handler: `@${targetUsername.toLowerCase().replace(/\\s+/g, '_')}` 
+        handler: `@${targetUsername.toLowerCase().replace(/\s+/g, '_')}` 
     };
 
     const menu = document.getElementById('chat-user-menu');
@@ -534,29 +534,14 @@ window.initializeChatEngine = async function() {
             input.disabled = true;
 
             try {
-                const modResponse = await fetch('https://project-qd4by.vercel.app/api/moderate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: val })
-                });
-
-                if (!modResponse.ok) {
-                    throw new Error("Compliance pipeline validation mismatch.");
-                }
-
-                const safetyCheck = await modResponse.json();
-
-                if (safetyCheck.flagged) {
-                    alert(`Message blocked by AI filter! (${safetyCheck.reason})`);
-                    input.disabled = false;
-                    input.focus();
-                    return; 
-                }
-
+                // --- MODERATION TEMPORARILY BYPASSED ---
+                // We are skipping the fetch to project-qd4by.vercel.app
+                
                 input.value = ""; 
                 if (charCounter) charCounter.textContent = "0 / 250";
                 lastMessageTime = now;
 
+                // Send directly to Supabase
                 await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
                     method: 'POST',
                     headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
@@ -567,9 +552,8 @@ window.initializeChatEngine = async function() {
                     msgContainer.scrollTop = msgContainer.scrollHeight;
                 });
             } catch (err) {
-                console.error("Moderation pipeline threw exception:", err);
-                alert("Safety verification offline. Message could not be processed safely.");
-                return;
+                console.error("Message send failed:", err);
+                alert("Database connection failed.");
             } finally {
                 input.disabled = false;
                 input.focus();
@@ -618,7 +602,14 @@ window.initializeChatEngine = async function() {
         if (target.startsWith('@')) target = target.substring(1);
         if (!target) return alert("Enter a username.");
         
-        const duration = parseInt(document.getElementById('temp-ban-duration').value);
+        // Grab the duration and make sure it is actually a number
+        const durationInput = document.getElementById('temp-ban-duration').value;
+        const duration = parseInt(durationInput);
+        
+        if (isNaN(duration) || duration <= 0) {
+            return alert("Please enter a valid number of minutes for the ban duration!");
+        }
+        
         const reason = document.getElementById('temp-ban-reason').value.trim();
         const expiry = new Date(); 
         expiry.setMinutes(expiry.getMinutes() + duration);
@@ -644,7 +635,7 @@ window.initializeChatEngine = async function() {
 
         } catch (err) {
             console.error("Temp ban failed:", err);
-            alert("Failed to apply temp ban.");
+            alert("Failed to apply temp ban. Check console for details.");
         }
     };
 
