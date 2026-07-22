@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pmBtn) {
         pmBtn.addEventListener('click', () => {
-            alert(`Opening private conversation with ${selectedChatUser.username}... (Database table required)`);
+            alert(`Opening private conversation with ${selectedChatUser.username}...`);
             document.getElementById('chat-user-menu')?.classList.add('hidden');
         });
     }
@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     blockedUsers.push(selectedChatUser.username);
                     localStorage.setItem('blockedUsers', JSON.stringify(blockedUsers));
                 }
-                alert(`${selectedChatUser.username} has been blocked.`);
+                alert(`User blocked successfully.`);
                 document.getElementById('chat-user-menu')?.classList.add('hidden');
                 
                 // Trigger refresh to immediately hide messages from blocked user
@@ -219,13 +219,16 @@ window.initializeChatEngine = async function() {
     if (currentUserIsAdmin) {
         const adminTab = document.getElementById('admin-tab');
         if (adminTab) adminTab.style.display = 'block';
+
+        const pmTab = document.getElementById('pm-tab');
+        if (pmTab) pmTab.style.display = 'block';
     }
 
     const msgContainer = document.getElementById('chat-messages');
 
-    // --- TAB NAVIGATION ---
+    // --- TAB NAVIGATION UPDATE ---
     window.switchTab = (target) => {
-        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view'].forEach(v => {
+        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view', 'private-messages-view'].forEach(v => {
             const el = document.getElementById(v);
             if (el) el.style.display = 'none';
         });
@@ -246,6 +249,13 @@ window.initializeChatEngine = async function() {
             if (adminTab) adminTab.classList.add('active');
             fetchAllUsers();
         } 
+        else if (target === 'private-messages') {
+            const pmView = document.getElementById('private-messages-view');
+            if (pmView) pmView.style.display = 'block';
+            const pmTab = document.getElementById('pm-tab');
+            if (pmTab) pmTab.classList.add('active');
+            fetchAdminPrivateMessages(); // Fetch all PMs
+        }
         else {
             const viewId = target + '-view';
             const v = document.getElementById(viewId);
@@ -256,6 +266,83 @@ window.initializeChatEngine = async function() {
             if (t) t.classList.add('active');
             
             if (target === 'users') fetchAllUsers();
+        }
+    };
+
+    // --- ADMIN DATALIST UPDATE (For autocomplete @ users) ---
+    function updateAdminUserDatalist() {
+        const datalist = document.getElementById('admin-user-suggestions');
+        if (!datalist) return;
+        
+        datalist.innerHTML = allUsers.map(u => `<option value="${u.username}">`).join('');
+
+        ['warn-search', 'ban-search', 'temp-ban-search'].forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.setAttribute('list', 'admin-user-suggestions');
+                input.setAttribute('placeholder', 'Type @ or username...');
+                
+                input.oninput = (e) => {
+                    if (e.target.value.startsWith('@')) {
+                        e.target.value = e.target.value.replace(/^@+/, '');
+                    }
+                };
+            }
+        });
+    }
+
+    // --- ADMIN PM FETCHING ---
+    window.fetchAdminPrivateMessages = async function() {
+        const container = document.getElementById('admin-pm-container');
+        if (!container || !currentUserIsAdmin) return;
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/private_messages?select=*&order=created_at.desc`, {
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            const pmData = await res.json();
+
+            if (!pmData || pmData.length === 0) {
+                container.innerHTML = '<p style="color:#a0928d; text-align:center;">No private messages found in database.</p>';
+                return;
+            }
+
+            container.innerHTML = pmData.map(pm => {
+                const time = new Date(pm.created_at).toLocaleString();
+                return `
+                    <div style="border-bottom: 1px solid rgba(207, 122, 60, 0.2); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <div style="font-size: 12px; color: #cf7a3c;">
+                                <strong>${pm.sender_username}</strong> ➔ <strong>${pm.recipient_username}</strong>
+                                <span style="color: #a0928d; margin-left: 8px;">${time}</span>
+                            </div>
+                            <div style="color: #e0e0e0; margin-top: 4px; font-size: 14px;">
+                                ${pm.content}
+                            </div>
+                        </div>
+                        <button style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;" 
+                                onclick="deletePrivateMsg('${pm.id}')">
+                            Delete
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        } catch (err) {
+            console.error("Failed to load PM log:", err);
+            container.innerHTML = '<p style="color:#ff4444;">Error fetching private messages.</p>';
+        }
+    };
+
+    window.deletePrivateMsg = async (id) => {
+        if (!confirm("Are you sure you want to delete this private message?")) return;
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/private_messages?id=eq.${id}`, {
+                method: 'DELETE',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+            });
+            fetchAdminPrivateMessages();
+        } catch (e) {
+            console.error("Deletion failed:", e);
         }
     };
 
@@ -287,6 +374,7 @@ window.initializeChatEngine = async function() {
             });
             
             renderUserDirectory();
+            updateAdminUserDatalist(); // Bind users to autocomplete menu
         } catch (err) { console.error("Could not fetch user database collection:", err); }
     }
 
@@ -459,7 +547,7 @@ window.initializeChatEngine = async function() {
                 const safetyCheck = await modResponse.json();
 
                 if (safetyCheck.flagged) {
-                    alert(`[SECURITY BLOCK] Message blocked by AI filter! (${safetyCheck.reason})`);
+                    alert(`Message blocked by AI filter! (${safetyCheck.reason})`);
                     input.disabled = false;
                     input.focus();
                     return; 
