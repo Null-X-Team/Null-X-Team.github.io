@@ -317,7 +317,14 @@ button:hover {
 .btn-ban { background: #ff4444; color: white; }
 .btn-unban { background: #2a1f1a; color: #a0928d; border: 1px solid rgba(207, 122, 60, 0.1); }
 
-/* --- USER CONTEXT MENU STYLING --- */
+/* --- USER CONTEXT MENU & SVGS STYLING --- */
+.menu-icon { 
+    width: 16px; 
+    height: 16px; 
+    fill: currentColor; 
+    flex-shrink: 0;
+}
+
 #chat-user-menu {
     position: fixed;
     background-color: #1e1613;
