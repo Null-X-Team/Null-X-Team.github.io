@@ -499,24 +499,24 @@
       
       <a href="../Settings/settings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none; display: flex; align-items: center; justify-content: center; text-align: center;">Settings</a>
 
-      <div style="background: rgba(139, 0, 255, 0.03); border: 1px solid rgba(139, 0, 255, 0.12); padding: 10px; border-radius: 6px; margin: 10px 0; font-family: 'Segoe UI', sans-serif; color: white;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <div style="display: flex; align-items: center; gap: 4px;">
-            <i class="fas fa-cloud" style="font-size: 0.85rem; color: #a033ff;"></i>
-            <h4 style="margin: 0; color: #a033ff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;">Cloud Sync</h4>
-          </div>
-          <div id="dashboard-sync-msg" style="font-size: 0.7rem; font-weight: bold; color: #888;"></div>
-        </div>
-          
-        <div style="display: flex; gap: 6px;">
-          <button onclick="window.cloudLoad('dashboard-sync-msg')" style="flex: 1; padding: 6px; background: rgba(255,255,255,0.02); color: #aaa; border: 1px solid #222; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
-            Import Save
-          </button>
-          <button onclick="window.cloudSave('dashboard-sync-msg')" style="flex: 1; padding: 6px; background: #8b00ff; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='#a033ff'" onmouseout="this.style.background='#8b00ff'">
-            Export Save
-          </button>
-        </div>
-      </div>
+    <div style="background: rgba(139, 0, 255, 0.03); border: 1px solid rgba(139, 0, 255, 0.12); padding: 10px; border-radius: 6px; margin: 10px 0; font-family: 'Segoe UI', sans-serif; color: white;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+    <div style="display: flex; align-items: center; gap: 4px;">
+      <i class="fas fa-cloud" style="font-size: 0.85rem; color: #a033ff;"></i>
+      <h4 style="margin: 0; color: #a033ff; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;">Cloud Sync</h4>
+    </div>
+    <div id="dashboard-sync-msg" style="font-size: 0.7rem; font-weight: bold; color: #888;"></div>
+  </div>
+    
+  <div style="display: flex; gap: 6px;">
+    <button onclick="window.cloudLoad('dashboard-sync-msg', true)" style="flex: 1; padding: 6px; background: rgba(255,255,255,0.02); color: #aaa; border: 1px solid #222; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.06)'" onmouseout="this.style.background='rgba(255,255,255,0.02)'">
+      Import Save
+    </button>
+    <button onclick="window.cloudSave('dashboard-sync-msg', true)" style="flex: 1; padding: 6px; background: #8b00ff; color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold; font-size: 0.7rem; transition: background 0.2s;" onmouseover="this.style.background='#a033ff'" onmouseout="this.style.background='#8b00ff'">
+      Export Save
+    </button>
+  </div>
+</div>
 
       <div class="news-sidebar">
         <h3 class="news-title">System News</h3>
