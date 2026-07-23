@@ -116,11 +116,11 @@
     // --- AUTOMATIC TIMERS & EVENT LISTENERS ---
     document.addEventListener('DOMContentLoaded', async () => {
         // 1. Automatically fetch cloud save when page opens
-        await window.cloudLoad('sync-status', false);
+        await window.cloudLoad('dashboard-sync-msg', false);
 
         // 2. Automatically save every 30 seconds in the background
         setInterval(() => {
-            window.cloudSave('sync-status', false);
+            window.cloudSave('dashboard-sync-msg', false);
         }, 30000);
     });
 
