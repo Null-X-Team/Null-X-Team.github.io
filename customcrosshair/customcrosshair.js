@@ -40,7 +40,7 @@
             background: #00ffcc;
             transform: rotate(45deg);
             box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             z-index: 5;
         }
 
@@ -55,7 +55,7 @@
             border-radius: 50%;
             box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
             animation: spinReverse 8s linear infinite;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease, border-style 0.5s ease, animation 0.5s ease;
         }
 
         /* ========================================= */
@@ -68,7 +68,7 @@
             border: 1px dashed rgba(0, 255, 204, 0.4);
             border-radius: 50%;
             animation: spinNormal 12s linear infinite;
-            transition: all 0.3s ease;
+            transition: all 0.5s ease, border-style 0.5s ease, animation 0.5s ease;
         }
 
         /* ========================================= */
@@ -78,7 +78,7 @@
             position: absolute;
             background: rgba(0, 255, 204, 0.8);
             box-shadow: 0 0 5px #00ffcc;
-            transition: all 0.3s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         /* Explicitly centering the axis lines perfectly with the core */
         .xhair-axis.top    { width: 2px; height: 8px; top: 12px; left: calc(50% - 1px); }
@@ -93,7 +93,7 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            transition: transform 0.3s cubic-bezier(0.1, 0.8, 0.2, 1), width 0.3s ease, height 0.3s ease, opacity 0.3s ease;
+            transition: transform 0.5s cubic-bezier(0.1, 0.8, 0.2, 1), width 0.5s ease, height 0.5s ease, opacity 0.5s ease, animation 0.5s ease;
         }
         .xhair-bracket {
             position: absolute;
@@ -101,7 +101,7 @@
             height: 12px;
             border: 2px solid #00ffcc;
             filter: drop-shadow(0 0 4px #00ffcc);
-            transition: border-color 0.3s ease, border-width 0.1s, all 0.3s ease;
+            transition: border-color 0.5s ease, border-width 0.5s, all 0.5s ease, filter 0.5s ease;
         }
         .bracket-tl { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 4px; }
         .bracket-tr { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 4px; }
@@ -223,12 +223,14 @@
             border-radius: 50%;
             box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
             animation: vortexPulse 1.2s ease-in-out infinite;
+            transform: rotate(0deg);
         }
         
         #unique-crosshair.text-input .xhair-ring-inner {
             width: 32px;
             height: 32px;
             border: 2px dotted #ff00ff;
+            border-style: dotted;
             border-radius: 50%;
             box-shadow: 0 0 12px #ff00ff;
             opacity: 0.8;
@@ -239,6 +241,7 @@
             width: 56px;
             height: 56px;
             border: 1px solid #ff00ff;
+            border-style: solid;
             border-radius: 50%;
             box-shadow: 0 0 8px #ff00ff;
             opacity: 0.6;
