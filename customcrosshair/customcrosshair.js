@@ -1,13 +1,13 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
- * MODIFIED: Slower, heavier mechanical recoil with a fiery red muzzle flash.
+ * MODIFIED: Text input cursor fix & custom text input hover animation.
  */
 (function() {
     // 1. Inject the highly detailed UI styling
     const style = document.createElement('style');
     style.innerHTML = `
-        /* Hide the default desktop mouse pointer */
-        body, a, button, iframe, .game-card, .clickable, [role="button"] {
+        /* Hide the default desktop mouse pointer across all elements including text inputs */
+        body, a, button, iframe, .game-card, .clickable, [role="button"], input, textarea, [contenteditable="true"] {
             cursor: none !important;
         }
 
@@ -101,7 +101,7 @@
             height: 12px;
             border: 2px solid #00ffcc;
             filter: drop-shadow(0 0 4px #00ffcc);
-            transition: border-color 0.3s ease, border-width 0.1s;
+            transition: border-color 0.3s ease, border-width 0.1s, all 0.3s ease;
         }
         .bracket-tl { top: 0; left: 0; border-right: none; border-bottom: none; border-top-left-radius: 4px; }
         .bracket-tr { top: 0; right: 0; border-left: none; border-bottom: none; border-top-right-radius: 4px; }
@@ -113,6 +113,7 @@
         /* ========================================= */
         @keyframes spinNormal { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes spinReverse { 0% { transform: rotate(360deg); } 100% { transform: rotate(0deg); } }
+        @keyframes caretPulse { 0% { opacity: 0.4; height: 16px; } 100% { opacity: 1; height: 22px; } }
 
         /* ========================================= */
         /* MECHANICAL SLAM-LOCK KEYFRAMES            */
@@ -147,7 +148,7 @@
         /* INTERACTIVE STATE MODIFIERS               */
         /* ========================================= */
 
-        /* 1. HOVERING STATE (Targeting) */
+        /* 1. HOVERING STATE (Targeting Buttons/Links) */
         #unique-crosshair.targeting .xhair-bracket-container {
             width: 38px;
             height: 38px;
@@ -181,18 +182,44 @@
         #unique-crosshair.targeting .xhair-axis.left   { animation: lockAxisLeft 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
+        /* 2. TEXT BOX HOVER STATE (Precision Text Caret Mode) */
+        #unique-crosshair.text-input .xhair-bracket-container {
+            width: 16px;
+            height: 32px;
+            transform: rotate(0deg);
+        }
+        #unique-crosshair.text-input .xhair-core {
+            width: 2px;
+            height: 20px;
+            background: #00e5ff;
+            box-shadow: 0 0 8px #00e5ff, 0 0 16px #00e5ff;
+            transform: rotate(0deg);
+            animation: caretPulse 0.7s ease-in-out infinite alternate;
+        }
+        #unique-crosshair.text-input .xhair-ring-inner,
+        #unique-crosshair.text-input .xhair-ring-outer {
+            opacity: 0.15;
+            transform: scale(0.5);
+        }
+        #unique-crosshair.text-input .xhair-bracket {
+            border-color: #00e5ff;
+            border-width: 1.5px;
+            filter: drop-shadow(0 0 5px #00e5ff);
+        }
+        #unique-crosshair.text-input .xhair-axis {
+            opacity: 0;
+            transform: scale(0);
+        }
 
-        /* 2. CLICKING / TAPPING STATE: Heavy Red Recoil & Flare */
+        /* 3. CLICKING / TAPPING STATE: Heavy Red Recoil & Flare */
         
-        /* 4 corners turn one click (45deg), scale up slightly, and push outward */
         #unique-crosshair.clicking .xhair-bracket-container {
             width: 95px;
             height: 95px;
             transform: rotate(45deg) scale(1.15); 
-            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1); /* Slower, punchy kick */
+            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
-        /* Rings flare out massively in red and fade away */
         #unique-crosshair.clicking .xhair-ring-outer {
             width: 80px;
             height: 80px;
@@ -200,7 +227,7 @@
             border-color: #ff3333;
             border-width: 2px;
             transform: scale(1.4);
-            transition: all 0.25s ease-out; /* Longer fade */
+            transition: all 0.25s ease-out;
         }
         #unique-crosshair.clicking .xhair-ring-inner {
             width: 60px;
@@ -213,7 +240,6 @@
             transition: all 0.25s ease-out;
         }
         
-        /* Core pulses violently in red */
         #unique-crosshair.clicking .xhair-core {
             background: #ff3333;
             box-shadow: 0 0 20px #ff0000, 0 0 40px #ff5555;
@@ -221,19 +247,18 @@
             transition: all 0.12s ease-out;
         }
         
-        /* Brackets light up red */
         #unique-crosshair.clicking .xhair-bracket {
             border-color: #ff3333;
             border-width: 3px;
             filter: drop-shadow(0 0 10px #ff0000);
         }
         
-        /* The 4 lines push aggressively outwards pointing into the corners */
         #unique-crosshair.clicking .xhair-axis {
             animation: none !important; 
             background: #ff3333 !important;
             box-shadow: 0 0 12px #ff0000 !important;
-            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1); /* Matched to container speed */
+            opacity: 1 !important;
+            transition: all 0.12s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         #unique-crosshair.clicking .xhair-axis.top    { top: -14px !important; height: 18px !important; }
         #unique-crosshair.clicking .xhair-axis.bottom { bottom: -14px !important; height: 18px !important; }
@@ -274,7 +299,6 @@
     };
     
     const stopFlare = () => {
-        // Increased time to 200ms so the heavier animation has time to be seen fully
         flareTimeout = setTimeout(() => {
             crosshair.classList.remove('clicking');
         }, 200); 
@@ -291,20 +315,35 @@
         
         const targetTag = target.tagName.toLowerCase();
         
-        // Detect globally interactive triggers
-        if (targetTag === 'a' || 
-            targetTag === 'button' || 
-            targetTag === 'iframe' || 
-            target.classList.contains('game-card') || 
-            target.closest('.game-card') ||
-            target.closest('.game-container') ||
-            target.closest('button') || 
-            target.closest('a') ||
-            target.closest('[role="button"]') ||
-            window.getComputedStyle(target).cursor === 'pointer') {
-            crosshair.classList.add('targeting');
-        } else {
+        // Detect text box / editable text targets
+        const isTextInput = (
+            targetTag === 'input' || 
+            targetTag === 'textarea' || 
+            target.isContentEditable || 
+            target.getAttribute('contenteditable') === 'true'
+        );
+
+        if (isTextInput) {
+            crosshair.classList.add('text-input');
             crosshair.classList.remove('targeting');
+        } else {
+            crosshair.classList.remove('text-input');
+
+            // Detect globally interactive triggers (Buttons, Links, Cards)
+            if (targetTag === 'a' || 
+                targetTag === 'button' || 
+                targetTag === 'iframe' || 
+                target.classList.contains('game-card') || 
+                target.closest('.game-card') ||
+                target.closest('.game-container') ||
+                target.closest('button') || 
+                target.closest('a') ||
+                target.closest('[role="button"]') ||
+                window.getComputedStyle(target).cursor === 'pointer') {
+                crosshair.classList.add('targeting');
+            } else {
+                crosshair.classList.remove('targeting');
+            }
         }
     });
 
