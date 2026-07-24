@@ -109,7 +109,8 @@ let _0xData = [
   { id: "superhot", title: "SUPERHOT", url: "../Games/superhot/index.html", image: "../Games/superhot/images (33).jpeg", desc: "An innovative first-person shooter where time moves only when you move.", popular: true },
   { id: "arena_king", title: "Arena King", url: "../Games/arenaking/index.html", image: "../Games/arenaking/images (34).jpeg", desc: "Battle opponents in the arena, collect gold, and grow your crown to become the ultimate king.", popular: true },
   { id: "a_dark_room", title: "A Dark Room", url: "../Games/adarkroom/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019f90ef-3bea-753d-be5c-54659e699c0a?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/adarkroom/images (36).jpeg", desc: "An atmospheric, text-based survival adventure that starts with a cold room and a single spark.", popular: true },
-  { id: "a_date_with_death", title: "A Date with Death", url: "../Games/adatewithdeath/index.html", image: "../Games/adatewithdeath/images.jpeg", desc: "A romance chat sim where you chat, customize your look, and place your soul on the line against the Grim Reaper.", popular: true }
+  { id: "a_date_with_death", title: "A Date with Death", url: "../Games/adatewithdeath/index.html", image: "../Games/adatewithdeath/images.jpeg", desc: "A romance chat sim where you chat, customize your look, and place your soul on the line against the Grim Reaper.", popular: true },
+  { id: "day_in_the_office", title: "A Day in the Office", url: "../Games/dayintheoffice/index.html", image: "../Games/dayintheoffice/images (1).jpeg", desc: "A surreal horror game where you navigate an endless work day that you can never escape.", popular: true }
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
