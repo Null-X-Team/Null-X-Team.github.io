@@ -200,31 +200,65 @@
         #unique-crosshair.targeting .xhair-axis.left   { animation: lockAxisLeft 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
         #unique-crosshair.targeting .xhair-axis.right  { animation: lockAxisRight 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards; }
 
-        /* 2. TEXT BOX HOVER STATE - UNIQUE PULSING DIAMOND */
+        /* 2. TEXT BOX HOVER STATE - UNIQUE SPIRAL VORTEX */
+        @keyframes textVortex {
+            0% { transform: rotate(0deg) scale(1); }
+            100% { transform: rotate(360deg) scale(1); }
+        }
+        
+        @keyframes vortexPulse {
+            0%, 100% { opacity: 1; box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff; }
+            50% { opacity: 0.5; box-shadow: 0 0 8px #ff00ff, 0 0 15px #ff00ff; }
+        }
+        
+        @keyframes bracketSpiral {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(-360deg); }
+        }
+        
         #unique-crosshair.text-input .xhair-core {
-            animation: textInputPulse 0.8s cubic-bezier(0.43, 0.13, 0.23, 0.96) infinite;
-            width: 6px;
-            height: 6px;
-            background: #00ffcc;
-            box-shadow: 0 0 12px #00ffcc, 0 0 24px rgba(0, 255, 204, 0.5);
+            width: 8px;
+            height: 8px;
+            background: #ff00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px #ff00ff, 0 0 30px #ff00ff;
+            animation: vortexPulse 1.2s ease-in-out infinite;
         }
         
         #unique-crosshair.text-input .xhair-ring-inner {
-            animation: ringContract 0.8s cubic-bezier(0.43, 0.13, 0.23, 0.96) infinite;
+            width: 32px;
+            height: 32px;
+            border: 2px dotted #ff00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 12px #ff00ff;
+            opacity: 0.8;
+            animation: textVortex 2s linear infinite;
         }
         
         #unique-crosshair.text-input .xhair-ring-outer {
-            animation: ringContractOuter 0.8s cubic-bezier(0.43, 0.13, 0.23, 0.96) infinite;
+            width: 56px;
+            height: 56px;
+            border: 1px solid #ff00ff;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #ff00ff;
+            opacity: 0.6;
+            animation: textVortex 3s linear infinite reverse;
+        }
+        
+        #unique-crosshair.text-input .xhair-bracket-container {
+            animation: bracketSpiral 3s linear infinite;
         }
         
         #unique-crosshair.text-input .xhair-bracket {
-            border-color: #00ffcc;
-            filter: drop-shadow(0 0 3px #00ffcc);
+            border-color: #ff00ff;
+            filter: drop-shadow(0 0 5px #ff00ff);
+            opacity: 0.7;
         }
         
         #unique-crosshair.text-input .xhair-axis {
-            opacity: 0;
-            transform: scale(0);
+            background: #ff00ff;
+            box-shadow: 0 0 6px #ff00ff;
+            opacity: 0.5;
         }
 
         /* 3. CLICKING / TAPPING STATE: Heavy Red Recoil & Flare */
