@@ -1,328 +1,718 @@
 /**
- * Null X - Advanced Interactive HUD Debug Menu Engine v2.0
- * Toggle Shortcut: Press the '~' (Tilde) key or click the debug trigger.
+ * ==============================================================================
+ * NULL X - ADVANCED DEVELOPER ENVIRONMENT (v3.0 - Overkill Edition)
+ * ==============================================================================
+ * WARNING: This is a massive, multi-threaded HUD engine. 
+ * Features:
+ * - Tabbed Navigation System
+ * - Live FPS & Memory Canvas Graphing
+ * - Native Console Hijacking & Rendering
+ * - DOM Inspector (Chrome DevTools style)
+ * - Network Fetch Tracking
+ * - Storage Management
+ * - Live Page Editing & Wireframing
+ * * Toggle Shortcut: Press the '~' (Tilde) key.
+ * ==============================================================================
  */
-(function() {
-    const startTime = Date.now();
 
-    // 1. Inject Styles
-    const style = document.createElement('style');
-    style.innerHTML = `
-        .debug-hidden { display: none !important; }
+(function NullXDevToolsEngine() {
+    "use strict";
 
-        /* Floating Trigger Button */
-        #debug-toggle-btn {
-            position: fixed; bottom: 15px; right: 15px;
-            background: rgba(13, 13, 19, 0.85); border: 1px solid #00ffcc;
-            color: #00ffcc; font-family: monospace; font-size: 11px;
-            padding: 6px 12px; border-radius: 4px; cursor: pointer;
-            z-index: 2147483646; box-shadow: 0 0 10px rgba(0, 255, 204, 0.3);
-            backdrop-filter: blur(4px); transition: all 0.2s ease;
+    // ==========================================
+    // 1. CONFIGURATION & STATE MANAGEMENT
+    // ==========================================
+    const CONFIG = {
+        version: "3.0.0",
+        theme: {
+            bg: "rgba(13, 13, 19, 0.95)",
+            border: "rgba(0, 255, 204, 0.5)",
+            accent: "#00ffcc",
+            text: "#e0e0e0",
+            danger: "#ff3333",
+            warning: "#ffd700",
+            info: "#00bfff",
+            success: "#00ff66"
+        },
+        fpsHistorySize: 60,
+        updateRateMs: 100,
+        keys: {
+            toggle: ['`', '~'],
+            inspector: 'F4'
         }
-        #debug-toggle-btn:hover { background: #00ffcc; color: #0d0d13; box-shadow: 0 0 15px #00ffcc; }
+    };
 
-        /* Debug Menu Window */
-        #debug-menu {
-            position: fixed; top: 20px; left: 20px; width: 320px;
-            background: rgba(10, 10, 16, 0.95); border: 1px solid rgba(0, 255, 204, 0.5);
-            border-radius: 6px; color: #00ffcc; font-family: 'Courier New', Courier, monospace;
-            font-size: 11px; z-index: 2147483646;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.9), 0 0 10px rgba(0, 255, 204, 0.2);
-            backdrop-filter: blur(8px); user-select: none;
-        }
+    const STATE = {
+        isVisible: false,
+        activeTab: 'tab-sys',
+        isDragging: false,
+        fpsHistory: new Array(CONFIG.fpsHistorySize).fill(0),
+        memHistory: new Array(CONFIG.fpsHistorySize).fill(0),
+        isInspectorActive: false,
+        isDesignMode: false,
+        isDeleteMode: false,
+        startTime: Date.now(),
+        logs: [],
+        requests: []
+    };
 
-        /* Header / Drag Bar */
-        .debug-header {
-            padding: 8px 12px; background: rgba(0, 255, 204, 0.15);
-            border-bottom: 1px solid rgba(0, 255, 204, 0.4);
-            cursor: move; display: flex; justify-content: space-between;
-            align-items: center; font-weight: bold; letter-spacing: 1px;
-        }
-        .debug-header .controls span { cursor: pointer; margin-left: 8px; color: #ff3333; transition: 0.2s; }
-        .debug-header .controls span:hover { color: #ff6666; text-shadow: 0 0 5px #ff3333; }
-
-        /* Content Sections */
-        .debug-content { padding: 10px; max-height: 450px; overflow-y: auto; }
-        .debug-section { margin-bottom: 12px; border-bottom: 1px dashed rgba(0, 255, 204, 0.2); padding-bottom: 10px; }
-        .debug-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
-
-        .debug-title { color: #ffd700; font-size: 10px; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-
-        /* Stat Grid */
-        .debug-stat { display: flex; justify-content: space-between; margin-bottom: 5px; }
-        .debug-stat-val { color: #ffffff; font-weight: bold; text-align: right; max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-        /* Controls / Toggles */
-        .debug-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .debug-btn {
-            background: rgba(0, 255, 204, 0.1); border: 1px solid #00ffcc;
-            color: #00ffcc; font-family: monospace; font-size: 10px;
-            padding: 4px 8px; border-radius: 3px; cursor: pointer; transition: all 0.1s ease;
-        }
-        .debug-btn:hover { background: #00ffcc; color: #000; }
-        .debug-btn.active { background: #ffd700; border-color: #ffd700; color: #000; box-shadow: 0 0 8px rgba(255, 215, 0, 0.4); }
-        .debug-btn.danger { border-color: #ff3333; color: #ff3333; }
-        .debug-btn.danger:hover { background: #ff3333; color: #fff; }
-        .debug-btn.danger.active { background: #ff3333; color: #fff; box-shadow: 0 0 8px rgba(255, 51, 51, 0.4); }
-
-        /* Global Delete Mode Cursor */
-        body.debug-delete-mode * { cursor: crosshair !important; }
-        body.debug-delete-mode *:hover { outline: 2px dashed #ff3333 !important; background: rgba(255, 51, 51, 0.2) !important; }
-
-        /* X-Ray Mode */
-        body.debug-xray-mode * { opacity: 0.8 !important; box-shadow: inset 0 0 4px rgba(0,255,204,0.2) !important; }
-
-        /* Custom Scrollbar */
-        .debug-content::-webkit-scrollbar { width: 5px; }
-        .debug-content::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); }
-        .debug-content::-webkit-scrollbar-thumb { background: rgba(0, 255, 204, 0.4); border-radius: 3px; }
-        .debug-content::-webkit-scrollbar-thumb:hover { background: #00ffcc; }
-    `;
-    document.head.appendChild(style);
-
-    // 2. Inject HTML Structure
-    const menu = document.createElement('div');
-    menu.id = 'debug-menu';
-    menu.className = 'debug-hidden';
-    menu.innerHTML = `
-        <div class="debug-header" id="debug-drag">
-            <span>// NULL_X ADV_DEBUGGER</span>
-            <div class="controls"><span id="debug-close">[X]</span></div>
-        </div>
-        <div class="debug-content">
+    // ==========================================
+    // 2. MASSIVE CSS INJECTION
+    // ==========================================
+    const injectStyles = () => {
+        const style = document.createElement('style');
+        style.id = 'nx-devtools-styles';
+        style.innerHTML = `
+            .nx-hidden { display: none !important; }
             
-            <div class="debug-section">
-                <div class="debug-title">System Telemetry</div>
-                <div class="debug-stat"><span>FPS:</span><span class="debug-stat-val" id="dbg-fps">--</span></div>
-                <div class="debug-stat"><span>Frame Time:</span><span class="debug-stat-val" id="dbg-ft">-- ms</span></div>
-                <div class="debug-stat"><span>JS Heap:</span><span class="debug-stat-val" id="dbg-mem">N/A</span></div>
-                <div class="debug-stat"><span>Session Uptime:</span><span class="debug-stat-val" id="dbg-uptime">00:00</span></div>
-            </div>
-
-            <div class="debug-section">
-                <div class="debug-title">DOM & Network</div>
-                <div class="debug-stat"><span>Total Elements:</span><span class="debug-stat-val" id="dbg-dom">--</span></div>
-                <div class="debug-stat"><span>Local Storage:</span><span class="debug-stat-val" id="dbg-ls">-- items</span></div>
-                <div class="debug-row" style="margin-top: 8px;">
-                    <span>Est. Server Ping:</span>
-                    <button class="debug-btn" id="btn-ping">Test Ping</button>
-                </div>
-            </div>
-
-            <div class="debug-section">
-                <div class="debug-title">Viewport Inspector</div>
-                <div class="debug-stat"><span>Resolution:</span><span class="debug-stat-val" id="dbg-res">--</span></div>
-                <div class="debug-stat"><span>Pointer Pos:</span><span class="debug-stat-val" id="dbg-pos">0, 0</span></div>
-                <div class="debug-stat"><span>Hover Target:</span><span class="debug-stat-val" id="dbg-target" style="color: #00ffcc;">None</span></div>
-            </div>
-
-            <div class="debug-section">
-                <div class="debug-title">Visual Overrides</div>
-                <div class="debug-row">
-                    <span>Wireframe Mode</span><button class="debug-btn" id="btn-wireframe">OFF</button>
-                </div>
-                <div class="debug-row">
-                    <span>X-Ray Vision</span><button class="debug-btn" id="btn-xray">OFF</button>
-                </div>
-            </div>
-
-            <div class="debug-section">
-                <div class="debug-title">Developer Actions</div>
-                <div class="debug-row">
-                    <span style="color:#ffd700;">Edit Page Text</span>
-                    <button class="debug-btn" id="btn-design-mode">OFF</button>
-                </div>
-                <div class="debug-row">
-                    <span style="color:#ff3333;">Click-to-Delete Tool</span>
-                    <button class="debug-btn danger" id="btn-delete-mode">OFF</button>
-                </div>
-                <button class="debug-btn" id="btn-clear-console" style="width: 100%; margin-top: 5px;">Clear JS Console</button>
-            </div>
-
-        </div>
-    `;
-
-    const toggleBtn = document.createElement('button');
-    toggleBtn.id = 'debug-toggle-btn';
-    toggleBtn.innerText = 'DEBUG [~]';
-
-    document.body.appendChild(menu);
-    document.body.appendChild(toggleBtn);
-
-    // 3. Telemetry Engine (FPS, Time, Memory, DOM)
-    let frameCount = 0;
-    let lastTime = performance.now();
-    let fps = 0;
-
-    function updateMetrics() {
-        const now = performance.now();
-        const delta = now - lastTime;
-        frameCount++;
-
-        if (delta >= 500) {
-            fps = Math.round((frameCount * 1000) / delta);
-            document.getElementById('dbg-fps').innerText = fps;
-            document.getElementById('dbg-ft').innerText = (delta / frameCount).toFixed(1) + ' ms';
-            
-            // Colors based on performance
-            const fpsEl = document.getElementById('dbg-fps');
-            fpsEl.style.color = fps >= 55 ? '#00ffcc' : fps >= 30 ? '#ffd700' : '#ff3333';
-
-            // Uptime
-            const upSeconds = Math.floor((Date.now() - startTime) / 1000);
-            const m = String(Math.floor(upSeconds / 60)).padStart(2, '0');
-            const s = String(upSeconds % 60).padStart(2, '0');
-            document.getElementById('dbg-uptime').innerText = `${m}:${s}`;
-
-            // Memory
-            if (performance.memory) {
-                const memMB = (performance.memory.usedJSHeapSize / 1048576).toFixed(1);
-                document.getElementById('dbg-mem').innerText = memMB + ' MB';
+            /* Master Container */
+            #nx-hud {
+                position: fixed; top: 20px; left: 20px; width: 450px; height: 550px;
+                background: ${CONFIG.theme.bg}; border: 1px solid ${CONFIG.theme.border};
+                border-radius: 8px; color: ${CONFIG.theme.text};
+                font-family: 'Consolas', 'Courier New', monospace; font-size: 11px;
+                z-index: 2147483647; box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 20px rgba(0,255,204,0.15);
+                backdrop-filter: blur(10px); display: flex; flex-direction: column;
+                overflow: hidden; user-select: none; transition: opacity 0.2s;
             }
 
-            // DOM Count & Storage
-            document.getElementById('dbg-dom').innerText = document.getElementsByTagName('*').length;
-            document.getElementById('dbg-ls').innerText = localStorage.length + ' items';
+            /* Header & Drag Bar */
+            #nx-header {
+                background: rgba(0, 255, 204, 0.1); border-bottom: 1px solid rgba(0,255,204,0.3);
+                padding: 10px 15px; cursor: move; display: flex; justify-content: space-between;
+                align-items: center; font-weight: bold; letter-spacing: 1px; color: ${CONFIG.theme.accent};
+            }
+            #nx-header .title-area { display: flex; align-items: center; gap: 8px; }
+            #nx-header .status-dot { width: 8px; height: 8px; background: ${CONFIG.theme.success}; border-radius: 50%; box-shadow: 0 0 8px ${CONFIG.theme.success}; animation: nx-pulse 2s infinite; }
+            #nx-close { cursor: pointer; color: ${CONFIG.theme.danger}; font-size: 14px; transition: 0.2s; }
+            #nx-close:hover { text-shadow: 0 0 8px ${CONFIG.theme.danger}; transform: scale(1.1); }
 
-            frameCount = 0;
-            lastTime = now;
-        }
-        requestAnimationFrame(updateMetrics);
-    }
-    requestAnimationFrame(updateMetrics);
+            /* Tabs */
+            #nx-tabs {
+                display: flex; background: rgba(0,0,0,0.4); border-bottom: 1px solid #333;
+            }
+            .nx-tab-btn {
+                flex: 1; padding: 8px 0; background: transparent; border: none; border-right: 1px solid #333;
+                color: #888; cursor: pointer; font-family: inherit; font-size: 10px; text-transform: uppercase;
+                transition: 0.2s;
+            }
+            .nx-tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+            .nx-tab-btn.active { color: ${CONFIG.theme.accent}; background: rgba(0,255,204,0.1); border-bottom: 2px solid ${CONFIG.theme.accent}; }
 
-    // 4. Viewport & Mouse Tracker
-    document.getElementById('dbg-res').innerText = `${window.innerWidth}x${window.innerHeight}`;
-    window.addEventListener('resize', () => {
-        document.getElementById('dbg-res').innerText = `${window.innerWidth}x${window.innerHeight}`;
-    });
+            /* Content Area */
+            #nx-content { flex: 1; overflow-y: auto; overflow-x: hidden; position: relative; }
+            .nx-tab-pane { display: none; padding: 15px; }
+            .nx-tab-pane.active { display: block; animation: nx-fade-in 0.2s; }
 
-    window.addEventListener('mousemove', (e) => {
-        document.getElementById('dbg-pos').innerText = `${e.clientX}, ${e.clientY}`;
-        
-        // Hide menu from element detection so we see what's *behind* it if needed
-        const oldPointer = menu.style.pointerEvents;
-        menu.style.pointerEvents = 'none';
-        const target = document.elementFromPoint(e.clientX, e.clientY);
-        menu.style.pointerEvents = oldPointer;
+            /* Component Typography */
+            .nx-section-title { color: #fff; border-bottom: 1px dashed #444; padding-bottom: 5px; margin-bottom: 10px; font-weight: bold; font-size: 12px; letter-spacing: 1px; }
+            .nx-row { display: flex; justify-content: space-between; margin-bottom: 6px; align-items: center; }
+            .nx-label { color: #aaa; }
+            .nx-value { color: #fff; font-weight: bold; }
+            .nx-value.good { color: ${CONFIG.theme.success}; }
+            .nx-value.warn { color: ${CONFIG.theme.warning}; }
+            .nx-value.bad { color: ${CONFIG.theme.danger}; }
 
-        if (target) {
-            const tag = target.tagName.toLowerCase();
-            const id = target.id ? `#${target.id}` : '';
-            const cls = target.className && typeof target.className === 'string' ? `.${target.className.split(' ')[0]}` : '';
-            document.getElementById('dbg-target').innerText = `${tag}${id}${cls}`.slice(0, 22);
-        }
-    });
+            /* Canvas Charts */
+            .nx-chart-container { width: 100%; height: 80px; background: #050505; border: 1px solid #333; border-radius: 4px; margin-bottom: 10px; position: relative; }
+            .nx-chart-label { position: absolute; top: 4px; left: 4px; color: rgba(255,255,255,0.5); font-size: 9px; }
 
-    // 5. Interactive Debug Toggles & Tools
+            /* Custom Buttons */
+            .nx-btn {
+                background: rgba(0,0,0,0.5); border: 1px solid #444; color: #ccc;
+                padding: 6px 12px; border-radius: 4px; cursor: pointer; font-family: inherit;
+                font-size: 10px; transition: 0.2s; width: 100%; text-align: center; text-transform: uppercase;
+            }
+            .nx-btn:hover { border-color: ${CONFIG.theme.accent}; color: ${CONFIG.theme.accent}; }
+            .nx-btn.active { background: rgba(0,255,204,0.2); border-color: ${CONFIG.theme.accent}; color: #fff; box-shadow: 0 0 10px rgba(0,255,204,0.3); }
+            .nx-btn.danger { border-color: #662222; color: ${CONFIG.theme.danger}; }
+            .nx-btn.danger:hover { background: rgba(255,51,51,0.2); border-color: ${CONFIG.theme.danger}; }
+            
+            /* Grid Layouts */
+            .nx-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+            .nx-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 10px; }
 
-    // Server Ping Tester
-    document.getElementById('btn-ping').addEventListener('click', async (e) => {
-        const btn = e.target;
-        btn.innerText = "Pinging...";
-        const start = performance.now();
-        try {
-            await fetch(window.location.href, { method: 'HEAD', cache: 'no-store' });
-            const ping = Math.round(performance.now() - start);
-            btn.innerText = `${ping} ms`;
-        } catch (err) {
-            btn.innerText = "Error";
-        }
-        setTimeout(() => btn.innerText = "Test Ping", 2000);
-    });
+            /* Console Log Styles */
+            #nx-console-list { list-style: none; padding: 0; margin: 0; }
+            .nx-log-entry { padding: 4px 6px; border-bottom: 1px solid #222; word-wrap: break-word; font-family: monospace; }
+            .nx-log-info { color: #ccc; }
+            .nx-log-warn { color: ${CONFIG.theme.warning}; background: rgba(255,215,0,0.05); border-left: 3px solid ${CONFIG.theme.warning}; }
+            .nx-log-error { color: ${CONFIG.theme.danger}; background: rgba(255,51,51,0.05); border-left: 3px solid ${CONFIG.theme.danger}; }
 
-    // Wireframe Mode
-    const wireframeBtn = document.getElementById('btn-wireframe');
-    wireframeBtn.addEventListener('click', () => {
-        const active = wireframeBtn.classList.toggle('active');
-        wireframeBtn.innerText = active ? 'ON' : 'OFF';
-        
-        const all = document.querySelectorAll('body *');
-        all.forEach(el => {
-            if (el.id !== 'debug-menu' && !el.closest('#debug-menu') && el.id !== 'debug-toggle-btn') {
-                el.style.outline = active ? '1px solid rgba(0, 255, 204, 0.4)' : '';
+            /* Network List */
+            #nx-network-list { border: 1px solid #333; height: 150px; overflow-y: auto; background: #050505; border-radius: 4px; padding: 5px; }
+            .nx-net-req { display: flex; justify-content: space-between; padding: 4px; border-bottom: 1px dashed #222; }
+            .nx-net-url { color: ${CONFIG.theme.info}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 70%; }
+            .nx-net-status { color: ${CONFIG.theme.success}; }
+
+            /* Scrollbars */
+            ::-webkit-scrollbar { width: 6px; height: 6px; }
+            ::-webkit-scrollbar-track { background: rgba(0,0,0,0.5); }
+            ::-webkit-scrollbar-thumb { background: rgba(0,255,204,0.3); border-radius: 3px; }
+            ::-webkit-scrollbar-thumb:hover { background: rgba(0,255,204,0.6); }
+
+            /* Overlay Inspector Mode */
+            body.nx-inspect-mode * { cursor: default !important; }
+            body.nx-inspect-mode *:hover { outline: 2px solid ${CONFIG.theme.info} !important; background: rgba(0, 191, 255, 0.1) !important; box-shadow: inset 0 0 10px rgba(0,191,255,0.2); }
+            
+            /* Animations */
+            @keyframes nx-pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
+            @keyframes nx-fade-in { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+            /* Trigger Button */
+            #nx-trigger {
+                position: fixed; bottom: 20px; right: 20px; background: rgba(0,0,0,0.8);
+                border: 1px solid ${CONFIG.theme.accent}; color: ${CONFIG.theme.accent};
+                padding: 8px 16px; border-radius: 20px; font-family: monospace; font-size: 12px;
+                cursor: pointer; z-index: 2147483646; backdrop-filter: blur(5px);
+            }
+            #nx-trigger:hover { background: ${CONFIG.theme.accent}; color: #000; }
+        `;
+        document.head.appendChild(style);
+    };
+
+    // ==========================================
+    // 3. HTML ARCHITECTURE CONSTRUCTION
+    // ==========================================
+    const buildDOM = () => {
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = `
+            <div id="nx-hud" class="nx-hidden">
+                <div id="nx-header">
+                    <div class="title-area">
+                        <div class="status-dot"></div>
+                        <span>NULL X // DEV_ENVIRONMENT v${CONFIG.version}</span>
+                    </div>
+                    <span id="nx-close">✖</span>
+                </div>
+
+                <div id="nx-tabs">
+                    <button class="nx-tab-btn active" data-target="tab-sys">System</button>
+                    <button class="nx-tab-btn" data-target="tab-dom">Elements</button>
+                    <button class="nx-tab-btn" data-target="tab-net">Network</button>
+                    <button class="nx-tab-btn" data-target="tab-con">Console</button>
+                    <button class="nx-tab-btn" data-target="tab-tool">Tools</button>
+                </div>
+
+                <div id="nx-content">
+                    
+                    <div id="tab-sys" class="nx-tab-pane active">
+                        <div class="nx-section-title">Performance Graphs</div>
+                        <div class="nx-chart-container">
+                            <span class="nx-chart-label">FPS (Target: 60)</span>
+                            <canvas id="nx-canvas-fps" width="418" height="80"></canvas>
+                        </div>
+                        <div class="nx-chart-container">
+                            <span class="nx-chart-label">Memory Heap (MB)</span>
+                            <canvas id="nx-canvas-mem" width="418" height="80"></canvas>
+                        </div>
+                        
+                        <div class="nx-section-title" style="margin-top:15px;">Hardware Telemetry</div>
+                        <div class="nx-grid-2">
+                            <div class="nx-row"><span class="nx-label">Uptime:</span><span class="nx-value" id="nx-val-uptime">00:00:00</span></div>
+                            <div class="nx-row"><span class="nx-label">Resolution:</span><span class="nx-value" id="nx-val-res">0x0</span></div>
+                            <div class="nx-row"><span class="nx-label">Platform:</span><span class="nx-value" id="nx-val-plat">Unknown</span></div>
+                            <div class="nx-row"><span class="nx-label">Logical Cores:</span><span class="nx-value" id="nx-val-cores">--</span></div>
+                        </div>
+                    </div>
+
+                    <div id="tab-dom" class="nx-tab-pane">
+                        <div class="nx-section-title">Element Inspector</div>
+                        <button class="nx-btn" id="nx-btn-inspect" style="margin-bottom: 10px;">Toggle Visual Inspector (Hover to select)</button>
+                        
+                        <div style="background: rgba(0,0,0,0.5); padding: 10px; border: 1px solid #333; border-radius: 4px;">
+                            <div class="nx-row"><span class="nx-label">Tag:</span><span class="nx-value" id="nx-insp-tag" style="color:#ff33cc;">N/A</span></div>
+                            <div class="nx-row"><span class="nx-label">ID:</span><span class="nx-value" id="nx-insp-id" style="color:#33ccff;">N/A</span></div>
+                            <div class="nx-row"><span class="nx-label">Classes:</span><span class="nx-value" id="nx-insp-class" style="color:#ffff33; font-size:10px;">N/A</span></div>
+                            <hr style="border: 0; border-bottom: 1px dashed #444; margin: 8px 0;">
+                            <div class="nx-row"><span class="nx-label">Dimensions:</span><span class="nx-value" id="nx-insp-dim">0 x 0</span></div>
+                            <div class="nx-row"><span class="nx-label">Font Family:</span><span class="nx-value" id="nx-insp-font">N/A</span></div>
+                            <div class="nx-row"><span class="nx-label">Color:</span><span class="nx-value" id="nx-insp-color">N/A</span></div>
+                        </div>
+
+                        <div class="nx-section-title" style="margin-top: 15px;">Document Stats</div>
+                        <div class="nx-grid-2">
+                            <div class="nx-row"><span class="nx-label">Total Nodes:</span><span class="nx-value" id="nx-val-nodes">0</span></div>
+                            <div class="nx-row"><span class="nx-label">Scripts:</span><span class="nx-value" id="nx-val-scripts">0</span></div>
+                            <div class="nx-row"><span class="nx-label">Images:</span><span class="nx-value" id="nx-val-imgs">0</span></div>
+                            <div class="nx-row"><span class="nx-label">Iframes:</span><span class="nx-value" id="nx-val-iframes">0</span></div>
+                        </div>
+                    </div>
+
+                    <div id="tab-net" class="nx-tab-pane">
+                        <div class="nx-section-title">Network Intercepts (Fetch/XHR)</div>
+                        <div id="nx-network-list">
+                            </div>
+
+                        <div class="nx-section-title" style="margin-top: 15px;">Local Storage Manager</div>
+                        <div class="nx-row">
+                            <span class="nx-label">Items in Storage:</span>
+                            <span class="nx-value" id="nx-val-storage">0</span>
+                        </div>
+                        <div class="nx-grid-2" style="margin-top: 10px;">
+                            <button class="nx-btn" id="nx-btn-log-storage">Log Data to Console</button>
+                            <button class="nx-btn danger" id="nx-btn-clear-storage">Nuke Storage</button>
+                        </div>
+                    </div>
+
+                    <div id="tab-con" class="nx-tab-pane">
+                        <div class="nx-section-title">Intercepted Console Stream</div>
+                        <div style="background: #000; border: 1px solid #333; height: 280px; overflow-y: auto; padding: 5px; font-size:10px;">
+                            <ul id="nx-console-list">
+                                <li class="nx-log-entry nx-log-info">>> Null X Console Engine Initialized.</li>
+                            </ul>
+                        </div>
+                        <div class="nx-grid-2" style="margin-top:10px;">
+                            <button class="nx-btn" id="nx-btn-test-log">Trigger Test Log</button>
+                            <button class="nx-btn danger" id="nx-btn-clear-con">Clear Output</button>
+                        </div>
+                    </div>
+
+                    <div id="tab-tool" class="nx-tab-pane">
+                        <div class="nx-section-title">Visual Overrides</div>
+                        <div class="nx-grid-2">
+                            <button class="nx-btn" id="nx-btn-wireframe">Wireframe Mode</button>
+                            <button class="nx-btn" id="nx-btn-xray">X-Ray Vision</button>
+                        </div>
+
+                        <div class="nx-section-title" style="margin-top: 15px;">Page Modifiers</div>
+                        <div class="nx-grid-2">
+                            <button class="nx-btn" id="nx-btn-design">Edit Page Text</button>
+                            <button class="nx-btn danger" id="nx-btn-delete">Click-to-Delete</button>
+                        </div>
+                        
+                        <div class="nx-section-title" style="margin-top: 15px;">Javascript Execution</div>
+                        <input type="text" id="nx-eval-input" placeholder="Enter JS code... (e.g. alert('hi'))" style="width:100%; background:#000; border:1px solid #333; color:#00ffcc; padding:8px; font-family:monospace; margin-bottom:8px;">
+                        <button class="nx-btn" id="nx-btn-eval">Execute in Sandbox</button>
+                    </div>
+
+                </div>
+            </div>
+            <button id="nx-trigger">DEV_HUD [~]</button>
+        `;
+        document.body.appendChild(wrapper);
+    };
+
+    // ==========================================
+    // 4. CORE ENGINE & EVENT BINDINGS
+    // ==========================================
+    const initCoreEngine = () => {
+        const hud = document.getElementById('nx-hud');
+        const trigger = document.getElementById('nx-trigger');
+        const closeBtn = document.getElementById('nx-close');
+
+        // Toggle Logic
+        const toggleHud = () => {
+            STATE.isVisible = !STATE.isVisible;
+            if (STATE.isVisible) {
+                hud.classList.remove('nx-hidden');
+                trigger.classList.add('nx-hidden');
+            } else {
+                hud.classList.add('nx-hidden');
+                trigger.classList.remove('nx-hidden');
+            }
+        };
+
+        trigger.addEventListener('click', toggleHud);
+        closeBtn.addEventListener('click', toggleHud);
+        window.addEventListener('keydown', (e) => {
+            if (CONFIG.keys.toggle.includes(e.key)) {
+                e.preventDefault();
+                toggleHud();
             }
         });
-    });
 
-    // X-Ray Mode
-    const xrayBtn = document.getElementById('btn-xray');
-    xrayBtn.addEventListener('click', () => {
-        const active = xrayBtn.classList.toggle('active');
-        xrayBtn.innerText = active ? 'ON' : 'OFF';
-        document.body.classList.toggle('debug-xray-mode', active);
-    });
+        // Tab Switching Logic
+        const tabs = document.querySelectorAll('.nx-tab-btn');
+        const panes = document.querySelectorAll('.nx-tab-pane');
+        
+        tabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                tabs.forEach(t => t.classList.remove('active'));
+                panes.forEach(p => p.classList.remove('active'));
+                
+                e.target.classList.add('active');
+                const targetId = e.target.getAttribute('data-target');
+                document.getElementById(targetId).classList.add('active');
+                STATE.activeTab = targetId;
+            });
+        });
 
-    // Design Mode (Edit Page Text)
-    const designBtn = document.getElementById('btn-design-mode');
-    designBtn.addEventListener('click', () => {
-        const active = designBtn.classList.toggle('active');
-        designBtn.innerText = active ? 'ON' : 'OFF';
-        document.designMode = active ? 'on' : 'off';
-    });
+        // Window Dragging Logic
+        const header = document.getElementById('nx-header');
+        let offsetX = 0, offsetY = 0;
 
-    // Element Deleter Mode (Click to destroy)
-    const deleteBtn = document.getElementById('btn-delete-mode');
-    let isDeleteMode = false;
-    deleteBtn.addEventListener('click', () => {
-        isDeleteMode = deleteBtn.classList.toggle('active');
-        deleteBtn.innerText = isDeleteMode ? 'ACTIVE' : 'OFF';
-        document.body.classList.toggle('debug-delete-mode', isDeleteMode);
-    });
+        header.addEventListener('mousedown', (e) => {
+            STATE.isDragging = true;
+            offsetX = e.clientX - hud.offsetLeft;
+            offsetY = e.clientY - hud.offsetTop;
+        });
 
-    // Intercept clicks when Delete Mode is ON
-    document.addEventListener('click', (e) => {
-        if (isDeleteMode) {
-            // Protect the debug menu itself from being deleted!
-            if (e.target.closest('#debug-menu') || e.target.id === 'debug-toggle-btn') return;
+        window.addEventListener('mousemove', (e) => {
+            if (STATE.isDragging) {
+                let x = e.clientX - offsetX;
+                let y = e.clientY - offsetY;
+                x = Math.max(0, Math.min(x, window.innerWidth - hud.offsetWidth));
+                y = Math.max(0, Math.min(y, window.innerHeight - hud.offsetHeight));
+                hud.style.left = x + 'px';
+                hud.style.top = y + 'px';
+            }
+        });
+
+        window.addEventListener('mouseup', () => { STATE.isDragging = false; });
+    };
+
+    // ==========================================
+    // 5. PERFORMANCE METRICS & GRAPHING
+    // ==========================================
+    const initTelemetry = () => {
+        let frameCount = 0;
+        let lastTime = performance.now();
+        const canvasFps = document.getElementById('nx-canvas-fps');
+        const ctxFps = canvasFps.getContext('2d');
+        const canvasMem = document.getElementById('nx-canvas-mem');
+        const ctxMem = canvasMem.getContext('2d');
+
+        // Fill static hardware info once
+        document.getElementById('nx-val-plat').innerText = navigator.platform || "Unknown";
+        document.getElementById('nx-val-cores').innerText = navigator.hardwareConcurrency || "--";
+
+        // Draw Line Chart Function
+        const drawChart = (ctx, data, maxVal, color) => {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 2;
+            ctx.lineJoin = "round";
+
+            const stepX = ctx.canvas.width / (CONFIG.fpsHistorySize - 1);
             
-            e.preventDefault();
-            e.stopPropagation();
-            e.target.remove();
-        }
-    }, true);
+            for (let i = 0; i < data.length; i++) {
+                const x = i * stepX;
+                // Calculate Y, invert it because canvas Y goes down
+                const normalized = Math.max(0, Math.min(data[i] / maxVal, 1));
+                const y = ctx.canvas.height - (normalized * ctx.canvas.height);
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.stroke();
 
-    // Clear Console
-    document.getElementById('btn-clear-console').addEventListener('click', () => {
-        console.clear();
-        console.log('%c[DEBUG] Console cleared via Debug Menu Engine v2.', 'color: #00ffcc; font-size: 14px; font-weight: bold;');
-    });
+            // Fill area under line
+            ctx.lineTo(ctx.canvas.width, ctx.canvas.height);
+            ctx.lineTo(0, ctx.canvas.height);
+            ctx.fillStyle = color.replace('rgb', 'rgba').replace(')', ', 0.2)');
+            ctx.fill();
+        };
 
-    // 6. Menu Visibility Toggles (Button + '~' Key)
-    const toggleMenu = () => menu.classList.toggle('debug-hidden');
-    toggleBtn.addEventListener('click', toggleMenu);
-    document.getElementById('debug-close').addEventListener('click', toggleMenu);
+        // Main Metric Loop
+        const loop = () => {
+            const now = performance.now();
+            const delta = now - lastTime;
+            frameCount++;
 
-    window.addEventListener('keydown', (e) => {
-        if (e.key === '`' || e.key === '~') {
-            e.preventDefault();
-            toggleMenu();
-        }
-    });
+            // Update every 500ms
+            if (delta >= 500) {
+                const currentFps = Math.round((frameCount * 1000) / delta);
+                
+                // Shift History arrays
+                STATE.fpsHistory.shift();
+                STATE.fpsHistory.push(currentFps);
 
-    // 7. Draggable Window Logic with screen bounds
-    const dragHeader = document.getElementById('debug-drag');
-    let isDragging = false, offsetX = 0, offsetY = 0;
+                let currentMem = 0;
+                if (performance.memory) {
+                    currentMem = Math.round(performance.memory.usedJSHeapSize / 1048576);
+                    STATE.memHistory.shift();
+                    STATE.memHistory.push(currentMem);
+                }
 
-    dragHeader.addEventListener('mousedown', (e) => {
-        isDragging = true;
-        offsetX = e.clientX - menu.offsetLeft;
-        offsetY = e.clientY - menu.offsetTop;
-    });
+                // Render Graphs (Only if System Tab is visible to save power)
+                if (STATE.isVisible && STATE.activeTab === 'tab-sys') {
+                    // Draw FPS (Target max is usually 60 or 144)
+                    drawChart(ctxFps, STATE.fpsHistory, 65, "rgb(0, 255, 204)");
+                    
+                    // Draw Mem (Scale max based on current usage)
+                    const maxMem = Math.max(...STATE.memHistory, 100);
+                    drawChart(ctxMem, STATE.memHistory, maxMem, "rgb(255, 215, 0)");
 
-    window.addEventListener('mousemove', (e) => {
-        if (isDragging) {
-            let newX = e.clientX - offsetX;
-            let newY = e.clientY - offsetY;
+                    // Update Texts
+                    document.getElementById('nx-val-res').innerText = `${window.innerWidth} x ${window.innerHeight}`;
+                    
+                    const uptimeSecs = Math.floor((Date.now() - STATE.startTime) / 1000);
+                    const h = String(Math.floor(uptimeSecs / 3600)).padStart(2, '0');
+                    const m = String(Math.floor((uptimeSecs % 3600) / 60)).padStart(2, '0');
+                    const s = String(uptimeSecs % 60).padStart(2, '0');
+                    document.getElementById('nx-val-uptime').innerText = `${h}:${m}:${s}`;
+                }
+
+                frameCount = 0;
+                lastTime = now;
+            }
+            requestAnimationFrame(loop);
+        };
+        requestAnimationFrame(loop);
+    };
+
+    // ==========================================
+    // 6. DOM INSPECTOR ENGINE
+    // ==========================================
+    const initInspector = () => {
+        const btnInspect = document.getElementById('nx-btn-inspect');
+        const hud = document.getElementById('nx-hud');
+
+        btnInspect.addEventListener('click', () => {
+            STATE.isInspectorActive = !STATE.isInspectorActive;
+            btnInspect.classList.toggle('active', STATE.isInspectorActive);
+            document.body.classList.toggle('nx-inspect-mode', STATE.isInspectorActive);
+        });
+
+        // Hover Tracking logic
+        document.addEventListener('mousemove', (e) => {
+            // Update document stats occasionally
+            if (Math.random() < 0.05 && STATE.isVisible && STATE.activeTab === 'tab-dom') {
+                document.getElementById('nx-val-nodes').innerText = document.getElementsByTagName('*').length;
+                document.getElementById('nx-val-scripts').innerText = document.scripts.length;
+                document.getElementById('nx-val-imgs').innerText = document.images.length;
+                document.getElementById('nx-val-iframes').innerText = document.getElementsByTagName('iframe').length;
+            }
+
+            if (!STATE.isInspectorActive) return;
+
+            // Hide HUD from pointer events temporarily to inspect elements UNDER the HUD
+            const oldEvents = hud.style.pointerEvents;
+            hud.style.pointerEvents = 'none';
+            const target = document.elementFromPoint(e.clientX, e.clientY);
+            hud.style.pointerEvents = oldEvents;
+
+            if (target && target.id !== 'nx-trigger') {
+                const compStyles = window.getComputedStyle(target);
+                
+                document.getElementById('nx-insp-tag').innerText = `<${target.tagName.toLowerCase()}>`;
+                document.getElementById('nx-insp-id').innerText = target.id ? `#${target.id}` : 'None';
+                document.getElementById('nx-insp-class').innerText = target.className || 'None';
+                
+                const rect = target.getBoundingClientRect();
+                document.getElementById('nx-insp-dim').innerText = `${Math.round(rect.width)}w x ${Math.round(rect.height)}h`;
+                
+                document.getElementById('nx-insp-font').innerText = compStyles.fontFamily.split(',')[0];
+                
+                // Color formatting
+                const colorEl = document.getElementById('nx-insp-color');
+                colorEl.innerText = compStyles.color;
+                colorEl.style.color = compStyles.color;
+            }
+        });
+
+        // Prevent clicking links while inspecting
+        document.addEventListener('click', (e) => {
+            if (STATE.isInspectorActive && !e.target.closest('#nx-hud') && e.target.id !== 'nx-trigger') {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
+    };
+
+    // ==========================================
+    // 7. CONSOLE HIJACKING SYSTEM
+    // ==========================================
+    const initConsoleManager = () => {
+        const logList = document.getElementById('nx-console-list');
+        
+        // Save original methods
+        const originalLog = console.log;
+        const originalWarn = console.warn;
+        const originalError = console.error;
+
+        const pushToHUD = (msg, type) => {
+            const li = document.createElement('li');
+            li.className = `nx-log-entry nx-log-${type}`;
             
-            // Keep menu on screen
-            newX = Math.max(0, Math.min(newX, window.innerWidth - menu.offsetWidth));
-            newY = Math.max(0, Math.min(newY, window.innerHeight - menu.offsetHeight));
+            // Basic stringification for objects
+            let text = "";
+            try {
+                text = (typeof msg === 'object') ? JSON.stringify(msg) : String(msg);
+            } catch(e) {
+                text = String(msg);
+            }
+            
+            const time = new Date().toLocaleTimeString();
+            li.innerText = `[${time}] ${text}`;
+            
+            logList.appendChild(li);
+            
+            // Auto scroll to bottom
+            logList.parentElement.scrollTop = logList.parentElement.scrollHeight;
 
-            menu.style.left = `${newX}px`;
-            menu.style.top = `${newY}px`;
-        }
-    });
+            // Keep memory safe, delete old logs
+            if (logList.childNodes.length > 100) {
+                logList.removeChild(logList.firstChild);
+            }
+        };
 
-    window.addEventListener('mouseup', () => isDragging = false);
+        // Override globals
+        console.log = function(...args) {
+            pushToHUD(args.join(' '), 'info');
+            originalLog.apply(console, args);
+        };
+        console.warn = function(...args) {
+            pushToHUD(args.join(' '), 'warn');
+            originalWarn.apply(console, args);
+        };
+        console.error = function(...args) {
+            pushToHUD(args.join(' '), 'error');
+            originalError.apply(console, args);
+        };
+
+        // Buttons
+        document.getElementById('nx-btn-test-log').addEventListener('click', () => {
+            console.log("Test Info Log Triggered.");
+            console.warn("Test Warning Triggered.");
+            console.error("Test Error Triggered.");
+        });
+
+        document.getElementById('nx-btn-clear-con').addEventListener('click', () => {
+            logList.innerHTML = '';
+            pushToHUD("Console cleared.", "info");
+        });
+    };
+
+    // ==========================================
+    // 8. NETWORK & STORAGE TRACKER
+    // ==========================================
+    const initNetworkStorage = () => {
+        // Storage Tracker Update
+        setInterval(() => {
+            if (STATE.isVisible && STATE.activeTab === 'tab-net') {
+                document.getElementById('nx-val-storage').innerText = localStorage.length;
+            }
+        }, 1000);
+
+        // Storage Buttons
+        document.getElementById('nx-btn-log-storage').addEventListener('click', () => {
+            console.log("--- LOCAL STORAGE DUMP ---");
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                console.log(`[${key}]:`, localStorage.getItem(key));
+            }
+        });
+
+        document.getElementById('nx-btn-clear-storage').addEventListener('click', () => {
+            if(confirm("WARNING: This will wipe all LocalStorage. Proceed?")) {
+                localStorage.clear();
+                console.warn("Local Storage Wiped by Developer.");
+            }
+        });
+
+        // Network Interception (Fetch)
+        const originalFetch = window.fetch;
+        const netList = document.getElementById('nx-network-list');
+
+        window.fetch = async function(...args) {
+            const url = typeof args[0] === 'string' ? args[0] : (args[0]?.url || 'unknown-url');
+            
+            const div = document.createElement('div');
+            div.className = 'nx-net-req';
+            div.innerHTML = `<span class="nx-net-url">${url}</span><span class="nx-net-status" style="color:yellow;">Pending</span>`;
+            netList.prepend(div);
+
+            try {
+                const response = await originalFetch.apply(this, args);
+                div.innerHTML = `<span class="nx-net-url">${url}</span><span class="nx-net-status" style="color:${response.ok ? CONFIG.theme.success : CONFIG.theme.danger};">${response.status}</span>`;
+                return response;
+            } catch (err) {
+                div.innerHTML = `<span class="nx-net-url">${url}</span><span class="nx-net-status" style="color:${CONFIG.theme.danger};">FAILED</span>`;
+                throw err;
+            }
+        };
+    };
+
+    // ==========================================
+    // 9. DEVELOPER TOOLS & MODIFIERS
+    // ==========================================
+    const initTools = () => {
+        // Wireframe
+        const btnWire = document.getElementById('nx-btn-wireframe');
+        btnWire.addEventListener('click', () => {
+            const active = btnWire.classList.toggle('active');
+            
+            const all = document.querySelectorAll('body *');
+            all.forEach(el => {
+                if (!el.closest('#nx-hud') && el.id !== 'nx-trigger') {
+                    el.style.outline = active ? '1px solid rgba(0, 255, 204, 0.4)' : '';
+                }
+            });
+        });
+
+        // X-Ray
+        const btnXray = document.getElementById('nx-btn-xray');
+        let styleTag = null;
+        btnXray.addEventListener('click', () => {
+            const active = btnXray.classList.toggle('active');
+            if (active) {
+                styleTag = document.createElement('style');
+                styleTag.innerHTML = `body *:not(#nx-hud):not(#nx-hud *):not(#nx-trigger) { opacity: 0.8 !important; box-shadow: inset 0 0 5px rgba(0,255,204,0.3) !important; background: rgba(0,0,0,0.1) !important; }`;
+                document.head.appendChild(styleTag);
+            } else if (styleTag) {
+                styleTag.remove();
+            }
+        });
+
+        // Design Mode
+        const btnDesign = document.getElementById('nx-btn-design');
+        btnDesign.addEventListener('click', () => {
+            STATE.isDesignMode = btnDesign.classList.toggle('active');
+            document.designMode = STATE.isDesignMode ? 'on' : 'off';
+            if(STATE.isDesignMode) console.log("Design Mode ON. Click text on page to edit.");
+        });
+
+        // Click to Delete
+        const btnDelete = document.getElementById('nx-btn-delete');
+        btnDelete.addEventListener('click', () => {
+            STATE.isDeleteMode = btnDelete.classList.toggle('active');
+            if (STATE.isDeleteMode) {
+                document.body.classList.add('nx-inspect-mode'); // Use same hover effect
+                console.warn("Delete Mode ON. Clicking elements will destroy them.");
+            } else {
+                document.body.classList.remove('nx-inspect-mode');
+            }
+        });
+
+        document.addEventListener('click', (e) => {
+            if (STATE.isDeleteMode) {
+                if (e.target.closest('#nx-hud') || e.target.id === 'nx-trigger') return;
+                e.preventDefault();
+                e.stopPropagation();
+                e.target.remove();
+                console.log("Element destroyed.");
+            }
+        }, true);
+
+        // JS Sandbox Eval
+        document.getElementById('nx-btn-eval').addEventListener('click', () => {
+            const input = document.getElementById('nx-eval-input');
+            const code = input.value;
+            if(!code) return;
+            try {
+                const result = eval(code);
+                console.log(`Eval Output:`, result);
+                input.value = '';
+            } catch(e) {
+                console.error(`Eval Error: ${e.message}`);
+            }
+        });
+    };
+
+    // ==========================================
+    // 10. SYSTEM BOOTSTRAP
+    // ==========================================
+    console.log(">> Booting Null X Developer Environment v3...");
+    injectStyles();
+    buildDOM();
+    initCoreEngine();
+    initTelemetry();
+    initInspector();
+    initConsoleManager();
+    initNetworkStorage();
+    initTools();
+    console.log(">> Null X DevTools fully operational. Press [~] to toggle.");
+
 })();
