@@ -45,7 +45,7 @@ let _0xData = [
   { id: "b_kt", title: "Basket Bros", url: "../Games/basketbros/Basketbros.html", image: "../Games/basketbros/images (29).jpeg", desc: "Chaotic basketball with crazy dunks and quick matches.", popular: true },
   { id: "b_sts", title: "Basketball Stars", url: "../Games/basketballstars/Basketballstars.html", image: "../Games/basketballstars/images (30).jpeg", desc: "Fast-paced 1v1 street-style basketball matches.", popular: true },
   { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", jsbin: "https://codepen.io/Glaeesas/embed/EaZpPeO?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/cookieclicker/images (35).jpeg", desc: "Click cookies to build an industrial empire.", popular: true },
-  { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
+  { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", image: "../Games/basketrandom/images (5).jpeg", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
   { id: "r_bw", title: "Retro Bowl", url: "../Games/retrobowl/Retrobowl.html", desc: "Manage your team and lead them to gridiron glory.", popular: true },
   { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true },
   { id: "d_dk", title: "Doki Doki Literature Club", url: "../Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true },
