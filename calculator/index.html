@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Null X - Python Terminal Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+</head>
+<body>
+
+  <div id="calc-terminal">
+    <div class="terminal-header">
+      <span class="title">// NULL_X PYTHON CALCULATOR ENGINE</span>
+      <span id="status" class="status-loading">INITIALIZING RUNTIME...</span>
+    </div>
+
+    <div id="terminal-output">
+      <div class="line system">Loading Python WebAssembly runtime...</div>
+    </div>
+
+    <div class="input-line">
+      <span class="prompt">py_calc&gt;&gt;</span>
+      <input type="text" id="calc-input" placeholder="Loading Python..." disabled autofocus />
+    </div>
+  </div>
+
+  <script src="calc.js"></script>
+</body>
+</html>
