@@ -111,7 +111,8 @@ let _0xData = [
   { id: "a_dark_room", title: "A Dark Room", url: "../Games/adarkroom/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019f90ef-3bea-753d-be5c-54659e699c0a?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/adarkroom/images (36).jpeg", desc: "An atmospheric, text-based survival adventure that starts with a cold room and a single spark.", popular: true },
   { id: "a_date_with_death", title: "A Date with Death", url: "../Games/adatewithdeath/index.html", image: "../Games/adatewithdeath/images.jpeg", desc: "A romance chat sim where you chat, customize your look, and place your soul on the line against the Grim Reaper.", popular: true },
   { id: "day_in_the_office", title: "A Day in the Office", url: "../Games/dayintheoffice/index.html", image: "../Games/dayintheoffice/images (1).jpeg", desc: "A surreal horror game where you navigate an endless work day that you can never escape.", popular: true },
-  { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true }
+  { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
+  { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true }
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
