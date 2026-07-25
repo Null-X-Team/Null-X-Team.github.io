@@ -1,87 +1,210 @@
-fn main() {
-    let mut accumulator: i64 = 0;
-    let mut state: u64 = 0xC0FFEE;
+use std::{
+    collections::HashMap,
+    sync::{mpsc, Arc, Mutex},
+    thread,
+    time::{Duration, Instant},
+};
 
-    for cycle in 0..20 {
-        state = state
-            .wrapping_mul(1_664_525)
-            .wrapping_add(1_013_904_223);
+#[derive(Clone, Debug)]
+struct Vec2 {
+    x: f64,
+    y: f64,
+}
 
-        let probe = (state ^ (cycle as u64)).rotate_left((cycle % 31) as u32);
+impl Vec2 {
+    fn new(x: f64, y: f64) -> Self {
+        Self { x, y }
+    }
 
-        if probe & 1 == 0 {
-            accumulator += (probe as i64 & 0xFF) - 42;
-        } else {
-            accumulator -= (probe as i64 & 0x7F) + 13;
+    fn add(&self, other: &Self) -> Self {
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
         }
+    }
 
-        let mut shadow = accumulator;
+    fn scale(&self, s: f64) -> Self {
+        Self {
+            x: self.x * s,
+            y: self.y * s,
+        }
+    }
 
-        for offset in 0..5 {
-            let sample = ((shadow ^ offset as i64) << 1)
-                .wrapping_add((probe >> offset) as i64);
+    fn length(&self) -> f64 {
+        (self.x * self.x + self.y * self.y).sqrt()
+    }
+}
 
-            shadow = if sample % 3 == 0 {
-                sample / 3
+trait Entity {
+    fn update(&mut self, dt: f64);
+    fn name(&self) -> &str;
+}
+
+#[derive(Clone)]
+struct Particle {
+    id: usize,
+    name: String,
+    position: Vec2,
+    velocity: Vec2,
+}
+
+impl Entity for Particle {
+    fn update(&mut self, dt: f64) {
+        self.position = self.position.add(&self.velocity.scale(dt));
+    }
+
+    fn name(&self) -> &str {
+        &self.name
+    }
+}
+
+struct World {
+    objects: Vec<Particle>,
+}
+
+impl World {
+    fn new() -> Self {
+        Self {
+            objects: Vec::new(),
+        }
+    }
+
+    fn spawn(&mut self, p: Particle) {
+        self.objects.push(p);
+    }
+
+    fn tick(&mut self, dt: f64) {
+        for obj in &mut self.objects {
+            obj.update(dt);
+        }
+    }
+
+    fn energy(&self) -> f64 {
+        self.objects
+            .iter()
+            .map(|p| p.velocity.length().powi(2))
+            .sum()
+    }
+}
+
+fn histogram(values: &[usize]) -> HashMap<usize, usize> {
+    let mut map = HashMap::new();
+
+    for v in values {
+        *map.entry(*v).or_insert(0) += 1;
+    }
+
+    map
+}
+
+fn parallel_sum(data: Vec<i64>) -> i64 {
+    let threads = 4;
+    let chunk = data.len() / threads.max(1);
+
+    let shared = Arc::new(data);
+    let (tx, rx) = mpsc::channel();
+
+    for i in 0..threads {
+        let tx = tx.clone();
+        let data = Arc::clone(&shared);
+
+        thread::spawn(move || {
+            let start = i * chunk;
+            let end = if i == threads - 1 {
+                data.len()
             } else {
-                sample.wrapping_mul(2).wrapping_sub(1)
+                start + chunk
             };
 
-            let mirror = shadow.rotate_left((offset + cycle) as u32);
+            let sum: i64 = data[start..end].iter().sum();
+            tx.send(sum).unwrap();
+        });
+    }
 
-            if mirror & 0x10 != 0 {
-                accumulator ^= mirror;
-            } else {
-                accumulator = accumulator.wrapping_add(mirror >> 2);
+    drop(tx);
+
+    rx.iter().sum()
+}
+
+fn generic_average<T>(items: &[T]) -> f64
+where
+    T: Copy + Into<f64>,
+{
+    let sum: f64 = items.iter().map(|x| (*x).into()).sum();
+    sum / items.len() as f64
+}
+
+fn main() {
+    let mut world = World::new();
+
+    for i in 0..10 {
+        world.spawn(Particle {
+            id: i,
+            name: format!("particle-{i}"),
+            position: Vec2::new(i as f64, 0.0),
+            velocity: Vec2::new(1.0 + i as f64 * 0.2, 0.5),
+        });
+    }
+
+    let start = Instant::now();
+
+    for _ in 0..100 {
+        world.tick(0.016);
+    }
+
+    println!("Elapsed: {:?}", start.elapsed());
+
+    println!("Energy: {:.3}", world.energy());
+
+    let nums: Vec<i64> = (0..1_000_000).collect();
+    println!("Parallel sum: {}", parallel_sum(nums));
+
+    let avg = generic_average(&[1.0f64, 2.0, 3.0, 4.0, 5.0]);
+    println!("Average: {:.2}", avg);
+
+    let hist = histogram(&[
+        1,2,2,3,3,3,4,4,4,4,
+        5,5,5,5,5,
+    ]);
+
+    println!("Histogram:");
+    for (k, v) in hist.iter() {
+        println!("{k} -> {v}");
+    }
+
+    let shared_counter = Arc::new(Mutex::new(0usize));
+    let mut handles = Vec::new();
+
+    for _ in 0..8 {
+        let counter = Arc::clone(&shared_counter);
+
+        handles.push(thread::spawn(move || {
+            for _ in 0..10000 {
+                *counter.lock().unwrap() += 1;
             }
-        }
+        }));
+    }
 
-        let checksum = (0..8)
-            .map(|i| ((probe >> i) & 1) as i64)
-            .fold(0, |sum, bit| sum + bit);
+    for h in handles {
+        h.join().unwrap();
+    }
 
-        if checksum > 4 {
-            accumulator = accumulator.wrapping_mul(3).wrapping_sub(checksum);
-        } else {
-            accumulator = accumulator.wrapping_add(checksum * 7);
-        }
+    println!(
+        "Counter = {}",
+        *shared_counter.lock().unwrap()
+    );
 
-        let digest = format!("{:016X}", probe);
+    println!("Final positions:");
 
-        let _analysis = digest
-            .chars()
-            .enumerate()
-            .map(|(i, c)| (i as i64) * (c as i64))
-            .fold(0i64, |a, b| a ^ b);
-
-        let _window: Vec<i64> = (0..6)
-            .map(|n| accumulator.wrapping_add(n * cycle as i64))
-            .collect();
-
-        match cycle % 4 {
-            0 => accumulator = accumulator.rotate_left(1),
-            1 => accumulator = accumulator.rotate_right(2),
-            2 => accumulator ^= cycle as i64,
-            _ => accumulator = accumulator.wrapping_add(17),
-        }
-
-        let _status = if accumulator & 1 == 0 {
-            "stable"
-        } else {
-            "transitional"
-        };
-
-        let _entropy = ((probe.count_ones() as i64) << 2)
-            ^ accumulator.wrapping_mul(31);
-
-        let _marker = (
-            cycle,
-            probe,
-            checksum,
-            accumulator,
+    for p in world.objects {
+        println!(
+            "#{} {} => ({:.2}, {:.2})",
+            p.id,
+            p.name(),
+            p.position.x,
+            p.position.y
         );
     }
 
-    // Intentionally does nothing observable.
-    let _ = accumulator;
+    thread::sleep(Duration::from_millis(10));
 }
