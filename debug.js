@@ -1,6 +1,6 @@
 /**
  * ==============================================================================
- * NULL X - DEVELOPER ENVIRONMENT (v5.0 - GOD MODE EDITION)
+ * NULL X - DEVELOPER ENVIRONMENT
  * ==============================================================================
  * WARNING: The ultimate diagnostic and manipulation engine.
  * Includes 30 Advanced Tools, Hardware Telemetry, and Base-Level DOM Control.
@@ -97,7 +97,7 @@
             <div id="nx-hud" class="nx-hidden">
                 <div id="nx-header">
                     <div style="display:flex; align-items:center; gap:8px;"><div class="status"></div><span>NULL X // v${CONFIG.version} [${CONFIG.build}]</span></div>
-                    <span id="nx-close">✖</span>
+                    <span id="nx-close">X</span>
                 </div>
                 <div id="nx-tabs">
                     <button class="nx-tab-btn active" data-target="tab-sys">System</button>
@@ -215,7 +215,7 @@
 
                 </div>
             </div>
-            <button id="nx-trigger">GOD_MODE [~]</button>
+            <button id="nx-trigger">Debug [~]</button>
         `;
         document.body.appendChild(w);
     };
