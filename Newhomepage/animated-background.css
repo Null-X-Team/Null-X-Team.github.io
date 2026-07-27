@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ANIMATED BACKGROUND CANVAS STYLES
+   ANIMATED GEOMETRIC MESH BACKGROUND CANVAS STYLES
    ========================================================================== */
 
 #animated-background-canvas {
@@ -26,26 +26,7 @@ body {
   z-index: 10;
 }
 
-/* Optional: Add a subtle gradient overlay on top of the animated background */
-body::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: radial-gradient(
-    ellipse at center,
-    rgba(30, 15, 15, 0.3) 0%,
-    rgba(10, 10, 10, 0.6) 100%
-  );
-  z-index: 2;
-  pointer-events: none;
-}
-
-/* Adjust if needed to ensure content is clickable */
-.top-nav-container,
-.dashboard-wrapper,
+/* Custom context menu stays on top */
 #custom-context-menu {
   position: relative;
   z-index: 10;
