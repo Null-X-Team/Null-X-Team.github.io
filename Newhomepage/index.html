@@ -6,6 +6,7 @@
     <title>Glaxyias Unblocked</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newpage.css">
+    <link rel="stylesheet" href="animated-background.css">
     <link rel="stylesheet" href="../themes/themes.css">
     <script src="../Games/GameSaveData/auto-save.js"></script>
     
@@ -57,7 +58,10 @@
     </style>
 </head>
 <body>
-
+    
+<!-- ADD THIS CANVAS AS THE FIRST ELEMENT -->
+    <canvas id="animated-background-canvas"></canvas>
+    
     <div id="educational-cloak" class="hidden">
         <div class="educational-content-card">
             <div class="educational-header">
@@ -219,6 +223,7 @@
 
     <script type="module" src="../JS/main.js"></script>
     <script src="../themes/themes.js"></script>
+    <script src="animated-background.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
