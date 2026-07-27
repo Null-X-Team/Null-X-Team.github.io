@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NXOS - Settings</title>
+    <title>Settings</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newsettings.css">
     <link rel="stylesheet" href="../themes/themes.css">
@@ -12,7 +12,7 @@
     <div class="settings-container">
         <header class="settings-header">
             <h2><i class="fa-solid fa-gear"></i> System Control Panel</h2>
-            <a href="../Newhomepage/index.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+            <a href="../newhomepage.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
         </header>
 
         <main class="settings-body">
@@ -46,7 +46,7 @@
                 
                 <div class="setting-row">
                     <label for="cloakSelect">Select Preset Cloak:</label>
-                    <select id="cloakSelect">
+                    <select id="cloakSelect" class="dropdown-input">
                         <option value="none">None (Default)</option>
                         <option value="google">Google Search</option>
                         <option value="drive">Google Drive</option>
@@ -55,6 +55,43 @@
                     </select>
                 </div>
             </section>
+
+            <section class="settings-card">
+                <h3><i class="fa-solid fa-keyboard"></i> Security & Keybinds</h3>
+                <p class="subtitle">Press this key to instantly redirect the page to a safe site.</p>
+                
+                <div class="setting-row">
+                    <label for="panicKeyInput">Panic Key:</label>
+                    <input type="text" id="panicKeyInput" readonly placeholder="Click to bind..." class="text-input" style="width: 120px; text-align: center; cursor: pointer;">
+                </div>
+                <div class="setting-row" style="margin-top: 10px;">
+                    <label for="panicUrlInput">Safe URL:</label>
+                    <input type="url" id="panicUrlInput" value="https://classroom.google.com" class="text-input" placeholder="https://...">
+                </div>
+            </section>
+
+            <section class="settings-card">
+                <h3><i class="fa-solid fa-gauge-high"></i> System Performance</h3>
+                <p class="subtitle">Disable heavy animations for low-end devices.</p>
+                
+                <div class="setting-row">
+                    <label for="animToggle">Enable UI Animations</label>
+                    <label class="switch">
+                        <input type="checkbox" id="animToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+            </section>
+
+            <section class="settings-card" style="border-color: rgba(255, 59, 59, 0.3);">
+                <h3><i class="fa-solid fa-database"></i> Data Management</h3>
+                <p class="subtitle">Wipe all local storage, favorites, and settings from this browser.</p>
+                
+                <div class="setting-row">
+                    <button id="clearDataBtn" class="danger-btn"><i class="fa-solid fa-trash"></i> Wipe All System Data</button>
+                </div>
+            </section>
+
         </main>
     </div>
 
