@@ -1,281 +1,557 @@
 <!DOCTYPE html>
+
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Glaxyias Unblocked</title>
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <link rel="stylesheet" href="newpage.css">
-    <link rel="stylesheet" href="../Settings/newsettings.css">
+
     <link rel="stylesheet" href="../themes/themes.css">
+
     <script src="../Games/GameSaveData/auto-save.js"></script>
+
     
+
     <style>
+
         /* ==========================================================================
+
            MINIMAL FOOTER ACTIVITY TRACKER STYLES
+
            ========================================================================== */
+
         .activity-footer {
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             gap: 8px;
+
             margin-top: auto;        
+
             padding-top: 15px;
+
             border-top: 1px solid rgba(255, 255, 255, 0.03);
+
             width: 100%;
+
         }
+
+
 
         #activity-status-text {
+
             font-size: 11px;
+
             font-family: monospace;
+
             color: rgba(255, 255, 255, 0.35);
+
             letter-spacing: 0.5px;
+
         }
+
+
 
         .status-indicator-dot {
+
             width: 6px;
+
             height: 6px;
+
             border-radius: 50%;
+
             background: #27c93f; 
+
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
         }
+
+
 
         .active-pulse {
+
             box-shadow: 0 0 8px #27c93f;
+
             animation: statusPulse 2s infinite ease-in-out;
+
         }
+
+
 
         .idle-mode {
+
             background: #ffbd2e !important; 
+
             box-shadow: none !important;
+
         }
+
+
 
         @keyframes statusPulse {
+
             0% { transform: scale(1); opacity: 1; }
+
             50% { transform: scale(1.15); opacity: 0.7; }
+
             100% { transform: scale(1); opacity: 1; }
+
         }
+
     </style>
+
 </head>
+
 <body>
 
+
+
     <div id="educational-cloak" class="hidden">
+
         <div class="educational-content-card">
+
             <div class="educational-header">
+
                 <h1>Academic Research Hub</h1>
+
                 <div class="academic-subheading">Database Connection Secured</div>
+
             </div>
+
             <div class="educational-scroll-body">
+
                 <p>This reference document outlines structural mechanics and runtime computational compilation metrics within isolated local sandbox parameters.</p>
+
             </div>
+
             <div class="timer-subtext-sticky">Session updates in: <span id="cloak-timer">00:00</span></div>
+
         </div>
+
     </div>
 
+
+
     <div class="top-nav-container">
+
         <nav class="nav-bar">
+
             <div class="nav-tabs-wrapper">
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-home">
+
                     <span class="tab-icon"><i class="fa-solid fa-crosshairs"></i></span>
+
                     <span class="tab-text">Home</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-games">
+
                     <span class="tab-icon"><i class="fa-solid fa-gamepad"></i></span>
+
                     <span class="tab-text">Games</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-favorites">
+
                     <span class="tab-icon"><i class="fa-solid fa-star"></i></span>
+
                     <span class="tab-text">Favorites</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-unblockers">
+
                     <span class="tab-icon"><i class="fa-solid fa-shield-halved"></i></span>
+
                     <span class="tab-text">Unblockers</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-profile">
+
                     <span class="tab-icon"><i class="fa-solid fa-user"></i></span>
+
                     <span class="tab-text">Profile</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-communications">
+
                     <span class="tab-icon"><i class="fa-solid fa-comments"></i></span>
+
                     <span class="tab-text">Communications</span>
+
                 </a>
+
                 <a href="#" class="nav-tab-item nav-item" id="nav-assistant">
+
                     <span class="tab-icon"><i class="fa-solid fa-robot"></i></span>
+
                     <span class="tab-text">Assistant</span>
+
                 </a>
+
             </div>
+
         </nav>
+
     </div>
+
+
 
     <div class="dashboard-wrapper">
 
+
+
         <div class="panel-column">
+
             
+
             <aside class="side-panel">
+
                 <div class="widget-header">
+
                     <i class="fa-solid fa-cloud-sun"></i> Weather
+
                 </div>
+
                 <div class="weather-row">
+
                     <div class="weather-main">
+
                         <span class="weather-temp" id="live-temp">--°</span>
+
                     </div>
+
                     <div class="weather-stats">
+
                         <span id="live-humidity"><i class="fa-solid fa-droplet"></i> --% Humidity</span>
+
                         <span class="location-label" id="live-city">Locating...</span>
+
                     </div>
+
                 </div>
+
                 
+
                 <div class="widget-header" style="margin-top: 25px;">
+
                     <i class="fa-solid fa-microchip"></i> Diagnostics
+
                 </div>
+
                 <div class="weather-stats">
+
                     <span id="battery-status" style="color: #4ade80;">Battery: 100%</span>
+
                     <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
+
                 </div>
+
             </aside>
+
+
 
             <div class="terminal-container">
+
                 <div class="terminal-header">
+
                     <div class="terminal-circle red"></div>
+
                     <div class="terminal-circle yellow"></div>
+
                     <div class="terminal-circle green"></div>
+
                     <span class="terminal-title">bash - system_core_sh</span>
+
                 </div>
+
                 <div class="terminal-body">
+
                     <div class="command-row">
+
                         <span class="terminal-prompt">guest@hub:~$</span>
+
                         <input type="text" id="terminalInput" placeholder="Type system help command..." autocomplete="off">
+
                     </div>
+
                 </div>
+
             </div>
 
+
+
         </div>
+
+
 
         <main class="main-hub">
+
             <h1 class="site-title" id="welcome-text">Loading Identity...</h1>
+
             
+
             <div class="search-container">
+
                 <span class="search-glass"><i class="fa-solid fa-magnifying-glass"></i></span>
+
                 <input type="text" id="searchBar" placeholder="Search games...">
+
             </div>
+
+
 
             <div class="main-content">
+
                 
+
                 <div class="random-section">
+
                     <button id="randomBtn" class="quick-action-btn">
+
                         <i class="fa-solid fa-shuffle"></i> Random Game
+
                     </button>
+
                 </div>
+
+
 
                 <div id="gameGrid" class="apps-grid"></div>
+
                 <div id="favoritesGrid" class="apps-grid" style="display: none;">
+
                     <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 40px;">
+
                         <i class="fas fa-star" style="color: #ff3b3b; margin-right: 6px;"></i> Your favorites catalog is currently empty.
+
                     </div>
+
                 </div>
+
+
 
                 <div id="unblockersSection" style="display: none;"></div>
+
                 <div id="profileSection" style="display: none;"></div>
+
                 <div id="communicationsSection" style="display: none;"></div>
+
                 <div id="assistantSection" style="display: none;"></div>
 
+
+
             </div>
+
+
 
             <div class="activity-footer">
+
                 <div class="status-indicator-dot active-pulse"></div>
+
                 <span id="activity-status-text">Status: Syncing connection...</span>
+
             </div>
+
         </main>
 
+
+
         <div class="panel-column">
+
             
+
             <aside class="side-panel">
+
                 <div class="widget-header">
+
                     <i class="fa-solid fa-star"></i> Featured
+
                 </div>
+
                 <div class="featured-content" id="heroSection">
+
                     <div class="featured-preview-box">
+
                         <span class="preview-placeholder"><i class="fa-solid fa-gamepad"></i></span>
+
                     </div>
+
                     <h3 id="hero-title">Drive0ad</h3>
+
                     <p id="hero-desc">Loading parameters...</p>
+
                     <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
+
                 </div>
+
                 
+
                 <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
+
                     <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
+
                     <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                    <a href="../Settings/newsettings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+
+                    <a href="#" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+
                 </div>
+
             </aside>
+
+
 
         </div>
 
+
+
     </div>
+
+
 
     <div id="custom-context-menu" style="display: none; position: absolute; background: #0a0a0a; border: 1px solid #8b00ff; border-radius: 4px; padding: 5px; z-index: 100000;">
+
         <div class="context-menu-item" id="ctx-favorite" style="color: white; padding: 5px 10px; cursor: pointer;"><i class="fa-solid fa-star"></i> Favorite Game</div>
+
         <div class="context-menu-item" id="ctx-delete" style="color: #ff3333; padding: 5px 10px; cursor: pointer;"><i class="fa-solid fa-trash"></i> Delete Game</div>
+
     </div>
 
+
+
     <script type="module" src="../JS/main.js"></script>
-    <script src="../Settings/newsettings.js"></script>
+
     <script src="../themes/themes.js"></script>
 
+
+
     <script>
+
         document.addEventListener("DOMContentLoaded", () => {
+
             // ----------------------------------------------------------------------
+
             // ACTIVITY STATUS ENGINE LOGIC
+
             // ----------------------------------------------------------------------
+
             const statusText = document.getElementById("activity-status-text");
+
             const statusDot = document.querySelector(".status-indicator-dot");
+
             
+
             if (statusText && statusDot) {
+
                 let idleTimer = null;
+
                 const IDLE_TIMEOUT_MS = 5000;
 
+
+
                 function setAsActive(customText = "Status: User Active") {
+
                     statusText.textContent = customText;
+
                     statusDot.classList.remove("idle-mode");
+
                     statusDot.classList.add("active-pulse");
 
+
+
                     clearTimeout(idleTimer);
+
                     idleTimer = setTimeout(() => {
+
                         statusText.textContent = "Status: Idle (No Input)";
+
                         statusDot.classList.remove("active-pulse");
+
                         statusDot.classList.add("idle-mode");
+
                     }, IDLE_TIMEOUT_MS);
+
                 }
 
+
+
                 window.addEventListener("mousemove", () => {
+
                     if (statusText.textContent.startsWith("Status: User Active") || statusText.textContent.includes("Idle")) {
+
                         setAsActive("Status: User Active");
+
                     } else {
+
                         setAsActive(statusText.textContent);
+
                     }
+
                 });
+
+
 
                 const observer = new MutationObserver(() => {
+
                     document.querySelectorAll(".game-card, .app-card").forEach(card => {
+
                         if (card.dataset.tracked) return;
+
                         card.dataset.tracked = "true";
 
+
+
                         card.addEventListener("mouseenter", () => {
+
                             const appName = card.querySelector(".game-title, .app-label")?.textContent || "Application";
+
                             setAsActive(`Status: Active [Interacting with ${appName}]`);
+
                         });
+
                         card.addEventListener("mouseleave", () => {
+
                             setAsActive("Status: User Active");
+
                         });
+
                     });
+
                 });
 
+
+
                 const gridTarget = document.getElementById("gameGrid");
+
                 if (gridTarget) observer.observe(gridTarget, { childList: true, subtree: true });
 
+
+
                 setAsActive("Status: Live Sync Online");
+
             }
+
         });
+
     </script>
+
 </body>
+
 </html>
