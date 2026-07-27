@@ -1,9 +1,9 @@
 // ==========================================================================
-// INTERACTIVE ANIMATED BACKGROUND SYSTEM
-// Particle-based animation with click responsiveness
+// ORIGINAL ANIMATED GEOMETRIC MESH BACKGROUND
+// Flowing wave patterns with procedural generation
 // ==========================================================================
 
-class AnimatedBackground {
+class GeometricMeshBackground {
   constructor(canvasId) {
     this.canvas = document.getElementById(canvasId);
     if (!this.canvas) {
@@ -12,17 +12,18 @@ class AnimatedBackground {
     }
 
     this.ctx = this.canvas.getContext('2d');
-    this.particles = [];
-    this.orbs = [];
+    this.time = 0;
     this.mousePos = { x: 0, y: 0 };
-    this.clickEffect = null;
+    this.distortions = [];
+    this.gridSize = 40;
+    this.waveAmplitude = 15;
 
-    // Color palette matching your theme
     this.colors = {
-      primary: '#8b00ff',      // Deep purple
-      accent: '#ff3b3b',       // Crimson red
-      secondary: '#1f0808',    // Dark red
-      light: 'rgba(255, 255, 255, 0.1)',
+      primary: '#8b00ff',
+      accent: '#ff3b3b',
+      dark: '#0a0a0a',
+      line: 'rgba(139, 0, 255, 0.15)',
+      lineHot: 'rgba(255, 59, 59, 0.3)',
     };
 
     this.init();
@@ -34,7 +35,6 @@ class AnimatedBackground {
     document.addEventListener('mousemove', (e) => this.updateMouse(e));
     document.addEventListener('click', (e) => this.handleClick(e));
 
-    this.createOrbNetwork();
     this.animate();
   }
 
@@ -48,29 +48,8 @@ class AnimatedBackground {
     this.mousePos.y = e.clientY;
   }
 
-  createOrbNetwork() {
-    // Create static orb positions that form a network
-    const orbCount = 5;
-    for (let i = 0; i < orbCount; i++) {
-      this.orbs.push({
-        x: Math.random() * this.canvas.width,
-        y: Math.random() * this.canvas.height,
-        baseX: 0,
-        baseY: 0,
-        radius: Math.random() * 3 + 1.5,
-        velocity: {
-          x: (Math.random() - 0.5) * 0.3,
-          y: (Math.random() - 0.5) * 0.3,
-        },
-        opacity: Math.random() * 0.5 + 0.3,
-        pulseSpeed: Math.random() * 0.02 + 0.01,
-        pulseAmount: 0,
-      });
-    }
-  }
-
   handleClick(e) {
-    // Only trigger click effect if not clicking on interactive elements
+    // Only trigger if not clicking UI elements
     if (
       e.target.closest('.nav-tab-item') ||
       e.target.closest('button') ||
@@ -80,200 +59,224 @@ class AnimatedBackground {
       return;
     }
 
-    // Create explosion effect at click point
-    for (let i = 0; i < 12; i++) {
-      const angle = (Math.PI * 2 * i) / 12;
-      const speed = Math.random() * 3 + 2;
-
-      this.particles.push({
-        x: e.clientX,
-        y: e.clientY,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        life: 1,
-        color: Math.random() > 0.5 ? this.colors.accent : this.colors.primary,
-        size: Math.random() * 3 + 1,
-        decay: Math.random() * 0.02 + 0.015,
-      });
-    }
-
-    // Create a brief flash effect
-    this.clickEffect = {
+    // Create ripple distortion at click point
+    this.distortions.push({
       x: e.clientX,
       y: e.clientY,
       radius: 0,
-      maxRadius: 100,
-      opacity: 0.6,
-      expandSpeed: 4,
-      color: this.colors.accent,
+      maxRadius: 300,
+      force: 1,
+      life: 1,
+      decay: 0.02,
+    });
+  }
+
+  // Perlin-like noise using sine waves
+  noise(x, y, time) {
+    return (
+      Math.sin(x * 0.01 + time * 0.001) * 0.5 +
+      Math.sin(y * 0.01 + time * 0.0015) * 0.3 +
+      Math.sin((x + y) * 0.005 + time * 0.001) * 0.2
+    );
+  }
+
+  // Get wave offset for a point based on time and position
+  getWaveOffset(x, y, time) {
+    const wave1 = Math.sin(x * 0.003 + time * 0.002) * this.waveAmplitude;
+    const wave2 = Math.cos(y * 0.003 + time * 0.0025) * (this.waveAmplitude * 0.7);
+    const wave3 = Math.sin((x + y) * 0.002 + time * 0.0018) * (this.waveAmplitude * 0.5);
+
+    return {
+      x: wave1 + wave3,
+      y: wave2 + wave3,
     };
   }
 
-  updateParticles() {
-    this.particles = this.particles.filter((p) => p.life > 0);
+  // Apply distortion from click ripples
+  applyDistortion(x, y) {
+    let distX = 0;
+    let distY = 0;
 
-    this.particles.forEach((p) => {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.1; // Gravity
-      p.life -= p.decay;
-      p.vx *= 0.98; // Friction
-    });
-  }
-
-  updateOrbs() {
-    this.orbs.forEach((orb) => {
-      // Slow floating motion
-      orb.x += orb.velocity.x;
-      orb.y += orb.velocity.y;
-
-      // Bounce off edges
-      if (orb.x - orb.radius < 0 || orb.x + orb.radius > this.canvas.width) {
-        orb.velocity.x *= -1;
-      }
-      if (orb.y - orb.radius < 0 || orb.y + orb.radius > this.canvas.height) {
-        orb.velocity.y *= -1;
-      }
-
-      // Keep in bounds
-      orb.x = Math.max(orb.radius, Math.min(this.canvas.width - orb.radius, orb.x));
-      orb.y = Math.max(orb.radius, Math.min(this.canvas.height - orb.radius, orb.y));
-
-      // Pulsing effect
-      orb.pulseAmount = Math.sin(Date.now() * orb.pulseSpeed * 0.001) * 1.5;
-
-      // React to mouse proximity
-      const dx = this.mousePos.x - orb.x;
-      const dy = this.mousePos.y - orb.y;
+    this.distortions.forEach((d) => {
+      const dx = x - d.x;
+      const dy = y - d.y;
       const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < 150) {
-        const force = (150 - distance) / 150;
-        orb.velocity.x -= (dx / distance) * force * 0.15;
-        orb.velocity.y -= (dy / distance) * force * 0.15;
-      }
+      if (distance < d.maxRadius && distance > 0) {
+        const factor = Math.sin((d.radius / d.maxRadius) * Math.PI);
+        const strength = (1 - distance / d.maxRadius) * factor * d.force;
 
-      // Damping
-      orb.velocity.x *= 0.99;
-      orb.velocity.y *= 0.99;
+        distX += (dx / distance) * strength * 8;
+        distY += (dy / distance) * strength * 8;
+      }
+    });
+
+    return { x: distX, y: distY };
+  }
+
+  updateDistortions() {
+    this.distortions = this.distortions.filter((d) => d.life > 0);
+
+    this.distortions.forEach((d) => {
+      d.radius += 5;
+      d.life -= d.decay;
+      d.force *= 0.95;
     });
   }
 
-  updateClickEffect() {
-    if (this.clickEffect) {
-      this.clickEffect.radius += this.clickEffect.expandSpeed;
-      this.clickEffect.opacity -= 0.015;
+  drawMesh() {
+    const cols = Math.ceil(this.canvas.width / this.gridSize) + 2;
+    const rows = Math.ceil(this.canvas.height / this.gridSize) + 2;
 
-      if (this.clickEffect.opacity <= 0 || this.clickEffect.radius > this.clickEffect.maxRadius) {
-        this.clickEffect = null;
+    // Build grid points with wave animation
+    const points = [];
+    for (let row = -1; row < rows; row++) {
+      points[row] = [];
+      for (let col = -1; col < cols; col++) {
+        const baseX = col * this.gridSize;
+        const baseY = row * this.gridSize;
+
+        const wave = this.getWaveOffset(baseX, baseY, this.time);
+        const distortion = this.applyDistortion(baseX, baseY);
+
+        points[row][col] = {
+          x: baseX + wave.x + distortion.x,
+          y: baseY + wave.y + distortion.y,
+          baseX,
+          baseY,
+        };
+      }
+    }
+
+    // Draw grid lines (horizontal and vertical)
+    this.ctx.lineWidth = 1;
+    this.ctx.globalAlpha = 0.6;
+
+    for (let row = -1; row < rows; row++) {
+      for (let col = -1; col < cols - 1; col++) {
+        const p1 = points[row][col];
+        const p2 = points[row][col + 1];
+
+        // Color based on wave intensity
+        const intensity = Math.abs(this.getWaveOffset(p1.baseX, p1.baseY, this.time).x);
+        const heatMap = Math.min(intensity / this.waveAmplitude, 1);
+
+        const color = heatMap > 0.5
+          ? this.colors.lineHot
+          : this.colors.line;
+
+        this.ctx.strokeStyle = color;
+        this.ctx.beginPath();
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(p2.x, p2.y);
+        this.ctx.stroke();
+      }
+    }
+
+    // Draw vertical lines
+    for (let row = -1; row < rows - 1; row++) {
+      for (let col = -1; col < cols; col++) {
+        const p1 = points[row][col];
+        const p2 = points[row + 1][col];
+
+        const intensity = Math.abs(this.getWaveOffset(p1.baseX, p1.baseY, this.time).y);
+        const heatMap = Math.min(intensity / this.waveAmplitude, 1);
+
+        const color = heatMap > 0.5
+          ? this.colors.lineHot
+          : this.colors.line;
+
+        this.ctx.strokeStyle = color;
+        this.ctx.beginPath();
+        this.ctx.moveTo(p1.x, p1.y);
+        this.ctx.lineTo(p2.x, p2.y);
+        this.ctx.stroke();
+      }
+    }
+
+    this.ctx.globalAlpha = 1;
+  }
+
+  drawNodePoints() {
+    const cols = Math.ceil(this.canvas.width / this.gridSize) + 2;
+    const rows = Math.ceil(this.canvas.height / this.gridSize) + 2;
+
+    for (let row = -1; row < rows; row++) {
+      for (let col = -1; col < cols; col++) {
+        const baseX = col * this.gridSize;
+        const baseY = row * this.gridSize;
+
+        const wave = this.getWaveOffset(baseX, baseY, this.time);
+        const distortion = this.applyDistortion(baseX, baseY);
+
+        const x = baseX + wave.x + distortion.x;
+        const y = baseY + wave.y + distortion.y;
+
+        // Small glow at grid intersections
+        const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, 4);
+        gradient.addColorStop(0, `rgba(139, 0, 255, 0.4)`);
+        gradient.addColorStop(1, `rgba(139, 0, 255, 0)`);
+
+        this.ctx.fillStyle = gradient;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 4, 0, Math.PI * 2);
+        this.ctx.fill();
+
+        // Bright center dot
+        this.ctx.fillStyle = 'rgba(139, 0, 255, 0.6)';
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, 1, 0, Math.PI * 2);
+        this.ctx.fill();
       }
     }
   }
 
-  drawOrbConnections() {
-    // Draw lines between nearby orbs
-    for (let i = 0; i < this.orbs.length; i++) {
-      for (let j = i + 1; j < this.orbs.length; j++) {
-        const dx = this.orbs[i].x - this.orbs[j].x;
-        const dy = this.orbs[i].y - this.orbs[j].y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance < 250) {
-          const opacity = (1 - distance / 250) * 0.3;
-          this.ctx.strokeStyle = `rgba(139, 0, 255, ${opacity})`;
-          this.ctx.lineWidth = 1;
-          this.ctx.beginPath();
-          this.ctx.moveTo(this.orbs[i].x, this.orbs[i].y);
-          this.ctx.lineTo(this.orbs[j].x, this.orbs[j].y);
-          this.ctx.stroke();
-        }
-      }
-    }
-  }
-
-  drawOrbs() {
-    this.orbs.forEach((orb) => {
-      const currentRadius = orb.radius + orb.pulseAmount;
-
-      // Glow effect
-      const gradient = this.ctx.createRadialGradient(
-        orb.x,
-        orb.y,
-        0,
-        orb.x,
-        orb.y,
-        currentRadius * 3
-      );
-      gradient.addColorStop(0, `rgba(139, 0, 255, ${orb.opacity * 0.4})`);
-      gradient.addColorStop(0.7, `rgba(139, 0, 255, ${orb.opacity * 0.1})`);
-      gradient.addColorStop(1, 'rgba(139, 0, 255, 0)');
-
-      this.ctx.fillStyle = gradient;
-      this.ctx.beginPath();
-      this.ctx.arc(orb.x, orb.y, currentRadius * 3, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Core orb
-      this.ctx.fillStyle = `rgba(139, 0, 255, ${orb.opacity})`;
-      this.ctx.beginPath();
-      this.ctx.arc(orb.x, orb.y, currentRadius, 0, Math.PI * 2);
-      this.ctx.fill();
-
-      // Bright center
-      this.ctx.fillStyle = `rgba(255, 255, 255, ${orb.opacity * 0.6})`;
-      this.ctx.beginPath();
-      this.ctx.arc(orb.x, orb.y, currentRadius * 0.4, 0, Math.PI * 2);
-      this.ctx.fill();
-    });
-  }
-
-  drawParticles() {
-    this.particles.forEach((p) => {
-      this.ctx.fillStyle = `${p.color}${Math.round(p.life * 255).toString(16).padStart(2, '0')}`;
-      this.ctx.beginPath();
-      this.ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      this.ctx.fill();
-    });
-  }
-
-  drawClickEffect() {
-    if (this.clickEffect) {
-      this.ctx.strokeStyle = `rgba(255, 59, 59, ${this.clickEffect.opacity})`;
+  drawRippleVisualization() {
+    this.distortions.forEach((d) => {
+      const alpha = (d.life * 0.3);
+      this.ctx.strokeStyle = `rgba(255, 59, 59, ${alpha})`;
       this.ctx.lineWidth = 2;
+      this.ctx.globalAlpha = alpha;
       this.ctx.beginPath();
-      this.ctx.arc(
-        this.clickEffect.x,
-        this.clickEffect.y,
-        this.clickEffect.radius,
-        0,
-        Math.PI * 2
-      );
+      this.ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
       this.ctx.stroke();
-    }
+      this.ctx.globalAlpha = 1;
+    });
   }
 
   animate() {
-    // Clear canvas with semi-transparent background for trailing effect
-    this.ctx.fillStyle = 'rgba(20, 17, 17, 0.15)';
+    // Clear with dark background
+    this.ctx.fillStyle = this.colors.dark;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.updateParticles();
-    this.updateOrbs();
-    this.updateClickEffect();
+    // Draw subtle gradient overlay
+    const gradient = this.ctx.createRadialGradient(
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      0,
+      this.canvas.width / 2,
+      this.canvas.height / 2,
+      Math.max(this.canvas.width, this.canvas.height)
+    );
+    gradient.addColorStop(0, 'rgba(30, 15, 15, 0.3)');
+    gradient.addColorStop(1, 'rgba(10, 10, 10, 0.8)');
+    this.ctx.fillStyle = gradient;
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    this.drawOrbConnections();
-    this.drawOrbs();
-    this.drawParticles();
-    this.drawClickEffect();
+    // Update and draw
+    this.updateDistortions();
+    this.drawMesh();
+    this.drawNodePoints();
+    this.drawRippleVisualization();
 
+    this.time += 1;
     requestAnimationFrame(() => this.animate());
   }
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  // Wait a brief moment to ensure canvas is in the DOM
   setTimeout(() => {
-    new AnimatedBackground('animated-background-canvas');
+    new GeometricMeshBackground('animated-background-canvas');
   }, 100);
 });
