@@ -1,1 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NXOS - Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="newsettings.css">
+    <link rel="stylesheet" href="../themes/themes.css">
+</head>
+<body>
+    <div class="settings-container">
+        <header class="settings-header">
+            <h2><i class="fa-solid fa-gear"></i> System Control Panel</h2>
+            <a href="newpage.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
+        </header>
 
+        <main class="settings-body">
+            <section class="settings-card">
+                <h3><i class="fa-solid fa-palette"></i> Theme Customization</h3>
+                <p class="subtitle">Select an accent color palette for the dashboard interface.</p>
+                
+                <div class="theme-grid">
+                    <button class="theme-option active" data-theme="crimson">
+                        <span class="color-preview crimson"></span>
+                        <span>Crimson Red</span>
+                    </button>
+                    <button class="theme-option" data-theme="purple">
+                        <span class="color-preview purple"></span>
+                        <span>NXOS Purple</span>
+                    </button>
+                    <button class="theme-option" data-theme="cyan">
+                        <span class="color-preview cyan"></span>
+                        <span>Cyber Cyan</span>
+                    </button>
+                    <button class="theme-option" data-theme="emerald">
+                        <span class="color-preview emerald"></span>
+                        <span>Matrix Green</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="settings-card">
+                <h3><i class="fa-solid fa-user-ninja"></i> Stealth & Cloaking</h3>
+                <p class="subtitle">Set up Tab Cloaking (Title & Favicon mask).</p>
+                
+                <div class="setting-row">
+                    <label for="cloakSelect">Select Preset Cloak:</label>
+                    <select id="cloakSelect">
+                        <option value="none">None (Default)</option>
+                        <option value="google">Google Search</option>
+                        <option value="drive">Google Drive</option>
+                        <option value="classroom">Google Classroom</option>
+                        <option value="canvas">Canvas</option>
+                    </select>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="newsettings.js"></script>
+    <script src="../themes/themes.js"></script>
+</body>
+</html>
