@@ -6,7 +6,6 @@
     <title>Glaxyias Unblocked</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newpage.css">
-    <link rel="stylesheet" href="../Settings/newsettings.css">
     <link rel="stylesheet" href="../themes/themes.css">
     <script src="../Games/GameSaveData/auto-save.js"></script>
     
@@ -205,7 +204,7 @@
                 <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
                     <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
                     <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                    <a href="../Settings/newsettings.html" class="settings-btn" id="settingsBtn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
+                    <a href="../Settings/newsettings.html" class="settings-btn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
                 </div>
             </aside>
 
@@ -219,11 +218,16 @@
     </div>
 
     <script type="module" src="../JS/main.js"></script>
-    <script src="../Settings/newsettings.js"></script>
     <script src="../themes/themes.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
+            // Theme setup for the homepage so it remembers what you set in settings
+            const savedTheme = localStorage.getItem("nxos_theme");
+            if (savedTheme) {
+                document.body.setAttribute("data-theme", savedTheme);
+            }
+
             // ----------------------------------------------------------------------
             // ACTIVITY STATUS ENGINE LOGIC
             // ----------------------------------------------------------------------
