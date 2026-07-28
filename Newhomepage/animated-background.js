@@ -1,6 +1,6 @@
 // ==========================================================================
-// ORIGINAL ANIMATED GEOMETRIC MESH BACKGROUND
-// Flowing wave patterns with procedural generation
+// ENHANCED INTERACTIVE GEOMETRIC MESH BACKGROUND
+// Mouse distortion, trail effects, and shockwave reactions
 // ==========================================================================
 
 class GeometricMeshBackground {
@@ -14,9 +14,14 @@ class GeometricMeshBackground {
     this.ctx = this.canvas.getContext('2d');
     this.time = 0;
     this.mousePos = { x: 0, y: 0 };
+    this.prevMousePos = { x: 0, y: 0 };
     this.distortions = [];
+    this.shockwaves = [];
+    this.mouseTrail = [];
     this.gridSize = 40;
     this.waveAmplitude = 15;
+    this.mouseDistortionRadius = 120;
+    this.mouseDistortionForce = 1.2;
 
     this.colors = {
       primary: '#8b00ff',
@@ -44,8 +49,20 @@ class GeometricMeshBackground {
   }
 
   updateMouse(e) {
+    this.prevMousePos.x = this.mousePos.x;
+    this.prevMousePos.y = this.mousePos.y;
     this.mousePos.x = e.clientX;
     this.mousePos.y = e.clientY;
+
+    // Add to mouse trail for healing effect
+    this.mouseTrail.push({
+      x: e.clientX,
+      y: e.clientY,
+      radius: this.mouseDistortionRadius,
+      life: 1,
+      maxLife: 1,
+      decay: 0.008, // Slow healing
+    });
   }
 
   handleClick(e) {
@@ -59,25 +76,16 @@ class GeometricMeshBackground {
       return;
     }
 
-    // Create ripple distortion at click point
-    this.distortions.push({
+    // Create powerful shockwave at click point
+    this.shockwaves.push({
       x: e.clientX,
       y: e.clientY,
       radius: 0,
-      maxRadius: 300,
-      force: 1,
+      maxRadius: 500,
+      force: 2.5,
       life: 1,
-      decay: 0.02,
+      decay: 0.018,
     });
-  }
-
-  // Perlin-like noise using sine waves
-  noise(x, y, time) {
-    return (
-      Math.sin(x * 0.01 + time * 0.001) * 0.5 +
-      Math.sin(y * 0.01 + time * 0.0015) * 0.3 +
-      Math.sin((x + y) * 0.005 + time * 0.001) * 0.2
-    );
   }
 
   // Get wave offset for a point based on time and position
@@ -92,35 +100,89 @@ class GeometricMeshBackground {
     };
   }
 
-  // Apply distortion from click ripples
-  applyDistortion(x, y) {
+  // Apply distortion from mouse position
+  applyMouseDistortion(x, y) {
     let distX = 0;
     let distY = 0;
 
-    this.distortions.forEach((d) => {
-      const dx = x - d.x;
-      const dy = y - d.y;
-      const distance = Math.sqrt(dx * dx + dy * dy);
+    const dx = x - this.mousePos.x;
+    const dy = y - this.mousePos.y;
+    const distance = Math.sqrt(dx * dx + dy * dy);
 
-      if (distance < d.maxRadius && distance > 0) {
-        const factor = Math.sin((d.radius / d.maxRadius) * Math.PI);
-        const strength = (1 - distance / d.maxRadius) * factor * d.force;
-
-        distX += (dx / distance) * strength * 8;
-        distY += (dy / distance) * strength * 8;
-      }
-    });
+    // Current mouse breaks/pushes mesh away
+    if (distance < this.mouseDistortionRadius && distance > 0) {
+      const strength = (1 - distance / this.mouseDistortionRadius) * this.mouseDistortionForce;
+      distX += (dx / distance) * strength * 12;
+      distY += (dy / distance) * strength * 12;
+    }
 
     return { x: distX, y: distY };
   }
 
-  updateDistortions() {
-    this.distortions = this.distortions.filter((d) => d.life > 0);
+  // Apply healing trail effect
+  applyTrailHealing(x, y) {
+    let healX = 0;
+    let healY = 0;
 
-    this.distortions.forEach((d) => {
-      d.radius += 5;
-      d.life -= d.decay;
-      d.force *= 0.95;
+    this.mouseTrail.forEach((trail) => {
+      const dx = x - trail.x;
+      const dy = y - trail.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < trail.radius && distance > 0) {
+        const strength = (1 - distance / trail.radius) * trail.life * 0.8;
+        healX += (dx / distance) * strength * 8;
+        healY += (dy / distance) * strength * 8;
+      }
+    });
+
+    return { x: healX, y: healY };
+  }
+
+  // Apply shockwave distortion
+  applyShockwave(x, y) {
+    let shockX = 0;
+    let shockY = 0;
+
+    this.shockwaves.forEach((shock) => {
+      const dx = x - shock.x;
+      const dy = y - shock.y;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+
+      if (distance < shock.maxRadius && distance > 0) {
+        // Wave effect - pushes away from center
+        const waveWidth = 40;
+        const distFromWave = Math.abs(distance - shock.radius);
+        
+        if (distFromWave < waveWidth) {
+          const factor = Math.sin((1 - distFromWave / waveWidth) * Math.PI);
+          const strength = factor * shock.force * shock.life;
+
+          shockX += (dx / distance) * strength * 15;
+          shockY += (dy / distance) * strength * 15;
+        }
+      }
+    });
+
+    return { x: shockX, y: shockY };
+  }
+
+  updateTrail() {
+    this.mouseTrail = this.mouseTrail.filter((t) => t.life > 0);
+
+    this.mouseTrail.forEach((trail) => {
+      trail.life -= trail.decay;
+      trail.radius *= 0.995; // Slowly shrink
+    });
+  }
+
+  updateShockwaves() {
+    this.shockwaves = this.shockwaves.filter((s) => s.life > 0);
+
+    this.shockwaves.forEach((shock) => {
+      shock.radius += 8;
+      shock.life -= shock.decay;
+      shock.force *= 0.92;
     });
   }
 
@@ -128,7 +190,7 @@ class GeometricMeshBackground {
     const cols = Math.ceil(this.canvas.width / this.gridSize) + 2;
     const rows = Math.ceil(this.canvas.height / this.gridSize) + 2;
 
-    // Build grid points with wave animation
+    // Build grid points with wave animation + distortions
     const points = [];
     for (let row = -1; row < rows; row++) {
       points[row] = [];
@@ -137,11 +199,13 @@ class GeometricMeshBackground {
         const baseY = row * this.gridSize;
 
         const wave = this.getWaveOffset(baseX, baseY, this.time);
-        const distortion = this.applyDistortion(baseX, baseY);
+        const mouseDistort = this.applyMouseDistortion(baseX, baseY);
+        const trailHeal = this.applyTrailHealing(baseX, baseY);
+        const shockwave = this.applyShockwave(baseX, baseY);
 
         points[row][col] = {
-          x: baseX + wave.x + distortion.x,
-          y: baseY + wave.y + distortion.y,
+          x: baseX + wave.x + mouseDistort.x + trailHeal.x + shockwave.x,
+          y: baseY + wave.y + mouseDistort.y + trailHeal.y + shockwave.y,
           baseX,
           baseY,
         };
@@ -207,10 +271,12 @@ class GeometricMeshBackground {
         const baseY = row * this.gridSize;
 
         const wave = this.getWaveOffset(baseX, baseY, this.time);
-        const distortion = this.applyDistortion(baseX, baseY);
+        const mouseDistort = this.applyMouseDistortion(baseX, baseY);
+        const trailHeal = this.applyTrailHealing(baseX, baseY);
+        const shockwave = this.applyShockwave(baseX, baseY);
 
-        const x = baseX + wave.x + distortion.x;
-        const y = baseY + wave.y + distortion.y;
+        const x = baseX + wave.x + mouseDistort.x + trailHeal.x + shockwave.x;
+        const y = baseY + wave.y + mouseDistort.y + trailHeal.y + shockwave.y;
 
         // Small glow at grid intersections
         const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, 4);
@@ -231,17 +297,48 @@ class GeometricMeshBackground {
     }
   }
 
-  drawRippleVisualization() {
-    this.distortions.forEach((d) => {
-      const alpha = (d.life * 0.3);
+  drawMouseDistortionZone() {
+    // Draw visual indicator of mouse distortion zone
+    this.ctx.globalAlpha = 0.08;
+    this.ctx.fillStyle = this.colors.accent;
+    this.ctx.beginPath();
+    this.ctx.arc(this.mousePos.x, this.mousePos.y, this.mouseDistortionRadius, 0, Math.PI * 2);
+    this.ctx.fill();
+    this.ctx.globalAlpha = 1;
+  }
+
+  drawTrailHealing() {
+    // Draw the healing trail zones
+    this.mouseTrail.forEach((trail) => {
+      const alpha = trail.life * 0.05;
+      this.ctx.globalAlpha = alpha;
+      this.ctx.fillStyle = this.colors.primary;
+      this.ctx.beginPath();
+      this.ctx.arc(trail.x, trail.y, trail.radius, 0, Math.PI * 2);
+      this.ctx.fill();
+    });
+    this.ctx.globalAlpha = 1;
+  }
+
+  drawShockwaveRings() {
+    // Draw shockwave visualization
+    this.shockwaves.forEach((shock) => {
+      const alpha = shock.life * 0.4;
       this.ctx.strokeStyle = `rgba(255, 59, 59, ${alpha})`;
       this.ctx.lineWidth = 2;
       this.ctx.globalAlpha = alpha;
       this.ctx.beginPath();
-      this.ctx.arc(d.x, d.y, d.radius, 0, Math.PI * 2);
+      this.ctx.arc(shock.x, shock.y, shock.radius, 0, Math.PI * 2);
       this.ctx.stroke();
-      this.ctx.globalAlpha = 1;
+
+      // Inner ring
+      this.ctx.strokeStyle = `rgba(139, 0, 255, ${alpha * 0.6})`;
+      this.ctx.lineWidth = 1;
+      this.ctx.beginPath();
+      this.ctx.arc(shock.x, shock.y, shock.radius - 20, 0, Math.PI * 2);
+      this.ctx.stroke();
     });
+    this.ctx.globalAlpha = 1;
   }
 
   animate() {
@@ -263,11 +360,16 @@ class GeometricMeshBackground {
     this.ctx.fillStyle = gradient;
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
-    // Update and draw
-    this.updateDistortions();
+    // Update effects
+    this.updateTrail();
+    this.updateShockwaves();
+
+    // Draw layers
+    this.drawTrailHealing();
     this.drawMesh();
     this.drawNodePoints();
-    this.drawRippleVisualization();
+    this.drawMouseDistortionZone();
+    this.drawShockwaveRings();
 
     this.time += 1;
     requestAnimationFrame(() => this.animate());
