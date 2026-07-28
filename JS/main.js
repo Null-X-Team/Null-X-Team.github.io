@@ -806,9 +806,9 @@ document.addEventListener('DOMContentLoaded', () => {
             const savePanicBtn = document.getElementById('savePanic');
 
             if (shortcutInput && panicLinkInput && savePanicBtn) {
-              const savedPanicKey = localStorage.getItem('panicKey') || '';
-              shortcutInput.value = savedPanicKey ? `Key: ${savedPanicKey.toUpperCase()}` : '';
-              panicLinkInput.value = localStorage.getItem('panicUrl') || '';
+              const savedPanicKey = localStorage.getItem('panicKey') || 'b';
+              const savedPanicBlocker = localStorage.getItem('panicBlocker') || 'goguardian';
+              const savedPanicUrl = localStorage.getItem('panicUrl') || 'https://classroom.google.com';
 
               let tempKey = savedPanicKey;
               shortcutInput.onkeydown = (e) => {
