@@ -219,7 +219,8 @@ function attachChatEventListeners() {
 }
 
 function launchStealthWindow(maskType, targetEnv) {
-  const currentUrl = window.location.href;
+  // Strip off any existing parameters to get a clean base URL
+  const currentUrl = window.location.href.split('?')[0];
   let title = "Google Docs";
   let escapeRedirect = "https://docs.google.com";
 
@@ -306,68 +307,71 @@ function launchStealthWindow(maskType, targetEnv) {
     'MasterClass': { t: "MasterClass - Learn from the Best", r: "https://www.masterclass.com/" },
     'Codecademy': { t: "Codecademy - Learn to Code", r: "https://www.codecademy.com/" },
     'freeCodeCamp': { t: "freeCodeCamp.org", r: "https://www.freecodecamp.org/" },
+    'Pluralsight': { t: "Pluralsight - Tech Skills Platform", r: "https://www.pluralsight.com/" },
+    'DataCamp': { t: "DataCamp - Learn Data Science", r: "https://www.datacamp.com/" },
     'Tynker': { t: "Tynker - Coding for Kids", r: "https://www.tynker.com/" },
-    'Outschool': { t: "Outschool - Online Classes", r: "https://outschool.com/" },
-    'XtraMath': { t: "XtraMath - Math Fact Practice", r: "https://xtramath.org/" },
-    'Raz-Kids': { t: "Raz-Kids - Online Reading", r: "https://www.raz-kids.com/" },
-    'Epic!': { t: "Epic! - Digital Library", r: "https://www.getepic.com/" },
-    'DreamBox': { t: "DreamBox Learning", r: "https://www.dreambox.com/" },
-    'ST Math': { t: "ST Math - Visual Math Program", r: "https://www.stmath.com/" },
-    'Zearn': { t: "Zearn Math", r: "https://www.zearn.org/" },
-    'Newsela': { t: "Newsela - Differentiated Reading", r: "https://newsela.com/" },
-    'CommonLit': { t: "CommonLit - Free Reading Program", r: "https://www.commonlit.org/" },
-    'ReadWorks': { t: "ReadWorks - Reading Comprehension", r: "https://www.readworks.org/" },
-    'Achieve the Core': { t: "Achieve the Core", r: "https://achievethecore.org/" },
-    'Illustrative Mathematics': { t: "Illustrative Mathematics", r: "https://illustrativemathematics.org/" },
-    'PhET Simulations': { t: "PhET Interactive Simulations", r: "https://phet.colorado.edu/" },
-    'GeoGebra': { t: "GeoGebra - Math & Science Tools", r: "https://www.geogebra.org/" },
-    'Wolfram MathWorld': { t: "Wolfram MathWorld", r: "https://mathworld.wolfram.com/" },
-    'SparkNotes': { t: "SparkNotes - Study Guides", r: "https://www.sparknotes.com/" },
-    'CliffsNotes': { t: "CliffsNotes - Study Guides", r: "https://www.cliffsnotes.com/" },
-    'Bartleby': { t: "Bartleby - Homework Help", r: "https://www.bartleby.com/" }
+    'Scratch': { t: "Scratch - Imagine, Program, Share", r: "https://scratch.mit.edu/" },
+    'Outschool': { t: "Outschool - Live Online Classes", r: "https://outschool.com/" },
+    'Epic!': { t: "Epic - Kids' Books and Videos", r: "https://www.getepic.com/" },
+    'XtraMath': { t: "XtraMath - Math Fact Fluency", r: "https://xtramath.org/" },
+    'Babbel': { t: "Babbel - Language Learning", r: "https://www.babbel.com/" },
+    'Rosetta Stone': { t: "Rosetta Stone - Language Learning", r: "https://www.rosettastone.com/" },
+    'Memrise': { t: "Memrise - Learn Languages", r: "https://www.memrise.com/" },
+    'Busuu': { t: "Busuu - Learn Languages Online", r: "https://www.busuu.com/" },
+    'Fluenz': { t: "Fluenz - Language Learning", r: "https://fluenz.com/" },
+    'Mango Languages': { t: "Mango Languages", r: "https://mangolanguages.com/" },
+    'Pimsleur': { t: "Pimsleur - Learn a New Language", r: "https://www.pimsleur.com/" },
+    'Glossika': { t: "Glossika - Language Training", r: "https://ai.glossika.com/" },
+    'Lingodeer': { t: "LingoDeer - Learn Languages", r: "https://www.lingodeer.com/" },
+    'Drops': { t: "Drops - Learn Languages", r: "https://languagedrops.com/" },
+    'Yousician': { t: "Yousician - Learn Guitar, Piano, Bass & Ukulele", r: "https://yousician.com/" },
+    'Simply Piano': { t: "Simply Piano - Learn Piano", r: "https://www.joytunes.com/simply-piano" },
+    'Flowkey': { t: "flowkey - Learn Piano", r: "https://www.flowkey.com/" },
+    'Synthesia': { t: "Synthesia - Piano Game", r: "https://synthesiagame.com/" },
+    'Skoove': { t: "Skoove - Learn to Play Piano", r: "https://www.skoove.com/" },
+    'Perfect Ear': { t: "Perfect Ear - Ear Training", r: "https://www.perfectear.app/" },
+    'ToneGym': { t: "ToneGym - Ear Training for Musicians", r: "https://www.tonegym.co/" },
+    'Soundgym': { t: "SoundGym - Audio Ear Training", r: "https://www.soundgym.co/" },
+    'Musictheory.net': { t: "Musictheory.net", r: "https://www.musictheory.net/" },
+    'Teoria': { t: "Teoria - Music Theory Web", r: "https://www.teoria.com/" },
+    'Audible': { t: "Audible - Audiobooks & Podcasts", r: "https://www.audible.com/" },
+    'Libby': { t: "Libby, by OverDrive", r: "https://libbyapp.com/" },
+    'Hoopla': { t: "hoopla - Streaming Audiobooks, Music, Video & eBooks", r: "https://www.hoopladigital.com/" },
+    'Scribd': { t: "Scribd - Audiobooks & Ebooks", r: "https://www.scribd.com/" },
+    'Wattpad': { t: "Wattpad - Where stories live", r: "https://www.wattpad.com/" },
+    'Goodreads': { t: "Goodreads - Book Reviews & Recommendations", r: "https://www.goodreads.com/" },
+    'StoryGraph': { t: "The StoryGraph", r: "https://app.thestorygraph.com/" },
+    'BookBub': { t: "BookBub - Great Deals on Bestselling Ebooks", r: "https://www.bookbub.com/" },
+    'LibraryThing': { t: "LibraryThing - Catalog your books online", r: "https://www.librarything.com/" },
+    'Project Gutenberg': { t: "Project Gutenberg - free ebooks", r: "https://www.gutenberg.org/" }
   };
 
-  if (customCloaks[maskType]) {
+  if (maskType && customCloaks[maskType]) {
     title = customCloaks[maskType].t;
     escapeRedirect = customCloaks[maskType].r;
   }
 
-  let targetTab;
-  if (targetEnv === 'blob') {
-    const htmlPayload = `
+  let win = window.open("about:blank", "_blank");
+  if (win) {
+    win.document.write(`
       <!DOCTYPE html>
-      <html>
+      <html style="margin: 0; padding: 0; overflow: hidden; height: 100%;">
       <head>
-        <meta charset="UTF-8">
         <title>${title}</title>
-        <style>
-          body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
-          iframe { width:100%; height:100%; border:none; margin:0; padding:0; }
-        </style>
       </head>
-      <body><iframe src="${currentUrl}"></iframe></body>
+      <body style="margin: 0; padding: 0; height: 100%; background: #000;">
+        <iframe src="${currentUrl}?mode=stealth" style="width: 100%; height: 100%; border: none;"></iframe>
+      </body>
       </html>
-    `;
-    const blob = new Blob([htmlPayload], { type: 'text/html' });
-    targetTab = window.open(URL.createObjectURL(blob), '_blank');
+    `);
+    win.document.close();
+    
+    // Redirect original tab to the mask target
+    window.location.replace(escapeRedirect);
   } else {
-    targetTab = window.open('about:blank', '_blank');
-    if (targetTab) {
-      targetTab.document.title = title;
-      const frame = targetTab.document.createElement('iframe');
-      frame.src = currentUrl;
-      frame.style = "position:fixed; top:0; left:0; width:100%; height:100%; border:none; margin:0; padding:0; overflow:hidden;";
-      targetTab.document.body.appendChild(frame);
-    }
+    alert("Pop-ups must be enabled to launch the Stealth Environment.");
   }
-
-  if (!targetTab) {
-    alert("Pop-up blocked! Please allow popup permissions.");
-    return;
-  }
-  window.location.replace(escapeRedirect);
 }
-
 // ========================================================
 // CORE GAME LAUNCH ENGINE WITH STABILIZED CONTROLS
 // ========================================================
