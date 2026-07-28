@@ -15,8 +15,8 @@
     // 1. STATE & CONFIGURATION
     // ==========================================
     const CONFIG = {
-        version: "5.0.0",
-        build: "GOD_MODE",
+        version: "6.0.0",
+        build: "Debug",
         theme: {
             bg: "rgba(5, 5, 8, 0.98)", border: "#8b00ff", accent: "#00ffcc",
             text: "#eee", danger: "#ff0055", warning: "#ffaa00", success: "#00ffaa"
