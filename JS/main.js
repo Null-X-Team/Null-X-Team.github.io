@@ -1284,3 +1284,166 @@ if (stealthBtn) {
         }
     });
 }
+// ==========================================
+// PRIVACY GUARD: PIN LOCK SYSTEM
+// ==========================================
+(function initPinLock() {
+  const STORAGE_KEY = "nxos_user_pin";
+  const IDLE_TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes idle time before locking
+  let idleTimer;
+
+  // 1. Inject Styles for the Lock Screen Overlay
+  const lockStyle = document.createElement("style");
+  lockStyle.innerHTML = `
+    #pin-lock-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: #0d0d13;
+      color: #fff;
+      z-index: 99999999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      box-sizing: border-box;
+    }
+    .pin-box {
+      background: #181824;
+      border: 1px solid rgba(139, 0, 255, 0.3);
+      padding: 30px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+      width: 300px;
+    }
+    .pin-box h2 {
+      margin: 0 0 10px 0;
+      color: #8b00ff;
+      font-size: 20px;
+    }
+    .pin-box p {
+      font-size: 13px;
+      color: #aaa;
+      margin-bottom: 20px;
+    }
+    .pin-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 20px;
+      letter-spacing: 8px;
+      text-align: center;
+      background: #0d0d13;
+      border: 1px solid #8b00ff;
+      color: #fff;
+      border-radius: 6px;
+      box-sizing: border-box;
+      outline: none;
+      margin-bottom: 15px;
+    }
+    .pin-btn {
+      width: 100%;
+      padding: 10px;
+      background: #8b00ff;
+      border: none;
+      color: #fff;
+      font-weight: bold;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .pin-btn:hover {
+      background: #a126ff;
+    }
+    .pin-error {
+      color: #ff4a4a;
+      font-size: 12px;
+      margin-top: 10px;
+      display: none;
+    }
+  `;
+  document.head.appendChild(lockStyle);
+
+  // 2. Lock Screen Modal Generator
+  function createLockOverlay() {
+    if (document.getElementById("pin-lock-overlay")) return;
+
+    const savedPin = localStorage.getItem(STORAGE_KEY);
+    const isFirstTime = !savedPin;
+
+    const overlay = document.createElement("div");
+    overlay.id = "pin-lock-overlay";
+    overlay.innerHTML = `
+      <div class="pin-box">
+        <h2>${isFirstTime ? "Set Security PIN" : "Dashboard Locked"}</h2>
+        <p>${isFirstTime ? "Create a 4-digit PIN to secure your site" : "Enter your 4-digit PIN to unlock"}</p>
+        <input type="password" maxlength="4" class="pin-input" id="pin-field" autofocus placeholder="••••" />
+        <button class="pin-btn" id="pin-submit">${isFirstTime ? "Save PIN" : "Unlock"}</button>
+        <div class="pin-error" id="pin-err-msg">Invalid PIN. Try again.</div>
+      </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const inputField = document.getElementById("pin-field");
+    const submitBtn = document.getElementById("pin-submit");
+    const errorMsg = document.getElementById("pin-err-msg");
+
+    function handleSubmission() {
+      const enteredPin = inputField.value.trim();
+
+      if (enteredPin.length !== 4) {
+        errorMsg.innerText = "PIN must be exactly 4 digits.";
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      if (isFirstTime) {
+        localStorage.setItem(STORAGE_KEY, enteredPin);
+        overlay.remove();
+        resetIdleTimer();
+      } else {
+        if (enteredPin === savedPin) {
+          overlay.remove();
+          resetIdleTimer();
+        } else {
+          errorMsg.innerText = "Incorrect PIN!";
+          errorMsg.style.display = "block";
+          inputField.value = "";
+        }
+      }
+    }
+
+    submitBtn.addEventListener("click", handleSubmission);
+    inputField.addEventListener("keyup", (e) => {
+      if (e.key === "Enter") handleSubmission();
+    });
+  }
+
+  // 3. Idle Detection Timer
+  function resetIdleTimer() {
+    clearTimeout(idleTimer);
+    if (localStorage.getItem(STORAGE_KEY)) {
+      idleTimer = setTimeout(() => {
+        createLockOverlay();
+      }, IDLE_TIMEOUT_MS);
+    }
+  }
+
+  // 4. Global Event Listeners (Mouse movement resets idle timer)
+  ["mousemove", "keydown", "click", "scroll"].forEach((evt) => {
+    window.addEventListener(evt, resetIdleTimer, { passive: true });
+  });
+
+  // 5. Quick-Lock Keyboard Shortcut (Ctrl + L or Alt + L)
+  window.addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.altKey) && e.key.toLowerCase() === "l") {
+      e.preventDefault();
+      createLockOverlay();
+    }
+  });
+
+  // Start initial timer
+  resetIdleTimer();
+})();
