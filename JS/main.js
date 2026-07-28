@@ -1246,3 +1246,37 @@ fetchLiveWeather();
   `;
   document.head.appendChild(style);
 })();
+// ==========================================
+// STEALTH MODE OPENER (about:blank)
+// ==========================================
+const stealthBtn = document.getElementById("stealthOpener");
+
+if (stealthBtn) {
+    stealthBtn.addEventListener("click", () => {
+        let win = window.open("about:blank", "_blank");
+        
+        if (win) {
+            // Get the current page URL, but strip off any existing parameters just in case
+            let currentUrl = window.location.href.split('?')[0]; 
+            
+            win.document.write(`
+                <!DOCTYPE html>
+                <html style="margin: 0; padding: 0; overflow: hidden; height: 100%;">
+                <head>
+                    <title>Google Drive</title>
+                    <link rel="icon" href="https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png">
+                </head>
+                <body style="margin: 0; padding: 0; height: 100%; background: #000;">
+                    <iframe src="${currentUrl}?mode=stealth" style="width: 100%; height: 100%; border: none;"></iframe>
+                </body>
+                </html>
+            `);
+            win.document.close();
+            
+            // Redirect the original tab to a safe site so the teacher doesn't see it left open
+            window.location.replace("https://classroom.google.com");
+        } else {
+            alert("Pop-ups must be enabled to launch Stealth Mode.");
+        }
+    });
+}
