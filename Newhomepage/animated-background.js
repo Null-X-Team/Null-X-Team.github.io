@@ -20,7 +20,7 @@ class GeometricMeshBackground {
     this.mouseTrail = [];
     this.gridSize = 40;
     this.waveAmplitude = 15;
-    this.mouseDistortionRadius = 70;
+    this.mouseDistortionRadius = 45;
     this.mouseDistortionForce = 1.2;
 
     this.colors = {
