@@ -1448,69 +1448,28 @@ if (stealthBtn) {
   resetIdleTimer();
 });
 // =========================================================================
-// NULLX ALL-IN-ONE PANIC & SCHOOL DECOY BLOCKER ENGINE (20 SCHOOL FILTERS)
+// UNIFIED PANIC & DECOY BLOCKER SYSTEM (20 SCHOOL FILTERS)
 // =========================================================================
 (function initNullXPanicEngine() {
-  // 1. SETTINGS BINDING (Runs on Settings Page)
-  document.addEventListener("DOMContentLoaded", () => {
-    const keyInput = document.getElementById("panicShortcut");
-    const linkInput = document.getElementById("panicLink");
-    const selectEl = document.getElementById("decoySelect");
-    const saveBtn = document.getElementById("savePanic");
-
-    // Load stored settings
-    const savedKey = localStorage.getItem("nullx_panic_key") || "b";
-    const savedLink = localStorage.getItem("nullx_panic_url") || "https://docs.google.com";
-    const savedBlocker = localStorage.getItem("nullx_panic_blocker") || "goguardian";
-
-    if (keyInput) keyInput.value = savedKey;
-    if (linkInput) linkInput.value = savedLink;
-    if (selectEl) selectEl.value = savedBlocker;
-
-    // Save settings click listener
-    saveBtn?.addEventListener("click", () => {
-      const newKey = keyInput ? keyInput.value.trim().toLowerCase() : "b";
-      const newLink = linkInput ? linkInput.value.trim() : "https://docs.google.com";
-      const newBlocker = selectEl ? selectEl.value : "goguardian";
-
-      localStorage.setItem("nullx_panic_key", newKey);
-      localStorage.setItem("nullx_panic_url", newLink);
-      localStorage.setItem("nullx_panic_blocker", newBlocker);
-
-      showNullXToast(`Panic settings saved! Shortcut: Alt + ${newKey.toUpperCase()}`);
-    });
-  });
-
-  function showNullXToast(msg) {
-    let toast = document.createElement("div");
-    toast.style.cssText = `
-      position: fixed; bottom: 20px; right: 20px; z-index: 2147483647;
-      background: #8b00ff; color: #fff; padding: 12px 20px; border-radius: 8px;
-      font-family: monospace; font-size: 13px; box-shadow: 0 4px 15px rgba(139,0,255,0.4);
-      transition: opacity 0.3s ease;
-    `;
-    toast.innerText = msg;
-    document.body.appendChild(toast);
-    setTimeout(() => {
-      toast.style.opacity = "0";
-      setTimeout(() => toast.remove(), 300);
-    }, 3000);
-  }
-
-  // 2. GLOBAL PANIC TRIGGER INTERCEPTOR
   let activeOverlay = null;
 
+  // 1. GLOBAL KEYDOWN LISTENER (Works on all pages)
   window.addEventListener("keydown", (e) => {
-    const targetKey = (localStorage.getItem("nullx_panic_key") || "b").toLowerCase();
-    
-    if (e.altKey && e.key.toLowerCase() === targetKey) {
+    // Ignore input if user is actively typing in a text field or input
+    const activeTag = document.activeElement ? document.activeElement.tagName : '';
+    if (activeTag === 'INPUT' || activeTag === 'TEXTAREA' || document.activeElement.isContentEditable) {
+      return;
+    }
+
+    const savedPanicKey = (localStorage.getItem("panicKey") || "b").toLowerCase();
+    const savedPanicUrl = localStorage.getItem("panicUrl") || "https://classroom.google.com";
+    const blockerType = localStorage.getItem("panicBlocker") || "goguardian";
+
+    if (savedPanicKey && e.key.toLowerCase() === savedPanicKey) {
       e.preventDefault();
-      
-      const blockerType = localStorage.getItem("nullx_panic_blocker") || "goguardian";
-      const redirectUrl = localStorage.getItem("nullx_panic_url") || "https://docs.google.com";
 
       if (blockerType === "redirect") {
-        window.location.replace(redirectUrl);
+        window.location.replace(savedPanicUrl);
       } else {
         toggleDecoyOverlay(blockerType);
       }
@@ -1542,7 +1501,7 @@ if (stealthBtn) {
       user-select: none; overflow: auto;
     `;
 
-    // ESC key backup: Press ESC twice rapidly to dismiss overlay
+    // Press ESC twice rapidly to dismiss overlay emergency backup
     let escCount = 0;
     let escTimer;
     window.addEventListener("keydown", function escListener(evt) {
@@ -1561,7 +1520,10 @@ if (stealthBtn) {
     document.body.appendChild(activeOverlay);
   }
 
-  // 3. COMPLETE SCHOOL BLOCKER TEMPLATES COLLECTION
+  // Expose toggle globally so settings modal can invoke it if needed
+  window.toggleDecoyOverlay = toggleDecoyOverlay;
+
+  // 2. TEMPLATES FOR ALL 20 BLOCKERS
   function getBlockerTemplate(type) {
     const host = window.location.hostname || "game-server.net";
     const ip = `10.${Math.floor(Math.random()*100+10)}.${Math.floor(Math.random()*200+10)}.${Math.floor(Math.random()*200+10)}`;
@@ -1672,9 +1634,7 @@ if (stealthBtn) {
               <h2 style="color:#dc2626; font-size:20px; margin-top:0;">URL Access Blocked</h2>
               <p style="font-size:14px; line-height:1.5;">The site you requested cannot be loaded due to district security policies.</p>
               <div style="background:#f8fafc; padding:15px; border:1px solid #e2e8f0; font-size:13px; font-family:monospace; margin-top:20px;">
-                URL: https://${host}/<br>
-                User: student@school.edu<br>
-                Action: Blocked
+                URL: https://${host}/<br>User: student@school.edu<br>Action: Blocked
               </div>
             </div>
           </div>
@@ -1688,8 +1648,7 @@ if (stealthBtn) {
               <h3 style="margin-top:0; color:#c2410c;">Web Site Blocked</h3>
               <p style="font-size:14px;">Access to the requested URL has been blocked by SonicWall Content Filtering Service.</p>
               <div style="background:#fff7ed; border:1px solid #ffedd5; padding:12px; font-size:13px; color:#9a3412; margin-top:15px;">
-                <strong>URL:</strong> http://${host}/<br>
-                <strong>Category:</strong> Games
+                <strong>URL:</strong> http://${host}/<br><strong>Category:</strong> Games
               </div>
             </div>
           </div>
@@ -1758,8 +1717,7 @@ if (stealthBtn) {
             <h2 style="font-size:20px; color:#0f172a; margin-bottom:15px;">Organization Security Policy - Blocked</h2>
             <p style="font-size:14px; color:#475569; line-height:1.5;">The requested URL violates institutional web use rules.</p>
             <div style="background:#f8fafc; border:1px solid #e2e8f0; padding:12px; font-size:12px; font-family:monospace; color:#334155; margin-top:20px;">
-              URL: https://${host}/<br>
-              Category: Games / Uncategorized
+              URL: https://${host}/<br>Category: Games / Uncategorized
             </div>
           </div>
         `;
@@ -1830,3 +1788,4 @@ if (stealthBtn) {
     }
   }
 })();
+
