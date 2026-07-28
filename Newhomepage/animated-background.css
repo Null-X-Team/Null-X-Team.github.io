@@ -1,5 +1,6 @@
 /* ==========================================================================
    ANIMATED GEOMETRIC MESH BACKGROUND CANVAS STYLES
+   Interactive version with trail damage and shockwave effects
    ========================================================================== */
 
 #animated-background-canvas {
@@ -11,12 +12,14 @@
   z-index: 1; /* Behind all content */
   pointer-events: none; /* Don't interfere with clicks on actual elements */
   will-change: contents; /* Optimize for animation */
+  image-rendering: auto; /* Smooth rendering for animations */
 }
 
 /* Ensure body is positioned relative so z-index stacking works */
 body {
   position: relative;
   overflow: hidden;
+  cursor: crosshair; /* Visual feedback that background is interactive */
 }
 
 /* Make sure all major content sections are above the canvas */
