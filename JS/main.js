@@ -1447,3 +1447,247 @@ if (stealthBtn) {
   // Start initial timer
   resetIdleTimer();
 })();
+// ==========================================
+// DECOY BLOCK SCREEN & PANIC SYSTEM
+// ==========================================
+(function initPanicAndSettingsSystem() {
+  // ------------------------------------------
+  // 1. SETTINGS HANDLER (Runs if on Settings Page)
+  // ------------------------------------------
+  document.addEventListener("DOMContentLoaded", () => {
+    const blockerSelect = document.getElementById("blocker-type");
+    const panicKeyInput = document.getElementById("panic-key");
+    const saveBtn = document.getElementById("save-blocker-btn");
+
+    // Load saved preferences if input elements exist on current page
+    const savedBlocker = localStorage.getItem("nullx_panic_blocker") || "goguardian";
+    const savedKey = localStorage.getItem("nullx_panic_key") || "b";
+
+    if (blockerSelect) blockerSelect.value = savedBlocker;
+    if (panicKeyInput) panicKeyInput.value = savedKey;
+
+    // Save preferences when button is clicked
+    saveBtn?.addEventListener("click", () => {
+      const selectedBlocker = blockerSelect.value;
+      const selectedKey = panicKeyInput.value.trim().toLowerCase() || "b";
+
+      localStorage.setItem("nullx_panic_blocker", selectedBlocker);
+      localStorage.setItem("nullx_panic_key", selectedKey);
+
+      showToast(`Panic Blocker updated to ${getBlockerName(selectedBlocker)}! Trigger with Alt + ${selectedKey.toUpperCase()}`);
+    });
+  });
+
+  function getBlockerName(type) {
+    const names = {
+      goguardian: "GoGuardian",
+      securly: "Securly",
+      lightspeed: "Lightspeed Systems",
+      fortinet: "Fortinet FortiGuard",
+      cisco: "Cisco Umbrella",
+      blocksi: "Blocksi"
+    };
+    return names[type] || "Decoy Screen";
+  }
+
+  function showToast(msg) {
+    let toast = document.createElement("div");
+    toast.style.cssText = `
+      position: fixed; bottom: 20px; right: 20px; z-index: 9999999;
+      background: #8b00ff; color: #fff; padding: 12px 20px; border-radius: 8px;
+      font-family: monospace; font-size: 13px; box-shadow: 0 4px 15px rgba(139,0,255,0.4);
+      transition: opacity 0.3s ease;
+    `;
+    toast.innerText = msg;
+    document.body.appendChild(toast);
+    setTimeout(() => {
+      toast.style.opacity = "0";
+      setTimeout(() => toast.remove(), 300);
+    }, 3000);
+  }
+
+  // ------------------------------------------
+  // 2. GLOBAL PANIC ENGINE (Runs on ALL Pages)
+  // ------------------------------------------
+  let activeOverlay = null;
+
+  // Listen for panic hotkey (Default: Alt + B)
+  window.addEventListener("keydown", (e) => {
+    const targetKey = (localStorage.getItem("nullx_panic_key") || "b").toLowerCase();
+    
+    if (e.altKey && e.key.toLowerCase() === targetKey) {
+      e.preventDefault();
+      toggleDecoyOverlay();
+    }
+  });
+
+  function toggleDecoyOverlay() {
+    if (activeOverlay) {
+      removeDecoyOverlay();
+    } else {
+      const blockerType = localStorage.getItem("nullx_panic_blocker") || "goguardian";
+      renderDecoyOverlay(blockerType);
+    }
+  }
+
+  function removeDecoyOverlay() {
+    if (activeOverlay) {
+      activeOverlay.remove();
+      activeOverlay = null;
+    }
+  }
+
+  function renderDecoyOverlay(type) {
+    activeOverlay = document.createElement("div");
+    activeOverlay.id = "decoy-panic-overlay";
+    activeOverlay.style.cssText = `
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      z-index: 2147483647; background: #ffffff; color: #000000;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      user-select: none; overflow: auto;
+    `;
+
+    // ESC key backup: Press ESC twice fast to close
+    let escCount = 0;
+    let escTimer;
+    window.addEventListener("keydown", function escListener(evt) {
+      if (evt.key === "Escape") {
+        escCount++;
+        clearTimeout(escTimer);
+        if (escCount >= 2) {
+          removeDecoyOverlay();
+          window.removeEventListener("keydown", escListener);
+        }
+        escTimer = setTimeout(() => { escCount = 0; }, 1000);
+      }
+    });
+
+    activeOverlay.innerHTML = getBlockerTemplate(type);
+    document.body.appendChild(activeOverlay);
+  }
+
+  function getBlockerTemplate(type) {
+    const host = window.location.hostname || "game-server.net";
+    
+    switch (type) {
+      case "goguardian":
+        return `
+          <div style="background:#1e293b; color:#fff; padding:15px 30px; display:flex; align-items:center; justify-content:space-between; border-bottom:3px solid #ef4444;">
+            <div style="font-weight:700; font-size:18px; display:flex; align-items:center; gap:10px;">
+              <span style="background:#ef4444; width:12px; height:12px; border-radius:50%; display:inline-block;"></span>
+              GoGuardian Admin
+            </div>
+            <div style="font-size:12px; color:#94a3b8;">Restricted Content Engine v6.2</div>
+          </div>
+          <div style="max-width:600px; margin:80px auto; padding:30px; text-align:center;">
+            <div style="font-size:64px; margin-bottom:10px;">🚫</div>
+            <h1 style="font-size:26px; color:#0f172a; margin-bottom:12px; font-weight:800;">Restricted Page</h1>
+            <p style="color:#475569; font-size:15px; line-height:1.5; margin-bottom:24px;">
+              This website has been restricted by your administrator policy.
+            </p>
+            <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:8px; padding:16px; text-align:left; font-size:13px; color:#334155; margin-bottom:20px;">
+              <div><strong>URL:</strong> https://${host}/</div>
+              <div><strong>Category:</strong> Games / Uncategorized</div>
+              <div><strong>Reason:</strong> Explicit Policy Block</div>
+            </div>
+            <button onclick="alert('Request sent to system administrator.')" style="background:#2563eb; color:#fff; border:none; padding:10px 20px; border-radius:6px; font-weight:600; cursor:pointer;">
+              Request Admin Review
+            </button>
+          </div>
+        `;
+
+      case "securly":
+        return `
+          <div style="max-width:550px; margin:100px auto; font-family:Arial, sans-serif; text-align:center; box-shadow:0 10px 25px rgba(0,0,0,0.08); border-radius:12px; overflow:hidden; border:1px solid #e5e7eb;">
+            <div style="background:#0284c7; color:#fff; padding:25px; font-size:22px; font-weight:bold;">
+              Website Blocked
+            </div>
+            <div style="padding:30px; background:#fff;">
+              <p style="font-size:16px; color:#374151; margin-bottom:20px;">
+                Securly Web Filter has restricted access to this page.
+              </p>
+              <div style="background:#f3f4f6; border-left:4px solid #0284c7; padding:12px; text-align:left; font-size:13px; color:#4b5563; margin-bottom:25px;">
+                <p style="margin:4px 0;"><strong>Domain:</strong> ${host}</p>
+                <p style="margin:4px 0;"><strong>Filter Policy:</strong> School Strict Policy</p>
+                <p style="margin:4px 0;"><strong>Category:</strong> Games & Entertainment</p>
+              </div>
+              <p style="font-size:12px; color:#9ca3af;">Securly Protection Services</p>
+            </div>
+          </div>
+        `;
+
+      case "lightspeed":
+        return `
+          <div style="background:#0f172a; height:100%; color:#f8fafc; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <div style="background:#1e293b; border:1px solid #334155; border-radius:12px; padding:40px; max-width:500px; width:100%;">
+              <div style="color:#f43f5e; font-size:14px; font-weight:700; text-transform:uppercase; letter-spacing:1px; margin-bottom:10px;">
+                Lightspeed Systems Relay
+              </div>
+              <h2 style="font-size:24px; font-weight:700; margin-bottom:15px; color:#fff;">Access Blocked</h2>
+              <p style="color:#94a3b8; font-size:14px; margin-bottom:25px;">
+                This domain is restricted by the network security profile.
+              </p>
+              <div style="background:#0f172a; padding:12px; border-radius:6px; font-family:monospace; font-size:12px; color:#64748b; text-align:left;">
+                HOST: ${host}<br>
+                RULE: DENY_GAMES_POLICY
+              </div>
+            </div>
+          </div>
+        `;
+
+      case "fortinet":
+        return `
+          <div style="max-width:600px; margin:80px auto; border:2px solid #dc2626; border-radius:4px; font-family:sans-serif; background:#fff;">
+            <div style="background:#dc2626; color:#fff; padding:12px 20px; font-weight:bold; font-size:16px;">
+              FortiGuard Web Filtering - Web Page Blocked!
+            </div>
+            <div style="padding:25px; color:#1f2937;">
+              <p style="font-size:14px; margin-bottom:15px;">
+                You have attempted to access a webpage that is in violation of network usage guidelines.
+              </p>
+              <table style="width:100%; border-collapse:collapse; font-size:13px; color:#374151; margin-bottom:20px;">
+                <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:8px 0; font-weight:bold;">URL:</td><td>http://${host}/</td></tr>
+                <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:8px 0; font-weight:bold;">Category:</td><td>Freeware and Software Downloads / Games</td></tr>
+                <tr style="border-bottom:1px solid #e5e7eb;"><td style="padding:8px 0; font-weight:bold;">Client IP:</td><td>10.240.12.${Math.floor(Math.random()*200+10)}</td></tr>
+              </table>
+              <div style="font-size:11px; color:#6b7280; text-align:right;">Powered by Fortinet</div>
+            </div>
+          </div>
+        `;
+
+      case "cisco":
+        return `
+          <div style="max-width:580px; margin:100px auto; font-family:Segoe UI, sans-serif;">
+            <div style="border-left:6px solid #2563eb; padding-left:20px;">
+              <h2 style="font-size:28px; color:#1e3a8a; margin:0 0 10px 0; font-weight:600;">Cisco Umbrella</h2>
+              <h3 style="font-size:20px; color:#1f2937; margin:0 0 15px 0;">This site is blocked.</h3>
+              <p style="color:#4b5563; font-size:14px; line-height:1.6;">
+                This site is blocked due to content filtering restrictions set by your network administrator.
+              </p>
+              <div style="margin-top:20px; font-size:12px; color:#9ca3af; font-family:monospace;">
+                Block Reason: Category "Gaming"<br>
+                Target: ${host}
+              </div>
+            </div>
+          </div>
+        `;
+
+      case "blocksi":
+        return `
+          <div style="max-width:500px; margin:90px auto; border-top:5px solid #2563eb; background:#fff; padding:30px; box-shadow:0 4px 12px rgba(0,0,0,0.1); border-radius:0 0 8px 8px; text-align:center;">
+            <div style="font-size:22px; font-weight:bold; color:#1e40af; margin-bottom:10px;">Blocksi Manager</div>
+            <div style="font-size:16px; color:#dc2626; font-weight:600; margin-bottom:20px;">Access Restricted</div>
+            <p style="font-size:14px; color:#4b5563; margin-bottom:20px;">
+              Web filtering settings prevent access to <strong>${host}</strong>.
+            </p>
+            <div style="background:#f3f4f6; padding:10px; border-radius:6px; font-size:12px; color:#6b7280;">
+              Policy: Student Filter Standard
+            </div>
+          </div>
+        `;
+
+      default:
+        return `<div style="padding:40px; text-align:center;"><h1>404 Not Found</h1></div>`;
+    }
+  }
+})();
