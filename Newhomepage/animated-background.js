@@ -54,14 +54,14 @@ class GeometricMeshBackground {
     this.mousePos.x = e.clientX;
     this.mousePos.y = e.clientY;
 
-    // Add to mouse trail for healing effect
+    // Add to mouse trail for healing effect (2-3 second healing time)
     this.mouseTrail.push({
       x: e.clientX,
       y: e.clientY,
       radius: this.mouseDistortionRadius,
       life: 1,
       maxLife: 1,
-      decay: 0.008, // Slow healing
+      decay: 0.0035, // Slower healing - takes ~2.8 seconds
     });
   }
 
@@ -262,62 +262,16 @@ class GeometricMeshBackground {
   }
 
   drawNodePoints() {
-    const cols = Math.ceil(this.canvas.width / this.gridSize) + 2;
-    const rows = Math.ceil(this.canvas.height / this.gridSize) + 2;
-
-    for (let row = -1; row < rows; row++) {
-      for (let col = -1; col < cols; col++) {
-        const baseX = col * this.gridSize;
-        const baseY = row * this.gridSize;
-
-        const wave = this.getWaveOffset(baseX, baseY, this.time);
-        const mouseDistort = this.applyMouseDistortion(baseX, baseY);
-        const trailHeal = this.applyTrailHealing(baseX, baseY);
-        const shockwave = this.applyShockwave(baseX, baseY);
-
-        const x = baseX + wave.x + mouseDistort.x + trailHeal.x + shockwave.x;
-        const y = baseY + wave.y + mouseDistort.y + trailHeal.y + shockwave.y;
-
-        // Small glow at grid intersections
-        const gradient = this.ctx.createRadialGradient(x, y, 0, x, y, 4);
-        gradient.addColorStop(0, `rgba(139, 0, 255, 0.4)`);
-        gradient.addColorStop(1, `rgba(139, 0, 255, 0)`);
-
-        this.ctx.fillStyle = gradient;
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 4, 0, Math.PI * 2);
-        this.ctx.fill();
-
-        // Bright center dot
-        this.ctx.fillStyle = 'rgba(139, 0, 255, 0.6)';
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, 1, 0, Math.PI * 2);
-        this.ctx.fill();
-      }
-    }
+    // Much more subtle - optional minimal glow only at grid corners
+    // Commented out for cleaner look
   }
 
   drawMouseDistortionZone() {
-    // Draw visual indicator of mouse distortion zone
-    this.ctx.globalAlpha = 0.08;
-    this.ctx.fillStyle = this.colors.accent;
-    this.ctx.beginPath();
-    this.ctx.arc(this.mousePos.x, this.mousePos.y, this.mouseDistortionRadius, 0, Math.PI * 2);
-    this.ctx.fill();
-    this.ctx.globalAlpha = 1;
+    // Hidden - no visual indicator needed
   }
 
   drawTrailHealing() {
-    // Draw the healing trail zones
-    this.mouseTrail.forEach((trail) => {
-      const alpha = trail.life * 0.05;
-      this.ctx.globalAlpha = alpha;
-      this.ctx.fillStyle = this.colors.primary;
-      this.ctx.beginPath();
-      this.ctx.arc(trail.x, trail.y, trail.radius, 0, Math.PI * 2);
-      this.ctx.fill();
-    });
-    this.ctx.globalAlpha = 1;
+    // Hidden - healing effect applied silently without visual indicator
   }
 
   drawShockwaveRings() {
@@ -365,10 +319,7 @@ class GeometricMeshBackground {
     this.updateShockwaves();
 
     // Draw layers
-    this.drawTrailHealing();
     this.drawMesh();
-    this.drawNodePoints();
-    this.drawMouseDistortionZone();
     this.drawShockwaveRings();
 
     this.time += 1;
