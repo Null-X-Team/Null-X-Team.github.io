@@ -37,6 +37,17 @@
       position: relative;
     }
 
+    /* Particle canvas layer */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
     /* Radar sweep animation background overlay */
     body::before {
       content: '';
@@ -64,6 +75,38 @@
         linear-gradient(to bottom, rgba(255,255,255,0.01) 1px, transparent 1px);
       background-size: 60px 60px;
       z-index: 0;
+      animation: gridDrift 20s linear infinite;
+    }
+
+    /* Scanline overlay for CRT feel */
+    .scanlines {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.015) 0px,
+        rgba(255, 255, 255, 0.015) 1px,
+        transparent 1px,
+        transparent 3px
+      );
+      mix-blend-mode: overlay;
+    }
+
+    /* Vignette to focus attention centrally */
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
     }
 
     /* Header Navbar Layout */
@@ -71,9 +114,10 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      z-index: 1;
+      z-index: 3;
       border-bottom: 1px solid rgba(157, 78, 221, 0.2);
       padding-bottom: 20px;
+      animation: fadeInDown 0.8s ease both;
     }
 
     .brand {
@@ -95,11 +139,24 @@
     .system-clock {
       color: var(--text-muted);
       font-size: 0.9rem;
+      position: relative;
+    }
+
+    .system-clock::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent-neon);
+      margin-right: 8px;
+      box-shadow: 0 0 6px var(--accent-neon);
+      animation: blinkDot 1.5s infinite ease-in-out;
     }
 
     /* Central Giant Display Node */
     main {
-      z-index: 1;
+      z-index: 3;
       text-align: left;
       max-width: 800px;
       margin: auto 0;
@@ -118,6 +175,8 @@
       display: inline-block;
       letter-spacing: -2px;
       position: relative;
+      animation: codeFloatIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) both,
+                 codeHoverFloat 4s ease-in-out 0.9s infinite;
     }
 
     .error-code::after {
@@ -132,10 +191,39 @@
       animation: glitchSplit 4s ease-in-out infinite alternate;
     }
 
+    /* Extra glitch shard layer for depth */
+    .error-code::before {
+      content: '404';
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      color: transparent;
+      -webkit-text-stroke: 1px var(--accent-neon);
+      opacity: 0;
+      clip-path: inset(10% 0 60% 0);
+      animation: glitchShard 6s steps(1) infinite;
+    }
+
     .terminal-output {
       border-left: 2px solid var(--accent-purple);
       padding-left: 25px;
       margin-bottom: 40px;
+      position: relative;
+      animation: fadeInLeft 0.8s ease 0.3s both;
+    }
+
+    .terminal-output::before {
+      content: '';
+      position: absolute;
+      left: -2px;
+      top: 0;
+      width: 2px;
+      height: 0%;
+      background: var(--accent-neon);
+      box-shadow: 0 0 8px var(--accent-neon);
+      animation: growLine 1.2s ease 0.5s forwards;
     }
 
     .status-title {
@@ -146,13 +234,23 @@
       margin-bottom: 15px;
       text-transform: uppercase;
       letter-spacing: 1px;
+      animation: flickerIn 1.4s ease 0.6s both;
     }
 
     .log-line {
       font-size: 1rem;
       color: var(--text-muted);
       margin-bottom: 6px;
+      white-space: nowrap;
+      overflow: hidden;
+      border-right: 2px solid transparent;
+      width: 0;
+      animation: typeLine 0.6s steps(40, end) forwards, blinkCursor 0.7s step-end infinite;
     }
+
+    .log-line:nth-child(2) { animation-delay: 1.0s, 1.0s; }
+    .log-line:nth-child(3) { animation-delay: 1.5s, 1.5s; }
+    .log-line:nth-child(4) { animation-delay: 2.0s, 2.0s; }
 
     .log-line span.highlight {
       color: var(--text-main);
@@ -162,6 +260,8 @@
     .action-row {
       display: flex;
       gap: 20px;
+      opacity: 0;
+      animation: fadeInUp 0.7s ease 2.4s forwards;
     }
 
     .cyber-btn {
@@ -177,7 +277,8 @@
       align-items: center;
       gap: 12px;
       position: relative;
-      transition: all 0.3s ease;
+      overflow: hidden;
+      transition: all 0.3s ease, letter-spacing 0.3s ease;
     }
 
     .cyber-btn::before {
@@ -194,31 +295,81 @@
       transition: transform 0.3s ease;
     }
 
+    .cyber-btn::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(120deg, transparent, rgba(255,255,255,0.35), transparent);
+      transform: skewX(-20deg);
+    }
+
     .cyber-btn:hover::before {
       transform: scaleX(1);
     }
 
+    .cyber-btn:hover::after {
+      animation: sheen 0.8s ease forwards;
+    }
+
     .cyber-btn:hover {
-      box-shadow: 0 0 15px var(--accent-purple);
+      box-shadow: 0 0 20px var(--accent-purple);
       border-color: var(--accent-neon);
+      letter-spacing: 1px;
+    }
+
+    .cyber-btn i {
+      transition: transform 0.3s ease;
+    }
+
+    .cyber-btn:hover i {
+      transform: translateX(-4px);
     }
 
     /* Bottom Status Bar */
     footer {
       display: flex;
       justify-content: space-between;
-      z-index: 1;
+      z-index: 3;
       border-top: 1px solid rgba(255, 255, 255, 0.05);
       padding-top: 20px;
       font-size: 0.8rem;
       color: var(--text-muted);
       letter-spacing: 1px;
+      opacity: 0;
+      animation: fadeIn 1s ease 1s forwards;
     }
 
-    /* High-Performance Fluid Animations */
+    footer div:first-child {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    footer div:first-child::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      background: #4ade80;
+      border-radius: 50%;
+      display: inline-block;
+      box-shadow: 0 0 6px #4ade80;
+      animation: blinkDot 2s infinite ease-in-out;
+    }
+
+    /* ==========================================================================
+       KEYFRAME ANIMATIONS
+       ========================================================================== */
     @keyframes radarSweep {
       from { transform: translate(-50%, -50%) rotate(0deg); }
       to { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    @keyframes gridDrift {
+      from { background-position: 0 0; }
+      to { background-position: 60px 60px; }
     }
 
     @keyframes corePulse {
@@ -232,6 +383,77 @@
       90% { transform: translate(-4px, 2px); }
     }
 
+    @keyframes glitchShard {
+      0%, 92%, 100% { opacity: 0; transform: translate(0,0); }
+      93% { opacity: 0.8; transform: translate(-6px, 2px); }
+      95% { opacity: 0; transform: translate(4px, -3px); }
+      97% { opacity: 0.6; transform: translate(-3px, 1px); }
+    }
+
+    @keyframes codeFloatIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.9); filter: blur(6px); }
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    @keyframes codeHoverFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+
+    @keyframes fadeInDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInLeft {
+      from { opacity: 0; transform: translateX(-16px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes flickerIn {
+      0% { opacity: 0; }
+      5% { opacity: 1; }
+      10% { opacity: 0.2; }
+      15% { opacity: 1; }
+      20% { opacity: 0.4; }
+      25%, 100% { opacity: 1; }
+    }
+
+    @keyframes growLine {
+      from { height: 0%; }
+      to { height: 100%; }
+    }
+
+    @keyframes typeLine {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+
+    @keyframes blinkCursor {
+      0%, 100% { border-color: transparent; }
+      50% { border-color: var(--accent-neon); }
+    }
+
+    @keyframes blinkDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes sheen {
+      from { left: -100%; }
+      to { left: 130%; }
+    }
+
     @media (max-width: 600px) {
       body { padding: 20px; }
       .error-code { font-size: 5.5rem; }
@@ -239,12 +461,16 @@
       .action-row { flex-direction: column; }
       .cyber-btn { width: 100%; justify-content: center; }
       footer { flex-direction: column; gap: 10px; text-align: center; }
+      .log-line { white-space: normal; width: auto; animation: fadeIn 0.6s ease forwards; border-right: none; }
     }
   </style>
 </head>
 <body>
 
+  <canvas id="particleCanvas"></canvas>
   <div class="grid-lines"></div>
+  <div class="vignette"></div>
+  <div class="scanlines"></div>
 
   <header>
     <div class="brand">
@@ -258,9 +484,9 @@
     
     <div class="terminal-output">
       <div class="status-title">Target Node Missing</div>
-      <div class="log-line">> Requested asset layer could not be fetched by the host pipeline.</div>
-      <div class="log-line">> PATH_STRING: <span class="highlight" id="brokenPath">/unknown-node</span></div>
-      <div class="log-line">> SYSTEM_ACTION: Halting execution matrix safely.</div>
+      <div class="log-line">&gt; Requested asset layer could not be fetched by the host pipeline.</div>
+      <div class="log-line">&gt; PATH_STRING: <span class="highlight" id="brokenPath">/unknown-node</span></div>
+      <div class="log-line">&gt; SYSTEM_ACTION: Halting execution matrix safely.</div>
     </div>
 
     <div class="action-row">
@@ -287,6 +513,80 @@
     }
     setInterval(updateClock, 1000);
     updateClock();
+
+    // ==========================================================================
+    // FLOATING PARTICLE FIELD (subtle drifting nodes, purple themed)
+    // ==========================================================================
+    (function () {
+      const canvas = document.getElementById('particleCanvas');
+      const ctx = canvas.getContext('2d');
+      let particles = [];
+
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      window.addEventListener('resize', resize);
+      resize();
+
+      function createParticles() {
+        const count = Math.min(60, Math.floor((canvas.width * canvas.height) / 22000));
+        particles = [];
+        for (let i = 0; i < count; i++) {
+          particles.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            r: Math.random() * 1.6 + 0.4,
+            vx: (Math.random() - 0.5) * 0.15,
+            vy: (Math.random() - 0.5) * 0.15,
+            alpha: Math.random() * 0.5 + 0.15,
+            pulse: Math.random() * Math.PI * 2,
+          });
+        }
+      }
+      createParticles();
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        particles.forEach((p) => {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.pulse += 0.015;
+
+          if (p.x < 0) p.x = canvas.width;
+          if (p.x > canvas.width) p.x = 0;
+          if (p.y < 0) p.y = canvas.height;
+          if (p.y > canvas.height) p.y = 0;
+
+          const flicker = p.alpha + Math.sin(p.pulse) * 0.15;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(224, 170, 255, ${Math.max(0, flicker)})`;
+          ctx.fill();
+        });
+
+        // Connect nearby particles with faint lines
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 120) {
+              ctx.strokeStyle = `rgba(157, 78, 221, ${0.12 * (1 - dist / 120)})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
   </script>
 
 </body>
