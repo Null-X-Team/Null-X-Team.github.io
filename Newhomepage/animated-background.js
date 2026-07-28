@@ -169,6 +169,11 @@ class GeometricMeshBackground {
 
   updateTrail() {
     this.mouseTrail = this.mouseTrail.filter((t) => t.life > 0);
+    
+    // Keep only last 50 trail points to prevent memory issues
+    if (this.mouseTrail.length > 50) {
+      this.mouseTrail = this.mouseTrail.slice(-50);
+    }
 
     this.mouseTrail.forEach((trail) => {
       trail.life -= trail.decay;
@@ -275,21 +280,14 @@ class GeometricMeshBackground {
   }
 
   drawShockwaveRings() {
-    // Draw shockwave visualization
+    // Draw shockwave visualization - simplified for performance
     this.shockwaves.forEach((shock) => {
-      const alpha = shock.life * 0.4;
+      const alpha = shock.life * 0.5;
       this.ctx.strokeStyle = `rgba(255, 59, 59, ${alpha})`;
       this.ctx.lineWidth = 2;
       this.ctx.globalAlpha = alpha;
       this.ctx.beginPath();
       this.ctx.arc(shock.x, shock.y, shock.radius, 0, Math.PI * 2);
-      this.ctx.stroke();
-
-      // Inner ring
-      this.ctx.strokeStyle = `rgba(139, 0, 255, ${alpha * 0.6})`;
-      this.ctx.lineWidth = 1;
-      this.ctx.beginPath();
-      this.ctx.arc(shock.x, shock.y, shock.radius - 20, 0, Math.PI * 2);
       this.ctx.stroke();
     });
     this.ctx.globalAlpha = 1;
