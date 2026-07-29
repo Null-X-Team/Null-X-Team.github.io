@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NULL Grades</title>
+    <title id="page-title">NULL Grades</title>
+    <link rel="icon" id="dynamic-favicon" href="data:,">
     <link rel="stylesheet" href="chat.css">
 </head>
 <body>
 
 <datalist id="admin-user-suggestions"></datalist>
+
+<div id="custom-bg-layer"></div>
 
 <div class="chat-container">
     <div class="sidebar">
@@ -20,8 +23,9 @@
             <div id="chan-general" class="channel active" onclick="switchTab('general')"># general</div>
             <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
             <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
+            <div id="chan-settings" class="channel" onclick="switchTab('settings')"># settings</div>
             <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
-            <div id="pm-tab" class="channel" style="display:none; color: #cf7a3c; font-weight: bold;" onclick="switchTab('private-messages')"># private-msgs</div>
+            <div id="pm-tab" class="channel" style="display:none; color: var(--accent); font-weight: bold;" onclick="switchTab('private-messages')"># private-msgs</div>
         </div>
 
         <div class="user-profile">
@@ -34,26 +38,26 @@
 
     <div class="main-chat">
         <div id="chat-view">
-            <div id="chat-view-header" style="padding: 10px 20px; background: #140f0d; border-bottom: 1px solid rgba(207, 122, 60, 0.1); color: #cf7a3c; font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
+            <div id="chat-view-header" style="padding: 10px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-soft); color: var(--accent); font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
                 <span># general</span>
-                <span id="room-status-indicator" style="font-size: 11px; color: #a0928d;">CONNECTING...</span>
+                <span id="room-status-indicator" style="font-size: 11px; color: var(--text-muted);">CONNECTING...</span>
             </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
-                <span id="char-counter" style="font-size: 11px; color: #a0928d; margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
+                <span id="char-counter" style="font-size: 11px; color: var(--text-muted); margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
             </form>
         </div>
 
         <div id="users-view" style="display:none; padding: 40px; height: 100%; overflow-y: auto;">
-            <h1 style="color: #cf7a3c; margin-bottom: 20px;">User Directory</h1>
-            <input type="text" id="directory-search" placeholder="Search for a user..." style="margin-bottom: 20px; width: 100%; padding: 12px; background: #140f0d; border: 1px solid rgba(207, 122, 60, 0.2); color: white; border-radius: 6px; outline: none;">
+            <h1 style="color: var(--accent); margin-bottom: 20px;">User Directory</h1>
+            <input type="text" id="directory-search" placeholder="Search for a user..." style="margin-bottom: 20px; width: 100%; padding: 12px; background: var(--bg-panel); border: 1px solid var(--border-soft); color: white; border-radius: 6px; outline: none;">
             <div id="user-list-display" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
         </div>
 
         <div id="rules-view" class="rules-content" style="display:none; padding: 40px; overflow-y: auto;">
-            <h1 style="color: #cf7a3c; margin-bottom: 20px;">COMMUNITY RULES</h1>
+            <h1 style="color: var(--accent); margin-bottom: 20px;">COMMUNITY RULES</h1>
             
             <div style="background: rgba(255, 68, 68, 0.1); border: 1px solid #ff4444; padding: 15px; border-radius: 6px; margin-bottom: 25px; color: #ff8888; font-size: 14px; font-weight: bold; display: flex; align-items: flex-start; gap: 8px;">
                 <svg viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0; fill: currentColor;"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
@@ -61,35 +65,146 @@
             </div>
 
             <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 16px; color: #e0e0e0; font-size: 14px;">
-                <li style="background: rgba(207, 122, 60, 0.05); padding: 12px; border-left: 3px solid #cf7a3c; border-radius: 4px;">
-                    <strong style="color: #cf7a3c;">1. No handing out personal information.</strong><br>
+                <li style="background: var(--bg-panel-soft); padding: 12px; border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <strong style="color: var(--accent);">1. No handing out personal information.</strong><br>
                     <span style="color: #aaa; font-size: 12px;">Penalty: Permanent Ban from both Chat and Games.</span>
                 </li>
-                <li style="background: rgba(207, 122, 60, 0.05); padding: 12px; border-left: 3px solid #cf7a3c; border-radius: 4px;">
-                    <strong style="color: #cf7a3c;">2. No cussing.</strong><br>
+                <li style="background: var(--bg-panel-soft); padding: 12px; border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <strong style="color: var(--accent);">2. No cussing.</strong><br>
                     <span style="color: #aaa; font-size: 12px;">Penalty: Warning on 1st offense; 24-Hour Ban from Chat on repeat offenses.</span>
                 </li>
-                <li style="background: rgba(207, 122, 60, 0.05); padding: 12px; border-left: 3px solid #cf7a3c; border-radius: 4px;">
-                    <strong style="color: #cf7a3c;">3. No pornographic content.</strong><br>
+                <li style="background: var(--bg-panel-soft); padding: 12px; border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <strong style="color: var(--accent);">3. No pornographic content.</strong><br>
                     <span style="color: #aaa; font-size: 12px;">Penalty: Immediate Permanent Ban from both Chat and Games.</span>
                 </li>
-                <li style="background: rgba(207, 122, 60, 0.05); padding: 12px; border-left: 3px solid #cf7a3c; border-radius: 4px;">
-                    <strong style="color: #cf7a3c;">4. No spamming.</strong><br>
+                <li style="background: var(--bg-panel-soft); padding: 12px; border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <strong style="color: var(--accent);">4. No spamming.</strong><br>
                     <span style="color: #aaa; font-size: 12px;">Penalty: 1 Hour to 24-Hour Ban from Chat depending on severity.</span>
                 </li>
-                <li style="background: rgba(207, 122, 60, 0.05); padding: 12px; border-left: 3px solid #cf7a3c; border-radius: 4px;">
-                    <strong style="color: #cf7a3c;">5. No racism or hate speech.</strong><br>
+                <li style="background: var(--bg-panel-soft); padding: 12px; border-left: 3px solid var(--accent); border-radius: 4px;">
+                    <strong style="color: var(--accent);">5. No racism or hate speech.</strong><br>
                     <span style="color: #aaa; font-size: 12px;">Penalty: 1-Week Ban up to a Permanent Ban from both Chat and Games.</span>
                 </li>
             </ul>
 
-            <div style="margin-top: 25px; padding: 15px; background: rgba(207, 122, 60, 0.02); border: 1px solid rgba(207, 122, 60, 0.1); border-radius: 6px; color: #aaa; font-size: 13px; line-height: 1.5;">
-                <strong style="color: #cf7a3c;">Enforcement Policy:</strong> If you commit a repeat aggressive offense by creating multiple alternative accounts to bypass restrictions, your IP address will be recorded, and any current or future accounts created on that IP will be automatically banned.
+            <div style="margin-top: 25px; padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--border-soft); border-radius: 6px; color: #aaa; font-size: 13px; line-height: 1.5;">
+                <strong style="color: var(--accent);">Enforcement Policy:</strong> If you commit a repeat aggressive offense by creating multiple alternative accounts to bypass restrictions, your IP address will be recorded, and any current or future accounts created on that IP will be automatically banned.
             </div>
         </div>
 
+        <!-- ============================================================
+             SETTINGS VIEW
+             ============================================================ -->
+        <div id="settings-view" style="display:none; padding: 40px; overflow-y: auto; height: 100%;">
+            <h1 style="color: var(--accent); margin-bottom: 8px;">Chat Settings</h1>
+            <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 30px;">These preferences are saved locally to this browser/device.</p>
+
+            <div class="settings-grid">
+
+                <!-- THEME PICKER -->
+                <div class="settings-card">
+                    <h3><i class="settings-icon">🎨</i> Chat Theme</h3>
+                    <p class="settings-desc">Pick an accent color scheme for the whole chat interface.</p>
+                    <div id="theme-swatch-row" class="theme-swatch-row">
+                        <div class="theme-swatch" data-theme="amber" style="--sw: #cf7a3c;" title="Amber (Default)"></div>
+                        <div class="theme-swatch" data-theme="crimson" style="--sw: #e0463f;" title="Crimson"></div>
+                        <div class="theme-swatch" data-theme="violet" style="--sw: #9d4edd;" title="Violet"></div>
+                        <div class="theme-swatch" data-theme="emerald" style="--sw: #2fbf71;" title="Emerald"></div>
+                        <div class="theme-swatch" data-theme="azure" style="--sw: #3aa0ff;" title="Azure"></div>
+                        <div class="theme-swatch" data-theme="rose" style="--sw: #ff5fa2;" title="Rose"></div>
+                    </div>
+                </div>
+
+                <!-- TAB CLOAK -->
+                <div class="settings-card">
+                    <h3><i class="settings-icon">🎭</i> Tab Cloak</h3>
+                    <p class="settings-desc">Disguises this tab's title and icon so it looks like a different site at a glance.</p>
+
+                    <div class="settings-toggle-row">
+                        <label class="switch">
+                            <input type="checkbox" id="toggle-chat-cloak">
+                            <span class="slider"></span>
+                        </label>
+                        <span id="cloak-toggle-label">Cloak Disabled</span>
+                    </div>
+
+                    <select id="cloak-disguise-select" style="margin-top: 12px;">
+                        <option value="docs">Google Docs</option>
+                        <option value="classroom">Google Classroom</option>
+                        <option value="drive">Google Drive</option>
+                        <option value="mail">Gmail</option>
+                        <option value="canvas">Canvas Dashboard</option>
+                    </select>
+
+                    <p class="settings-hint">Tip: press <strong>Esc</strong> at any time to instantly leave the page.</p>
+                </div>
+
+                <!-- CUSTOM BACKGROUND -->
+                <div class="settings-card">
+                    <h3><i class="settings-icon">🖼️</i> Custom Background</h3>
+                    <p class="settings-desc">Upload an image to use as the chat background.</p>
+
+                    <label for="bg-file-input" class="upload-dropzone" id="bg-upload-dropzone">
+                        <span id="bg-upload-text">Click to choose an image, or drag one here</span>
+                    </label>
+                    <input type="file" id="bg-file-input" accept="image/*" style="display:none;">
+
+                    <div class="settings-toggle-row" style="margin-top: 12px;">
+                        <button type="button" class="settings-btn-secondary" id="remove-bg-btn">Remove Background</button>
+                    </div>
+
+                    <div class="settings-toggle-row" style="margin-top: 10px;">
+                        <label style="font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
+                            Overlay Darkness
+                            <input type="range" id="bg-overlay-range" min="0" max="90" value="70">
+                        </label>
+                    </div>
+                </div>
+
+                <!-- MESSAGE BUBBLE STYLE -->
+                <div class="settings-card">
+                    <h3><i class="settings-icon">💬</i> Your Message Style</h3>
+                    <p class="settings-desc">Change how your own outgoing messages appear to you.</p>
+
+                    <div id="bubble-style-row" class="bubble-style-row">
+                        <div class="bubble-style-option" data-style="default">
+                            <div class="bubble-preview style-default">Hey!</div>
+                            <span>Default</span>
+                        </div>
+                        <div class="bubble-style-option" data-style="neon">
+                            <div class="bubble-preview style-neon">Hey!</div>
+                            <span>Neon Glow</span>
+                        </div>
+                        <div class="bubble-style-option" data-style="glass">
+                            <div class="bubble-preview style-glass">Hey!</div>
+                            <span>Glass</span>
+                        </div>
+                        <div class="bubble-style-option" data-style="terminal">
+                            <div class="bubble-preview style-terminal">Hey!</div>
+                            <span>Terminal</span>
+                        </div>
+                        <div class="bubble-style-option" data-style="gradient">
+                            <div class="bubble-preview style-gradient">Hey!</div>
+                            <span>Gradient</span>
+                        </div>
+                        <div class="bubble-style-option" data-style="minimal">
+                            <div class="bubble-preview style-minimal">Hey!</div>
+                            <span>Minimal</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================
+             ADMIN PANEL VIEW (IMPROVED)
+             ============================================================ -->
         <div id="admin-panel-view" style="display:none; padding: 40px; overflow-y: auto;">
             <h1 style="margin-bottom:20px; color:#ff4444;">Admin Management</h1>
+
+            <div id="admin-stats-row" class="admin-stats-row"></div>
+
             <div class="admin-grid">
                 <div class="admin-card">
                     <h3>Warnings</h3>
@@ -106,7 +221,7 @@
                     <div class="search-wrapper">
                         <input type="text" id="temp-ban-search" placeholder="Type @ to find user...">
                     </div>
-                    <select id="temp-ban-duration" style="width:100%; margin: 10px 0; padding: 10px; background: #140f0d; color: white; border: 1px solid rgba(207, 122, 60, 0.2); border-radius: 4px;">
+                    <select id="temp-ban-duration" style="width:100%; margin: 10px 0; padding: 10px; background: var(--bg-dark); color: white; border: 1px solid var(--border-soft); border-radius: 4px;">
                         <option value="60">1 Hour</option>
                         <option value="1440">24 Hours</option>
                         <option value="10080">1 Week</option>
@@ -121,7 +236,7 @@
                         <input type="text" id="ban-search" placeholder="Type @ to find user...">
                     </div>
                     <input type="text" id="ban-reason" placeholder="Reason...">
-                    <select id="ban-category" style="width:100%; margin: 10px 0; padding: 10px; background: #140f0d; color: white; border: 1px solid rgba(207, 122, 60, 0.2); border-radius: 4px;">
+                    <select id="ban-category" style="width:100%; margin: 10px 0; padding: 10px; background: var(--bg-dark); color: white; border: 1px solid var(--border-soft); border-radius: 4px;">
                         <option value="Both">Both</option>
                         <option value="Chat">Chat</option>
                     </select>
@@ -129,11 +244,19 @@
                     <button class="admin-btn btn-unban" onclick="adminExecute('unban')">Unban User</button>
                 </div>
             </div>
+
+            <div class="admin-card" style="margin-top: 20px;">
+                <div style="display:flex; justify-content: space-between; align-items:center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="margin:0;">Quick User Management</h3>
+                    <input type="text" id="admin-quick-search" placeholder="Filter users..." style="max-width: 220px;">
+                </div>
+                <div id="admin-user-table" class="admin-user-table"></div>
+            </div>
         </div>
 
         <div id="private-messages-view" style="display:none; padding: 40px; overflow-y: auto; height: 100%;">
-            <h1 style="color: #cf7a3c; margin-bottom: 20px;">Master Private Message Log</h1>
-            <p style="color: #a0928d; font-size: 14px; margin-bottom: 20px;">Live log of all direct communications across the server.</p>
+            <h1 style="color: var(--accent); margin-bottom: 20px;">Master Private Message Log</h1>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Live log of all direct communications across the server.</p>
             <div id="admin-pm-container" style="display: flex; flex-direction: column; gap: 15px; background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px;"></div>
         </div>
 
