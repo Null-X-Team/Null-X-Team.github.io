@@ -4,6 +4,7 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
+let allRolesCache = [];
 let lastMessageTime = 0;
 let chatPollingInterval = null; 
 let heartbeatInterval = null;
@@ -13,6 +14,201 @@ let selectedChatUser = { username: '', handler: '' };
 
 // Track the live authorization status dynamically from Supabase
 let currentUserIsAdmin = false;
+
+// ==========================================================================
+// LOCAL CHAT SETTINGS SYSTEM (theme / cloak / background / message style)
+// ==========================================================================
+const SETTINGS_KEYS = {
+    theme: 'nullchat_theme',
+    cloakEnabled: 'nullchat_cloak_enabled',
+    cloakType: 'nullchat_cloak_type',
+    bgImage: 'nullchat_bg_image',
+    bgOverlay: 'nullchat_bg_overlay',
+    bubbleStyle: 'nullchat_bubble_style',
+};
+
+const CLOAK_PRESETS = {
+    docs:      { title: 'Google Docs',        icon: 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico' },
+    classroom: { title: 'Home',                icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
+    drive:     { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
+    mail:      { title: 'Inbox (2) - Gmail',    icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
+    canvas:    { title: 'Dashboard',            icon: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
+};
+
+function applyTheme(themeName) {
+    document.body.setAttribute('data-theme', themeName);
+    document.querySelectorAll('.theme-swatch').forEach(sw => {
+        sw.classList.toggle('active-swatch', sw.getAttribute('data-theme') === themeName);
+    });
+    localStorage.setItem(SETTINGS_KEYS.theme, themeName);
+}
+
+function applyCloak(enabled, type) {
+    const preset = CLOAK_PRESETS[type] || CLOAK_PRESETS.docs;
+    const titleEl = document.getElementById('page-title');
+    const favicon = document.getElementById('dynamic-favicon');
+
+    if (enabled) {
+        if (titleEl) titleEl.textContent = preset.title;
+        if (favicon) favicon.href = preset.icon;
+    } else {
+        if (titleEl) titleEl.textContent = 'NULL Grades';
+        if (favicon) favicon.href = 'data:,';
+    }
+
+    const label = document.getElementById('cloak-toggle-label');
+    if (label) label.textContent = enabled ? `Cloak Enabled (${preset.title})` : 'Cloak Disabled';
+}
+
+function applyBackground(dataUrl, overlayPercent) {
+    const layer = document.getElementById('custom-bg-layer');
+    const dropzone = document.getElementById('bg-upload-dropzone');
+    const dzText = document.getElementById('bg-upload-text');
+
+    if (dataUrl) {
+        layer.style.display = 'block';
+        layer.style.backgroundImage = `url(${dataUrl})`;
+        layer.style.setProperty('--bg-overlay-alpha', (overlayPercent ?? 70) / 100);
+        document.body.classList.add('has-custom-bg');
+        if (dropzone) dropzone.classList.add('has-image');
+        if (dzText) dzText.textContent = 'Custom background active — click to change';
+    } else {
+        layer.style.display = 'none';
+        layer.style.backgroundImage = '';
+        document.body.classList.remove('has-custom-bg');
+        if (dropzone) dropzone.classList.remove('has-image');
+        if (dzText) dzText.textContent = 'Click to choose an image, or drag one here';
+    }
+}
+
+function applyBubbleStyle(styleName) {
+    document.querySelectorAll('.bubble-style-option').forEach(opt => {
+        opt.classList.toggle('selected-style', opt.getAttribute('data-style') === styleName);
+    });
+    localStorage.setItem(SETTINGS_KEYS.bubbleStyle, styleName);
+    // Re-render messages so the style takes effect immediately on existing bubbles
+    document.querySelectorAll('.my-bubble-color').forEach(bubble => {
+        bubble.className = bubble.className.replace(/style-\S+/g, '').trim();
+        if (styleName !== 'default') bubble.classList.add(`style-${styleName}`);
+    });
+}
+
+function getSavedBubbleStyle() {
+    return localStorage.getItem(SETTINGS_KEYS.bubbleStyle) || 'default';
+}
+
+function loadAllSettings() {
+    // Theme
+    const savedTheme = localStorage.getItem(SETTINGS_KEYS.theme) || 'amber';
+    applyTheme(savedTheme);
+
+    // Cloak
+    const cloakEnabled = localStorage.getItem(SETTINGS_KEYS.cloakEnabled) === 'true';
+    const cloakType = localStorage.getItem(SETTINGS_KEYS.cloakType) || 'docs';
+    const cloakToggle = document.getElementById('toggle-chat-cloak');
+    const cloakSelect = document.getElementById('cloak-disguise-select');
+    if (cloakToggle) cloakToggle.checked = cloakEnabled;
+    if (cloakSelect) cloakSelect.value = cloakType;
+    applyCloak(cloakEnabled, cloakType);
+
+    // Background
+    const savedBg = localStorage.getItem(SETTINGS_KEYS.bgImage);
+    const savedOverlay = parseInt(localStorage.getItem(SETTINGS_KEYS.bgOverlay) || '70');
+    const overlayRange = document.getElementById('bg-overlay-range');
+    if (overlayRange) overlayRange.value = savedOverlay;
+    applyBackground(savedBg, savedOverlay);
+
+    // Bubble style
+    const savedStyle = getSavedBubbleStyle();
+    applyBubbleStyle(savedStyle);
+}
+
+function initSettingsPanelBindings() {
+    // Theme swatches
+    document.querySelectorAll('.theme-swatch').forEach(sw => {
+        sw.addEventListener('click', () => applyTheme(sw.getAttribute('data-theme')));
+    });
+
+    // Cloak toggle + select
+    const cloakToggle = document.getElementById('toggle-chat-cloak');
+    const cloakSelect = document.getElementById('cloak-disguise-select');
+    if (cloakToggle) {
+        cloakToggle.addEventListener('change', (e) => {
+            const enabled = e.target.checked;
+            const type = cloakSelect ? cloakSelect.value : 'docs';
+            localStorage.setItem(SETTINGS_KEYS.cloakEnabled, enabled ? 'true' : 'false');
+            applyCloak(enabled, type);
+        });
+    }
+    if (cloakSelect) {
+        cloakSelect.addEventListener('change', (e) => {
+            localStorage.setItem(SETTINGS_KEYS.cloakType, e.target.value);
+            const enabled = cloakToggle ? cloakToggle.checked : false;
+            applyCloak(enabled, e.target.value);
+        });
+    }
+
+    // Escape key panic - jump to a neutral page instantly
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const cloakEnabled = localStorage.getItem(SETTINGS_KEYS.cloakEnabled) === 'true';
+            if (cloakEnabled) {
+                window.location.href = 'https://docs.google.com';
+            }
+        }
+    });
+
+    // Background upload
+    const bgInput = document.getElementById('bg-file-input');
+    const removeBgBtn = document.getElementById('remove-bg-btn');
+    const overlayRange = document.getElementById('bg-overlay-range');
+
+    if (bgInput) {
+        bgInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (!file.type.startsWith('image/')) {
+                alert('Please choose a valid image file.');
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (evt) => {
+                const dataUrl = evt.target.result;
+                try {
+                    localStorage.setItem(SETTINGS_KEYS.bgImage, dataUrl);
+                } catch (err) {
+                    alert('That image is too large to save locally. Try a smaller/compressed image.');
+                    return;
+                }
+                const overlay = overlayRange ? parseInt(overlayRange.value) : 70;
+                applyBackground(dataUrl, overlay);
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    if (removeBgBtn) {
+        removeBgBtn.addEventListener('click', () => {
+            localStorage.removeItem(SETTINGS_KEYS.bgImage);
+            applyBackground(null);
+            if (bgInput) bgInput.value = '';
+        });
+    }
+
+    if (overlayRange) {
+        overlayRange.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            localStorage.setItem(SETTINGS_KEYS.bgOverlay, val);
+            const layer = document.getElementById('custom-bg-layer');
+            if (layer) layer.style.setProperty('--bg-overlay-alpha', val / 100);
+        });
+    }
+
+    // Message bubble style picker
+    document.querySelectorAll('.bubble-style-option').forEach(opt => {
+        opt.addEventListener('click', () => applyBubbleStyle(opt.getAttribute('data-style')));
+    });
+}
 
 // Globally scoped Quick Reply utility handler
 window.mentionUser = function(rawEncodedName) {
@@ -126,6 +322,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+
+    // Load and bind all local settings as soon as the DOM is ready
+    loadAllSettings();
+    initSettingsPanelBindings();
 });
 
 // Global initialization hook exposed directly to main.js router
@@ -228,7 +428,7 @@ window.initializeChatEngine = async function() {
 
     // --- TAB NAVIGATION UPDATE ---
     window.switchTab = (target) => {
-        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view', 'private-messages-view'].forEach(v => {
+        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view', 'private-messages-view', 'settings-view'].forEach(v => {
             const el = document.getElementById(v);
             if (el) el.style.display = 'none';
         });
@@ -255,6 +455,12 @@ window.initializeChatEngine = async function() {
             const pmTab = document.getElementById('pm-tab');
             if (pmTab) pmTab.classList.add('active');
             fetchAdminPrivateMessages(); // Fetch all PMs
+        }
+        else if (target === 'settings') {
+            const settingsView = document.getElementById('settings-view');
+            if (settingsView) settingsView.style.display = 'block';
+            const settingsTab = document.getElementById('chan-settings');
+            if (settingsTab) settingsTab.classList.add('active');
         }
         else {
             const viewId = target + '-view';
@@ -303,18 +509,18 @@ window.initializeChatEngine = async function() {
             const pmData = await res.json();
 
             if (!pmData || pmData.length === 0) {
-                container.innerHTML = '<p style="color:#a0928d; text-align:center;">No private messages found in database.</p>';
+                container.innerHTML = '<p style="color:var(--text-muted); text-align:center;">No private messages found in database.</p>';
                 return;
             }
 
             container.innerHTML = pmData.map(pm => {
                 const time = new Date(pm.created_at).toLocaleString();
                 return `
-                    <div style="border-bottom: 1px solid rgba(207, 122, 60, 0.2); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div style="border-bottom: 1px solid var(--border-soft); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <div style="font-size: 12px; color: #cf7a3c;">
+                            <div style="font-size: 12px; color: var(--accent);">
                                 <strong>${pm.sender_username}</strong> ➔ <strong>${pm.recipient_username}</strong>
-                                <span style="color: #a0928d; margin-left: 8px;">${time}</span>
+                                <span style="color: var(--text-muted); margin-left: 8px;">${time}</span>
                             </div>
                             <div style="color: #e0e0e0; margin-top: 4px; font-size: 14px;">
                                 ${pm.content}
@@ -358,6 +564,7 @@ window.initializeChatEngine = async function() {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const rolesData = await rolesRes.json();
+            allRolesCache = rolesData || [];
 
             const uniqueNames = [...new Set(usersData.map(u => u.username))].filter(name => name != null);
             
@@ -369,12 +576,18 @@ window.initializeChatEngine = async function() {
                     pfp_url: foundProfile ? foundProfile.pfp_url : DEFAULT_PFP,
                     role_tag: foundProfile ? foundProfile.role_tag : 'User',
                     last_seen: foundProfile ? foundProfile.last_seen : null,
+                    is_banned: foundProfile ? (foundProfile.is_banned === true || String(foundProfile.is_banned).toLowerCase() === 'true') : false,
                     is_admin: (checkAdminStatus === true || String(checkAdminStatus).toLowerCase() === 'true' || (foundProfile && String(foundProfile.role_tag).toLowerCase() === 'admin'))
                 };
             });
             
             renderUserDirectory();
             updateAdminUserDatalist(); // Bind users to autocomplete menu
+
+            if (currentUserIsAdmin) {
+                renderAdminStats();
+                renderAdminUserTable();
+            }
         } catch (err) { console.error("Could not fetch user database collection:", err); }
     }
 
@@ -405,10 +618,123 @@ window.initializeChatEngine = async function() {
                     <span class="chat-clickable" style="color:white; font-weight:bold; cursor:pointer;" onclick="openUserMenu(event, '${u.username}')">
                         ${u.username}
                     </span>
-                    <div style="font-size:11px; color:#a0928d; margin-top:5px; text-transform:uppercase;">[${displayTag}]</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:5px; text-transform:uppercase;">[${displayTag}]</div>
                 </div>
             `;
         }).join('');
+    }
+
+    // --- IMPROVED ADMIN: STATS ROW ---
+    function renderAdminStats() {
+        const row = document.getElementById('admin-stats-row');
+        if (!row) return;
+
+        const total = allUsers.length;
+        const bannedCount = allUsers.filter(u => u.is_banned).length;
+        const adminCount = allUsers.filter(u => u.is_admin).length;
+        const onlineCount = allUsers.filter(u => u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)).length;
+
+        row.innerHTML = `
+            <div class="admin-stat-card">
+                <div class="stat-value">${total}</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="admin-stat-card stat-good">
+                <div class="stat-value">${onlineCount}</div>
+                <div class="stat-label">Online Now</div>
+            </div>
+            <div class="admin-stat-card">
+                <div class="stat-value">${adminCount}</div>
+                <div class="stat-label">Admins</div>
+            </div>
+            <div class="admin-stat-card stat-danger">
+                <div class="stat-value">${bannedCount}</div>
+                <div class="stat-label">Banned</div>
+            </div>
+        `;
+    }
+
+    // --- IMPROVED ADMIN: QUICK USER MANAGEMENT TABLE ---
+    function renderAdminUserTable(filterTerm = "") {
+        const table = document.getElementById('admin-user-table');
+        if (!table) return;
+
+        const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
+
+        if (filtered.length === 0) {
+            table.innerHTML = `<p style="color:var(--text-muted); font-size:13px; text-align:center; padding:20px 0;">No users match that search.</p>`;
+            return;
+        }
+
+        table.innerHTML = filtered.map(u => {
+            let onlineDot = "rgba(160, 146, 141, 0.4)";
+            if (u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)) {
+                onlineDot = "#22c55e";
+            }
+            const tagLabel = u.is_admin ? 'ADMIN' : (u.role_tag || 'User');
+            const banLabel = u.is_banned ? `<span style="color:#ff4444; font-weight:bold;"> · BANNED</span>` : '';
+
+            return `
+                <div class="admin-user-row">
+                    <img src="${u.pfp_url || DEFAULT_PFP}" style="border: 2px solid ${onlineDot};" alt="">
+                    <div class="aur-name">
+                        <strong>${u.username}</strong>
+                        <span>[${tagLabel}]${banLabel}</span>
+                    </div>
+                    <div class="aur-actions">
+                        <button class="aur-btn warn" onclick="quickAdminAction('warn', '${u.username.replace(/'/g, "\\'")}')">Warn</button>
+                        ${u.is_banned
+                            ? `<button class="aur-btn unban" onclick="quickAdminAction('unban', '${u.username.replace(/'/g, "\\'")}')">Unban</button>`
+                            : `<button class="aur-btn ban" onclick="quickAdminAction('ban', '${u.username.replace(/'/g, "\\'")}')">Ban</button>`
+                        }
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Quick inline action from the table (uses a lightweight prompt for reason on warn/ban)
+    window.quickAdminAction = async (action, username) => {
+        let reason = "";
+        if (action === 'warn' || action === 'ban') {
+            reason = prompt(`Reason for ${action === 'warn' ? 'warning' : 'banning'} ${username}:`, "") || "";
+            if (reason === null) return;
+        }
+
+        let data = { last_action_reason: reason, last_action_type: action };
+        if (action === 'ban') data.is_banned = true;
+        else if (action === 'unban') { data.is_banned = false; data.warned = false; data.temp_ban_until = null; }
+        else if (action === 'warn') data.warned = true;
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}`, {
+                method: 'PATCH',
+                headers: {
+                    'apikey': SUPABASE_KEY,
+                    'Authorization': `Bearer ${SUPABASE_KEY}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            });
+            if (!res.ok) throw new Error(await res.text());
+
+            // Reflect the change immediately without a full page reload
+            const target = allUsers.find(u => u.username === username);
+            if (target) {
+                if (action === 'ban') target.is_banned = true;
+                if (action === 'unban') target.is_banned = false;
+            }
+            renderAdminStats();
+            renderAdminUserTable(document.getElementById('admin-quick-search')?.value || "");
+        } catch (err) {
+            console.error("Quick action failed:", err);
+            alert("Action failed. Check console for details.");
+        }
+    };
+
+    const quickSearchInput = document.getElementById('admin-quick-search');
+    if (quickSearchInput) {
+        quickSearchInput.oninput = (e) => renderAdminUserTable(e.target.value);
     }
 
     // --- MESSAGE ENGINE ---
@@ -439,6 +765,7 @@ window.initializeChatEngine = async function() {
 
             const isAtBottom = msgContainer.scrollHeight - msgContainer.scrollTop <= msgContainer.clientHeight + 100;
             const blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
+            const myBubbleStyle = getSavedBubbleStyle();
 
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
@@ -467,8 +794,11 @@ window.initializeChatEngine = async function() {
                     }
                 }
 
+                const isMine = msg.username === user;
+                const bubbleExtraClass = (isMine && myBubbleStyle !== 'default') ? ` style-${myBubbleStyle}` : '';
+
                 const div = document.createElement('div');
-                div.className = `message-wrapper ${msg.username === user ? 'my-message-wrapper' : 'other-message-wrapper'}`;
+                div.className = `message-wrapper ${isMine ? 'my-message-wrapper' : 'other-message-wrapper'}`;
                 
                 div.innerHTML = `
                     <img src="${userPfp}" class="chat-pfp chat-clickable" alt="Avatar" style="border: 2px solid ${senderStatusColor};" onclick="openUserMenu(event, '${msg.username}')">
@@ -477,11 +807,11 @@ window.initializeChatEngine = async function() {
                             <span class="chat-username-link chat-clickable" onclick="openUserMenu(event, '${msg.username}')">
                                 <strong>${msg.username}</strong>
                             </span>
-                            <span style="font-size:10px; color:#cf7a3c; cursor:pointer; margin-left:4px;" onclick="window.mentionUser('${encodeURIComponent(msg.username)}')">[reply]</span>
+                            <span style="font-size:10px; color:var(--accent); cursor:pointer; margin-left:4px;" onclick="window.mentionUser('${encodeURIComponent(msg.username)}')">[reply]</span>
                             ${tag}
                             <span class="message-timestamp">${time}</span>
                         </div>
-                        <div class="message-text-bubble ${msg.username === user ? 'my-bubble-color' : 'other-bubble-color'}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
+                        <div class="message-text-bubble ${isMine ? 'my-bubble-color' : 'other-bubble-color'}${bubbleExtraClass}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
                             ${msg.content}
                         </div>
                          ${(currentUserIsAdmin && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
@@ -508,9 +838,9 @@ window.initializeChatEngine = async function() {
             if (len >= 230) {
                 charCounter.style.color = "#ff4444";
             } else if (len >= 200) {
-                charCounter.style.color = "#cf7a3c";
+                charCounter.style.color = "var(--accent)";
             } else {
-                charCounter.style.color = "#a0928d";
+                charCounter.style.color = "var(--text-muted)";
             }
         };
     }
@@ -599,6 +929,7 @@ window.initializeChatEngine = async function() {
 
             if (!res.ok) throw new Error(await res.text());
             alert("Action completed successfully!");
+            fetchAllUsers();
             
         } catch (err) {
             console.error("Database update failed:", err);
