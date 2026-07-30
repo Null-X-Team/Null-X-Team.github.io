@@ -4,16 +4,39 @@ const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 const DEFAULT_PFP = "https://Glaxyias.github.io/imgs/download.jpeg";
 let allUsers = [];
-let allRolesCache = [];
 let lastMessageTime = 0;
 let chatPollingInterval = null; 
 let heartbeatInterval = null;
+let pmPollingInterval = null;
 
 // Track active menu state
 let selectedChatUser = { username: '', handler: '' };
 
 // Track the live authorization status dynamically from Supabase
 let currentUserIsAdmin = false;
+let myUsernameGlobal = '';
+let myHandleGlobal = '';
+
+// PM state
+let pmConversations = {};      // handle -> { otherHandle, otherUsername, messages: [], unread: 0 }
+let activePmHandle = null;     // handle of the conversation currently open
+let pendingImageDataUrl = null;      // staged image for main chat
+let pendingPmImageDataUrl = null;    // staged image for PM thread
+
+// Image marker used to embed an attached image inside a text message row
+const IMG_MARKER = "[[IMG]]";
+
+function usernameToHandle(username) {
+    return '@' + String(username).toLowerCase().replace(/\s+/g, '_');
+}
+
+function renderMessageBody(content) {
+    if (typeof content === 'string' && content.startsWith(IMG_MARKER)) {
+        const url = content.slice(IMG_MARKER.length);
+        return `<img src="${url}" class="chat-attached-image" onclick="window.open('${url}', '_blank')" alt="attachment">`;
+    }
+    return content;
+}
 
 // ==========================================================================
 // LOCAL CHAT SETTINGS SYSTEM (theme / cloak / background / message style)
@@ -22,17 +45,62 @@ const SETTINGS_KEYS = {
     theme: 'nullchat_theme',
     cloakEnabled: 'nullchat_cloak_enabled',
     cloakType: 'nullchat_cloak_type',
-    bgImage: 'nullchat_bg_image',
+    bgType: 'nullchat_bg_type',       // 'none' | 'upload' | 'preset'
+    bgValue: 'nullchat_bg_value',     // data URL or preset key
     bgOverlay: 'nullchat_bg_overlay',
     bubbleStyle: 'nullchat_bubble_style',
 };
 
+// Expanded cloak library — uses Google's public favicon service so every
+// entry gets a real icon without needing to host our own image assets.
+function faviconFor(domain) {
+    return `https://www.google.com/s2/favicons?sz=64&domain=${domain}`;
+}
+
 const CLOAK_PRESETS = {
-    docs:      { title: 'Google Docs',        icon: 'https://ssl.gstatic.com/docs/documents/images/kix-favicon7.ico' },
-    classroom: { title: 'Home',                icon: 'https://ssl.gstatic.com/classroom/favicon.png' },
-    drive:     { title: 'My Drive - Google Drive', icon: 'https://ssl.gstatic.com/images/branding/product/1x/drive_2020q4_32dp.png' },
-    mail:      { title: 'Inbox (2) - Gmail',    icon: 'https://ssl.gstatic.com/ui/v1/icons/mail/rfr/gmail.ico' },
-    canvas:    { title: 'Dashboard',            icon: 'https://du11hjcvx0uqb.cloudfront.net/dist/images/favicon-e10d657a73.ico' },
+    docs:        { title: 'Google Docs',                domain: 'docs.google.com' },
+    classroom:   { title: 'Home',                        domain: 'classroom.google.com' },
+    drive:       { title: 'My Drive - Google Drive',     domain: 'drive.google.com' },
+    mail:        { title: 'Inbox (2) - Gmail',           domain: 'mail.google.com' },
+    slides:      { title: 'Google Slides',               domain: 'slides.google.com' },
+    sheets:      { title: 'Google Sheets',                domain: 'sheets.google.com' },
+    canvas:      { title: 'Dashboard',                    domain: 'instructure.com' },
+    canva:       { title: 'Home - Canva',                 domain: 'canva.com' },
+    m365:        { title: 'M365 Copilot',                 domain: 'microsoft365.com' },
+    noredink:    { title: 'Student Home | NoRedInk',      domain: 'noredink.com' },
+    ixl:         { title: 'IXL | Math, Language Arts',    domain: 'ixl.com' },
+    khan:        { title: 'Khan Academy',                 domain: 'khanacademy.org' },
+    quizlet:     { title: 'Quizlet - Flashcards',         domain: 'quizlet.com' },
+    desmos:      { title: 'Desmos | Graphing Calculator', domain: 'desmos.com' },
+    kahoot:      { title: 'Kahoot!',                      domain: 'kahoot.it' },
+    nearpod:     { title: 'Nearpod',                      domain: 'nearpod.com' },
+    edpuzzle:    { title: 'Edpuzzle',                     domain: 'edpuzzle.com' },
+    schoology:   { title: 'Schoology',                    domain: 'schoology.com' },
+    blackboard:  { title: 'Blackboard',                   domain: 'blackboard.com' },
+    coursera:    { title: 'Coursera | Online Courses',    domain: 'coursera.org' },
+    edx:         { title: 'edX',                          domain: 'edx.org' },
+    duolingo:    { title: 'Duolingo',                     domain: 'duolingo.com' },
+    codeorg:     { title: 'Code.org',                     domain: 'code.org' },
+    grammarly:   { title: 'Grammarly',                    domain: 'grammarly.com' },
+    wolfram:     { title: 'Wolfram|Alpha',                domain: 'wolframalpha.com' },
+    notion:      { title: 'Notion',                       domain: 'notion.so' },
+    quizizz:     { title: 'Quizizz',                      domain: 'quizizz.com' },
+    zearn:       { title: 'Zearn Math',                   domain: 'zearn.org' },
+    newsela:     { title: 'Newsela',                      domain: 'newsela.com' },
+    commonlit:   { title: 'CommonLit',                    domain: 'commonlit.org' },
+};
+
+// Preset backgrounds (CSS-only, no image hosting needed)
+const PRESET_BACKGROUNDS = {
+    none:       { label: 'None',        css: '' },
+    dusk:       { label: 'Dusk',        css: 'linear-gradient(135deg, #1e1613, #3a2418, #1e1613)' },
+    midnight:   { label: 'Midnight',    css: 'linear-gradient(135deg, #0b0e18, #1a2340, #0b0e18)' },
+    forest:     { label: 'Forest',      css: 'linear-gradient(135deg, #0d1f14, #1c3d24, #0d1f14)' },
+    ember:      { label: 'Ember',       css: 'radial-gradient(circle at 30% 20%, #4a1610, #140f0d 70%)' },
+    violet:     { label: 'Violet Haze', css: 'linear-gradient(135deg, #1a0f2e, #3d1f5c, #1a0f2e)' },
+    ocean:      { label: 'Ocean',       css: 'linear-gradient(135deg, #061a24, #0d3a52, #061a24)' },
+    sunrise:    { label: 'Sunrise',     css: 'linear-gradient(135deg, #3d1a0f, #a35a2c, #3d1a0f)' },
+    grid:       { label: 'Grid Lines',  css: 'repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 40px), repeating-linear-gradient(90deg, rgba(255,255,255,0.03) 0 1px, transparent 1px 40px), #140f0d' },
 };
 
 function applyTheme(themeName) {
@@ -50,7 +118,7 @@ function applyCloak(enabled, type) {
 
     if (enabled) {
         if (titleEl) titleEl.textContent = preset.title;
-        if (favicon) favicon.href = preset.icon;
+        if (favicon) favicon.href = faviconFor(preset.domain);
     } else {
         if (titleEl) titleEl.textContent = 'NULL Grades';
         if (favicon) favicon.href = 'data:,';
@@ -60,22 +128,69 @@ function applyCloak(enabled, type) {
     if (label) label.textContent = enabled ? `Cloak Enabled (${preset.title})` : 'Cloak Disabled';
 }
 
-function applyBackground(dataUrl, overlayPercent) {
+function populateCloakSelect() {
+    const select = document.getElementById('cloak-disguise-select');
+    if (!select) return;
+    select.innerHTML = Object.keys(CLOAK_PRESETS).map(key =>
+        `<option value="${key}">${CLOAK_PRESETS[key].title}</option>`
+    ).join('');
+}
+
+function populatePresetBackgrounds() {
+    const row = document.getElementById('preset-bg-row');
+    if (!row) return;
+    row.innerHTML = Object.keys(PRESET_BACKGROUNDS).map(key => {
+        const preset = PRESET_BACKGROUNDS[key];
+        const bgCss = preset.css ? `background: ${preset.css};` : 'background: #2a1f1a; border: 1px dashed rgba(255,255,255,0.2) !important;';
+        return `<div class="preset-bg-swatch" data-preset="${key}" style="${bgCss}"><span>${preset.label}</span></div>`;
+    }).join('');
+
+    row.querySelectorAll('.preset-bg-swatch').forEach(sw => {
+        sw.addEventListener('click', () => {
+            const key = sw.getAttribute('data-preset');
+            if (key === 'none') {
+                localStorage.removeItem(SETTINGS_KEYS.bgType);
+                localStorage.removeItem(SETTINGS_KEYS.bgValue);
+                applyBackground(null, null);
+            } else {
+                localStorage.setItem(SETTINGS_KEYS.bgType, 'preset');
+                localStorage.setItem(SETTINGS_KEYS.bgValue, key);
+                const overlay = parseInt(document.getElementById('bg-overlay-range')?.value || '70');
+                applyBackground('preset', key, overlay);
+            }
+        });
+    });
+}
+
+function applyBackground(type, value, overlayPercent) {
     const layer = document.getElementById('custom-bg-layer');
     const dropzone = document.getElementById('bg-upload-dropzone');
     const dzText = document.getElementById('bg-upload-text');
 
-    if (dataUrl) {
-        layer.style.display = 'block';
-        layer.style.backgroundImage = `url(${dataUrl})`;
-        layer.style.setProperty('--bg-overlay-alpha', (overlayPercent ?? 70) / 100);
-        document.body.classList.add('has-custom-bg');
-        if (dropzone) dropzone.classList.add('has-image');
-        if (dzText) dzText.textContent = 'Custom background active — click to change';
-    } else {
+    document.querySelectorAll('.preset-bg-swatch').forEach(sw => {
+        sw.classList.toggle('active-preset', type === 'preset' && sw.getAttribute('data-preset') === value);
+    });
+
+    if (!type || !value) {
         layer.style.display = 'none';
         layer.style.backgroundImage = '';
         document.body.classList.remove('has-custom-bg');
+        if (dropzone) dropzone.classList.remove('has-image');
+        if (dzText) dzText.textContent = 'Click to choose an image, or drag one here';
+        return;
+    }
+
+    layer.style.display = 'block';
+    layer.style.setProperty('--bg-overlay-alpha', (overlayPercent ?? 70) / 100);
+    document.body.classList.add('has-custom-bg');
+
+    if (type === 'upload') {
+        layer.style.backgroundImage = `url(${value})`;
+        if (dropzone) dropzone.classList.add('has-image');
+        if (dzText) dzText.textContent = 'Custom background active — click to change';
+    } else if (type === 'preset') {
+        const preset = PRESET_BACKGROUNDS[value];
+        layer.style.backgroundImage = preset ? preset.css : '';
         if (dropzone) dropzone.classList.remove('has-image');
         if (dzText) dzText.textContent = 'Click to choose an image, or drag one here';
     }
@@ -86,7 +201,6 @@ function applyBubbleStyle(styleName) {
         opt.classList.toggle('selected-style', opt.getAttribute('data-style') === styleName);
     });
     localStorage.setItem(SETTINGS_KEYS.bubbleStyle, styleName);
-    // Re-render messages so the style takes effect immediately on existing bubbles
     document.querySelectorAll('.my-bubble-color').forEach(bubble => {
         bubble.className = bubble.className.replace(/style-\S+/g, '').trim();
         if (styleName !== 'default') bubble.classList.add(`style-${styleName}`);
@@ -98,11 +212,12 @@ function getSavedBubbleStyle() {
 }
 
 function loadAllSettings() {
-    // Theme
+    populateCloakSelect();
+    populatePresetBackgrounds();
+
     const savedTheme = localStorage.getItem(SETTINGS_KEYS.theme) || 'amber';
     applyTheme(savedTheme);
 
-    // Cloak
     const cloakEnabled = localStorage.getItem(SETTINGS_KEYS.cloakEnabled) === 'true';
     const cloakType = localStorage.getItem(SETTINGS_KEYS.cloakType) || 'docs';
     const cloakToggle = document.getElementById('toggle-chat-cloak');
@@ -111,25 +226,21 @@ function loadAllSettings() {
     if (cloakSelect) cloakSelect.value = cloakType;
     applyCloak(cloakEnabled, cloakType);
 
-    // Background
-    const savedBg = localStorage.getItem(SETTINGS_KEYS.bgImage);
+    const savedBgType = localStorage.getItem(SETTINGS_KEYS.bgType);
+    const savedBgValue = localStorage.getItem(SETTINGS_KEYS.bgValue);
     const savedOverlay = parseInt(localStorage.getItem(SETTINGS_KEYS.bgOverlay) || '70');
     const overlayRange = document.getElementById('bg-overlay-range');
     if (overlayRange) overlayRange.value = savedOverlay;
-    applyBackground(savedBg, savedOverlay);
+    applyBackground(savedBgType, savedBgValue, savedOverlay);
 
-    // Bubble style
-    const savedStyle = getSavedBubbleStyle();
-    applyBubbleStyle(savedStyle);
+    applyBubbleStyle(getSavedBubbleStyle());
 }
 
 function initSettingsPanelBindings() {
-    // Theme swatches
     document.querySelectorAll('.theme-swatch').forEach(sw => {
         sw.addEventListener('click', () => applyTheme(sw.getAttribute('data-theme')));
     });
 
-    // Cloak toggle + select
     const cloakToggle = document.getElementById('toggle-chat-cloak');
     const cloakSelect = document.getElementById('cloak-disguise-select');
     if (cloakToggle) {
@@ -148,17 +259,13 @@ function initSettingsPanelBindings() {
         });
     }
 
-    // Escape key panic - jump to a neutral page instantly
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape') {
             const cloakEnabled = localStorage.getItem(SETTINGS_KEYS.cloakEnabled) === 'true';
-            if (cloakEnabled) {
-                window.location.href = 'https://docs.google.com';
-            }
+            if (cloakEnabled) window.location.href = 'https://docs.google.com';
         }
     });
 
-    // Background upload
     const bgInput = document.getElementById('bg-file-input');
     const removeBgBtn = document.getElementById('remove-bg-btn');
     const overlayRange = document.getElementById('bg-overlay-range');
@@ -167,21 +274,19 @@ function initSettingsPanelBindings() {
         bgInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (!file) return;
-            if (!file.type.startsWith('image/')) {
-                alert('Please choose a valid image file.');
-                return;
-            }
+            if (!file.type.startsWith('image/')) { alert('Please choose a valid image file.'); return; }
             const reader = new FileReader();
             reader.onload = (evt) => {
                 const dataUrl = evt.target.result;
                 try {
-                    localStorage.setItem(SETTINGS_KEYS.bgImage, dataUrl);
+                    localStorage.setItem(SETTINGS_KEYS.bgType, 'upload');
+                    localStorage.setItem(SETTINGS_KEYS.bgValue, dataUrl);
                 } catch (err) {
                     alert('That image is too large to save locally. Try a smaller/compressed image.');
                     return;
                 }
                 const overlay = overlayRange ? parseInt(overlayRange.value) : 70;
-                applyBackground(dataUrl, overlay);
+                applyBackground('upload', dataUrl, overlay);
             };
             reader.readAsDataURL(file);
         });
@@ -189,8 +294,9 @@ function initSettingsPanelBindings() {
 
     if (removeBgBtn) {
         removeBgBtn.addEventListener('click', () => {
-            localStorage.removeItem(SETTINGS_KEYS.bgImage);
-            applyBackground(null);
+            localStorage.removeItem(SETTINGS_KEYS.bgType);
+            localStorage.removeItem(SETTINGS_KEYS.bgValue);
+            applyBackground(null, null);
             if (bgInput) bgInput.value = '';
         });
     }
@@ -204,10 +310,76 @@ function initSettingsPanelBindings() {
         });
     }
 
-    // Message bubble style picker
     document.querySelectorAll('.bubble-style-option').forEach(opt => {
         opt.addEventListener('click', () => applyBubbleStyle(opt.getAttribute('data-style')));
     });
+}
+
+// ==========================================================================
+// IMAGE ATTACHMENT HELPERS (shared by main chat + PMs)
+// ==========================================================================
+function readImageAsDataUrl(file, callback) {
+    if (!file.type.startsWith('image/')) { alert('Please choose a valid image file.'); return; }
+    if (file.size > 1.5 * 1024 * 1024) { alert('Please choose an image smaller than 1.5MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = (evt) => callback(evt.target.result);
+    reader.readAsDataURL(file);
+}
+
+function initImageAttachUI() {
+    // Main chat attach
+    const attachBtn = document.getElementById('attach-image-btn');
+    const attachInput = document.getElementById('attach-image-input');
+    const previewBar = document.getElementById('image-preview-bar');
+    const previewThumb = document.getElementById('image-preview-thumb');
+    const cancelBtn = document.getElementById('cancel-image-btn');
+
+    if (attachBtn && attachInput) {
+        attachBtn.addEventListener('click', () => attachInput.click());
+        attachInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            readImageAsDataUrl(file, (dataUrl) => {
+                pendingImageDataUrl = dataUrl;
+                previewThumb.src = dataUrl;
+                previewBar.classList.remove('hidden');
+            });
+        });
+    }
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', () => {
+            pendingImageDataUrl = null;
+            attachInput.value = '';
+            previewBar.classList.add('hidden');
+        });
+    }
+
+    // PM thread attach
+    const pmAttachBtn = document.getElementById('pm-attach-image-btn');
+    const pmAttachInput = document.getElementById('pm-attach-image-input');
+    const pmPreviewBar = document.getElementById('pm-image-preview-bar');
+    const pmPreviewThumb = document.getElementById('pm-image-preview-thumb');
+    const pmCancelBtn = document.getElementById('pm-cancel-image-btn');
+
+    if (pmAttachBtn && pmAttachInput) {
+        pmAttachBtn.addEventListener('click', () => pmAttachInput.click());
+        pmAttachInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            readImageAsDataUrl(file, (dataUrl) => {
+                pendingPmImageDataUrl = dataUrl;
+                pmPreviewThumb.src = dataUrl;
+                pmPreviewBar.classList.remove('hidden');
+            });
+        });
+    }
+    if (pmCancelBtn) {
+        pmCancelBtn.addEventListener('click', () => {
+            pendingPmImageDataUrl = null;
+            pmAttachInput.value = '';
+            pmPreviewBar.classList.add('hidden');
+        });
+    }
 }
 
 // Globally scoped Quick Reply utility handler
@@ -235,7 +407,7 @@ window.openUserMenu = function(event, targetUsername) {
 
     selectedChatUser = { 
         username: targetUsername, 
-        handler: `@${targetUsername.toLowerCase().replace(/\s+/g, '_')}` 
+        handler: usernameToHandle(targetUsername)
     };
 
     const menu = document.getElementById('chat-user-menu');
@@ -246,27 +418,18 @@ window.openUserMenu = function(event, targetUsername) {
     if (handlerEl) handlerEl.textContent = selectedChatUser.handler;
 
     if (menu) {
-        // Prevent overflowing outside screen edges
         let posX = event.clientX;
         let posY = event.clientY;
-
         const menuWidth = 220;
         const menuHeight = 180;
-
-        if (posX + menuWidth > window.innerWidth) {
-            posX = window.innerWidth - menuWidth - 10;
-        }
-        if (posY + menuHeight > window.innerHeight) {
-            posY = window.innerHeight - menuHeight - 10;
-        }
-
+        if (posX + menuWidth > window.innerWidth) posX = window.innerWidth - menuWidth - 10;
+        if (posY + menuHeight > window.innerHeight) posY = window.innerHeight - menuHeight - 10;
         menu.style.left = `${posX}px`;
         menu.style.top = `${posY}px`;
         menu.classList.remove('hidden');
     }
 };
 
-// Global click event to dismiss context menu when clicking elsewhere
 document.addEventListener('click', (e) => {
     const menu = document.getElementById('chat-user-menu');
     if (menu && !e.target.closest('#chat-user-menu') && !e.target.closest('.chat-clickable')) {
@@ -274,7 +437,6 @@ document.addEventListener('click', (e) => {
     }
 });
 
-// Menu Action Button Bindings
 document.addEventListener('DOMContentLoaded', () => {
     const profileBtn = document.getElementById('menu-btn-profile');
     const pmBtn = document.getElementById('menu-btn-pm');
@@ -292,8 +454,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (pmBtn) {
         pmBtn.addEventListener('click', () => {
-            alert(`Opening private conversation with ${selectedChatUser.username}...`);
             document.getElementById('chat-user-menu')?.classList.add('hidden');
+            if (selectedChatUser.username && window.switchTab) {
+                window.switchTab('pms');
+                window.openPmWithUser?.(selectedChatUser.username);
+            }
         });
     }
 
@@ -307,7 +472,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (blockBtn) {
         blockBtn.addEventListener('click', () => {
             if (!selectedChatUser.username) return;
-            
             if (confirm(`Are you sure you want to block ${selectedChatUser.username}? You won't see their messages in chat.`)) {
                 let blockedUsers = JSON.parse(localStorage.getItem('blockedUsers') || '[]');
                 if (!blockedUsers.includes(selectedChatUser.username)) {
@@ -316,17 +480,70 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
                 alert(`User blocked successfully.`);
                 document.getElementById('chat-user-menu')?.classList.add('hidden');
-                
-                // Trigger refresh to immediately hide messages from blocked user
                 if (window.refreshChatMessages) window.refreshChatMessages();
             }
         });
     }
 
-    // Load and bind all local settings as soon as the DOM is ready
     loadAllSettings();
     initSettingsPanelBindings();
+    initImageAttachUI();
+
+    // New PM modal open/close
+    const newPmBtn = document.getElementById('new-pm-btn');
+    const modal = document.getElementById('new-pm-modal');
+    const closeModalBtn = document.getElementById('close-new-pm-modal');
+    const searchInput = document.getElementById('pm-user-search-input');
+
+    if (newPmBtn && modal) {
+        newPmBtn.addEventListener('click', () => {
+            modal.classList.remove('hidden');
+            if (searchInput) { searchInput.value = ''; searchInput.focus(); }
+            renderPmUserSearchResults('');
+        });
+    }
+    if (closeModalBtn && modal) {
+        closeModalBtn.addEventListener('click', () => modal.classList.add('hidden'));
+    }
+    if (modal) {
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.classList.add('hidden'); });
+    }
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => renderPmUserSearchResults(e.target.value));
+    }
 });
+
+function renderPmUserSearchResults(term) {
+    const container = document.getElementById('pm-user-search-results');
+    if (!container) return;
+    const lower = term.trim().toLowerCase();
+
+    const results = allUsers.filter(u => {
+        if (u.username === myUsernameGlobal) return false;
+        const handle = usernameToHandle(u.username);
+        return !lower || u.username.toLowerCase().includes(lower) || handle.includes(lower);
+    }).slice(0, 30);
+
+    if (results.length === 0) {
+        container.innerHTML = `<p class="pm-empty-hint">No matching users found.</p>`;
+        return;
+    }
+
+    container.innerHTML = results.map(u => `
+        <div class="pm-user-result-item" onclick="window.startNewPm('${u.username.replace(/'/g, "\\'")}')">
+            <img src="${u.pfp_url || DEFAULT_PFP}" alt="">
+            <div>
+                <div class="pmr-name">${u.username}</div>
+                <div class="pmr-handle">${usernameToHandle(u.username)}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.startNewPm = function(username) {
+    document.getElementById('new-pm-modal')?.classList.add('hidden');
+    window.openPmWithUser?.(username);
+};
 
 // Global initialization hook exposed directly to main.js router
 window.initializeChatEngine = async function() {
@@ -337,8 +554,12 @@ window.initializeChatEngine = async function() {
         return;
     }
 
+    myUsernameGlobal = user;
+    myHandleGlobal = usernameToHandle(user);
+
     if (chatPollingInterval) clearInterval(chatPollingInterval);
     if (heartbeatInterval) clearInterval(heartbeatInterval);
+    if (pmPollingInterval) clearInterval(pmPollingInterval);
 
     try {
         const verifyRes = await fetch(`${SUPABASE_URL}/rest/v1/users?select=username`, {
@@ -357,16 +578,11 @@ window.initializeChatEngine = async function() {
         console.error("Security handshake failed:", authError);
     }
 
-    // Dynamic background online indicator loop
     async function executePresenceHeartbeat() {
         try {
             await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(user)}`, {
                 method: 'PATCH',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify({ last_seen: new Date().toISOString() })
             });
         } catch (e) { console.error("Heartbeat sync lost:", e); }
@@ -404,9 +620,7 @@ window.initializeChatEngine = async function() {
                 }
                 
                 const systemFooterAvatar = document.getElementById('current-user-avatar');
-                if (systemFooterAvatar) {
-                    systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
-                }
+                if (systemFooterAvatar) systemFooterAvatar.src = profile.pfp_url || DEFAULT_PFP;
             }
         }
     } catch (banCheckErr) {
@@ -419,7 +633,6 @@ window.initializeChatEngine = async function() {
     if (currentUserIsAdmin) {
         const adminTab = document.getElementById('admin-tab');
         if (adminTab) adminTab.style.display = 'block';
-
         const pmTab = document.getElementById('pm-tab');
         if (pmTab) pmTab.style.display = 'block';
     }
@@ -428,7 +641,7 @@ window.initializeChatEngine = async function() {
 
     // --- TAB NAVIGATION UPDATE ---
     window.switchTab = (target) => {
-        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view', 'private-messages-view', 'settings-view'].forEach(v => {
+        ['chat-view', 'rules-view', 'admin-panel-view', 'users-view', 'private-messages-view', 'settings-view', 'pms-view'].forEach(v => {
             const el = document.getElementById(v);
             if (el) el.style.display = 'none';
         });
@@ -454,13 +667,23 @@ window.initializeChatEngine = async function() {
             if (pmView) pmView.style.display = 'block';
             const pmTab = document.getElementById('pm-tab');
             if (pmTab) pmTab.classList.add('active');
-            fetchAdminPrivateMessages(); // Fetch all PMs
+            fetchAdminPrivateMessages();
         }
         else if (target === 'settings') {
             const settingsView = document.getElementById('settings-view');
             if (settingsView) settingsView.style.display = 'block';
             const settingsTab = document.getElementById('chan-settings');
             if (settingsTab) settingsTab.classList.add('active');
+        }
+        else if (target === 'pms') {
+            const pmsView = document.getElementById('pms-view');
+            if (pmsView) pmsView.style.display = 'block';
+            const pmsTab = document.getElementById('chan-pms');
+            if (pmsTab) pmsTab.classList.add('active');
+            if (allUsers.length === 0) fetchAllUsers();
+            fetchMyPrivateConversations();
+            if (pmPollingInterval) clearInterval(pmPollingInterval);
+            pmPollingInterval = setInterval(fetchMyPrivateConversations, 4000);
         }
         else {
             const viewId = target + '-view';
@@ -473,31 +696,30 @@ window.initializeChatEngine = async function() {
             
             if (target === 'users') fetchAllUsers();
         }
+
+        // Stop PM polling when leaving the PMs tab to save requests
+        if (target !== 'pms' && pmPollingInterval) {
+            clearInterval(pmPollingInterval);
+            pmPollingInterval = null;
+        }
     };
 
-    // --- ADMIN DATALIST UPDATE (For autocomplete @ users) ---
     function updateAdminUserDatalist() {
         const datalist = document.getElementById('admin-user-suggestions');
         if (!datalist) return;
-        
         datalist.innerHTML = allUsers.map(u => `<option value="${u.username}">`).join('');
-
-        ['warn-search', 'ban-search', 'temp-ban-search'].forEach(id => {
+        ['warn-search', 'ban-search', 'temp-ban-search', 'role-tag-search'].forEach(id => {
             const input = document.getElementById(id);
             if (input) {
                 input.setAttribute('list', 'admin-user-suggestions');
-                input.setAttribute('placeholder', 'Type @ or username...');
-                
                 input.oninput = (e) => {
-                    if (e.target.value.startsWith('@')) {
-                        e.target.value = e.target.value.replace(/^@+/, '');
-                    }
+                    if (e.target.value.startsWith('@')) e.target.value = e.target.value.replace(/^@+/, '');
                 };
             }
         });
     }
 
-    // --- ADMIN PM FETCHING ---
+    // --- ADMIN MASTER PM LOG ---
     window.fetchAdminPrivateMessages = async function() {
         const container = document.getElementById('admin-pm-container');
         if (!container || !currentUserIsAdmin) return;
@@ -519,11 +741,12 @@ window.initializeChatEngine = async function() {
                     <div style="border-bottom: 1px solid var(--border-soft); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
                             <div style="font-size: 12px; color: var(--accent);">
-                                <strong>${pm.sender_username}</strong> ➔ <strong>${pm.recipient_username}</strong>
+                                <strong>${pm.sender_handle}</strong> ➔ <strong>${pm.recipient_handle}</strong>
                                 <span style="color: var(--text-muted); margin-left: 8px;">${time}</span>
+                                ${pm.is_read ? '' : '<span style="color:#ff4444; margin-left:8px;">UNREAD</span>'}
                             </div>
                             <div style="color: #e0e0e0; margin-top: 4px; font-size: 14px;">
-                                ${pm.content}
+                                ${renderMessageBody(pm.content)}
                             </div>
                         </div>
                         <button style="background: #ff4444; color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 10px; cursor: pointer;" 
@@ -547,10 +770,215 @@ window.initializeChatEngine = async function() {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             fetchAdminPrivateMessages();
-        } catch (e) {
-            console.error("Deletion failed:", e);
-        }
+        } catch (e) { console.error("Deletion failed:", e); }
     };
+
+    // ==========================================================================
+    // REAL 1:1 PRIVATE MESSAGING (uses the private_messages table directly)
+    // Columns: id, sender_handle, recipient_handle, content, created_at, is_read
+    // ==========================================================================
+    async function fetchMyPrivateConversations() {
+        try {
+            const [sentRes, receivedRes] = await Promise.all([
+                fetch(`${SUPABASE_URL}/rest/v1/private_messages?sender_handle=eq.${encodeURIComponent(myHandleGlobal)}&order=created_at.asc`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                }),
+                fetch(`${SUPABASE_URL}/rest/v1/private_messages?recipient_handle=eq.${encodeURIComponent(myHandleGlobal)}&order=created_at.asc`, {
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
+                })
+            ]);
+            const sent = await sentRes.json();
+            const received = await receivedRes.json();
+
+            const all = [...(sent || []), ...(received || [])].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+            pmConversations = {};
+            all.forEach(msg => {
+                const isMine = msg.sender_handle === myHandleGlobal;
+                const otherHandle = isMine ? msg.recipient_handle : msg.sender_handle;
+                if (!pmConversations[otherHandle]) {
+                    pmConversations[otherHandle] = { otherHandle, otherUsername: handleToDisplayUsername(otherHandle), messages: [], unread: 0 };
+                }
+                pmConversations[otherHandle].messages.push(msg);
+                if (!isMine && !msg.is_read) pmConversations[otherHandle].unread++;
+            });
+
+            renderPmConversationList();
+            updatePmUnreadBadge();
+
+            if (activePmHandle && pmConversations[activePmHandle]) {
+                renderPmThread(activePmHandle);
+            }
+        } catch (err) {
+            console.error("Failed to fetch private conversations:", err);
+        }
+    }
+
+    function handleToDisplayUsername(handle) {
+        const match = allUsers.find(u => usernameToHandle(u.username) === handle);
+        return match ? match.username : handle.replace('@', '');
+    }
+
+    function pfpForHandle(handle) {
+        const match = allUsers.find(u => usernameToHandle(u.username) === handle);
+        return match ? (match.pfp_url || DEFAULT_PFP) : DEFAULT_PFP;
+    }
+
+    function updatePmUnreadBadge() {
+        const totalUnread = Object.values(pmConversations).reduce((sum, c) => sum + c.unread, 0);
+        const badge = document.getElementById('pm-unread-badge');
+        if (badge) {
+            if (totalUnread > 0) {
+                badge.textContent = totalUnread > 99 ? '99+' : totalUnread;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    }
+
+    function renderPmConversationList() {
+        const list = document.getElementById('pm-convo-list');
+        if (!list) return;
+
+        const convos = Object.values(pmConversations).sort((a, b) => {
+            const aLast = a.messages[a.messages.length - 1];
+            const bLast = b.messages[b.messages.length - 1];
+            return new Date(bLast.created_at) - new Date(aLast.created_at);
+        });
+
+        if (convos.length === 0) {
+            list.innerHTML = `<p class="pm-empty-hint">No conversations yet. Click "+ New PM" to message someone.</p>`;
+            return;
+        }
+
+        list.innerHTML = convos.map(c => {
+            const lastMsg = c.messages[c.messages.length - 1];
+            const previewText = lastMsg.content.startsWith(IMG_MARKER) ? '📷 Image' : lastMsg.content;
+            const isActive = c.otherHandle === activePmHandle;
+            return `
+                <div class="pm-convo-item ${isActive ? 'active-convo' : ''}" onclick="window.openPmConversation('${c.otherHandle.replace(/'/g, "\\'")}')">
+                    <img src="${pfpForHandle(c.otherHandle)}" alt="">
+                    <div class="pm-convo-text">
+                        <div class="pm-convo-name">${c.otherUsername}</div>
+                        <div class="pm-convo-preview">${previewText}</div>
+                    </div>
+                    ${c.unread > 0 ? '<div class="pm-unread-dot"></div>' : ''}
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function markConversationRead(otherHandle) {
+        const convo = pmConversations[otherHandle];
+        if (!convo || convo.unread === 0) return;
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/private_messages?recipient_handle=eq.${encodeURIComponent(myHandleGlobal)}&sender_handle=eq.${encodeURIComponent(otherHandle)}&is_read=eq.false`, {
+                method: 'PATCH',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ is_read: true })
+            });
+            convo.unread = 0;
+            updatePmUnreadBadge();
+        } catch (e) { console.error("Failed marking conversation read:", e); }
+    }
+
+    function renderPmThread(otherHandle) {
+        const convo = pmConversations[otherHandle];
+        const threadMessages = document.getElementById('pm-thread-messages');
+        const threadTitle = document.getElementById('pm-thread-title');
+        const threadForm = document.getElementById('pm-thread-form');
+        if (!threadMessages) return;
+
+        if (threadTitle) threadTitle.textContent = convo ? convo.otherUsername : otherHandle.replace('@', '');
+        if (threadForm) threadForm.classList.remove('hidden');
+
+        if (!convo || convo.messages.length === 0) {
+            threadMessages.innerHTML = `<p class="pm-empty-hint">Send your first message below to start the conversation.</p>`;
+            return;
+        }
+
+        threadMessages.innerHTML = convo.messages.map(msg => {
+            const isMine = msg.sender_handle === myHandleGlobal;
+            const time = new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const bubbleExtra = isMine && getSavedBubbleStyle() !== 'default' ? ` style-${getSavedBubbleStyle()}` : '';
+            return `
+                <div class="message-wrapper ${isMine ? 'my-message-wrapper' : 'other-message-wrapper'}">
+                    <img src="${pfpForHandle(isMine ? myHandleGlobal : otherHandle)}" class="chat-pfp" alt="">
+                    <div class="message-content-node">
+                        <div class="message-meta-header">
+                            <span><strong>${isMine ? 'You' : convo.otherUsername}</strong></span>
+                            <span class="message-timestamp">${time}</span>
+                        </div>
+                        <div class="message-text-bubble ${isMine ? 'my-bubble-color' : 'other-bubble-color'}${bubbleExtra}">
+                            ${renderMessageBody(msg.content)}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        threadMessages.scrollTop = threadMessages.scrollHeight;
+    }
+
+    window.openPmConversation = function(otherHandle) {
+        activePmHandle = otherHandle;
+        renderPmConversationList();
+        renderPmThread(otherHandle);
+        markConversationRead(otherHandle);
+    };
+
+    window.openPmWithUser = function(username) {
+        const handle = usernameToHandle(username);
+        if (!pmConversations[handle]) {
+            pmConversations[handle] = { otherHandle: handle, otherUsername: username, messages: [], unread: 0 };
+        }
+        activePmHandle = handle;
+        renderPmConversationList();
+        renderPmThread(handle);
+    };
+
+    async function sendPrivateMessage(content) {
+        if (!activePmHandle) return;
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/private_messages`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    sender_handle: myHandleGlobal,
+                    recipient_handle: activePmHandle,
+                    content: content,
+                    is_read: false
+                })
+            });
+            await fetchMyPrivateConversations();
+        } catch (err) {
+            console.error("Failed to send private message:", err);
+            alert("Could not send that message. Please try again.");
+        }
+    }
+
+    const pmForm = document.getElementById('pm-thread-form');
+    if (pmForm) {
+        pmForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('pm-message-input');
+            const val = input.value.trim();
+
+            if (pendingPmImageDataUrl) {
+                const imgPayload = IMG_MARKER + pendingPmImageDataUrl;
+                pendingPmImageDataUrl = null;
+                document.getElementById('pm-attach-image-input').value = '';
+                document.getElementById('pm-image-preview-bar')?.classList.add('hidden');
+                await sendPrivateMessage(imgPayload);
+            }
+
+            if (val) {
+                input.value = '';
+                await sendPrivateMessage(val);
+            }
+        });
+    }
 
     // --- USER DIRECTORY ---
     async function fetchAllUsers() {
@@ -564,7 +992,6 @@ window.initializeChatEngine = async function() {
                 headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` }
             });
             const rolesData = await rolesRes.json();
-            allRolesCache = rolesData || [];
 
             const uniqueNames = [...new Set(usersData.map(u => u.username))].filter(name => name != null);
             
@@ -582,7 +1009,7 @@ window.initializeChatEngine = async function() {
             });
             
             renderUserDirectory();
-            updateAdminUserDatalist(); // Bind users to autocomplete menu
+            updateAdminUserDatalist();
 
             if (currentUserIsAdmin) {
                 renderAdminStats();
@@ -598,15 +1025,11 @@ window.initializeChatEngine = async function() {
         
         listContainer.innerHTML = filtered.map(u => {
             const displayTag = u.is_admin ? 'ADMIN' : u.role_tag;
-            
             let onlineDot = "rgba(160, 146, 141, 0.4)";
             let statusLabel = "OFFLINE";
             if (u.last_seen) {
                 const diff = Date.now() - new Date(u.last_seen).getTime();
-                if (diff < 5 * 60 * 1000) {
-                    onlineDot = "#22c55e";
-                    statusLabel = "ONLINE";
-                }
+                if (diff < 5 * 60 * 1000) { onlineDot = "#22c55e"; statusLabel = "ONLINE"; }
             }
 
             return `
@@ -624,41 +1047,27 @@ window.initializeChatEngine = async function() {
         }).join('');
     }
 
-    // --- IMPROVED ADMIN: STATS ROW ---
+    // --- ADMIN: STATS ROW ---
     function renderAdminStats() {
         const row = document.getElementById('admin-stats-row');
         if (!row) return;
-
         const total = allUsers.length;
         const bannedCount = allUsers.filter(u => u.is_banned).length;
         const adminCount = allUsers.filter(u => u.is_admin).length;
         const onlineCount = allUsers.filter(u => u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)).length;
 
         row.innerHTML = `
-            <div class="admin-stat-card">
-                <div class="stat-value">${total}</div>
-                <div class="stat-label">Total Users</div>
-            </div>
-            <div class="admin-stat-card stat-good">
-                <div class="stat-value">${onlineCount}</div>
-                <div class="stat-label">Online Now</div>
-            </div>
-            <div class="admin-stat-card">
-                <div class="stat-value">${adminCount}</div>
-                <div class="stat-label">Admins</div>
-            </div>
-            <div class="admin-stat-card stat-danger">
-                <div class="stat-value">${bannedCount}</div>
-                <div class="stat-label">Banned</div>
-            </div>
+            <div class="admin-stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Users</div></div>
+            <div class="admin-stat-card stat-good"><div class="stat-value">${onlineCount}</div><div class="stat-label">Online Now</div></div>
+            <div class="admin-stat-card"><div class="stat-value">${adminCount}</div><div class="stat-label">Admins</div></div>
+            <div class="admin-stat-card stat-danger"><div class="stat-value">${bannedCount}</div><div class="stat-label">Banned</div></div>
         `;
     }
 
-    // --- IMPROVED ADMIN: QUICK USER MANAGEMENT TABLE ---
+    // --- ADMIN: QUICK USER MANAGEMENT TABLE ---
     function renderAdminUserTable(filterTerm = "") {
         const table = document.getElementById('admin-user-table');
         if (!table) return;
-
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
 
         if (filtered.length === 0) {
@@ -668,11 +1077,10 @@ window.initializeChatEngine = async function() {
 
         table.innerHTML = filtered.map(u => {
             let onlineDot = "rgba(160, 146, 141, 0.4)";
-            if (u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)) {
-                onlineDot = "#22c55e";
-            }
+            if (u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)) onlineDot = "#22c55e";
             const tagLabel = u.is_admin ? 'ADMIN' : (u.role_tag || 'User');
             const banLabel = u.is_banned ? `<span style="color:#ff4444; font-weight:bold;"> · BANNED</span>` : '';
+            const safeName = u.username.replace(/'/g, "\\'");
 
             return `
                 <div class="admin-user-row">
@@ -682,47 +1090,47 @@ window.initializeChatEngine = async function() {
                         <span>[${tagLabel}]${banLabel}</span>
                     </div>
                     <div class="aur-actions">
-                        <button class="aur-btn warn" onclick="quickAdminAction('warn', '${u.username.replace(/'/g, "\\'")}')">Warn</button>
+                        <button class="aur-btn warn" onclick="quickAdminAction('warn', '${safeName}')">Warn</button>
                         ${u.is_banned
-                            ? `<button class="aur-btn unban" onclick="quickAdminAction('unban', '${u.username.replace(/'/g, "\\'")}')">Unban</button>`
-                            : `<button class="aur-btn ban" onclick="quickAdminAction('ban', '${u.username.replace(/'/g, "\\'")}')">Ban</button>`
+                            ? `<button class="aur-btn unban" onclick="quickAdminAction('unban', '${safeName}')">Unban</button>`
+                            : `<button class="aur-btn ban" onclick="quickAdminAction('ban', '${safeName}')">Ban</button>`
                         }
+                        <button class="aur-btn promote" onclick="quickAdminAction('${u.is_admin ? 'demote' : 'promote'}', '${safeName}')">${u.is_admin ? 'Demote' : 'Promote'}</button>
                     </div>
                 </div>
             `;
         }).join('');
     }
 
-    // Quick inline action from the table (uses a lightweight prompt for reason on warn/ban)
     window.quickAdminAction = async (action, username) => {
         let reason = "";
         if (action === 'warn' || action === 'ban') {
             reason = prompt(`Reason for ${action === 'warn' ? 'warning' : 'banning'} ${username}:`, "") || "";
             if (reason === null) return;
         }
+        if ((action === 'promote' || action === 'demote') && !confirm(`${action === 'promote' ? 'Grant' : 'Remove'} admin privileges for ${username}?`)) return;
 
         let data = { last_action_reason: reason, last_action_type: action };
         if (action === 'ban') data.is_banned = true;
         else if (action === 'unban') { data.is_banned = false; data.warned = false; data.temp_ban_until = null; }
         else if (action === 'warn') data.warned = true;
+        else if (action === 'promote') data.is_admin = true;
+        else if (action === 'demote') data.is_admin = false;
 
         try {
             const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}`, {
                 method: 'PATCH',
-                headers: {
-                    'apikey': SUPABASE_KEY,
-                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json'
-                },
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
             if (!res.ok) throw new Error(await res.text());
 
-            // Reflect the change immediately without a full page reload
             const target = allUsers.find(u => u.username === username);
             if (target) {
                 if (action === 'ban') target.is_banned = true;
                 if (action === 'unban') target.is_banned = false;
+                if (action === 'promote') target.is_admin = true;
+                if (action === 'demote') target.is_admin = false;
             }
             renderAdminStats();
             renderAdminUserTable(document.getElementById('admin-quick-search')?.value || "");
@@ -733,11 +1141,65 @@ window.initializeChatEngine = async function() {
     };
 
     const quickSearchInput = document.getElementById('admin-quick-search');
-    if (quickSearchInput) {
-        quickSearchInput.oninput = (e) => renderAdminUserTable(e.target.value);
-    }
+    if (quickSearchInput) quickSearchInput.oninput = (e) => renderAdminUserTable(e.target.value);
 
-    // --- MESSAGE ENGINE ---
+    // --- ADMIN: BROADCAST ANNOUNCEMENT ---
+    window.sendBroadcast = async () => {
+        const textEl = document.getElementById('broadcast-text');
+        const text = textEl ? textEl.value.trim() : '';
+        if (!text) return alert("Write an announcement message first.");
+
+        try {
+            await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+                method: 'POST',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: `📢 ${user}`, content: `[ANNOUNCEMENT] ${text}` })
+            });
+            textEl.value = '';
+            alert("Announcement posted to # general.");
+            fetchMessages();
+        } catch (err) {
+            console.error("Broadcast failed:", err);
+            alert("Failed to post announcement.");
+        }
+    };
+
+    // --- ADMIN: SET CUSTOM ROLE TAG ---
+    window.setRoleTag = async () => {
+        let target = document.getElementById('role-tag-search').value.trim();
+        const tag = document.getElementById('role-tag-value').value.trim();
+        if (target.startsWith('@')) target = target.substring(1);
+        if (!target) return alert("Enter a username.");
+        if (!tag) return alert("Enter a role tag value.");
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(target)}`, {
+                method: 'PATCH',
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ role_tag: tag })
+            });
+            if (!res.ok) throw new Error(await res.text());
+            alert(`Role tag "${tag}" applied to ${target}.`);
+            fetchAllUsers();
+        } catch (err) {
+            console.error("Role tag update failed:", err);
+            alert("Failed to set role tag.");
+        }
+    };
+
+    // --- ADMIN: EXPORT USER DATA ---
+    window.exportUserData = () => {
+        const dataStr = JSON.stringify(allUsers, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'users.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
+    // --- MESSAGE ENGINE (MAIN CHAT) ---
     async function fetchMessages() {
         if (!document.getElementById('chat-messages')) {
             clearInterval(chatPollingInterval);
@@ -769,7 +1231,6 @@ window.initializeChatEngine = async function() {
 
             msgContainer.innerHTML = '';
             messages.forEach(msg => {
-                // Ignore messages sent by blocked users
                 if (blockedUsers.includes(msg.username)) return;
 
                 const isDel = msg.content === "Message Was Deleted By Owner";
@@ -789,13 +1250,15 @@ window.initializeChatEngine = async function() {
 
                 let senderStatusColor = "transparent";
                 if (role && role.last_seen) {
-                    if (Date.now() - new Date(role.last_seen).getTime() < 5 * 60 * 1000) {
-                        senderStatusColor = "#22c55e";
-                    }
+                    if (Date.now() - new Date(role.last_seen).getTime() < 5 * 60 * 1000) senderStatusColor = "#22c55e";
                 }
 
                 const isMine = msg.username === user;
                 const bubbleExtraClass = (isMine && myBubbleStyle !== 'default') ? ` style-${myBubbleStyle}` : '';
+                const isAnnouncement = typeof msg.content === 'string' && msg.content.startsWith('[ANNOUNCEMENT]');
+                const bodyHtml = isAnnouncement
+                    ? `<strong style="color:#3aa0ff;">📢 ${msg.content.replace('[ANNOUNCEMENT]', '').trim()}</strong>`
+                    : renderMessageBody(msg.content);
 
                 const div = document.createElement('div');
                 div.className = `message-wrapper ${isMine ? 'my-message-wrapper' : 'other-message-wrapper'}`;
@@ -812,7 +1275,7 @@ window.initializeChatEngine = async function() {
                             <span class="message-timestamp">${time}</span>
                         </div>
                         <div class="message-text-bubble ${isMine ? 'my-bubble-color' : 'other-bubble-color'}${bubbleExtraClass}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
-                            ${msg.content}
+                            ${bodyHtml}
                         </div>
                          ${(currentUserIsAdmin && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
                     </div>
@@ -820,29 +1283,30 @@ window.initializeChatEngine = async function() {
                 msgContainer.appendChild(div);
             });
 
-            if (isAtBottom) {
-                msgContainer.scrollTop = msgContainer.scrollHeight;
-            }
+            if (isAtBottom) msgContainer.scrollTop = msgContainer.scrollHeight;
         } catch (e) { console.error(e); }
     }
 
     window.refreshChatMessages = fetchMessages;
 
-    // --- CHARACTER COUNTER LOGIC MOUNT ---
     const msgInput = document.getElementById('message-input');
     const charCounter = document.getElementById('char-counter');
     if (msgInput && charCounter) {
         msgInput.oninput = (e) => {
             const len = e.target.value.length;
             charCounter.textContent = `${len} / 250`;
-            if (len >= 230) {
-                charCounter.style.color = "#ff4444";
-            } else if (len >= 200) {
-                charCounter.style.color = "var(--accent)";
-            } else {
-                charCounter.style.color = "var(--text-muted)";
-            }
+            if (len >= 230) charCounter.style.color = "#ff4444";
+            else if (len >= 200) charCounter.style.color = "var(--accent)";
+            else charCounter.style.color = "var(--text-muted)";
         };
+    }
+
+    async function sendPlainMessage(content) {
+        await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
+            method: 'POST',
+            headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username: user, content })
+        });
     }
 
     const chatForm = document.getElementById('chat-form');
@@ -851,22 +1315,19 @@ window.initializeChatEngine = async function() {
             e.preventDefault();
             const now = Date.now();
             const input = document.getElementById('message-input');
+
             if (now - lastMessageTime < 2000 && !currentUserIsAdmin) return alert("Please wait between messages.");
-            
+
             const val = input.value.trim();
-            if (!val) return;
-            
-            if (val.length > 250) {
-                alert(`Your message is too long (${val.length}/250 characters). Please shorten it.`);
-                return;
-            }
-            
+            const hasImage = !!pendingImageDataUrl;
+
+            if (!val && !hasImage) return;
+            if (val.length > 250) return alert(`Your message is too long (${val.length}/250 characters). Please shorten it.`);
+
             input.disabled = true;
 
             try {
-                // --- CLIENT-SIDE BAD WORD FILTER INTEGRATION ---
-                // Checks if badword.js has loaded successfully and runs the filter
-                if (typeof filterBadWords === 'function') {
+                if (val && typeof filterBadWords === 'function') {
                     const cleanText = filterBadWords(val);
                     if (cleanText !== val) {
                         alert("Message blocked by filter! Please remove inappropriate language before sending.");
@@ -875,21 +1336,24 @@ window.initializeChatEngine = async function() {
                         return;
                     }
                 }
-                
-                input.value = ""; 
-                if (charCounter) charCounter.textContent = "0 / 250";
+
                 lastMessageTime = now;
 
-                // Send directly to Supabase
-                await fetch(`${SUPABASE_URL}/rest/v1/messages`, {
-                    method: 'POST',
-                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username: user, content: val })
-                });
-                
-                fetchMessages().then(() => {
-                    msgContainer.scrollTop = msgContainer.scrollHeight;
-                });
+                if (hasImage) {
+                    const imgPayload = IMG_MARKER + pendingImageDataUrl;
+                    pendingImageDataUrl = null;
+                    document.getElementById('attach-image-input').value = '';
+                    document.getElementById('image-preview-bar')?.classList.add('hidden');
+                    await sendPlainMessage(imgPayload);
+                }
+
+                if (val) {
+                    input.value = "";
+                    if (charCounter) charCounter.textContent = "0 / 250";
+                    await sendPlainMessage(val);
+                }
+
+                fetchMessages().then(() => { msgContainer.scrollTop = msgContainer.scrollHeight; });
             } catch (err) {
                 console.error("Message send failed:", err);
                 alert("Database connection failed.");
@@ -900,7 +1364,6 @@ window.initializeChatEngine = async function() {
         };
     }
 
-    // --- FIX: ADMIN ACTIONS USING PATCH TO UPDATE EXISTING ROWS ---
     window.adminExecute = async (action) => {
         let target = document.getElementById(action === 'warn' ? 'warn-search' : 'ban-search').value.trim();
         const reason = document.getElementById(action === 'warn' ? 'warn-reason' : 'ban-reason').value.trim();
@@ -909,28 +1372,20 @@ window.initializeChatEngine = async function() {
         if (!target) return alert("Enter a username.");
         if (target.startsWith('@')) target = target.substring(1);
 
-        // Define what we are updating
         let data = { last_action_reason: reason, last_action_type: action, last_action_category: cat };
         if (action === 'ban') { data.is_banned = true; }
         else if (action === 'unban') { data.is_banned = false; data.warned = false; data.temp_ban_until = null; }
         else if (action === 'warn') data.warned = true;
 
         try {
-            // Using PATCH to UPDATE the existing row where username matches
             const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(target)}`, {
                 method: 'PATCH',
-                headers: { 
-                    'apikey': SUPABASE_KEY, 
-                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                    'Content-Type': 'application/json' 
-                },
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
                 body: JSON.stringify(data)
             });
-
             if (!res.ok) throw new Error(await res.text());
             alert("Action completed successfully!");
             fetchAllUsers();
-            
         } catch (err) {
             console.error("Database update failed:", err);
             alert("Failed to update user. Check console for details.");
@@ -942,37 +1397,22 @@ window.initializeChatEngine = async function() {
         if (target.startsWith('@')) target = target.substring(1);
         if (!target) return alert("Enter a username.");
         
-        // Grab the duration and make sure it is actually a number
         const durationInput = document.getElementById('temp-ban-duration').value;
         const duration = parseInt(durationInput);
-        
-        if (isNaN(duration) || duration <= 0) {
-            return alert("Please enter a valid number of minutes for the ban duration!");
-        }
+        if (isNaN(duration) || duration <= 0) return alert("Please enter a valid number of minutes for the ban duration!");
         
         const reason = document.getElementById('temp-ban-reason').value.trim();
         const expiry = new Date(); 
         expiry.setMinutes(expiry.getMinutes() + duration);
 
         try {
-            // Using PATCH to UPDATE the existing row
             const res = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(target)}`, {
                 method: 'PATCH',
-                headers: { 
-                    'apikey': SUPABASE_KEY, 
-                    'Authorization': `Bearer ${SUPABASE_KEY}`, 
-                    'Content-Type': 'application/json' 
-                },
-                body: JSON.stringify({ 
-                    last_action_type: 'temp_ban', 
-                    last_action_reason: reason,
-                    temp_ban_until: expiry.toISOString() 
-                })
+                headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                body: JSON.stringify({ last_action_type: 'temp_ban', last_action_reason: reason, temp_ban_until: expiry.toISOString() })
             });
-
             if (!res.ok) throw new Error(await res.text());
             alert("Temporary ban applied successfully!");
-
         } catch (err) {
             console.error("Temp ban failed:", err);
             alert("Failed to apply temp ban. Check console for details.");
@@ -989,14 +1429,10 @@ window.initializeChatEngine = async function() {
     };
 
     const dirSearch = document.getElementById('directory-search');
-    if (dirSearch) {
-        dirSearch.oninput = (e) => renderUserDirectory(e.target.value);
-    }
+    if (dirSearch) dirSearch.oninput = (e) => renderUserDirectory(e.target.value);
 
     chatPollingInterval = setInterval(fetchMessages, 3000);
-    fetchMessages().then(() => {
-        msgContainer.scrollTop = msgContainer.scrollHeight;
-    });
+    fetchMessages().then(() => { msgContainer.scrollTop = msgContainer.scrollHeight; });
 };
 
 if (document.getElementById('chat-messages')) {
