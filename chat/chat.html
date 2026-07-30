@@ -22,10 +22,13 @@
         <div class="channel-list">
             <div id="chan-general" class="channel active" onclick="switchTab('general')"># general</div>
             <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
+            <div id="chan-pms" class="channel" onclick="switchTab('pms')">
+                # PMs <span id="pm-unread-badge" class="pm-badge hidden">0</span>
+            </div>
             <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
             <div id="chan-settings" class="channel" onclick="switchTab('settings')"># settings</div>
             <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
-            <div id="pm-tab" class="channel" style="display:none; color: var(--accent); font-weight: bold;" onclick="switchTab('private-messages')"># private-msgs</div>
+            <div id="pm-tab" class="channel" style="display:none; color: var(--accent); font-weight: bold;" onclick="switchTab('private-messages')"># pm-log (admin)</div>
         </div>
 
         <div class="user-profile">
@@ -44,16 +47,60 @@
             </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
+                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image">📎</button>
+                <input type="file" id="attach-image-input" accept="image/*" style="display:none;">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
                 <span id="char-counter" style="font-size: 11px; color: var(--text-muted); margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
             </form>
+            <div id="image-preview-bar" class="image-preview-bar hidden">
+                <img id="image-preview-thumb" src="" alt="preview">
+                <span>Image attached — press Send</span>
+                <button type="button" id="cancel-image-btn">✕</button>
+            </div>
         </div>
 
         <div id="users-view" style="display:none; padding: 40px; height: 100%; overflow-y: auto;">
             <h1 style="color: var(--accent); margin-bottom: 20px;">User Directory</h1>
             <input type="text" id="directory-search" placeholder="Search for a user..." style="margin-bottom: 20px; width: 100%; padding: 12px; background: var(--bg-panel); border: 1px solid var(--border-soft); color: white; border-radius: 6px; outline: none;">
             <div id="user-list-display" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
+        </div>
+
+        <!-- ============================================================
+             PERSONAL MESSAGES (PMs) VIEW
+             ============================================================ -->
+        <div id="pms-view" style="display:none; height: 100%;">
+            <div class="pm-layout">
+                <div class="pm-convo-panel">
+                    <div class="pm-convo-header">
+                        <span>Conversations</span>
+                        <button type="button" id="new-pm-btn" class="pm-new-btn">+ New PM</button>
+                    </div>
+                    <div id="pm-convo-list" class="pm-convo-list">
+                        <p class="pm-empty-hint">Loading conversations...</p>
+                    </div>
+                </div>
+
+                <div class="pm-thread-panel">
+                    <div id="pm-thread-header" class="pm-thread-header">
+                        <span id="pm-thread-title">Select a conversation</span>
+                    </div>
+                    <div id="pm-thread-messages" class="messages-container pm-thread-messages">
+                        <p class="pm-empty-hint">Pick a conversation on the left, or start a new one.</p>
+                    </div>
+                    <form id="pm-thread-form" class="input-area hidden">
+                        <button type="button" id="pm-attach-image-btn" class="attach-btn" title="Attach an image">📎</button>
+                        <input type="file" id="pm-attach-image-input" accept="image/*" style="display:none;">
+                        <input type="text" id="pm-message-input" placeholder="Send your first message..." autocomplete="off" maxlength="250">
+                        <button type="submit">Send</button>
+                    </form>
+                    <div id="pm-image-preview-bar" class="image-preview-bar hidden">
+                        <img id="pm-image-preview-thumb" src="" alt="preview">
+                        <span>Image attached — press Send</span>
+                        <button type="button" id="pm-cancel-image-btn">✕</button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="rules-view" class="rules-content" style="display:none; padding: 40px; overflow-y: auto;">
@@ -112,6 +159,8 @@
                         <div class="theme-swatch" data-theme="emerald" style="--sw: #2fbf71;" title="Emerald"></div>
                         <div class="theme-swatch" data-theme="azure" style="--sw: #3aa0ff;" title="Azure"></div>
                         <div class="theme-swatch" data-theme="rose" style="--sw: #ff5fa2;" title="Rose"></div>
+                        <div class="theme-swatch" data-theme="gold" style="--sw: #e8c547;" title="Gold"></div>
+                        <div class="theme-swatch" data-theme="mono" style="--sw: #b8b8b8;" title="Monochrome"></div>
                     </div>
                 </div>
 
@@ -128,32 +177,25 @@
                         <span id="cloak-toggle-label">Cloak Disabled</span>
                     </div>
 
-                    <select id="cloak-disguise-select" style="margin-top: 12px;">
-                        <option value="docs">Google Docs</option>
-                        <option value="classroom">Google Classroom</option>
-                        <option value="drive">Google Drive</option>
-                        <option value="mail">Gmail</option>
-                        <option value="canvas">Canvas Dashboard</option>
-                    </select>
+                    <select id="cloak-disguise-select" style="margin-top: 12px;"></select>
 
                     <p class="settings-hint">Tip: press <strong>Esc</strong> at any time to instantly leave the page.</p>
                 </div>
 
-                <!-- CUSTOM BACKGROUND -->
-                <div class="settings-card">
-                    <h3><i class="settings-icon">🖼️</i> Custom Background</h3>
-                    <p class="settings-desc">Upload an image to use as the chat background.</p>
+                <!-- BACKGROUND -->
+                <div class="settings-card" style="grid-column: span 2;">
+                    <h3><i class="settings-icon">🖼️</i> Chat Background</h3>
+                    <p class="settings-desc">Pick a preset background, or upload your own image.</p>
 
-                    <label for="bg-file-input" class="upload-dropzone" id="bg-upload-dropzone">
+                    <div id="preset-bg-row" class="preset-bg-row"></div>
+
+                    <label for="bg-file-input" class="upload-dropzone" id="bg-upload-dropzone" style="margin-top:16px;">
                         <span id="bg-upload-text">Click to choose an image, or drag one here</span>
                     </label>
                     <input type="file" id="bg-file-input" accept="image/*" style="display:none;">
 
-                    <div class="settings-toggle-row" style="margin-top: 12px;">
+                    <div class="settings-toggle-row" style="margin-top: 12px; flex-wrap: wrap; gap: 14px;">
                         <button type="button" class="settings-btn-secondary" id="remove-bg-btn">Remove Background</button>
-                    </div>
-
-                    <div class="settings-toggle-row" style="margin-top: 10px;">
                         <label style="font-size: 12px; color: var(--text-muted); display:flex; align-items:center; gap:8px;">
                             Overlay Darkness
                             <input type="range" id="bg-overlay-range" min="0" max="90" value="70">
@@ -162,7 +204,7 @@
                 </div>
 
                 <!-- MESSAGE BUBBLE STYLE -->
-                <div class="settings-card">
+                <div class="settings-card" style="grid-column: span 2;">
                     <h3><i class="settings-icon">💬</i> Your Message Style</h3>
                     <p class="settings-desc">Change how your own outgoing messages appear to you.</p>
 
@@ -243,6 +285,27 @@
                     <button class="admin-btn btn-ban" onclick="adminExecute('ban')">Execute Ban</button>
                     <button class="admin-btn btn-unban" onclick="adminExecute('unban')">Unban User</button>
                 </div>
+
+                <div class="admin-card">
+                    <h3>Broadcast Announcement</h3>
+                    <textarea id="broadcast-text" class="bulk-area" placeholder="Message shown to everyone in # general..."></textarea>
+                    <button class="admin-btn" style="background:#3aa0ff; color:white;" onclick="sendBroadcast()">Post Announcement</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>Set Custom Role Tag</h3>
+                    <div class="search-wrapper">
+                        <input type="text" id="role-tag-search" placeholder="Type @ to find user...">
+                    </div>
+                    <input type="text" id="role-tag-value" placeholder="e.g. Moderator, VIP, Dev...">
+                    <button class="admin-btn" style="background:#9d4edd; color:white;" onclick="setRoleTag()">Apply Tag</button>
+                </div>
+
+                <div class="admin-card">
+                    <h3>Export Data</h3>
+                    <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Download a JSON snapshot of the current user directory (usernames, roles, status).</p>
+                    <button class="admin-btn" style="background:#2a1f1a; color:var(--text-muted); border:1px solid var(--border-soft);" onclick="exportUserData()">Download users.json</button>
+                </div>
             </div>
 
             <div class="admin-card" style="margin-top: 20px;">
@@ -256,10 +319,22 @@
 
         <div id="private-messages-view" style="display:none; padding: 40px; overflow-y: auto; height: 100%;">
             <h1 style="color: var(--accent); margin-bottom: 20px;">Master Private Message Log</h1>
-            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Live log of all direct communications across the server.</p>
+            <p style="color: var(--text-muted); font-size: 14px; margin-bottom: 20px;">Live log of all direct communications across the server (admin visibility only).</p>
             <div id="admin-pm-container" style="display: flex; flex-direction: column; gap: 15px; background: rgba(0, 0, 0, 0.15); padding: 20px; border-radius: 8px;"></div>
         </div>
 
+    </div>
+</div>
+
+<!-- NEW PM MODAL -->
+<div id="new-pm-modal" class="modal-overlay hidden">
+    <div class="modal-box">
+        <div class="modal-header">
+            <span>Start a New Conversation</span>
+            <button type="button" id="close-new-pm-modal" class="modal-close">✕</button>
+        </div>
+        <input type="text" id="pm-user-search-input" placeholder="Search by username or handle..." class="modal-search-input">
+        <div id="pm-user-search-results" class="pm-user-search-results"></div>
     </div>
 </div>
 
