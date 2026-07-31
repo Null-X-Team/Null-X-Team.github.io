@@ -22,6 +22,7 @@ let pmConversations = {};      // handle -> { otherHandle, otherUsername, messag
 let activePmHandle = null;     // handle of the conversation currently open
 let pendingImageDataUrl = null;      // staged image for main chat
 let pendingPmImageDataUrl = null;    // staged image for PM thread
+let suppressPmRefresh = false;       // guards against the poller clobbering a just-opened conversation
 
 // Image marker used to embed an attached image inside a text message row
 const IMG_MARKER = "[[IMG]]";
@@ -530,7 +531,7 @@ function renderPmUserSearchResults(term) {
     }
 
     container.innerHTML = results.map(u => `
-        <div class="pm-user-result-item" onclick="window.startNewPm('${u.username.replace(/'/g, "\\'")}')">
+        <div class="pm-user-result-item" data-username="${u.username.replace(/"/g, '&quot;')}">
             <img src="${u.pfp_url || DEFAULT_PFP}" alt="">
             <div>
                 <div class="pmr-name">${u.username}</div>
@@ -538,11 +539,35 @@ function renderPmUserSearchResults(term) {
             </div>
         </div>
     `).join('');
+
+    // Bind click handlers directly instead of inline onclick, and stop the
+    // click from bubbling up to the modal-overlay "click outside to close"
+    // listener, which was racing with the PM-open logic below.
+    container.querySelectorAll('.pm-user-result-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const username = item.getAttribute('data-username');
+            window.startNewPm(username);
+        });
+    });
 }
 
 window.startNewPm = function(username) {
+    // Guard the PM state against the background poller for a moment while
+    // we switch tabs and open the thread, so a fetch that lands mid-transition
+    // can't stomp on the conversation we're about to open.
+    suppressPmRefresh = true;
+
     document.getElementById('new-pm-modal')?.classList.add('hidden');
+
+    // The modal previously only hid itself and opened the thread state,
+    // but never actually switched the visible view to the PMs tab. If the
+    // user opened "+ New PM" from anywhere other than the PMs tab, nothing
+    // appeared to happen — the modal just closed. Explicitly switch tabs first.
+    if (window.switchTab) window.switchTab('pms');
     window.openPmWithUser?.(username);
+
+    setTimeout(() => { suppressPmRefresh = false; }, 500);
 };
 
 // Global initialization hook exposed directly to main.js router
@@ -741,7 +766,7 @@ window.initializeChatEngine = async function() {
                     <div style="border-bottom: 1px solid var(--border-soft); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
                             <div style="font-size: 12px; color: var(--accent);">
-                                <strong>${pm.sender_handle}</strong> ➔ <strong>${pm.recipient_handle}</strong>
+                                <strong>${pm.sender_handle}</strong> <img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/27a1/emoji.svg" alt="to"> <strong>${pm.recipient_handle}</strong>
                                 <span style="color: var(--text-muted); margin-left: 8px;">${time}</span>
                                 ${pm.is_read ? '' : '<span style="color:#ff4444; margin-left:8px;">UNREAD</span>'}
                             </div>
@@ -778,6 +803,7 @@ window.initializeChatEngine = async function() {
     // Columns: id, sender_handle, recipient_handle, content, created_at, is_read
     // ==========================================================================
     async function fetchMyPrivateConversations() {
+        if (suppressPmRefresh) return;
         try {
             const [sentRes, receivedRes] = await Promise.all([
                 fetch(`${SUPABASE_URL}/rest/v1/private_messages?sender_handle=eq.${encodeURIComponent(myHandleGlobal)}&order=created_at.asc`, {
@@ -792,16 +818,25 @@ window.initializeChatEngine = async function() {
 
             const all = [...(sent || []), ...(received || [])].sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
-            pmConversations = {};
+            const freshConversations = {};
             all.forEach(msg => {
                 const isMine = msg.sender_handle === myHandleGlobal;
                 const otherHandle = isMine ? msg.recipient_handle : msg.sender_handle;
-                if (!pmConversations[otherHandle]) {
-                    pmConversations[otherHandle] = { otherHandle, otherUsername: handleToDisplayUsername(otherHandle), messages: [], unread: 0 };
+                if (!freshConversations[otherHandle]) {
+                    freshConversations[otherHandle] = { otherHandle, otherUsername: handleToDisplayUsername(otherHandle), messages: [], unread: 0 };
                 }
-                pmConversations[otherHandle].messages.push(msg);
-                if (!isMine && !msg.is_read) pmConversations[otherHandle].unread++;
+                freshConversations[otherHandle].messages.push(msg);
+                if (!isMine && !msg.is_read) freshConversations[otherHandle].unread++;
             });
+
+            // Preserve any conversation the user just opened locally (e.g. via
+            // "+ New PM") that has no messages yet, so a poll landing right
+            // after doesn't make the freshly-opened thread disappear.
+            if (activePmHandle && !freshConversations[activePmHandle] && pmConversations[activePmHandle]) {
+                freshConversations[activePmHandle] = pmConversations[activePmHandle];
+            }
+
+            pmConversations = freshConversations;
 
             renderPmConversationList();
             updatePmUnreadBadge();
@@ -844,6 +879,9 @@ window.initializeChatEngine = async function() {
         const convos = Object.values(pmConversations).sort((a, b) => {
             const aLast = a.messages[a.messages.length - 1];
             const bLast = b.messages[b.messages.length - 1];
+            if (!aLast && !bLast) return 0;
+            if (!aLast) return -1;
+            if (!bLast) return 1;
             return new Date(bLast.created_at) - new Date(aLast.created_at);
         });
 
@@ -854,10 +892,14 @@ window.initializeChatEngine = async function() {
 
         list.innerHTML = convos.map(c => {
             const lastMsg = c.messages[c.messages.length - 1];
-            const previewText = lastMsg.content.startsWith(IMG_MARKER) ? '📷 Image' : lastMsg.content;
+            const previewText = !lastMsg
+                ? 'Say hello!'
+                : (lastMsg.content.startsWith(IMG_MARKER)
+                    ? '<img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4f7/emoji.svg" alt=""> Image'
+                    : lastMsg.content);
             const isActive = c.otherHandle === activePmHandle;
             return `
-                <div class="pm-convo-item ${isActive ? 'active-convo' : ''}" onclick="window.openPmConversation('${c.otherHandle.replace(/'/g, "\\'")}')">
+                <div class="pm-convo-item ${isActive ? 'active-convo' : ''}" data-handle="${c.otherHandle.replace(/"/g, '&quot;')}">
                     <img src="${pfpForHandle(c.otherHandle)}" alt="">
                     <div class="pm-convo-text">
                         <div class="pm-convo-name">${c.otherUsername}</div>
@@ -867,6 +909,12 @@ window.initializeChatEngine = async function() {
                 </div>
             `;
         }).join('');
+
+        list.querySelectorAll('.pm-convo-item').forEach(item => {
+            item.addEventListener('click', () => {
+                window.openPmConversation(item.getAttribute('data-handle'));
+            });
+        });
     }
 
     async function markConversationRead(otherHandle) {
@@ -1257,7 +1305,7 @@ window.initializeChatEngine = async function() {
                 const bubbleExtraClass = (isMine && myBubbleStyle !== 'default') ? ` style-${myBubbleStyle}` : '';
                 const isAnnouncement = typeof msg.content === 'string' && msg.content.startsWith('[ANNOUNCEMENT]');
                 const bodyHtml = isAnnouncement
-                    ? `<strong style="color:#3aa0ff;">📢 ${msg.content.replace('[ANNOUNCEMENT]', '').trim()}</strong>`
+                    ? `<strong style="color:#3aa0ff;"><img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4e2/emoji.svg" alt=""> ${msg.content.replace('[ANNOUNCEMENT]', '').trim()}</strong>`
                     : renderMessageBody(msg.content);
 
                 const div = document.createElement('div');
