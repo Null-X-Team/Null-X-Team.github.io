@@ -116,6 +116,7 @@ let _0xData = [
   { id: "day_in_the_office", title: "A Day in the Office", url: "../Games/dayintheoffice/index.html", image: "../Games/dayintheoffice/images (1).jpeg", desc: "A surreal horror game where you navigate an endless work day that you can never escape.", popular: true },
   { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
+    {id: "itch", title: "itch.io test", url: "../Games/Sortthecourt/SortTheCourt_Windows.zip", desc: "itch.io test", popular:true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
