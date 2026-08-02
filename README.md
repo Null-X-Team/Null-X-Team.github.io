@@ -1,6 +1,6 @@
 # Null_X
 
-## Cool isn't it?
+## Cool isn't it? 
 
 > [!IMPORTANT]
 > This site is non-compatible with vercel and some others because of some dumb file sortage thing (something to do where on vercel, it doesn't actually have the folders or something and ../ breaks it? I am just going off what AI said).
