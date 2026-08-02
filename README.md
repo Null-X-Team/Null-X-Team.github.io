@@ -12,7 +12,7 @@
 > This site follows all DMCA Rules (I think) and any games that are requested to be taken down will be. (I think that is under DMCA rules but I just want to be sure)
 
 > [!TIP]
-> This site is non-iframeable so don't even try. :]
+> This site is non-iframeable so don't even try.
 
 ---
 
