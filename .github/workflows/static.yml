@@ -46,7 +46,7 @@ jobs:
           git add version.json
           # Commit only if changed; use [skip ci] so this automatic commit doesn't trigger a duplicate run
           if ! git diff-index --quiet HEAD; then
-            git commit -m "sys: update version stamp [skip ci]"
+            git commit -m "Update version stamp [skip ci]"
             git pull --rebase origin main
             git push origin main
           fi
