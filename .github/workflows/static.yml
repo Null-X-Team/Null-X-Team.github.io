@@ -41,7 +41,7 @@ jobs:
 
       - name: Commit version.json back to repo
         run: |
-          git config --global user.name "github-actions[bot]"
+          git config --global user.name "Version[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add version.json
           # Commit only if changed; use [skip ci] so this automatic commit doesn't trigger a duplicate run
