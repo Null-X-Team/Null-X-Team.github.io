@@ -26,6 +26,25 @@
     <hr class="settings-divider" style="border: 0; height: 1px; background: linear-gradient(to right, #8b00ff, transparent); margin: 20px 0 30px 0;">
 
     <div class="setting-section" style="margin-bottom: 35px;">
+      <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-music" style="margin-right: 8px;"></i>Music</h3>
+      <p class="setting-label" style="color: #ccc; font-size: 0.9rem; margin-bottom: 12px;">Background music uses licensed tracks hosted in <code>/audio</code> (HTML5 Audio — no iframes or YouTube).</p>
+      <div style="display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="nx-music-enable" style="cursor: pointer; width: 18px; height: 18px;">
+          <label for="nx-music-enable" style="margin: 0; cursor: pointer; font-size: 0.95rem; color: #ccc;">Enable background music</label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <input type="checkbox" id="nx-music-mute" style="cursor: pointer; width: 18px; height: 18px;">
+          <label for="nx-music-mute" style="margin: 0; cursor: pointer; font-size: 0.95rem; color: #ccc;">Mute</label>
+        </div>
+        <div>
+          <label for="nx-music-volume" style="display: block; color: #ccc; font-size: 0.9rem; margin-bottom: 6px;">Volume: <span id="nx-music-volume-label">35%</span></label>
+          <input type="range" id="nx-music-volume" min="0" max="100" value="35" style="width: 100%; cursor: pointer;">
+        </div>
+      </div>
+    </div>
+
+    <div class="setting-section" style="margin-bottom: 35px;">
       <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-palette" style="margin-right: 8px;"></i>Appearance</h3>
       <p class="setting-label" style="color: #ccc; font-size: 0.9rem; margin-bottom: 12px;">Select Theme:</p>
       <div class="theme-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px;">
@@ -226,5 +245,6 @@
 
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
+  <script src="../JS/music.js"></script>
 </body>
 </html>
