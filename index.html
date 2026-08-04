@@ -338,7 +338,7 @@
         <a href="#" id="nav-unblockers" class="nav-item"><i class="fas fa-shield-halved" style="margin-right: 8px;"></i>Unblockers</a>
         <a href="#" id="nav-profile" class="nav-item"><i class="fas fa-user" style="margin-right: 8px;"></i>Profile</a>
         <a href="#" id="nav-communications" class="nav-item"><i class="fas fa-comments" style="margin-right: 8px;"></i>Communications</a>
-        <a href="#" id="nav-terminal" class="nav-item"><i class="fas fa-terminal" style="margin-right: 8px;"></i>Terminal</a>
+        <a href="#" id="nav-calculator" class="nav-item"><i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculator</a>
       </nav>
     </aside>
 
@@ -489,12 +489,9 @@
         </div>
       </div>
 
-      <div id="terminalSection" style="display: none; padding: 20px; font-family: sans-serif; color: white; width: 100%; box-sizing: border-box;">
-        <h2>System Console</h2>
-        <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); font-family: monospace; padding: 15px; border-radius: 6px; color: #00ff66;">
-          <p>&gt; Null_X dashboard core loaded successfully.</p>
-          <p>&gt; waiting for local command sequence...</p>
-        </div>
+      <div id="calculatorSection" style="display: none; padding: 20px; font-family: sans-serif; color: white; width: 100%; box-sizing: border-box;">
+        <h2 style="margin-top:0;">Calculator</h2>
+        <iframe src="calculator/index.html" title="Calculator" style="width:100%;height:calc(100vh - 160px);min-height:520px;border:1px solid rgba(139,0,255,0.35);border-radius:8px;background:#000;"></iframe>
       </div>
     </main>
 
@@ -838,7 +835,7 @@
     </div>
     <div id="console-output"></div>
     <div id="console-input-container">
-      <span style="color: #a033ff; font-weight: bold;">&gt;</span>
+      <span style="color: #a033ff; font-weight: bold;">></span>
       <input type="text" id="console-input" placeholder="Type JS command here..." />
     </div>
   </div>
@@ -1060,7 +1057,7 @@
     });
   </script>
   
-  <script src="../debug.js"></script>
+  <script src="debug.js"></script>
   
   <script type="module" src="JS/main.js"></script>
   <script src="customcrosshair/customcrosshair.js"></script>

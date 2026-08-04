@@ -1,49 +1,51 @@
 // Master Dynamic Theme Switcher Engine
 window.applyTheme = function(themeName) {
-  // 1. Find all classes on the body that start with "theme-"
-  const classesToRemove = Array.from(document.body.classList).filter(cls => 
+  const classesToRemove = Array.from(document.body.classList).filter(cls =>
     cls.startsWith('theme-')
   );
-  
-  // 2. Wipe them out completely
   classesToRemove.forEach(cls => document.body.classList.remove(cls));
-  
-  // 3. Apply the brand new theme class if it's not the default
   if (themeName && themeName !== 'default') {
     document.body.classList.add(`theme-${themeName}`);
   }
-  
-  // 4. Backup user configuration profile state to local storage
   localStorage.setItem('nullx-theme', themeName);
 };
 
-// Start system theme configurations on launch
 document.addEventListener('DOMContentLoaded', () => {
   const savedTheme = localStorage.getItem('nullx-theme') || 'default';
   window.applyTheme(savedTheme);
-  
-  // Attach click event listeners to the document to catch theme card clicks
+
   document.addEventListener('click', (e) => {
-    // Look for the closest element with the 'theme-card' class
     const card = e.target.closest('.theme-card');
     if (card) {
       const selectedTheme = card.getAttribute('data-theme');
-      if (selectedTheme) {
-        window.applyTheme(selectedTheme);
-      }
+      if (selectedTheme) window.applyTheme(selectedTheme);
     }
   });
-});
 
-// Load HTML5 background music player (licensed local /audio files only)
-(function loadNullXMusic() {
-  if (document.querySelector('script[data-nx-music]')) return;
-  var s = document.createElement('script');
-  s.src = (window.location.pathname.indexOf('/Settings/') !== -1 ||
-           window.location.pathname.indexOf('/themes/') !== -1)
-    ? '../JS/music.js'
-    : 'JS/music.js';
-  s.setAttribute('data-nx-music', '1');
-  s.async = true;
-  document.head.appendChild(s);
-})();
+  // Replace Terminal sidebar entry with Calculator (no Terminal pages)
+  const navTerm = document.getElementById('nav-terminal');
+  if (navTerm) {
+    navTerm.id = 'nav-calculator';
+    navTerm.innerHTML = '<i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculator';
+    navTerm.onclick = function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (typeof clearAllViews === 'function') clearAllViews();
+      if (typeof updateNavActiveState === 'function') updateNavActiveState('nav-calculator');
+      else {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        navTerm.classList.add('active');
+      }
+      let sec = document.getElementById('calculatorSection') || document.getElementById('terminalSection');
+      if (sec) {
+        sec.id = 'calculatorSection';
+        sec.style.setProperty('display', 'block', 'important');
+        sec.innerHTML =
+          '<h2 style="margin-top:0;color:#fff;font-family:sans-serif;">Calculator</h2>' +
+          '<iframe src="calculator/index.html" title="Calculator" ' +
+          'style="width:100%;height:calc(100vh - 160px);min-height:520px;border:1px solid rgba(139,0,255,0.35);' +
+          'border-radius:8px;background:#000;"></iframe>';
+      }
+    };
+  }
+});
