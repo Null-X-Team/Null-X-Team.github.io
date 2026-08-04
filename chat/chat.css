@@ -1,1 +1,112 @@
-PLACEHOLDER_USE_REAL
+/* chat/chat.css - FIXED overlay */
+
+/* ==========================================================================
+   THEME VARIABLES
+   ========================================================================== */
+:root {
+    --accent: #cf7a3c;
+    --accent-soft: rgba(207, 122, 60, 0.15);
+    --accent-border: rgba(207, 122, 60, 0.2);
+    --bg-dark: #140f0d;
+    --bg-panel: #1e1613;
+    --bg-panel-soft: rgba(207, 122, 60, 0.05);
+    --border-soft: rgba(207, 122, 60, 0.15);
+    --text-muted: #a0928d;
+}
+
+body[data-theme="crimson"] {
+    --accent: #e0463f; --accent-soft: rgba(224, 70, 63, 0.15); --accent-border: rgba(224, 70, 63, 0.25);
+    --bg-dark: #140b0b; --bg-panel: #1e1414; --bg-panel-soft: rgba(224, 70, 63, 0.05);
+    --border-soft: rgba(224, 70, 63, 0.15); --text-muted: #a08e8e;
+}
+body[data-theme="violet"] {
+    --accent: #9d4edd; --accent-soft: rgba(157, 78, 221, 0.15); --accent-border: rgba(157, 78, 221, 0.25);
+    --bg-dark: #100b14; --bg-panel: #19131e; --bg-panel-soft: rgba(157, 78, 221, 0.05);
+    --border-soft: rgba(157, 78, 221, 0.15); --text-muted: #948aa0;
+}
+body[data-theme="emerald"] {
+    --accent: #2fbf71; --accent-soft: rgba(47, 191, 113, 0.15); --accent-border: rgba(47, 191, 113, 0.25);
+    --bg-dark: #0b1410; --bg-panel: #131e18; --bg-panel-soft: rgba(47, 191, 113, 0.05);
+    --border-soft: rgba(47, 191, 113, 0.15); --text-muted: #8ea095;
+}
+body[data-theme="azure"] {
+    --accent: #3aa0ff; --accent-soft: rgba(58, 160, 255, 0.15); --accent-border: rgba(58, 160, 255, 0.25);
+    --bg-dark: #0b1014; --bg-panel: #13191e; --bg-panel-soft: rgba(58, 160, 255, 0.05);
+    --border-soft: rgba(58, 160, 255, 0.15); --text-muted: #8e97a0;
+}
+body[data-theme="rose"] {
+    --accent: #ff5fa2; --accent-soft: rgba(255, 95, 162, 0.15); --accent-border: rgba(255, 95, 162, 0.25);
+    --bg-dark: #140b10; --bg-panel: #1e1319; --bg-panel-soft: rgba(255, 95, 162, 0.05);
+    --border-soft: rgba(255, 95, 162, 0.15); --text-muted: #a08e97;
+}
+body[data-theme="gold"] {
+    --accent: #e8c547; --accent-soft: rgba(232, 197, 71, 0.15); --accent-border: rgba(232, 197, 71, 0.25);
+    --bg-dark: #14120b; --bg-panel: #1e1a13; --bg-panel-soft: rgba(232, 197, 71, 0.05);
+    --border-soft: rgba(232, 197, 71, 0.15); --text-muted: #a09c8e;
+}
+body[data-theme="mono"] {
+    --accent: #b8b8b8; --accent-soft: rgba(184, 184, 184, 0.15); --accent-border: rgba(184, 184, 184, 0.25);
+    --bg-dark: #0e0e0e; --bg-panel: #181818; --bg-panel-soft: rgba(184, 184, 184, 0.05);
+    --border-soft: rgba(184, 184, 184, 0.15); --text-muted: #969696;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background-color: var(--bg-dark);
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+}
+
+.hidden { display: none !important; }
+
+/* ==========================================================================
+   CUSTOM BACKGROUND LAYER
+   ========================================================================== */
+#custom-bg-layer {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0;
+    background-size: cover;
+    background-position: center;
+    pointer-events: none;
+    display: none;
+}
+
+#custom-bg-layer::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0, var(--bg-overlay-alpha, 0.7));
+}
+
+.chat-container {
+    display: flex;
+    height: 100vh;
+    position: relative;
+    z-index: 1;
+}
+
+body.has-custom-bg .sidebar,
+body.has-custom-bg .main-chat,
+body.has-custom-bg .messages-container,
+body.has-custom-bg .input-area,
+body.has-custom-bg .pm-convo-panel,
+body.has-custom-bg .pm-thread-header {
+    /* Panel opacity tracks overlay darkness so lowering the slider reveals the bg color */
+    background: rgba(20, 15, 13, var(--panel-bg-alpha, 0.42));
+    backdrop-filter: blur(4px);
+}
+
+body.has-custom-bg .sidebar-header,
+body.has-custom-bg .user-profile,
+body.has-custom-bg #chat-view-header,
+body.has-custom-bg .settings-card,
+body.has-custom-bg .admin-card {
+    background: rgba(20, 15, 13, var(--panel-bg-alpha, 0.42));
+}
+
+/* NOTE: Full stylesheet continues - this push was truncated. Restoring full file next. */
