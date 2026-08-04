@@ -34,16 +34,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
-
-// Load HTML5 background music player (licensed local /audio files only)
-(function loadNullXMusic() {
-  if (document.querySelector('script[data-nx-music]')) return;
-  var s = document.createElement('script');
-  s.src = (window.location.pathname.indexOf('/Settings/') !== -1 ||
-           window.location.pathname.indexOf('/themes/') !== -1)
-    ? '../JS/music.js'
-    : 'JS/music.js';
-  s.setAttribute('data-nx-music', '1');
-  s.async = true;
-  document.head.appendChild(s);
-})();
