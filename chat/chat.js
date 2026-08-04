@@ -182,7 +182,9 @@ function applyBackground(type, value, overlayPercent) {
     }
 
     layer.style.display = 'block';
-    layer.style.setProperty('--bg-overlay-alpha', (overlayPercent ?? 70) / 100);
+    const ov = (overlayPercent ?? 70) / 100;
+    layer.style.setProperty('--bg-overlay-alpha', ov);
+    document.documentElement.style.setProperty('--panel-bg-alpha', Math.max(0.18, ov * 0.55).toFixed(3));
     document.body.classList.add('has-custom-bg');
 
     if (type === 'upload') {
@@ -307,7 +309,9 @@ function initSettingsPanelBindings() {
             const val = parseInt(e.target.value);
             localStorage.setItem(SETTINGS_KEYS.bgOverlay, val);
             const layer = document.getElementById('custom-bg-layer');
-            if (layer) layer.style.setProperty('--bg-overlay-alpha', val / 100);
+            const ov = val / 100;
+            if (layer) layer.style.setProperty('--bg-overlay-alpha', ov);
+            document.documentElement.style.setProperty('--panel-bg-alpha', Math.max(0.18, ov * 0.55).toFixed(3));
         });
     }
 
@@ -766,7 +770,7 @@ window.initializeChatEngine = async function() {
                     <div style="border-bottom: 1px solid var(--border-soft); padding: 10px 0; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
                             <div style="font-size: 12px; color: var(--accent);">
-                                <strong>${pm.sender_handle}</strong> <img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/27a1/emoji.svg" alt="to"> <strong>${pm.recipient_handle}</strong>
+                                <strong>${pm.sender_handle}</strong> → <strong>${pm.recipient_handle}</strong>
                                 <span style="color: var(--text-muted); margin-left: 8px;">${time}</span>
                                 ${pm.is_read ? '' : '<span style="color:#ff4444; margin-left:8px;">UNREAD</span>'}
                             </div>
@@ -895,7 +899,7 @@ window.initializeChatEngine = async function() {
             const previewText = !lastMsg
                 ? 'Say hello!'
                 : (lastMsg.content.startsWith(IMG_MARKER)
-                    ? '<img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4f7/emoji.svg" alt=""> Image'
+                    ? '📷 Image'
                     : lastMsg.content);
             const isActive = c.otherHandle === activePmHandle;
             return `
@@ -1305,7 +1309,7 @@ window.initializeChatEngine = async function() {
                 const bubbleExtraClass = (isMine && myBubbleStyle !== 'default') ? ` style-${myBubbleStyle}` : '';
                 const isAnnouncement = typeof msg.content === 'string' && msg.content.startsWith('[ANNOUNCEMENT]');
                 const bodyHtml = isAnnouncement
-                    ? `<strong style="color:#3aa0ff;"><img class="inline-emoji-svg" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4e2/emoji.svg" alt=""> ${msg.content.replace('[ANNOUNCEMENT]', '').trim()}</strong>`
+                    ? `<strong style="color:#3aa0ff;">📢 ${msg.content.replace('[ANNOUNCEMENT]', '').trim()}</strong>`
                     : renderMessageBody(msg.content);
 
                 const div = document.createElement('div');

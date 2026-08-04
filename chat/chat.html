@@ -47,7 +47,7 @@
             </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
-                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ce/emoji.svg" alt="attach"></button>
+                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="attach"></button>
                 <input type="file" id="attach-image-input" accept="image/*" style="display:none;">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
@@ -66,9 +66,6 @@
             <div id="user-list-display" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px;"></div>
         </div>
 
-        <!-- ============================================================
-             PERSONAL MESSAGES (PMs) VIEW
-             ============================================================ -->
         <div id="pms-view" style="display:none; height: 100%;">
             <div class="pm-layout">
                 <div class="pm-convo-panel">
@@ -89,7 +86,7 @@
                         <p class="pm-empty-hint">Pick a conversation on the left, or start a new one.</p>
                     </div>
                     <form id="pm-thread-form" class="input-area hidden">
-                        <button type="button" id="pm-attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ce/emoji.svg" alt="attach"></button>
+                        <button type="button" id="pm-attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="attach"></button>
                         <input type="file" id="pm-attach-image-input" accept="image/*" style="display:none;">
                         <input type="text" id="pm-message-input" placeholder="Send your first message..." autocomplete="off" maxlength="250">
                         <button type="submit">Send</button>
@@ -139,18 +136,14 @@
             </div>
         </div>
 
-        <!-- ============================================================
-             SETTINGS VIEW
-             ============================================================ -->
         <div id="settings-view" style="display:none; padding: 40px; overflow-y: auto; height: 100%;">
             <h1 style="color: var(--accent); margin-bottom: 8px;">Chat Settings</h1>
             <p style="color: var(--text-muted); font-size: 13px; margin-bottom: 30px;">These preferences are saved locally to this browser/device.</p>
 
             <div class="settings-grid">
 
-                <!-- THEME PICKER -->
                 <div class="settings-card">
-                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3a8/emoji.svg" alt="theme"> Chat Theme</h3>
+                    <h3><img class="settings-icon-img" src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="theme"> Chat Theme</h3>
                     <p class="settings-desc">Pick an accent color scheme for the whole chat interface.</p>
                     <div id="theme-swatch-row" class="theme-swatch-row">
                         <div class="theme-swatch" data-theme="amber" style="--sw: #cf7a3c;" title="Amber (Default)"></div>
@@ -164,9 +157,8 @@
                     </div>
                 </div>
 
-                <!-- TAB CLOAK -->
                 <div class="settings-card">
-                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3ad/emoji.svg" alt="cloak"> Tab Cloak</h3>
+                    <h3><img class="settings-icon-img" src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="cloak"> Tab Cloak</h3>
                     <p class="settings-desc">Disguises this tab's title and icon so it looks like a different site at a glance.</p>
 
                     <div class="settings-toggle-row">
@@ -182,9 +174,8 @@
                     <p class="settings-hint">Tip: press <strong>Esc</strong> at any time to instantly leave the page.</p>
                 </div>
 
-                <!-- BACKGROUND -->
                 <div class="settings-card" style="grid-column: span 2;">
-                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f5bc/emoji.svg" alt="background"> Chat Background</h3>
+                    <h3><img class="settings-icon-img" src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="background"> Chat Background</h3>
                     <p class="settings-desc">Pick a preset background, or upload your own image.</p>
 
                     <div id="preset-bg-row" class="preset-bg-row"></div>
@@ -203,9 +194,8 @@
                     </div>
                 </div>
 
-                <!-- MESSAGE BUBBLE STYLE -->
                 <div class="settings-card" style="grid-column: span 2;">
-                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/emoji.svg" alt="messages"> Your Message Style</h3>
+                    <h3><img class="settings-icon-img" src="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png" alt="messages"> Your Message Style</h3>
                     <p class="settings-desc">Change how your own outgoing messages appear to you.</p>
 
                     <div id="bubble-style-row" class="bubble-style-row">
@@ -239,9 +229,6 @@
             </div>
         </div>
 
-        <!-- ============================================================
-             ADMIN PANEL VIEW (IMPROVED)
-             ============================================================ -->
         <div id="admin-panel-view" style="display:none; padding: 40px; overflow-y: auto;">
             <h1 style="margin-bottom:20px; color:#ff4444;">Admin Management</h1>
 
@@ -326,7 +313,6 @@
     </div>
 </div>
 
-<!-- NEW PM MODAL -->
 <div id="new-pm-modal" class="modal-overlay hidden">
     <div class="modal-box">
         <div class="modal-header">
@@ -369,5 +355,24 @@
 
 <script src="https://cdn.jsdelivr.net/gh/Galethis/badwordfilter@main/badword.js"></script>
 <script src="chat.js"></script>
+<script>
+/* Overlay patch: keep --panel-bg-alpha in sync with the darkness slider */
+(function () {
+  function syncPanelAlpha() {
+    var range = document.getElementById('bg-overlay-range');
+    if (!range) return;
+    var ov = parseInt(range.value || '70', 10) / 100;
+    document.documentElement.style.setProperty('--panel-bg-alpha', Math.max(0.18, ov * 0.55).toFixed(3));
+  }
+  document.addEventListener('DOMContentLoaded', function () {
+    var range = document.getElementById('bg-overlay-range');
+    if (range) {
+      range.addEventListener('input', syncPanelAlpha);
+      syncPanelAlpha();
+    }
+  });
+})();
+</script>
+
 </body>
 </html>

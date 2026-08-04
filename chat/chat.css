@@ -96,8 +96,17 @@ body.has-custom-bg .messages-container,
 body.has-custom-bg .input-area,
 body.has-custom-bg .pm-convo-panel,
 body.has-custom-bg .pm-thread-header {
-    background: rgba(20, 15, 13, 0.75);
-    backdrop-filter: blur(6px);
+    /* Panel opacity tracks overlay darkness so lowering the slider reveals the bg color */
+    background: rgba(20, 15, 13, var(--panel-bg-alpha, 0.42));
+    backdrop-filter: blur(4px);
+}
+
+body.has-custom-bg .sidebar-header,
+body.has-custom-bg .user-profile,
+body.has-custom-bg #chat-view-header,
+body.has-custom-bg .settings-card,
+body.has-custom-bg .admin-card {
+    background: rgba(20, 15, 13, var(--panel-bg-alpha, 0.42));
 }
 
 /* Sidebar */

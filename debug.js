@@ -1,11 +1,13 @@
 /**
- * NULL X - DEVELOPER ENVIRONMENT v6.1.0
- * Toggle: press ~ (tilde)
+ * ============================================================
+ *  NULL X - DEVELOPER ENVIRONMENT v6.0.0
+ *  Toggle: press ~ (tilde) or click Debug button
+ * ============================================================
  */
 (function NullXDevTools() {
   "use strict";
   const CONFIG = {
-    version: "6.1.0",
+    version: "6.0.0",
     theme: { bg: "rgba(5,5,8,0.98)", border: "#8b00ff", accent: "#00ffcc", text: "#eee", danger: "#ff0055" }
   };
   const STATE = { isVisible: false, activeTab: "tab-sys", tools: {}, startTime: Date.now() };
