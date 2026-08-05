@@ -15,24 +15,65 @@
         'panicKey',
         'panicUrl',
         'panicBlocker',
-        'nxos_user_pin',
-        'nullx_favorites_arr'
+        'nxos_user_pin'
     ]);
 
     let lastSavedString = '';
     let exportPaused = false;      // true while empty-cache warning modal is open
-    let autoSaveReady = false;     // false until 5s startup grace period ends
+    let autoSaveReady = false;     // false until grace period + cloak done
     let autoSaveTimer = null;
-    let emptyCacheModalShown = false;
+
+    function isEducationalCloakActive() {
+        const cloak = document.getElementById('educational-cloak');
+        if (!cloak) return false;
+        if (localStorage.getItem('disableStudyCloak') === 'true') return false;
+        if (cloak.classList.contains('hidden')) return false;
+        const style = window.getComputedStyle(cloak);
+        if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') return false;
+        // If it covers the screen and is still in the DOM without hidden, treat as active
+        return true;
+    }
+
+    function waitForEducationalCloakDone() {
+        return new Promise((resolve) => {
+            if (!isEducationalCloakActive()) {
+                resolve();
+                return;
+            }
+
+            const cloak = document.getElementById('educational-cloak');
+            let settled = false;
+            const done = () => {
+                if (settled) return;
+                settled = true;
+                observer.disconnect();
+                clearInterval(poll);
+                clearTimeout(maxWait);
+                resolve();
+            };
+
+            const observer = new MutationObserver(() => {
+                if (!isEducationalCloakActive()) done();
+            });
+            if (cloak) {
+                observer.observe(cloak, { attributes: true, attributeFilter: ['class', 'style'] });
+            }
+
+            const poll = setInterval(() => {
+                if (!isEducationalCloakActive()) done();
+            }, 250);
+
+            // Safety: never wait forever (cloak is ~10s)
+            const maxWait = setTimeout(done, 15000);
+        });
+    }
 
     function isProgressCacheEmpty() {
-        // Count keys that look like real progress (anything outside known UI/session keys)
         let progressKeyCount = 0;
         for (let i = 0; i < localStorage.length; i++) {
             const key = localStorage.key(i);
             if (!key) continue;
             if (NON_PROGRESS_KEYS.has(key)) continue;
-            // Tiny placeholder values still count as empty-ish
             const val = localStorage.getItem(key);
             if (val === null || val === '' || val === '{}' || val === '[]' || val === 'null') continue;
             progressKeyCount++;
@@ -124,7 +165,6 @@
                 status.style.color = '#a033ff';
             }
             await window.cloudLoad('ecw-status', true);
-            // After import, re-check; if we have progress, close modal and resume exports
             if (!isProgressCacheEmpty()) {
                 hideEmptyCacheWarning();
                 if (status) {
@@ -150,8 +190,7 @@
         if (!modal) return;
         modal.classList.remove('hidden');
         exportPaused = true;
-        emptyCacheModalShown = true;
-        console.warn('[CloudSync] Export paused — empty local cache detected.');
+        console.warn('[CloudSync] Export paused — empty local cache warning shown.');
     }
 
     function hideEmptyCacheWarning() {
@@ -161,11 +200,14 @@
         console.log('[CloudSync] Export resumed.');
     }
 
+    // Public helpers for debugging
+    window.showEmptyCacheWarning = showEmptyCacheWarning;
+    window.isProgressCacheEmpty = isProgressCacheEmpty;
     window.isCloudExportPaused = function() {
-        return exportPaused || !autoSaveReady;
+        return exportPaused || !autoSaveReady || isEducationalCloakActive();
     };
 
-    // --- CLOUD SAVE (Handles Manual Clicks + Background Auto-Saves) ---
+    // --- CLOUD SAVE ---
     window.cloudSave = async function(statusElementId = null, isManual = false) {
         const loggedInUser = localStorage.getItem('chatUser');
         const statusBox = statusElementId ? document.getElementById(statusElementId) : null;
@@ -175,32 +217,37 @@
             return;
         }
 
-        // Hard stop while warning modal is open (manual or auto)
+        // Block while educational overlay is up
+        if (isEducationalCloakActive()) {
+            if (statusBox) {
+                statusBox.textContent = 'Save paused (overlay active)';
+                statusBox.style.color = '#888';
+            }
+            return;
+        }
+
+        // Hard stop while warning modal is open
         if (exportPaused) {
             if (statusBox) {
                 statusBox.textContent = 'Export paused — import your data first';
                 statusBox.style.color = '#ff8888';
             }
-            console.warn('[CloudSync] cloudSave blocked: exportPaused');
             return;
         }
 
-        // Block auto-saves during startup grace period
-        if (!isManual && !autoSaveReady) {
-            return;
-        }
+        // Block auto-saves until grace period ends
+        if (!isManual && !autoSaveReady) return;
 
-        // Never auto-upload an empty progress cache (prevents wiping cloud on new device)
+        // Never auto-upload an empty progress cache
         if (!isManual && isProgressCacheEmpty()) {
             if (statusBox) {
                 statusBox.textContent = 'Auto-save skipped (empty local cache)';
                 statusBox.style.color = '#ffaa00';
             }
-            console.warn('[CloudSync] Auto-save skipped — local progress cache is empty.');
             return;
         }
 
-        // Manual export of empty cache still blocked unless user already dismissed warning
+        // Manual export of empty cache → force warning
         if (isManual && isProgressCacheEmpty()) {
             showEmptyCacheWarning();
             if (statusBox) {
@@ -262,7 +309,7 @@
         }
     };
 
-    // --- CLOUD LOAD (Handles Manual Downloads + Startup Sync) ---
+    // --- CLOUD LOAD ---
     window.cloudLoad = async function(statusElementId = null, isManual = false) {
         const loggedInUser = localStorage.getItem('chatUser');
         const statusBox = statusElementId ? document.getElementById(statusElementId) : null;
@@ -306,7 +353,6 @@
         }
     };
 
-    // Hook Sign Out: warn if local cache is empty so user doesn't leave without importing
     function interceptSignOut() {
         const btn = document.getElementById('signInBtn');
         if (!btn || btn.dataset.ecwHooked === '1') return;
@@ -314,7 +360,6 @@
 
         btn.addEventListener('click', function onSignOutClick(e) {
             const user = localStorage.getItem('chatUser');
-            // Only intercept when logged in (button acts as Sign Out)
             if (!user) return;
 
             if (isProgressCacheEmpty()) {
@@ -327,37 +372,43 @@
                     status.style.color = '#ff4444';
                 }
             }
-        }, true); // capture phase so we run before main.js handler
+        }, true);
     }
 
-    // --- AUTOMATIC TIMERS & EVENT LISTENERS ---
+    // --- STARTUP ---
     document.addEventListener('DOMContentLoaded', async () => {
         interceptSignOut();
+        ensureEmptyCacheModal(); // build DOM early so it exists
 
-        // 1. Try to pull cloud data first
+        // Never save while educational overlay is running
+        // Wait for it to finish before load/check/autosave
+        console.log('[CloudSync] Waiting for educational overlay...');
+        await waitForEducationalCloakDone();
+        console.log('[CloudSync] Educational overlay done.');
+
+        // Pull cloud data after overlay
         await window.cloudLoad('dashboard-sync-msg', false);
 
-        // 2. If still empty after load attempt, warn (logged-in users only)
+        // Show warning only after overlay, if still empty
         if (localStorage.getItem('chatUser') && isProgressCacheEmpty()) {
             showEmptyCacheWarning();
         }
 
-        // 3. 5 second grace period before auto-save may run
+        // Extra 5s grace after overlay before auto-save starts
         setTimeout(() => {
             autoSaveReady = true;
-            console.log('[CloudSync] Auto-save grace period ended — auto-save enabled.');
+            console.log('[CloudSync] Auto-save enabled.');
 
-            // Start 30s interval only after grace period
             if (autoSaveTimer) clearInterval(autoSaveTimer);
             autoSaveTimer = setInterval(() => {
+                if (isEducationalCloakActive() || exportPaused) return;
                 window.cloudSave('dashboard-sync-msg', false);
             }, 30000);
         }, 5000);
     });
 
-    // Emergency backup on tab close — still blocked if exportPaused or empty
     window.addEventListener('beforeunload', () => {
-        if (exportPaused || !autoSaveReady || isProgressCacheEmpty()) return;
+        if (exportPaused || !autoSaveReady || isEducationalCloakActive() || isProgressCacheEmpty()) return;
         window.cloudSave(null, false);
     });
 })();
