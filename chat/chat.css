@@ -272,6 +272,9 @@ body.has-custom-bg .admin-card {
     height: 44px;
     font-size: 16px;
     width: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .attach-btn:hover { color: white; border-color: var(--accent); }
 
@@ -401,9 +404,11 @@ button:hover { filter: brightness(1.15); }
 .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; }
 .settings-card { background: var(--bg-panel); border: 1px solid var(--accent-border); border-radius: 10px; padding: 22px; }
 .settings-card h3 { margin: 0 0 8px 0; color: var(--accent); display: flex; align-items: center; gap: 8px; font-size: 1.05rem; }
-.settings-icon { font-style: normal; }
+.settings-icon { font-style: normal; font-size: 1.05rem; margin-right: 4px; }
 .settings-icon-img { width: 18px; height: 18px; vertical-align: -4px; margin-right: 2px; }
 .inline-emoji-svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 2px; }
+.inline-emoji { font-style: normal; font-size: 13px; margin: 0 3px; }
+.attach-icon { font-size: 16px; line-height: 1; display: block; }
 .attach-btn img { width: 18px; height: 18px; vertical-align: middle; display: block; }
 .settings-desc { color: var(--text-muted); font-size: 12.5px; margin: 0 0 16px 0; line-height: 1.4; }
 .settings-hint { color: var(--text-muted); font-size: 11px; margin-top: 14px; line-height: 1.4; }
