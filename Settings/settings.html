@@ -144,6 +144,17 @@
     </div>
 
     <div class="setting-section" style="margin-bottom: 35px;">
+      <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-crosshairs" style="margin-right: 8px;"></i>Custom Crosshair</h3>
+      <p class="setting-label" style="color: #ccc; font-size: 0.9rem; margin-bottom: 12px;">Choose your on-screen crosshair style. Saved to this browser.</p>
+      <label for="crosshair-style-select" class="setting-label" style="display: block; color: #ccc; font-size: 0.95rem; margin-bottom: 8px;">Crosshair Style:</label>
+      <select id="crosshair-style-select" data-crosshair-select class="settings-input" style="width: 100%; max-width: 350px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(139,0,255,0.3); color: white; border-radius: 6px;">
+        <option value="cyan-hud">Cyan HUD (Original)</option>
+        <option value="red-reticle">Red Reticle</option>
+        <option value="none">None (System Cursor)</option>
+      </select>
+    </div>
+
+    <div class="setting-section" style="margin-bottom: 35px;">
       <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-power-off" style="margin-right: 8px;"></i>Startup Environment</h3>
       <div style="display: flex; align-items: center; gap: 10px; margin-top: 10px;">
         <input type="checkbox" id="toggle-study-cloak" style="cursor: pointer; width: 18px; height: 18px;">
@@ -246,5 +257,6 @@
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
   <script src="../JS/music.js"></script>
+  <script src="../customcrosshair/loader.js"></script>
 </body>
 </html>
