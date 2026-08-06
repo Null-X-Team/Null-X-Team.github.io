@@ -41,6 +41,19 @@
             </section>
 
             <section class="settings-card">
+                <h3><i class="fa-solid fa-crosshairs"></i> Custom Crosshair</h3>
+                <p class="subtitle">Pick your on-screen crosshair. Choice is saved in this browser.</p>
+                <div class="setting-row">
+                    <label for="crosshair-style-select">Crosshair Style:</label>
+                    <select id="crosshair-style-select" data-crosshair-select class="dropdown-input">
+                        <option value="cyan-hud">Cyan HUD (Original)</option>
+                        <option value="red-reticle">Red Reticle</option>
+                        <option value="none">None (System Cursor)</option>
+                    </select>
+                </div>
+            </section>
+
+            <section class="settings-card">
                 <h3><i class="fa-solid fa-user-ninja"></i> Stealth & Cloaking</h3>
                 <p class="subtitle">Set up Tab Cloaking (Title & Favicon mask).</p>
                 
@@ -97,5 +110,6 @@
 
     <script src="newsettings.js"></script>
     <script src="../themes/themes.js"></script>
+    <script src="../customcrosshair/loader.js"></script>
 </body>
 </html>
