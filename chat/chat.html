@@ -47,7 +47,7 @@
             </div>
             <div id="chat-messages" class="messages-container"></div>
             <form id="chat-form" class="input-area">
-                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image"><span class="attach-icon" aria-hidden="true">📎</span></button>
+                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ce/emoji.svg" alt="attach"></button>
                 <input type="file" id="attach-image-input" accept="image/*" style="display:none;">
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
@@ -86,7 +86,7 @@
                         <p class="pm-empty-hint">Pick a conversation on the left, or start a new one.</p>
                     </div>
                     <form id="pm-thread-form" class="input-area hidden">
-                        <button type="button" id="pm-attach-image-btn" class="attach-btn" title="Attach an image"><span class="attach-icon" aria-hidden="true">📎</span></button>
+                        <button type="button" id="pm-attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ce/emoji.svg" alt="attach"></button>
                         <input type="file" id="pm-attach-image-input" accept="image/*" style="display:none;">
                         <input type="text" id="pm-message-input" placeholder="Send your first message..." autocomplete="off" maxlength="250">
                         <button type="submit">Send</button>
@@ -143,7 +143,7 @@
             <div class="settings-grid">
 
                 <div class="settings-card">
-                    <h3><span class="settings-icon" aria-hidden="true">🎨</span> Chat Theme</h3>
+                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f3a8/emoji.svg" alt=""> Chat Theme</h3>
                     <p class="settings-desc">Pick an accent color scheme for the whole chat interface.</p>
                     <div id="theme-swatch-row" class="theme-swatch-row">
                         <div class="theme-swatch" data-theme="amber" style="--sw: #cf7a3c;" title="Amber (Default)"></div>
@@ -158,7 +158,7 @@
                 </div>
 
                 <div class="settings-card">
-                    <h3><span class="settings-icon" aria-hidden="true">🕵️</span> Tab Cloak</h3>
+                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f575/emoji.svg" alt=""> Tab Cloak</h3>
                     <p class="settings-desc">Disguises this tab's title and icon so it looks like a different site at a glance.</p>
 
                     <div class="settings-toggle-row">
@@ -175,7 +175,7 @@
                 </div>
 
                 <div class="settings-card" style="grid-column: span 2;">
-                    <h3><span class="settings-icon" aria-hidden="true">🖼️</span> Chat Background</h3>
+                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f5bc/emoji.svg" alt=""> Chat Background</h3>
                     <p class="settings-desc">Pick a preset background, or upload your own image.</p>
 
                     <div id="preset-bg-row" class="preset-bg-row"></div>
@@ -195,7 +195,7 @@
                 </div>
 
                 <div class="settings-card" style="grid-column: span 2;">
-                    <h3><span class="settings-icon" aria-hidden="true">💬</span> Your Message Style</h3>
+                    <h3><img class="settings-icon-img" src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ac/emoji.svg" alt=""> Your Message Style</h3>
                     <p class="settings-desc">Change how your own outgoing messages appear to you.</p>
 
                     <div id="bubble-style-row" class="bubble-style-row">
