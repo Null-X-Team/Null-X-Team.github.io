@@ -1,15 +1,22 @@
 /**
  * Null_X Crosshair Loader
  * Loads the selected style from localStorage (nxos_crosshair).
+ * Original customcrosshair.js is kept intact and selectable as "original".
  * Listens for settings picker changes (works in injected modals too).
  */
 (function () {
     const STORAGE_KEY = 'nxos_crosshair';
-    const DEFAULT_STYLE = 'cyan-hud';
+    const DEFAULT_STYLE = 'original';
 
     const CATALOG = {
-        'cyan-hud': { file: 'cyan-hud.js', label: 'Cyan HUD (Original)' },
+        'original': { file: 'customcrosshair.js', label: 'Original Cyan HUD' },
+        'cyan-hud': { file: 'cyan-hud.js', label: 'Cyan HUD (Alt)' },
         'red-reticle': { file: 'red-reticle.js', label: 'Red Reticle' },
+        'gold-lock': { file: 'gold-lock.js', label: 'Gold Lock' },
+        'minimal-dot': { file: 'minimal-dot.js', label: 'Minimal Dot' },
+        'neon-pulse': { file: 'neon-pulse.js', label: 'Neon Pulse' },
+        'mono-sharp': { file: 'mono-sharp.js', label: 'Mono Sharp' },
+        'purple-tactical': { file: 'purple-tactical.js', label: 'Purple Tactical' },
         'none': { file: 'none.js', label: 'None (System Cursor)' }
     };
 
