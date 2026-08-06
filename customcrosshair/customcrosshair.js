@@ -1,6 +1,7 @@
 /**
  * Advanced Multi-Layered HUD Crosshair Engine
  * MODIFIED: Text input cursor fix & custom text input hover animation.
+ * MODIFIED: Disabled while educational overlay is open; enabled after it closes.
  */
 (function() {
     // 1. Inject the highly detailed UI styling
@@ -9,6 +10,26 @@
         /* Hide the default desktop mouse pointer across all elements including text inputs */
         body, a, button, iframe, .game-card, .clickable, [role="button"], input, textarea, [contenteditable="true"] {
             cursor: none !important;
+        }
+
+        /* While educational overlay is up: restore normal OS cursor, hide custom crosshair */
+        html.crosshair-paused,
+        html.crosshair-paused body,
+        html.crosshair-paused a,
+        html.crosshair-paused button,
+        html.crosshair-paused iframe,
+        html.crosshair-paused .game-card,
+        html.crosshair-paused .clickable,
+        html.crosshair-paused [role="button"],
+        html.crosshair-paused input,
+        html.crosshair-paused textarea,
+        html.crosshair-paused [contenteditable="true"] {
+            cursor: auto !important;
+        }
+        html.crosshair-paused #unique-crosshair {
+            display: none !important;
+            opacity: 0 !important;
+            visibility: hidden !important;
         }
 
         /* Root element wrapper setup */
@@ -344,14 +365,89 @@
     `;
     document.body.appendChild(crosshair);
 
+    // ---- Educational overlay gate ----
+    // Crosshair stays off until #educational-cloak is gone / hidden.
+    let crosshairEnabled = false;
+
+    function isEducationalCloakActive() {
+        if (localStorage.getItem('disableStudyCloak') === 'true') return false;
+        const cloak = document.getElementById('educational-cloak');
+        if (!cloak) return false;
+        if (cloak.classList.contains('hidden')) return false;
+        try {
+            const cs = window.getComputedStyle(cloak);
+            if (cs.display === 'none' || cs.visibility === 'hidden' || cs.opacity === '0') return false;
+        } catch (e) {}
+        return true;
+    }
+
+    function pauseCrosshair() {
+        crosshairEnabled = false;
+        document.documentElement.classList.add('crosshair-paused');
+        crosshair.classList.add('crosshair-hidden');
+    }
+
+    function resumeCrosshair() {
+        crosshairEnabled = true;
+        document.documentElement.classList.remove('crosshair-paused');
+    }
+
+    function waitForCloakThenEnable() {
+        if (!isEducationalCloakActive()) {
+            resumeCrosshair();
+            return;
+        }
+        pauseCrosshair();
+
+        const cloak = document.getElementById('educational-cloak');
+        let done = false;
+        const finish = () => {
+            if (done) return;
+            done = true;
+            try { observer.disconnect(); } catch (e) {}
+            clearInterval(poll);
+            clearTimeout(maxWait);
+            resumeCrosshair();
+            console.log('[Crosshair] Enabled after educational overlay closed.');
+        };
+
+        const observer = new MutationObserver(() => {
+            if (!isEducationalCloakActive()) finish();
+        });
+        if (cloak) {
+            observer.observe(cloak, { attributes: true, attributeFilter: ['class', 'style'] });
+        }
+
+        const poll = setInterval(() => {
+            if (!isEducationalCloakActive()) finish();
+        }, 200);
+
+        // Safety: cloak countdown is ~10s
+        const maxWait = setTimeout(finish, 15000);
+    }
+
+    // Pause immediately if cloak is already present
+    if (isEducationalCloakActive()) {
+        pauseCrosshair();
+    }
+
+    // Run after DOM is ready so cloak element exists
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', waitForCloakThenEnable);
+    } else {
+        waitForCloakThenEnable();
+    }
+
     // Helper functions to handle flare activation with tap-guarantee timers
     let flareTimeout;
     const startFlare = () => {
+        if (!crosshairEnabled) return;
         crosshair.classList.add('clicking');
         clearTimeout(flareTimeout);
     };
     
     const stopFlare = () => {
+        if (!crosshairEnabled) return;
         flareTimeout = setTimeout(() => {
             crosshair.classList.remove('clicking');
         }, 200); 
@@ -359,6 +455,8 @@
 
     // 3. Automation tracking & state triggers
     window.addEventListener('mousemove', (e) => {
+        if (!crosshairEnabled) return;
+
         crosshair.style.left = e.clientX + 'px';
         crosshair.style.top = e.clientY + 'px';
         crosshair.classList.remove('crosshair-hidden');
@@ -402,6 +500,7 @@
 
     // Support tracking crosshair position on touchscreen drag movements
     window.addEventListener('touchmove', (e) => {
+        if (!crosshairEnabled) return;
         if (e.touches.length > 0) {
             crosshair.style.left = e.touches[0].clientX + 'px';
             crosshair.style.top = e.touches[0].clientY + 'px';
@@ -410,8 +509,14 @@
     }, { passive: true });
 
     // Viewport bound safety checks
-    document.addEventListener('mouseleave', () => crosshair.classList.add('crosshair-hidden'));
-    document.addEventListener('mouseenter', () => crosshair.classList.remove('crosshair-hidden'));
+    document.addEventListener('mouseleave', () => {
+        if (!crosshairEnabled) return;
+        crosshair.classList.add('crosshair-hidden');
+    });
+    document.addEventListener('mouseenter', () => {
+        if (!crosshairEnabled) return;
+        crosshair.classList.remove('crosshair-hidden');
+    });
 
     // Handle traditional mouse clicks
     window.addEventListener('mousedown', startFlare);
