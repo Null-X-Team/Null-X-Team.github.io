@@ -10,11 +10,6 @@
     const CATALOG = {
         'cyan-hud': { file: 'cyan-hud.js', label: 'Cyan HUD (Original)' },
         'red-reticle': { file: 'red-reticle.js', label: 'Red Reticle' },
-        'gold-lock': { file: 'gold-lock.js', label: 'Gold Lock' },
-        'minimal-dot': { file: 'minimal-dot.js', label: 'Minimal Dot' },
-        'neon-pulse': { file: 'neon-pulse.js', label: 'Neon Pulse' },
-        'mono-sharp': { file: 'mono-sharp.js', label: 'Mono Sharp' },
-        'purple-tactical': { file: 'purple-tactical.js', label: 'Purple Tactical' },
         'none': { file: 'none.js', label: 'None (System Cursor)' }
     };
 
@@ -24,7 +19,6 @@
                 return document.currentScript.src.replace(/[^/]+$/, '');
             }
         } catch (e) {}
-        // Fallbacks for common pages
         const path = window.location.pathname || '';
         if (path.includes('/Settings/') || path.includes('/settings')) {
             return '../customcrosshair/';
@@ -51,12 +45,10 @@
     function applyStyle(id) {
         if (!CATALOG[id]) id = DEFAULT_STYLE;
 
-        // Tear down previous dynamic script
         if (currentScriptEl && currentScriptEl.parentNode) {
             currentScriptEl.parentNode.removeChild(currentScriptEl);
             currentScriptEl = null;
         }
-        // Clear DOM artifacts left by previous style
         const old = document.getElementById('unique-crosshair');
         if (old) old.remove();
         document.querySelectorAll('style[data-nx-crosshair]').forEach(s => s.remove());
@@ -89,7 +81,6 @@
         sel.value = getSelected();
     }
 
-    // Event delegation so injected settings modals work without main.js changes
     document.addEventListener('change', (e) => {
         const t = e.target;
         if (!t) return;
@@ -105,14 +96,12 @@
         }
     });
 
-    // Observe DOM for late-injected settings UI (main.js modal)
     const mo = new MutationObserver(() => {
         document.querySelectorAll('#crosshair-style-select, select[data-crosshair-select]').forEach(fillSelect);
         syncPickers(getSelected());
     });
     mo.observe(document.documentElement, { childList: true, subtree: true });
 
-    // Public API
     window.NxCrosshair = {
         catalog: CATALOG,
         get: getSelected,
@@ -120,7 +109,6 @@
         apply: applyStyle
     };
 
-    // Boot
     function boot() {
         document.querySelectorAll('#crosshair-style-select, select[data-crosshair-select]').forEach(fillSelect);
         applyStyle(getSelected());
