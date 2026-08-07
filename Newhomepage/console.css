@@ -1,0 +1,132 @@
+/* ===== DevTools-style console (replaces left terminal) ===== */
+.nx-console {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 220px;
+  max-height: 240px;
+  background: #0c0c0c;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  overflow: hidden;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.nx-console-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.nx-console-dots {
+  display: flex;
+  gap: 5px;
+}
+
+.nx-console-dots .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.nx-console-dots .dot.red { background: #ff5f56; }
+.nx-console-dots .dot.yellow { background: #ffbd2e; }
+.nx-console-dots .dot.green { background: #27c93f; }
+
+.nx-console-title {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.45);
+  letter-spacing: 0.4px;
+  flex: 1;
+}
+
+.nx-console-clear {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 10px;
+  font-family: inherit;
+  padding: 2px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.nx-console-clear:hover {
+  color: #fff;
+  border-color: var(--nx-accent, #ff3b3b);
+}
+
+.nx-console-output {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 10px;
+  font-size: 11px;
+  line-height: 1.45;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.nx-console-output::-webkit-scrollbar { width: 5px; }
+.nx-console-output::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+
+.nx-console-line {
+  margin: 0 0 3px 0;
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
+.nx-console-line .lvl {
+  font-weight: 600;
+  margin-right: 6px;
+}
+
+.nx-console-line.log .lvl { color: #9cdcfe; }
+.nx-console-line.info .lvl { color: #4fc1ff; }
+.nx-console-line.warn .lvl { color: #ffbd2e; }
+.nx-console-line.error .lvl { color: #ff5f56; }
+.nx-console-line.cmd .lvl { color: var(--nx-accent, #ff3b3b); }
+.nx-console-line.ok .lvl { color: #27c93f; }
+
+.nx-console-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.35);
+  flex-shrink: 0;
+}
+
+.nx-console-prompt {
+  color: var(--nx-accent, #ff3b3b);
+  font-weight: 700;
+  font-size: 12px;
+}
+
+.nx-console-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #e8e8e8;
+  font-family: inherit;
+  font-size: 11px;
+  padding: 2px 0;
+}
+
+.nx-console-input::placeholder {
+  color: rgba(255, 255, 255, 0.25);
+}
+
+.time-on-site {
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-variant-numeric: tabular-nums;
+}
