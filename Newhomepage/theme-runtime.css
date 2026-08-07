@@ -1,0 +1,106 @@
+/* Theme system + custom background — applied after newpage.css */
+:root {
+  --nx-page-bg: #0d0606;
+  --nx-accent: #ff3b3b;
+}
+
+body {
+  background-color: var(--nx-page-bg) !important;
+}
+
+#nx-custom-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+#animated-background-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+body.has-custom-bg #animated-background-canvas {
+  opacity: 0.35;
+}
+
+body.no-interactive-bg #animated-background-canvas {
+  display: none !important;
+}
+
+/* Accent-driven UI */
+.nav-bar {
+  border-color: color-mix(in srgb, var(--nx-accent) 30%, transparent) !important;
+}
+.nav-tab-item:hover {
+  background: color-mix(in srgb, var(--nx-accent) 15%, transparent) !important;
+}
+.nav-tab-item.active {
+  background: color-mix(in srgb, var(--nx-accent) 30%, transparent) !important;
+  border-color: color-mix(in srgb, var(--nx-accent) 45%, transparent) !important;
+}
+.weather-stats i,
+.location-label {
+  color: var(--nx-accent) !important;
+}
+.search-container input {
+  border-color: color-mix(in srgb, var(--nx-accent) 25%, transparent) !important;
+}
+.search-container input:focus {
+  border-color: color-mix(in srgb, var(--nx-accent) 60%, transparent) !important;
+  box-shadow: 0 0 15px color-mix(in srgb, var(--nx-accent) 20%, transparent) !important;
+}
+.main-content::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--nx-accent) 25%, transparent) !important;
+}
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--nx-accent) 50%, transparent) !important;
+}
+.quick-action-btn,
+.signin-btn,
+.widget-btn {
+  background: var(--nx-accent) !important;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--nx-accent) 30%, transparent) !important;
+}
+.cloak-btn {
+  border-color: color-mix(in srgb, var(--nx-accent) 40%, transparent) !important;
+}
+.cloak-btn:hover {
+  background: color-mix(in srgb, var(--nx-accent) 12%, transparent) !important;
+}
+.settings-btn {
+  color: var(--nx-accent) !important;
+  border-color: color-mix(in srgb, var(--nx-accent) 35%, transparent) !important;
+}
+.settings-btn:hover {
+  border-color: var(--nx-accent) !important;
+  color: #fff !important;
+}
+.game-card:hover,
+.app-card:hover {
+  border-color: color-mix(in srgb, var(--nx-accent) 30%, transparent) !important;
+}
+.featured-preview-box {
+  border-color: color-mix(in srgb, var(--nx-accent) 20%, transparent) !important;
+}
+.preview-placeholder {
+  color: color-mix(in srgb, var(--nx-accent) 45%, transparent) !important;
+}
+#pfp-preview {
+  border-color: var(--nx-accent) !important;
+}
+.news-tag {
+  background: var(--nx-accent) !important;
+}
+.context-menu-item:hover {
+  background: var(--nx-accent) !important;
+}
+body.no-ui-anim * {
+  animation: none !important;
+  transition: none !important;
+}

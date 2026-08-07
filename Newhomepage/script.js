@@ -93,6 +93,9 @@
     document.body.classList.toggle('no-ui-anim', localStorage.getItem(ANIM_KEY) === 'false');
     const canvas = document.getElementById('animated-background-canvas');
     if (canvas) canvas.style.display = enabled ? '' : 'none';
+    if (!enabled && window.__nxMeshBg && typeof window.__nxMeshBg.stop === 'function') {
+      try { window.__nxMeshBg.stop(); } catch (e) {}
+    }
   }
 
   function boot() {
@@ -110,18 +113,18 @@
   window.NxHomeTheme = { applyTheme, applyBackgroundImage, applyInteractiveFlag, meshShouldRun };
 })();
 
-document.addEventListener("DOMContentLoaded", () => {
-  const navTabs = document.querySelectorAll(".nav-tab-item");
-  const contentSections = document.querySelectorAll(".content-section");
+document.addEventListener('DOMContentLoaded', () => {
+  const navTabs = document.querySelectorAll('.nav-tab-item');
+  const contentSections = document.querySelectorAll('.content-section');
   navTabs.forEach(tab => {
-    tab.addEventListener("click", (e) => {
+    tab.addEventListener('click', (e) => {
       e.preventDefault();
-      navTabs.forEach(t => t.classList.remove("active"));
-      tab.classList.add("active");
-      const targetTab = tab.getAttribute("data-tab");
-      contentSections.forEach(section => section.classList.remove("active"));
-      const targetSection = document.getElementById(targetTab + "-section");
-      if (targetSection) targetSection.classList.add("active");
+      navTabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const targetTab = tab.getAttribute('data-tab');
+      contentSections.forEach(section => section.classList.remove('active'));
+      const targetSection = document.getElementById(targetTab + '-section');
+      if (targetSection) targetSection.classList.add('active');
     });
   });
 });
