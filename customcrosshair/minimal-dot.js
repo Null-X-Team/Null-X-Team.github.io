@@ -1,6 +1,6 @@
 /**
- * Null_X Crosshair Style — Minimal Dot
- * Self-contained. Controlled by customcrosshair/loader.js via localStorage nxos_crosshair.
+ * Null_X Crosshair Style — minimal-dot
+ * Self-contained. Controlled by customcrosshair/loader.js
  */
 (function() {
     if (window.__nxCrosshairActiveStyle === 'minimal-dot') return;
@@ -33,7 +33,7 @@
             display: none !important; opacity: 0 !important; visibility: hidden !important;
         }
         #unique-crosshair {
-            position: fixed; width: 40px; height: 40px;
+            position: fixed; width: 80px; height: 80px;
             pointer-events: none !important; z-index: 2147483647 !important;
             transform: translate(-50%, -50%);
             display: flex; align-items: center; justify-content: center;
@@ -41,21 +41,39 @@
         }
         .crosshair-hidden { opacity: 0 !important; }
         .xhair-core {
-            position:absolute; width:8px; height:8px; background:rgba(255,255,255,0.85);
-            border-radius:50%; box-shadow:0 0 6px rgba(255,255,255,0.5); z-index:5;
-            transition: all 0.15s ease;
+            position:absolute; width:8px; height:8px; background:rgba(255,255,255,0.9);
+            border-radius:50%; box-shadow:0 0 6px rgba(255,255,255,0.5); z-index:5; transition:all 0.12s ease;
         }
-        #unique-crosshair.targeting .xhair-core { background:#8b00ff; box-shadow:0 0 10px #8b00ff; width:10px; height:10px; }
-        #unique-crosshair.text-input .xhair-core { background:#3aa0ff; width:3px; height:16px; border-radius:1px; }
-        #unique-crosshair.clicking .xhair-core { transform:scale(1.6); background:#fff; }
+        .xhair-ripple {
+            position:absolute; width:8px; height:8px; border-radius:50%;
+            border:2px solid rgba(255,255,255,0.6); opacity:0; pointer-events:none;
+        }
+        #unique-crosshair.targeting .xhair-core { background:#8b00ff; box-shadow:0 0 12px #8b00ff; width:10px; height:10px; }
+        #unique-crosshair.text-input .xhair-core {
+            width:2px; height:16px; border-radius:1px; background:#5eb0ff;
+            box-shadow:0 0 10px #3aa0ff; animation: minPulse 0.8s ease-in-out infinite;
+        }
+        @keyframes minPulse { 0%,100%{ opacity:1; } 50%{ opacity:0.25; } }
+        #unique-crosshair.clicking .xhair-core { transform:scale(0.4); background:#fff; }
+        #unique-crosshair.clicking .xhair-ripple {
+            animation: minRipple 0.35s ease-out forwards;
+        }
+        @keyframes minRipple {
+            0% { width:8px; height:8px; opacity:0.8; }
+            100% { width:48px; height:48px; opacity:0; }
+        }
     `;
     document.head.appendChild(style);
 
     const crosshair = document.createElement('div');
     crosshair.id = 'unique-crosshair';
     crosshair.className = 'crosshair-hidden';
-    crosshair.innerHTML = '<div class="xhair-core"></div>';
-    document.body.appendChild(crosshair);
+    crosshair.innerHTML = `<div class="xhair-core"></div><div class="xhair-ripple"></div>`;
+    function attach() {
+        if (!document.body) { document.addEventListener('DOMContentLoaded', attach, { once: true }); return; }
+        if (!document.getElementById('unique-crosshair')) document.body.appendChild(crosshair);
+    }
+    attach();
 
     let crosshairEnabled = false;
     function isEducationalCloakActive() {
@@ -99,7 +117,7 @@
 
     let flareTimeout;
     const startFlare = () => { if (!crosshairEnabled) return; crosshair.classList.add('clicking'); clearTimeout(flareTimeout); };
-    const stopFlare = () => { if (!crosshairEnabled) return; flareTimeout = setTimeout(() => crosshair.classList.remove('clicking'), 200); };
+    const stopFlare = () => { if (!crosshairEnabled) return; flareTimeout = setTimeout(() => crosshair.classList.remove('clicking'), 220); };
 
     window.addEventListener('mousemove', (e) => {
         if (!crosshairEnabled) return;

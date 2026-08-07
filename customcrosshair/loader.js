@@ -1,8 +1,7 @@
 /**
  * Null_X Crosshair Loader
- * Loads the selected style from localStorage (nxos_crosshair).
- * Original customcrosshair.js is kept intact and selectable as "original".
- * Listens for settings picker changes (works in injected modals too).
+ * Loads selected style from localStorage (nxos_crosshair).
+ * Original customcrosshair.js stays selectable as "original".
  */
 (function () {
     const STORAGE_KEY = 'nxos_crosshair';
@@ -26,10 +25,10 @@
                 return document.currentScript.src.replace(/[^/]+$/, '');
             }
         } catch (e) {}
+        const known = document.querySelector('script[src*="customcrosshair/"]');
+        if (known && known.src) return known.src.replace(/[^/]+$/, '');
         const path = window.location.pathname || '';
-        if (path.includes('/Settings/') || path.includes('/settings')) {
-            return '../customcrosshair/';
-        }
+        if (/\/Settings\//i.test(path) || /\/settings/i.test(path)) return '../customcrosshair/';
         return 'customcrosshair/';
     }
 
@@ -37,7 +36,8 @@
     let currentScriptEl = null;
 
     function getSelected() {
-        const v = localStorage.getItem(STORAGE_KEY);
+        let v = localStorage.getItem(STORAGE_KEY);
+        if (v === 'cyan-hud-original') v = 'original';
         return (v && CATALOG[v]) ? v : DEFAULT_STYLE;
     }
 
@@ -49,9 +49,7 @@
         return id;
     }
 
-    function applyStyle(id) {
-        if (!CATALOG[id]) id = DEFAULT_STYLE;
-
+    function teardown() {
         if (currentScriptEl && currentScriptEl.parentNode) {
             currentScriptEl.parentNode.removeChild(currentScriptEl);
             currentScriptEl = null;
@@ -59,14 +57,37 @@
         const old = document.getElementById('unique-crosshair');
         if (old) old.remove();
         document.querySelectorAll('style[data-nx-crosshair]').forEach(s => s.remove());
+        document.querySelectorAll('style').forEach(s => {
+            const txt = s.textContent || '';
+            if (txt.includes('#unique-crosshair') && !s.hasAttribute('data-nx-crosshair')) {
+                s.remove();
+            }
+        });
+        document.documentElement.classList.remove('crosshair-paused');
         window.__nxCrosshairActiveStyle = null;
+    }
 
-        const script = document.createElement('script');
-        script.src = BASE + CATALOG[id].file + '?v=' + Date.now();
-        script.async = false;
-        script.dataset.nxCrosshairLoader = '1';
-        currentScriptEl = script;
-        document.head.appendChild(script);
+    function applyStyle(id) {
+        if (!CATALOG[id]) id = DEFAULT_STYLE;
+        teardown();
+
+        const run = () => {
+            const script = document.createElement('script');
+            script.src = BASE + CATALOG[id].file + '?v=' + Date.now();
+            script.async = false;
+            script.dataset.nxCrosshairLoader = '1';
+            script.onerror = function () {
+                console.error('[NxCrosshair] Failed to load', script.src);
+            };
+            currentScriptEl = script;
+            (document.body || document.head).appendChild(script);
+        };
+
+        if (!document.body && document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', run, { once: true });
+        } else {
+            run();
+        }
     }
 
     function syncPickers(id) {
@@ -74,15 +95,16 @@
             if (sel.value !== id) sel.value = id;
         });
         document.querySelectorAll('[data-crosshair-id]').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-crosshair-id') === id);
-            btn.classList.toggle('crosshair-option-active', btn.getAttribute('data-crosshair-id') === id);
+            const on = btn.getAttribute('data-crosshair-id') === id;
+            btn.classList.toggle('active', on);
+            btn.classList.toggle('crosshair-option-active', on);
         });
     }
 
     function fillSelect(sel) {
         if (!sel || sel.dataset.nxFilled === '1') return;
         sel.innerHTML = Object.keys(CATALOG).map(id =>
-            `<option value="${id}">${CATALOG[id].label}</option>`
+            '<option value="' + id + '">' + CATALOG[id].label + '</option>'
         ).join('');
         sel.dataset.nxFilled = '1';
         sel.value = getSelected();
