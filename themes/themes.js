@@ -49,3 +49,19 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 });
+
+
+// Load full lockscreen hook (Alt+L / Ctrl+L -> Lockscreen/Lockscreen.html)
+(function loadNxLockHook() {
+  if (document.querySelector('script[data-nx-lock-hook]')) return;
+  var s = document.createElement('script');
+  s.src = (function () {
+    try {
+      return new URL('/JS/nx-lock-hook.js', window.location.origin).href;
+    } catch (e) {
+      return '/JS/nx-lock-hook.js';
+    }
+  })();
+  s.setAttribute('data-nx-lock-hook', '1');
+  (document.head || document.documentElement).appendChild(s);
+})();
