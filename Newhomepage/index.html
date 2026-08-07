@@ -35,17 +35,17 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newpage.css">
     <link rel="stylesheet" href="theme-runtime.css">
+    <link rel="stylesheet" href="console.css">
     <link rel="stylesheet" href="animated-background.css">
     <link rel="stylesheet" href="../themes/themes.css">
     <script src="../Games/GameSaveData/auto-save.js"></script>
-    
     <style>
         .activity-footer {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: auto;        
+            margin-top: auto;
             padding-top: 15px;
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             width: 100%;
@@ -60,7 +60,7 @@
             width: 6px;
             height: 6px;
             border-radius: 50%;
-            background: #27c93f; 
+            background: #27c93f;
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
         .active-pulse {
@@ -68,7 +68,7 @@
             animation: statusPulse 2s infinite ease-in-out;
         }
         .idle-mode {
-            background: #ffbd2e !important; 
+            background: #ffbd2e !important;
             box-shadow: none !important;
         }
         @keyframes statusPulse {
@@ -79,9 +79,8 @@
     </style>
 </head>
 <body>
-    
     <canvas id="animated-background-canvas"></canvas>
-    
+
     <div id="educational-cloak" class="hidden">
         <div class="educational-content-card">
             <div class="educational-header">
@@ -131,79 +130,72 @@
     </div>
 
     <div class="dashboard-wrapper">
-
         <div class="panel-column">
-            
             <aside class="side-panel">
                 <div class="widget-header">
                     <i class="fa-solid fa-cloud-sun"></i> Weather
                 </div>
                 <div class="weather-row">
                     <div class="weather-main">
-                        <span class="weather-temp" id="live-temp">--°</span>
+                        <span class="weather-temp" id="live-temp">--&deg;</span>
                     </div>
                     <div class="weather-stats">
                         <span id="live-humidity"><i class="fa-solid fa-droplet"></i> --% Humidity</span>
                         <span class="location-label" id="live-city">Locating...</span>
                     </div>
                 </div>
-                
+
                 <div class="widget-header" style="margin-top: 25px;">
                     <i class="fa-solid fa-microchip"></i> Diagnostics
                 </div>
                 <div class="weather-stats">
                     <span id="battery-status" style="color: #4ade80;">Battery: 100%</span>
                     <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
+                    <span id="time-on-site" class="time-on-site">Time on site: 0s</span>
                 </div>
             </aside>
 
-            <div class="terminal-container">
-                <div class="terminal-header">
-                    <div class="terminal-circle red"></div>
-                    <div class="terminal-circle yellow"></div>
-                    <div class="terminal-circle green"></div>
-                    <span class="terminal-title">bash - system_core_sh</span>
-                </div>
-                <div class="terminal-body">
-                    <div class="command-row">
-                        <span class="terminal-prompt">guest@hub:~$</span>
-                        <input type="text" id="terminalInput" placeholder="Type system help command..." autocomplete="off">
+            <div class="nx-console" id="nxConsole">
+                <div class="nx-console-header">
+                    <div class="nx-console-dots">
+                        <span class="dot red"></span>
+                        <span class="dot yellow"></span>
+                        <span class="dot green"></span>
                     </div>
+                    <span class="nx-console-title">Console</span>
+                    <button type="button" class="nx-console-clear" id="nxConsoleClear" title="Clear">Clear</button>
+                </div>
+                <div class="nx-console-output" id="nxConsoleOutput" aria-live="polite"></div>
+                <div class="nx-console-input-row">
+                    <span class="nx-console-prompt">></span>
+                    <input type="text" id="nxConsoleInput" class="nx-console-input" placeholder="help" autocomplete="off" spellcheck="false">
                 </div>
             </div>
-
         </div>
 
         <main class="main-hub">
             <h1 class="site-title" id="welcome-text">Loading Identity...</h1>
-            
             <div class="search-container">
                 <span class="search-glass"><i class="fa-solid fa-magnifying-glass"></i></span>
                 <input type="text" id="searchBar" placeholder="Search games...">
             </div>
-
             <div class="main-content">
-                
                 <div class="random-section">
                     <button id="randomBtn" class="quick-action-btn">
                         <i class="fa-solid fa-shuffle"></i> Random Game
                     </button>
                 </div>
-
                 <div id="gameGrid" class="apps-grid"></div>
                 <div id="favoritesGrid" class="apps-grid" style="display: none;">
                     <div id="favorites-empty-msg" style="grid-column: 1 / -1; text-align: center; color: rgba(255,255,255,0.4); padding: 40px;">
                         <i class="fas fa-star" style="color: #ff3b3b; margin-right: 6px;"></i> Your favorites catalog is currently empty.
                     </div>
                 </div>
-
                 <div id="unblockersSection" style="display: none;"></div>
                 <div id="profileSection" style="display: none;"></div>
                 <div id="communicationsSection" style="display: none;"></div>
                 <div id="assistantSection" style="display: none;"></div>
-
             </div>
-
             <div class="activity-footer">
                 <div class="status-indicator-dot active-pulse"></div>
                 <span id="activity-status-text">Status: Syncing connection...</span>
@@ -211,7 +203,6 @@
         </main>
 
         <div class="panel-column">
-            
             <aside class="side-panel">
                 <div class="widget-header">
                     <i class="fa-solid fa-star"></i> Featured
@@ -224,16 +215,13 @@
                     <p id="hero-desc">Loading parameters...</p>
                     <a href="#" class="widget-btn" id="playFeatured">Play Now</a>
                 </div>
-                
                 <div style="margin-top: 25px; display: flex; flex-direction: column; gap: 12px;">
                     <button id="stealthOpener" class="cloak-btn"><i class="fa-solid fa-mask"></i> Stealth Mode</button>
                     <button id="signInBtn" class="signin-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
                     <a href="../Settings/newsettings.html" class="settings-btn" style="text-decoration: none;"><i class="fa-solid fa-gear"></i> Settings</a>
                 </div>
             </aside>
-
         </div>
-
     </div>
 
     <div id="custom-context-menu" style="display: none; position: absolute; background: #0a0a0a; border: 1px solid #8b00ff; border-radius: 4px; padding: 5px; z-index: 100000;">
@@ -245,21 +233,17 @@
     <script type="module" src="../JS/main.js"></script>
     <script src="../themes/themes.js"></script>
     <script src="animated-background.js"></script>
-
     <script>
         document.addEventListener("DOMContentLoaded", () => {
             const statusText = document.getElementById("activity-status-text");
             const statusDot = document.querySelector(".status-indicator-dot");
-            
             if (statusText && statusDot) {
                 let idleTimer = null;
                 const IDLE_TIMEOUT_MS = 5000;
-
                 function setAsActive(customText = "Status: User Active") {
                     statusText.textContent = customText;
                     statusDot.classList.remove("idle-mode");
                     statusDot.classList.add("active-pulse");
-
                     clearTimeout(idleTimer);
                     idleTimer = setTimeout(() => {
                         statusText.textContent = "Status: Idle (No Input)";
@@ -267,7 +251,6 @@
                         statusDot.classList.add("idle-mode");
                     }, IDLE_TIMEOUT_MS);
                 }
-
                 window.addEventListener("mousemove", () => {
                     if (statusText.textContent.startsWith("Status: User Active") || statusText.textContent.includes("Idle")) {
                         setAsActive("Status: User Active");
@@ -275,12 +258,10 @@
                         setAsActive(statusText.textContent);
                     }
                 });
-
                 const observer = new MutationObserver(() => {
                     document.querySelectorAll(".game-card, .app-card").forEach(card => {
                         if (card.dataset.tracked) return;
                         card.dataset.tracked = "true";
-
                         card.addEventListener("mouseenter", () => {
                             const appName = card.querySelector(".game-title, .app-label")?.textContent || "Application";
                             setAsActive(`Status: Active [Interacting with ${appName}]`);
@@ -290,10 +271,8 @@
                         });
                     });
                 });
-
                 const gridTarget = document.getElementById("gameGrid");
                 if (gridTarget) observer.observe(gridTarget, { childList: true, subtree: true });
-
                 setAsActive("Status: Live Sync Online");
             }
         });
