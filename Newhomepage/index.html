@@ -4,16 +4,42 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Glaxyias Unblocked</title>
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nxos_theme') || 'crimson';
+          var bg = localStorage.getItem('nxos_theme_bg');
+          var accent = localStorage.getItem('nxos_theme_accent');
+          var defs = {
+            crimson:{bg:'#0d0606',accent:'#ff3b3b'},purple:{bg:'#0b0813',accent:'#8b00ff'},
+            cyan:{bg:'#041018',accent:'#00f2ff'},emerald:{bg:'#04140c',accent:'#00ff88'},
+            midnight:{bg:'#000000',accent:'#888888'},ocean:{bg:'#051425',accent:'#0088ff'},
+            amber:{bg:'#1a1005',accent:'#ffb020'},rose:{bg:'#1a0a12',accent:'#ff5ca8'},
+            vampire:{bg:'#0d0202',accent:'#ff0000'},forest:{bg:'#030c05',accent:'#00cc44'},
+            cyberpunk:{bg:'#1c0024',accent:'#fcee0a'},toxic:{bg:'#0f1402',accent:'#a3ff00'},
+            solar:{bg:'#140700',accent:'#ff5500'},ice:{bg:'#0f191c',accent:'#00f3ff'},
+            arcade:{bg:'#120421',accent:'#ff007f'},royal:{bg:'#0f0314',accent:'#ffd700'},
+            ghost:{bg:'#11161a',accent:'#708090'},copper:{bg:'#140d0a',accent:'#b87333'},
+            moonlight:{bg:'#080a0f',accent:'#7b92b5'},neon:{bg:'#020005',accent:'#00ffef'}
+          };
+          var d = defs[t] || defs.crimson;
+          if (!bg) bg = d.bg;
+          if (!accent) accent = d.accent;
+          document.documentElement.setAttribute('data-theme', t);
+          document.documentElement.style.setProperty('--nx-page-bg', bg);
+          document.documentElement.style.setProperty('--nx-accent', accent);
+          document.documentElement.style.backgroundColor = bg;
+        } catch (e) {}
+      })();
+    </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newpage.css">
+    <link rel="stylesheet" href="theme-runtime.css">
     <link rel="stylesheet" href="animated-background.css">
     <link rel="stylesheet" href="../themes/themes.css">
     <script src="../Games/GameSaveData/auto-save.js"></script>
     
     <style>
-        /* ==========================================================================
-           MINIMAL FOOTER ACTIVITY TRACKER STYLES
-           ========================================================================== */
         .activity-footer {
             display: flex;
             align-items: center;
@@ -24,14 +50,12 @@
             border-top: 1px solid rgba(255, 255, 255, 0.03);
             width: 100%;
         }
-
         #activity-status-text {
             font-size: 11px;
             font-family: monospace;
             color: rgba(255, 255, 255, 0.35);
             letter-spacing: 0.5px;
         }
-
         .status-indicator-dot {
             width: 6px;
             height: 6px;
@@ -39,17 +63,14 @@
             background: #27c93f; 
             transition: background-color 0.3s ease, box-shadow 0.3s ease;
         }
-
         .active-pulse {
             box-shadow: 0 0 8px #27c93f;
             animation: statusPulse 2s infinite ease-in-out;
         }
-
         .idle-mode {
             background: #ffbd2e !important; 
             box-shadow: none !important;
         }
-
         @keyframes statusPulse {
             0% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.15); opacity: 0.7; }
@@ -59,7 +80,6 @@
 </head>
 <body>
     
-<!-- ADD THIS CANVAS AS THE FIRST ELEMENT -->
     <canvas id="animated-background-canvas"></canvas>
     
     <div id="educational-cloak" class="hidden">
@@ -221,21 +241,13 @@
         <div class="context-menu-item" id="ctx-delete" style="color: #ff3333; padding: 5px 10px; cursor: pointer;"><i class="fa-solid fa-trash"></i> Delete Game</div>
     </div>
 
+    <script src="script.js"></script>
     <script type="module" src="../JS/main.js"></script>
     <script src="../themes/themes.js"></script>
     <script src="animated-background.js"></script>
 
     <script>
         document.addEventListener("DOMContentLoaded", () => {
-            // Theme setup for the homepage so it remembers what you set in settings
-            const savedTheme = localStorage.getItem("nxos_theme");
-            if (savedTheme) {
-                document.body.setAttribute("data-theme", savedTheme);
-            }
-
-            // ----------------------------------------------------------------------
-            // ACTIVITY STATUS ENGINE LOGIC
-            // ----------------------------------------------------------------------
             const statusText = document.getElementById("activity-status-text");
             const statusDot = document.querySelector(".status-indicator-dot");
             
