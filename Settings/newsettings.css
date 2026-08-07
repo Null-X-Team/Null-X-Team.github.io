@@ -1,7 +1,7 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #141111;
+    background-color: var(--nx-page-bg, #141111);
     color: #fff;
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     display: flex;
@@ -14,7 +14,7 @@ body {
 
 .settings-container {
     width: 90%;
-    max-width: 700px;
+    max-width: 720px;
     background: rgba(22, 14, 14, 0.85);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
@@ -40,16 +40,16 @@ body {
     gap: 10px;
 }
 
+.icon-inline { flex-shrink: 0; vertical-align: middle; }
+
 .close-btn {
     color: rgba(255, 255, 255, 0.6);
-    font-size: 20px;
+    display: flex;
+    align-items: center;
     text-decoration: none;
     transition: color 0.2s;
 }
-
-.close-btn:hover {
-    color: #ff3b3b;
-}
+.close-btn:hover { color: var(--nx-accent, #ff3b3b); }
 
 .settings-card {
     background: rgba(0, 0, 0, 0.25);
@@ -63,6 +63,9 @@ body {
     margin: 0 0 4px 0;
     font-size: 15px;
     color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .subtitle {
@@ -71,55 +74,57 @@ body {
     color: rgba(255, 255, 255, 0.4);
 }
 
-/* Theme Swatch Selector */
+.hint {
+    margin: 0;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.35);
+}
+
 .theme-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
 }
 
 .theme-option {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px;
+    padding: 11px 12px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 10px;
     color: white;
     cursor: pointer;
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 600;
     transition: all 0.2s ease;
+    text-align: left;
 }
-
 .theme-option:hover {
     background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-2px);
+    transform: translateY(-1px);
 }
-
 .theme-option.active {
-    border-color: #ff3b3b; /* Defaults to crimson, will dynamically update via JS later if needed */
+    border-color: var(--nx-accent, #ff3b3b);
+    box-shadow: 0 0 0 1px var(--nx-accent, #ff3b3b);
     background: rgba(255, 255, 255, 0.1);
 }
 
 .color-preview {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 1px rgba(255,255,255,0.15);
 }
 
-.color-preview.crimson { background: #ff3b3b; }
-.color-preview.purple { background: #8b00ff; }
-.color-preview.cyan { background: #00f2ff; }
-.color-preview.emerald { background: #00ff88; }
-
-/* Inputs and Rows */
 .setting-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 13px;
+    gap: 12px;
 }
 
 .dropdown-input, .text-input {
@@ -132,39 +137,28 @@ body {
     font-family: inherit;
     transition: border-color 0.2s;
 }
-
-.text-input {
-    width: 250px;
-}
-
+.text-input { width: 250px; max-width: 55%; }
 .text-input:focus, .dropdown-input:focus {
-    border-color: #ff3b3b;
+    border-color: var(--nx-accent, #ff3b3b);
 }
 
-/* Toggle Switch */
 .switch {
     position: relative;
     display: inline-block;
     width: 44px;
     height: 24px;
+    flex-shrink: 0;
 }
-
-.switch input { 
-    opacity: 0;
-    width: 0;
-    height: 0;
-}
-
+.switch input { opacity: 0; width: 0; height: 0; }
 .slider {
     position: absolute;
     cursor: pointer;
     top: 0; left: 0; right: 0; bottom: 0;
     background-color: rgba(255, 255, 255, 0.1);
-    transition: .4s;
+    transition: .3s;
     border-radius: 34px;
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
-
 .slider:before {
     position: absolute;
     content: "";
@@ -173,20 +167,60 @@ body {
     left: 3px;
     bottom: 3px;
     background-color: white;
-    transition: .4s;
+    transition: .3s;
     border-radius: 50%;
 }
-
 input:checked + .slider {
     background-color: #27c93f;
     border-color: #27c93f;
 }
+input:checked + .slider:before { transform: translateX(20px); }
 
-input:checked + .slider:before {
-    transform: translateX(20px);
+.upload-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
 }
+.file-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    transition: border-color 0.2s, background 0.2s;
+}
+.file-btn:hover {
+    border-color: var(--nx-accent, #ff3b3b);
+    background: rgba(255,255,255,0.1);
+}
+.ghost-btn {
+    padding: 8px 12px;
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    font-size: 12px;
+}
+.ghost-btn:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
 
-/* Danger Button */
+.bg-preview {
+    width: 100%;
+    height: 90px;
+    border-radius: 10px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+.bg-preview.hidden { display: none; }
+
 .danger-btn {
     width: 100%;
     padding: 12px;
@@ -203,8 +237,9 @@ input:checked + .slider:before {
     align-items: center;
     gap: 8px;
 }
-
 .danger-btn:hover {
     background: #ff3b3b;
     color: white;
 }
+
+.hidden { display: none !important; }
