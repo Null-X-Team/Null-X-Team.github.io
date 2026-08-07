@@ -1,0 +1,29 @@
+:root { --nx-page-bg: #0d0606; --nx-accent: #ff3b3b; }
+body { background-color: var(--nx-page-bg) !important; }
+body[data-theme="crimson"]   { --nx-page-bg: #0d0606; --nx-accent: #ff3b3b; }
+body[data-theme="purple"]    { --nx-page-bg: #0b0813; --nx-accent: #8b00ff; }
+body[data-theme="cyan"]      { --nx-page-bg: #041018; --nx-accent: #00f2ff; }
+body[data-theme="emerald"]   { --nx-page-bg: #04140c; --nx-accent: #00ff88; }
+body[data-theme="midnight"]  { --nx-page-bg: #000000; --nx-accent: #888888; }
+body[data-theme="ocean"]     { --nx-page-bg: #051425; --nx-accent: #0088ff; }
+body[data-theme="amber"]     { --nx-page-bg: #1a1005; --nx-accent: #ffb020; }
+body[data-theme="rose"]      { --nx-page-bg: #1a0a12; --nx-accent: #ff5ca8; }
+body[data-theme="vampire"]   { --nx-page-bg: #0d0202; --nx-accent: #ff0000; }
+body[data-theme="forest"]    { --nx-page-bg: #030c05; --nx-accent: #00cc44; }
+body[data-theme="cyberpunk"] { --nx-page-bg: #1c0024; --nx-accent: #fcee0a; }
+body[data-theme="toxic"]     { --nx-page-bg: #0f1402; --nx-accent: #a3ff00; }
+body[data-theme="solar"]     { --nx-page-bg: #140700; --nx-accent: #ff5500; }
+body[data-theme="ice"]       { --nx-page-bg: #0f191c; --nx-accent: #00f3ff; }
+body[data-theme="arcade"]    { --nx-page-bg: #120421; --nx-accent: #ff007f; }
+body[data-theme="royal"]     { --nx-page-bg: #0f0314; --nx-accent: #ffd700; }
+body[data-theme="ghost"]     { --nx-page-bg: #11161a; --nx-accent: #708090; }
+body[data-theme="copper"]    { --nx-page-bg: #140d0a; --nx-accent: #b87333; }
+body[data-theme="moonlight"] { --nx-page-bg: #080a0f; --nx-accent: #7b92b5; }
+body[data-theme="neon"]      { --nx-page-bg: #020005; --nx-accent: #00ffef; }
+#nx-custom-bg { position: fixed; inset: 0; z-index: 0; background-size: cover; background-position: center; pointer-events: none; }
+body.has-custom-bg #animated-background-canvas { opacity: 0.35; }
+body.no-interactive-bg #animated-background-canvas { display: none !important; }
+.quick-action-btn, .signin-btn, .widget-btn { background: var(--nx-accent) !important; }
+.nav-tab-item.active, .nav-tab-item:hover { color: var(--nx-accent) !important; }
+.weather-stats i, .location-label { color: var(--nx-accent) !important; }
+body.no-ui-anim *, body.no-ui-anim *::before, body.no-ui-anim *::after { animation: none !important; transition: none !important; }

@@ -7,58 +7,105 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="newsettings.css">
     <link rel="stylesheet" href="../themes/themes.css">
+    <script>
+      (function () {
+        try {
+          var t = localStorage.getItem('nxos_theme') || 'crimson';
+          var bg = localStorage.getItem('nxos_theme_bg');
+          var accent = localStorage.getItem('nxos_theme_accent');
+          document.documentElement.setAttribute('data-theme', t);
+          if (bg) document.documentElement.style.setProperty('--nx-page-bg', bg);
+          if (accent) document.documentElement.style.setProperty('--nx-accent', accent);
+        } catch (e) {}
+      })();
+    </script>
 </head>
 <body>
     <div class="settings-container">
         <header class="settings-header">
+            <h2>
+                <svg class="icon-inline" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path fill="currentColor" d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.2 7.2 0 0 0-1.63-.94l-.36-2.54A.49.49 0 0 0 14 2h-4a.49.49 0 0 0-.48.41l-.36 2.54c-.58.23-1.12.54-1.63.94l-2.39-.96a.49.49 0 0 0-.59.22L2.63 8.87a.49.49 0 0 0 .12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.3.59.22l2.39-.96c.5.4 1.05.72 1.63.94l.36 2.54c.05.24.25.41.48.41h4c.24 0 .44-.17.48-.41l.36-2.54c.58-.23 1.12-.54 1.63-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.49.49 0 0 0-.12-.61l-2.03-1.58zM12 15.5A3.5 3.5 0 1 1 12 8.5a3.5 3.5 0 0 1 0 7z"/></svg>
+                System Control Panel
+            </h2>
+            <a href="../Newhomepage/index.html" class="close-btn" title="Close">
+                <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path fill="currentColor" d="M18.3 5.71a1 1 0 0 0-1.41 0L12 10.59 7.11 5.7A1 1 0 0 0 5.7 7.11L10.59 12 5.7 16.89a1 1 0 1 0 1.41 1.41L12 13.41l4.89 4.89a1 1 0 0 0 1.41-1.41L13.41 12l4.89-4.89a1 1 0 0 0 0-1.4z"/></svg>
+            </a>
             <h2><i class="fa-solid fa-gear"></i> System Control Panel</h2>
             <a href="../Newhomepage/index.html" class="close-btn"><i class="fa-solid fa-xmark"></i></a>
         </header>
 
         <main class="settings-body">
+
             <section class="settings-card">
-                <h3><i class="fa-solid fa-palette"></i> Theme Customization</h3>
-                <p class="subtitle">Select an accent color palette for the dashboard interface.</p>
-                
-                <div class="theme-grid">
-                    <button class="theme-option active" data-theme="crimson">
-                        <span class="color-preview crimson"></span>
-                        <span>Crimson Red</span>
-                    </button>
-                    <button class="theme-option" data-theme="purple">
-                        <span class="color-preview purple"></span>
-                        <span>NXOS Purple</span>
-                    </button>
-                    <button class="theme-option" data-theme="cyan">
-                        <span class="color-preview cyan"></span>
-                        <span>Cyber Cyan</span>
-                    </button>
-                    <button class="theme-option" data-theme="emerald">
-                        <span class="color-preview emerald"></span>
-                        <span>Matrix Green</span>
-                    </button>
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 3a9 9 0 0 0 0 18c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16a5 5 0 0 0 0-10h-4zm-5.5 9a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+                    Theme &amp; Colors
+                </h3>
+                <p class="subtitle">Accent palette and page background for the homepage. Changes apply immediately.</p>
+                <div class="theme-grid" id="themeGrid">
                 </div>
             </section>
 
             <section class="settings-card">
-                <h3><i class="fa-solid fa-crosshairs"></i> Custom Crosshair</h3>
-                <p class="subtitle">Pick your on-screen crosshair. Choice is saved in this browser.</p>
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M21 19V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                    Background
+                </h3>
+                <p class="subtitle">Interactive mesh, solid theme color, or your own image.</p>
+
                 <div class="setting-row">
-                    <label for="crosshair-style-select">Crosshair Style:</label>
+                    <label for="interactiveBgToggle">Interactive mesh background</label>
+                    <label class="switch">
+                        <input type="checkbox" id="interactiveBgToggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <div class="setting-row" style="margin-top:14px; flex-direction:column; align-items:flex-start; gap:10px;">
+                    <label for="bgImageInput">Custom background image</label>
+                    <div class="upload-row">
+                        <label class="file-btn" for="bgImageInput">
+                            <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/></svg>
+                            Upload image
+                        </label>
+                        <input type="file" id="bgImageInput" accept="image/*" hidden>
+                        <button type="button" id="clearBgImageBtn" class="ghost-btn">Clear image</button>
+                    </div>
+                    <div id="bgImagePreview" class="bg-preview hidden"></div>
+                    <p class="hint">Stored in this browser only. Max about 2.5 MB.</p>
+                </div>
+            </section>
+
+            <section class="settings-card">
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-2h-2v2zm0-4h2V7h-2v6z"/></svg>
+                    Custom Crosshair
+                </h3>
+                <p class="subtitle">Pick your on-screen crosshair. Saved in this browser.</p>
+                <div class="setting-row">
+                    <label for="crosshair-style-select">Crosshair Style</label>
                     <select id="crosshair-style-select" data-crosshair-select class="dropdown-input">
-                        <option value="cyan-hud">Cyan HUD (Original)</option>
+                        <option value="original">Original Cyan HUD</option>
+                        <option value="cyan-hud">Cyan HUD</option>
                         <option value="red-reticle">Red Reticle</option>
+                        <option value="gold-lock">Gold Lock</option>
+                        <option value="minimal-dot">Minimal Dot</option>
+                        <option value="neon-pulse">Neon Pulse</option>
+                        <option value="mono-sharp">Mono Sharp</option>
+                        <option value="purple-tactical">Purple Tactical</option>
                         <option value="none">None (System Cursor)</option>
                     </select>
                 </div>
             </section>
 
             <section class="settings-card">
-                <h3><i class="fa-solid fa-user-ninja"></i> Stealth & Cloaking</h3>
-                <p class="subtitle">Set up Tab Cloaking (Title & Favicon mask).</p>
-                
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                    Stealth &amp; Cloaking
+                </h3>
+                <p class="subtitle">Tab title and favicon mask.</p>
                 <div class="setting-row">
-                    <label for="cloakSelect">Select Preset Cloak:</label>
+                    <label for="cloakSelect">Preset cloak</label>
                     <select id="cloakSelect" class="dropdown-input">
                         <option value="none">None (Default)</option>
                         <option value="google">Google Search</option>
@@ -70,25 +117,29 @@
             </section>
 
             <section class="settings-card">
-                <h3><i class="fa-solid fa-keyboard"></i> Security & Keybinds</h3>
-                <p class="subtitle">Press this key to instantly redirect the page to a safe site.</p>
-                
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M20 5H4c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 12H4V7h16v10z"/></svg>
+                    Security &amp; Keybinds
+                </h3>
+                <p class="subtitle">Panic key redirects to a safe URL.</p>
                 <div class="setting-row">
-                    <label for="panicKeyInput">Panic Key:</label>
-                    <input type="text" id="panicKeyInput" readonly placeholder="Click to bind..." class="text-input" style="width: 120px; text-align: center; cursor: pointer;">
+                    <label for="panicKeyInput">Panic key</label>
+                    <input type="text" id="panicKeyInput" readonly placeholder="Click to bind..." class="text-input" style="width:120px;text-align:center;cursor:pointer;">
                 </div>
-                <div class="setting-row" style="margin-top: 10px;">
-                    <label for="panicUrlInput">Safe URL:</label>
+                <div class="setting-row" style="margin-top:10px;">
+                    <label for="panicUrlInput">Safe URL</label>
                     <input type="url" id="panicUrlInput" value="https://classroom.google.com" class="text-input" placeholder="https://...">
                 </div>
             </section>
 
             <section class="settings-card">
-                <h3><i class="fa-solid fa-gauge-high"></i> System Performance</h3>
-                <p class="subtitle">Disable heavy animations for low-end devices.</p>
-                
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+                    System Performance
+                </h3>
+                <p class="subtitle">Turning this off also disables the interactive mesh background.</p>
                 <div class="setting-row">
-                    <label for="animToggle">Enable UI Animations</label>
+                    <label for="animToggle">Enable UI animations</label>
                     <label class="switch">
                         <input type="checkbox" id="animToggle" checked>
                         <span class="slider"></span>
@@ -97,11 +148,16 @@
             </section>
 
             <section class="settings-card" style="border-color: rgba(255, 59, 59, 0.3);">
-                <h3><i class="fa-solid fa-database"></i> Data Management</h3>
-                <p class="subtitle">Wipe all local storage, favorites, and settings from this browser.</p>
-                
+                <h3>
+                    <svg class="icon-inline" viewBox="0 0 24 24" width="18" height="18"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                    Data Management
+                </h3>
+                <p class="subtitle">Wipe local storage, favorites, and settings from this browser.</p>
                 <div class="setting-row">
-                    <button id="clearDataBtn" class="danger-btn"><i class="fa-solid fa-trash"></i> Wipe All System Data</button>
+                    <button type="button" id="clearDataBtn" class="danger-btn">
+                        <svg viewBox="0 0 24 24" width="16" height="16"><path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+                        Wipe All System Data
+                    </button>
                 </div>
             </section>
 
