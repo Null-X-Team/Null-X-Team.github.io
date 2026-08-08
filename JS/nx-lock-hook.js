@@ -1,5 +1,6 @@
 (function () {
   var STORAGE_KEY = "nxos_user_pin";
+  var LOCKED_KEY = "nxos_locked";
   var LOCK_ID = "pin-lock-overlay";
   var clockTimer = null;
 
@@ -27,6 +28,21 @@
     } catch (e) {
       return false;
     }
+  }
+
+  function isLocked() {
+    try {
+      return localStorage.getItem(LOCKED_KEY) === "1";
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function setLocked(on) {
+    try {
+      if (on) localStorage.setItem(LOCKED_KEY, "1");
+      else localStorage.removeItem(LOCKED_KEY);
+    } catch (e) {}
   }
 
   function removeLockOverlay() {
@@ -78,6 +94,7 @@
       "@keyframes nxLockShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}",
       "#" + LOCK_ID + " .nx-error-shake{animation:nxLockShake .4s ease;}",
       "#" + LOCK_ID + " .nx-status{margin-top:14px;font-size:.95rem;min-height:22px;text-align:center;}",
+      /* Create-password card */
       "#" + LOCK_ID + " .nx-create-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;box-sizing:border-box;}",
       "#" + LOCK_ID + " .nx-create-card{background:rgba(18,9,28,0.95);border:1px solid rgba(139,0,255,0.45);",
       "border-radius:14px;padding:28px 26px;max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.55);",
@@ -159,6 +176,7 @@
       }
       showErr("");
       removeLockOverlay();
+      // Immediately show lock screen so they can practice unlock
       createLockScreen();
     }
 
@@ -176,6 +194,7 @@
   function createLockScreen() {
     removeLockOverlay();
     injectStyles();
+    setLocked(true);
 
     var overlay = document.createElement("div");
     overlay.id = LOCK_ID;
@@ -204,97 +223,109 @@
       "  </div>" +
       "</div>";
 
-    document.body.appendChild(overlay);
+    function attach() {
+      if (!document.body) {
+        document.addEventListener("DOMContentLoaded", attach);
+        return;
+      }
+      document.body.appendChild(overlay);
+      wireLockScreen();
+    }
 
-    var timeView = document.getElementById("nx-time-view");
-    var loginView = document.getElementById("nx-login");
-    var clickHint = document.getElementById("nx-hint");
-    var passwordInput = document.getElementById("nx-password");
-    var statusMessage = document.getElementById("nx-status");
-    var inputGroup = document.getElementById("nx-input-group");
-    var screenRoot = document.getElementById("nx-screen-root");
-    var clockEl = document.getElementById("nx-clock");
-    var dateEl = document.getElementById("nx-date");
+    function wireLockScreen() {
+      var timeView = document.getElementById("nx-time-view");
+      var loginView = document.getElementById("nx-login");
+      var clickHint = document.getElementById("nx-hint");
+      var passwordInput = document.getElementById("nx-password");
+      var statusMessage = document.getElementById("nx-status");
+      var inputGroup = document.getElementById("nx-input-group");
+      var screenRoot = document.getElementById("nx-screen-root");
+      var clockEl = document.getElementById("nx-clock");
+      var dateEl = document.getElementById("nx-date");
 
-    function updateClock() {
-      var now = new Date();
-      var h = now.getHours();
-      var m = now.getMinutes();
-      h = h < 10 ? "0" + h : String(h);
-      m = m < 10 ? "0" + m : String(m);
-      if (clockEl) clockEl.textContent = h + ":" + m;
-      if (dateEl) {
-        dateEl.textContent = now.toLocaleDateString("en-US", {
-          weekday: "long",
-          month: "long",
-          day: "numeric"
+      function updateClock() {
+        var now = new Date();
+        var h = now.getHours();
+        var m = now.getMinutes();
+        h = h < 10 ? "0" + h : String(h);
+        m = m < 10 ? "0" + m : String(m);
+        if (clockEl) clockEl.textContent = h + ":" + m;
+        if (dateEl) {
+          dateEl.textContent = now.toLocaleDateString("en-US", {
+            weekday: "long",
+            month: "long",
+            day: "numeric"
+          });
+        }
+      }
+
+      function showLogin() {
+        if (timeView) timeView.classList.add("slide-up");
+        if (clickHint) clickHint.style.display = "none";
+        setTimeout(function () {
+          if (loginView) loginView.classList.add("active");
+          if (passwordInput) passwordInput.focus();
+        }, 280);
+      }
+
+      function hideLogin() {
+        if (loginView) loginView.classList.remove("active");
+        if (timeView) timeView.classList.remove("slide-up");
+        if (clickHint) clickHint.style.display = "block";
+        if (passwordInput) passwordInput.value = "";
+        if (statusMessage) statusMessage.textContent = "";
+      }
+
+      function submitPasscode() {
+        if (!passwordInput) return;
+        var entered = passwordInput.value;
+        if (!entered) return;
+        if (entered === getPin()) {
+          if (statusMessage) {
+            statusMessage.style.color = "#00ff88";
+            statusMessage.textContent = "Welcome...";
+          }
+          setLocked(false);
+          setTimeout(function () {
+            removeLockOverlay();
+          }, 450);
+        } else {
+          if (statusMessage) {
+            statusMessage.style.color = "#ff6b6b";
+            statusMessage.textContent = "The password is incorrect. Try again.";
+          }
+          passwordInput.value = "";
+          if (inputGroup) inputGroup.classList.add("nx-error-shake");
+          setTimeout(function () {
+            if (inputGroup) inputGroup.classList.remove("nx-error-shake");
+            passwordInput.focus();
+          }, 400);
+        }
+      }
+
+      if (timeView) timeView.addEventListener("click", showLogin);
+      if (clickHint) clickHint.addEventListener("click", showLogin);
+      if (screenRoot) {
+        screenRoot.addEventListener("click", function (e) {
+          if (e.target === screenRoot && loginView && !loginView.classList.contains("active")) {
+            showLogin();
+          }
         });
       }
-    }
-
-    function showLogin() {
-      if (timeView) timeView.classList.add("slide-up");
-      if (clickHint) clickHint.style.display = "none";
-      setTimeout(function () {
-        if (loginView) loginView.classList.add("active");
-        if (passwordInput) passwordInput.focus();
-      }, 280);
-    }
-
-    function hideLogin() {
-      if (loginView) loginView.classList.remove("active");
-      if (timeView) timeView.classList.remove("slide-up");
-      if (clickHint) clickHint.style.display = "block";
-      if (passwordInput) passwordInput.value = "";
-      if (statusMessage) statusMessage.textContent = "";
-    }
-
-    function submitPasscode() {
-      if (!passwordInput) return;
-      var entered = passwordInput.value;
-      if (!entered) return;
-      if (entered === getPin()) {
-        if (statusMessage) {
-          statusMessage.style.color = "#00ff88";
-          statusMessage.textContent = "Welcome...";
-        }
-        setTimeout(function () {
-          removeLockOverlay();
-        }, 450);
-      } else {
-        if (statusMessage) {
-          statusMessage.style.color = "#ff6b6b";
-          statusMessage.textContent = "The password is incorrect. Try again.";
-        }
-        passwordInput.value = "";
-        if (inputGroup) inputGroup.classList.add("nx-error-shake");
-        setTimeout(function () {
-          if (inputGroup) inputGroup.classList.remove("nx-error-shake");
-          passwordInput.focus();
-        }, 400);
+      var submitBtn = document.getElementById("nx-submit");
+      if (submitBtn) submitBtn.addEventListener("click", submitPasscode);
+      if (passwordInput) {
+        passwordInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") submitPasscode();
+          else if (e.key === "Escape") hideLogin();
+        });
       }
+
+      updateClock();
+      clockTimer = setInterval(updateClock, 1000);
     }
 
-    if (timeView) timeView.addEventListener("click", showLogin);
-    if (clickHint) clickHint.addEventListener("click", showLogin);
-    if (screenRoot) {
-      screenRoot.addEventListener("click", function (e) {
-        if (e.target === screenRoot && loginView && !loginView.classList.contains("active")) {
-          showLogin();
-        }
-      });
-    }
-    var submitBtn = document.getElementById("nx-submit");
-    if (submitBtn) submitBtn.addEventListener("click", submitPasscode);
-    if (passwordInput) {
-      passwordInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter") submitPasscode();
-        else if (e.key === "Escape") hideLogin();
-      });
-    }
-
-    updateClock();
-    clockTimer = setInterval(updateClock, 1000);
+    attach();
   }
 
   function handleLockRequest() {
@@ -304,6 +335,27 @@
       createLockScreen();
     }
   }
+
+  // Restore lock after reload / hard refresh if still locked
+  function restoreIfLocked() {
+    if (isLocked() && hasPin()) {
+      createLockScreen();
+    } else if (isLocked() && !hasPin()) {
+      // PIN was cleared while locked — drop the flag
+      setLocked(false);
+    }
+  }
+
+  function tryRestore() {
+    if (document.body) {
+      restoreIfLocked();
+    } else {
+      document.addEventListener("DOMContentLoaded", restoreIfLocked);
+    }
+  }
+
+  // Run as early as possible
+  tryRestore();
 
   window.addEventListener(
     "keydown",
@@ -317,6 +369,7 @@
     true
   );
 
+  // If idle timer creates the old PIN box, route through our flow
   var obs = new MutationObserver(function () {
     if (document.querySelector("#pin-lock-overlay .pin-box")) {
       handleLockRequest();
