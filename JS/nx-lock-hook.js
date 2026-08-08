@@ -45,6 +45,23 @@
     } catch (e) {}
   }
 
+  function getAccountName() {
+    try {
+      var u = localStorage.getItem("chatUser");
+      if (u && String(u).trim()) return String(u).trim();
+    } catch (e) {}
+    return "Guest User";
+  }
+
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, "&")
+      .replace(/</g, "<")
+      .replace(/>/g, ">")
+      .replace(/"/g, """)
+      .replace(/'/g, "&#39;");
+  }
+
   function removeLockOverlay() {
     if (clockTimer) {
       clearInterval(clockTimer);
@@ -94,7 +111,6 @@
       "@keyframes nxLockShake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}",
       "#" + LOCK_ID + " .nx-error-shake{animation:nxLockShake .4s ease;}",
       "#" + LOCK_ID + " .nx-status{margin-top:14px;font-size:.95rem;min-height:22px;text-align:center;}",
-      /* Create-password card */
       "#" + LOCK_ID + " .nx-create-wrap{display:flex;align-items:center;justify-content:center;width:100%;height:100%;padding:20px;box-sizing:border-box;}",
       "#" + LOCK_ID + " .nx-create-card{background:rgba(18,9,28,0.95);border:1px solid rgba(139,0,255,0.45);",
       "border-radius:14px;padding:28px 26px;max-width:380px;width:100%;box-shadow:0 12px 40px rgba(0,0,0,0.55);",
@@ -176,7 +192,6 @@
       }
       showErr("");
       removeLockOverlay();
-      // Immediately show lock screen so they can practice unlock
       createLockScreen();
     }
 
@@ -196,6 +211,8 @@
     injectStyles();
     setLocked(true);
 
+    var accountName = escapeHtml(getAccountName());
+
     var overlay = document.createElement("div");
     overlay.id = LOCK_ID;
     overlay.innerHTML =
@@ -210,7 +227,7 @@
       '      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>' +
       '      <circle cx="12" cy="7" r="4"/>' +
       "    </svg>" +
-      '    <div class="nx-user-name">Guest User</div>' +
+      '    <div class="nx-user-name">' + accountName + "</div>" +
       '    <div class="nx-input-group" id="nx-input-group">' +
       '      <input type="password" id="nx-password" placeholder="Password" autocomplete="off">' +
       '      <button type="button" class="nx-submit" id="nx-submit" aria-label="Submit">' +
@@ -336,12 +353,10 @@
     }
   }
 
-  // Restore lock after reload / hard refresh if still locked
   function restoreIfLocked() {
     if (isLocked() && hasPin()) {
       createLockScreen();
     } else if (isLocked() && !hasPin()) {
-      // PIN was cleared while locked — drop the flag
       setLocked(false);
     }
   }
@@ -354,7 +369,6 @@
     }
   }
 
-  // Run as early as possible
   tryRestore();
 
   window.addEventListener(
@@ -369,7 +383,6 @@
     true
   );
 
-  // If idle timer creates the old PIN box, route through our flow
   var obs = new MutationObserver(function () {
     if (document.querySelector("#pin-lock-overlay .pin-box")) {
       handleLockRequest();
