@@ -54,12 +54,13 @@
   }
 
   function escapeHtml(str) {
-    return String(str)
-      .replace(/&/g, "&")
-      .replace(/</g, "<")
-      .replace(/>/g, ">")
-      .replace(/"/g, """)
-      .replace(/'/g, "&#39;");
+    var s = String(str);
+    s = s.split("&").join("&" + "amp;");
+    s = s.split("<").join("&" + "lt;");
+    s = s.split(">").join("&" + "gt;");
+    s = s.split('"').join("&" + "quot;");
+    s = s.split("'").join("&#39;");
+    return s;
   }
 
   function removeLockOverlay() {
