@@ -1,201 +1,769 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Windows Style Lock Screen</title>
-<style>
-html, body {
-  margin: 0; padding: 0; width: 100%; height: 100%;
-  min-height: 100vh; box-sizing: border-box;
-}
-body {
-  display: flex; justify-content: center; align-items: center;
-  background: linear-gradient(135deg, #1a0033, #590099, #0a001a);
-  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-  color: #fff; overflow: hidden; user-select: none;
-}
-.screen {
-  width: 100%; height: 100%; position: relative;
-  display: flex; flex-direction: column; justify-content: center; align-items: center;
-}
-.time-view {
-  position: absolute; bottom: 12%; left: 5%; right: 5%;
-  cursor: pointer; transition: transform 0.6s ease, opacity 0.4s ease;
-}
-.time-view.slide-up {
-  transform: translateY(-100vh); opacity: 0; pointer-events: none;
-}
-#clock {
-  font-size: clamp(3.5rem, 12vw, 7rem);
-  font-weight: 200; margin: 0; line-height: 1;
-  text-shadow: 0 2px 24px rgba(0,0,0,0.45);
-}
-#date {
-  font-size: clamp(1.1rem, 3vw, 1.6rem);
-  font-weight: 300; margin-top: 12px;
-  text-shadow: 0 1px 12px rgba(0,0,0,0.4);
-}
-.click-hint {
-  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
-  font-size: 1rem; opacity: 0.75; animation: pulse 2s infinite; cursor: pointer;
-  white-space: nowrap;
-}
-@keyframes pulse {
-  0%, 100% { opacity: 0.35; }
-  50% { opacity: 1; }
-}
-.login-view {
-  display: flex; flex-direction: column; align-items: center;
-  opacity: 0; transform: scale(0.92); transition: all 0.45s ease;
-  pointer-events: none; width: 100%;
-}
-.login-view.active {
-  opacity: 1; transform: scale(1); pointer-events: all;
-}
-.user-icon {
-  width: 110px; height: 110px;
-  background: rgba(255,255,255,0.08); border-radius: 50%;
-  padding: 18px; margin-bottom: 18px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
-}
-.user-name { font-size: 1.7rem; font-weight: 400; margin-bottom: 18px; }
-.input-group {
-  display: flex; align-items: center;
-  background: rgba(0,0,0,0.55);
-  border: 2px solid rgba(255,255,255,0.25);
-  border-radius: 6px; overflow: hidden;
-  transition: border-color 0.2s;
-}
-.input-group:focus-within { border-color: #b533ff; }
-input[type="password"] {
-  background: transparent; border: none; color: #fff;
-  padding: 14px 16px; font-size: 1.05rem; width: 210px; outline: none;
-}
-.submit-btn {
-  background: transparent; border: none; color: #fff;
-  padding: 0 16px; cursor: pointer; display: flex; align-items: center;
-}
-.submit-btn:hover { color: #b533ff; }
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20%, 60% { transform: translateX(-8px); }
-  40%, 80% { transform: translateX(8px); }
-}
-.error-shake { animation: shake 0.4s ease; }
-#status-message {
-  margin-top: 14px; font-size: 0.95rem; min-height: 22px; text-align: center;
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Style Lock Screen</title>
+    <style>
+        /* CSS: Styling and Layout */
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1a0033, #590099, #0a001a);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+            user-select: none;
+            transition: transform 0.3s ease, background 0.3s ease;
+        }
+
+        /* --- HIGH CONTRAST OVERRIDES --- */
+        body.high-contrast {
+            background: #000000 !important;
+            color: #ffff00 !important;
+        }
+        body.high-contrast * {
+            border-color: #ffff00 !important;
+        }
+        body.high-contrast svg {
+            stroke: #ffff00 !important;
+            fill: #ffff00 !important;
+        }
+        body.high-contrast .input-group,
+        body.high-contrast .setup-box {
+            background: #000 !important;
+            border: 3px solid #ffff00 !important;
+        }
+        body.high-contrast input[type="password"] {
+            color: #ffff00 !important;
+        }
+        body.high-contrast input[type="password"]::placeholder {
+            color: #cccc00 !important;
+        }
+        body.high-contrast .popup-menu {
+            background: #000 !important;
+            border: 2px solid #ffff00 !important;
+        }
+        body.high-contrast .menu-item:hover {
+            background: #333300 !important;
+        }
+        body.high-contrast .user-icon {
+            box-shadow: none !important;
+            border: 2px solid #ffff00 !important;
+        }
+
+        .screen-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- FIRST TIME SETUP VIEW --- */
+        .setup-view {
+            display: flex; /* Displayed by default, JS will hide it if a password exists */
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(135deg, #0a001a, #1a0033);
+            z-index: 500; 
+            transition: opacity 0.5s ease;
+        }
+
+        .setup-view.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .setup-box {
+            background: rgba(0, 0, 0, 0.6);
+            padding: 40px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .setup-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            font-weight: 300;
+        }
+
+        /* --- TIME VIEW --- */
+        .time-view {
+            position: absolute;
+            bottom: 10%;
+            left: 5%;
+            transition: transform 0.6s ease-in-out, opacity 0.4s ease-in-out;
+            cursor: pointer;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+        }
+
+        .time-view.slide-up {
+            transform: translateY(-100vh);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #clock {
+            font-size: 6rem;
+            font-weight: 200;
+            margin: 0;
+            line-height: 1;
+        }
+
+        #date {
+            font-size: 1.5rem;
+            font-weight: 300;
+            margin-top: 10px;
+        }
+
+        .click-hint {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            opacity: 0.7;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        /* --- LOGIN VIEW --- */
+        .login-view {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0;
+            transform: scale(0.9);
+            transition: all 0.5s ease-in-out;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+        }
+
+        .login-view.active {
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+
+        .user-icon {
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50%;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        }
+
+        .user-name {
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 20px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+
+        .input-group:focus-within {
+            border-color: #b533ff; 
+        }
+
+        input[type="password"] {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            font-size: 1rem;
+            width: 200px;
+            outline: none;
+        }
+
+        .submit-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0 15px;
+            cursor: pointer;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .submit-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        .submit-btn:hover { color: #b533ff; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .error-shake { animation: shake 0.4s ease; }
+
+        .status-message {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            height: 20px;
+        }
+
+        /* --- SYSTEM TRAY --- */
+        .system-tray {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 100;
+        }
+
+        .status-text {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-right: 10px;
+        }
+
+        .tray-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s, color 0.2s;
+            fill: white; 
+        }
+
+        .tray-icon:hover {
+            opacity: 1;
+            color: #b533ff;
+            fill: #b533ff;
+        }
+
+        .popup-menu {
+            position: absolute;
+            bottom: 40px;
+            right: 0;
+            background: rgba(15, 15, 15, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px 0;
+            min-width: 220px;
+            display: none; 
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+        }
+
+        .popup-menu.active { display: flex; }
+
+        .menu-item {
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .menu-item:hover { background: rgba(255, 255, 255, 0.1); }
+        
+        .menu-item svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .menu-header {
+            padding: 5px 20px 10px 20px;
+            font-size: 0.8rem;
+            color: #a0a0a0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 5px;
+        }
+
+        #restarting-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: black;
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top: 4px solid #b533ff;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Power on hint box */
+        #power-on-hint {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 1px solid white;
+            color: white;
+            padding: 6px 10px;
+            font-size: 10px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+    </style>
 </head>
 <body>
-<div class="screen" id="screen-root">
-  <div class="time-view" id="time-view">
-    <div id="clock">12:00</div>
-    <div id="date">Monday, January 1</div>
-  </div>
-  <div class="click-hint" id="click-hint">Click anywhere to unlock</div>
-  <div class="login-view" id="login-view">
-    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-      <circle cx="12" cy="7" r="4"/>
-    </svg>
-    <div class="user-name">Guest User</div>
-    <div class="input-group" id="input-group">
-      <input type="password" id="password-input" placeholder="Password" autocomplete="off">
-      <button type="button" class="submit-btn" id="submit-btn" aria-label="Submit">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
-        </svg>
-      </button>
+
+    <div id="restarting-screen">
+        <div class="spinner"></div>
+        <div class="narrate" data-text="Restarting system">Restarting...</div>
     </div>
-    <div id="status-message"></div>
-  </div>
-</div>
-<script>
-(function () {
-  var CORRECT_PASSCODE = "1234";
-  try {
-    CORRECT_PASSCODE = localStorage.getItem("nxos_user_pin") || "1234";
-  } catch (e) {}
 
-  var timeView = document.getElementById("time-view");
-  var loginView = document.getElementById("login-view");
-  var clickHint = document.getElementById("click-hint");
-  var passwordInput = document.getElementById("password-input");
-  var statusMessage = document.getElementById("status-message");
-  var inputGroup = document.getElementById("input-group");
-  var screenRoot = document.getElementById("screen-root");
+    <div id="power-on-hint">to turn back on click or press any key</div>
 
-  function updateClock() {
-    var now = new Date();
-    var h = now.getHours();
-    var m = now.getMinutes();
-    h = h < 10 ? "0" + h : String(h);
-    m = m < 10 ? "0" + m : String(m);
-    document.getElementById("clock").textContent = h + ":" + m;
-    document.getElementById("date").textContent = now.toLocaleDateString("en-US", {
-      weekday: "long", month: "long", day: "numeric"
-    });
-  }
+    <div class="screen-container">
+        
+        <div class="setup-view" id="setup-view">
+            <div class="setup-box">
+                <div class="setup-title narrate" data-text="Welcome. Please create a password.">Create System Password</div>
+                <div class="input-group" id="setup-input-group">
+                    <input type="password" id="setup-password-input" placeholder="New Password" onkeypress="handleSetupKeyPress(event)" class="narrate" data-text="Enter new password field">
+                    <button class="submit-btn narrate" data-text="Save password" onclick="saveNewPassword()">
+                        <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                    </button>
+                </div>
+                <div id="setup-status-message" class="status-message"></div>
+            </div>
+        </div>
 
-  function showLogin() {
-    timeView.classList.add("slide-up");
-    clickHint.style.display = "none";
-    setTimeout(function () {
-      loginView.classList.add("active");
-      passwordInput.focus();
-    }, 280);
-  }
+        <div class="time-view" id="time-view" onclick="showLogin()">
+            <div id="clock" class="narrate" data-text="Current time">12:00</div>
+            <div id="date" class="narrate" data-text="Current date">Monday, January 1</div>
+        </div>
+        <div class="click-hint narrate" data-text="Click anywhere to unlock" id="click-hint" onclick="showLogin()">Click anywhere to unlock</div>
 
-  function hideLogin() {
-    loginView.classList.remove("active");
-    timeView.classList.remove("slide-up");
-    clickHint.style.display = "block";
-    passwordInput.value = "";
-    statusMessage.textContent = "";
-  }
+        <div class="login-view" id="login-view">
+            <svg class="user-icon narrate" data-text="User icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </svg>
 
-  function submitPasscode() {
-    var entered = passwordInput.value;
-    if (!entered) return;
-    if (entered === CORRECT_PASSCODE) {
-      statusMessage.style.color = "#00ff88";
-      statusMessage.textContent = "Welcome...";
-      setTimeout(function () {
-        document.body.style.opacity = "0";
-        try {
-          if (window.parent && window.parent !== window) {
-            window.parent.postMessage({ type: "nxos-unlock" }, "*");
-          }
-        } catch (e) {}
-      }, 500);
-    } else {
-      statusMessage.style.color = "#ff6b6b";
-      statusMessage.textContent = "The password is incorrect. Try again.";
-      passwordInput.value = "";
-      inputGroup.classList.add("error-shake");
-      setTimeout(function () {
-        inputGroup.classList.remove("error-shake");
-        passwordInput.focus();
-      }, 400);
-    }
-  }
+            <div class="user-name narrate" data-text="Logged in as Guest User">Guest User</div>
 
-  timeView.addEventListener("click", showLogin);
-  clickHint.addEventListener("click", showLogin);
-  screenRoot.addEventListener("click", function (e) {
-    if (e.target === screenRoot && !loginView.classList.contains("active")) showLogin();
-  });
-  document.getElementById("submit-btn").addEventListener("click", submitPasscode);
-  passwordInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") submitPasscode();
-    else if (e.key === "Escape") hideLogin();
-  });
+            <div class="input-group" id="input-group">
+                <input type="password" id="password-input" placeholder="Password" onkeypress="handleKeyPress(event)" class="narrate" data-text="Password input field">
+                <button class="submit-btn narrate" data-text="Submit password" onclick="submitPasscode()">
+                    <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+                </button>
+            </div>
+            
+            <div id="status-message" class="status-message"></div>
+        </div>
 
-  setInterval(updateClock, 1000);
-  updateClock();
-})();
-</script>
+        <div class="system-tray">
+            <span class="status-text narrate" data-text="TEST USER">logged in as TEST USER</span>
+            
+            <div style="position: relative;">
+                <svg class="tray-icon narrate" data-text="Network Settings" onclick="toggleMenu('wifi-menu')" viewBox="0 0 24 24">
+                    <path d="M12 3C7.95 3 4.21 4.34 1.2 6.6L3 9c2.5-1.92 5.6-3 9-3s6.5 1.08 9 3l1.8-2.4C19.79 4.34 16.05 3 12 3zm0 5c-2.58 0-4.96.88-6.9 2.36l1.8 2.4C8.36 11.66 10.1 11 12 11s3.64.66 5.1 1.76l1.8-2.4C16.96 8.88 14.58 8 12 8zm0 5c-1.15 0-2.22.38-3.08 1.03l3.08 4.11 3.08-4.11C14.22 13.38 13.15 13 12 13z"/>
+                </svg>
+                <div class="popup-menu" id="wifi-menu">
+                    <div class="menu-header">Networks</div>
+                    <div class="menu-item narrate" data-text="Fast 5G" onclick="setWifi('fast')">
+                        <svg viewBox="0 0 24 24"><path d="M12 3C7.95 3 4.21 4.34 1.2 6.6L3 9c2.5-1.92 5.6-3 9-3s6.5 1.08 9 3l1.8-2.4C19.79 4.34 16.05 3 12 3zm0 5c-2.58 0-4.96.88-6.9 2.36l1.8 2.4C8.36 11.66 10.1 11 12 11s3.64.66 5.1 1.76l1.8-2.4C16.96 8.88 14.58 8 12 8zm0 5c-1.15 0-2.22.38-3.08 1.03l3.08 4.11 3.08-4.11C14.22 13.38 13.15 13 12 13z"/></svg>
+                        Fast 5G
+                    </div>
+                    <div class="menu-item narrate" data-text="Average Windows Wi-Fi" onclick="setWifi('lag')">
+                        <svg viewBox="0 0 24 24"><path d="M24 16.08V13C20.35 9.4 16.29 7.6 12 7.6s-8.35 1.8-12 5.4v3.08c1.34-1 3.23-2.18 5.69-3.32l1.6 3.19C4.85 17.15 3.32 18 2.11 18.7L12 24l9.89-5.3c-1.21-.7-2.74-1.55-5.18-2.64l1.6-3.19c2.46 1.14 4.35 2.32 5.69 3.32z"/><path fill="#ff4d4d" d="M11 2h2v7h-2z"/><path fill="#ff4d4d" d="M11 10h2v2h-2z"/></svg>
+                        Average Windows Wi-Fi
+                    </div>
+                </div>
+            </div>
+
+            <div style="position: relative;">
+                <svg class="tray-icon narrate" data-text="Accessibility Settings" onclick="toggleMenu('access-menu')" viewBox="0 0 24 24">
+                    <circle cx="12" cy="4" r="2"></circle>
+                    <path d="M19 13v-2c-1.54.02-3.09-.75-4.07-1.83l-1.29-1.43C13.25 7.33 12.65 7 12 7c-.65 0-1.25.33-1.64.74L9.07 9.17C8.09 10.25 6.54 11.02 5 11v2c2.18 0 4.13-1.02 5-2.61V14l-3.26 3.26c-.46.46-.74 1.1-.74 1.74v2h2v-2c0-.26.11-.53.29-.71l2.71-2.71 2.71 2.71c.18.18.43.45.29.71v2h2v-2c0-.64-.28-1.28-.74-1.74L14 14v-3.61c.87 1.59 2.82 2.61 5 2.61z"></path>
+                </svg>
+                <div class="popup-menu" id="access-menu">
+                    <div class="menu-header">Accessibility</div>
+                    <div class="menu-item narrate" data-text="Toggle Magnifier" onclick="toggleMagnifier()" id="mag-btn">
+                        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                        Magnifier (Off)
+                    </div>
+                    <div class="menu-item narrate" data-text="Toggle High Contrast" onclick="toggleHighContrast()" id="contrast-btn">
+                        <svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17.93c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93V4.07z"/></svg>
+                        High Contrast (Off)
+                    </div>
+                    <div class="menu-item narrate" data-text="Toggle Narrator" onclick="toggleNarrator()" id="narrator-btn">
+                        <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                        Narrator (Off)
+                    </div>
+                </div>
+            </div>
+
+            <div style="position: relative;">
+                <svg class="tray-icon narrate" data-text="Power Menu" onclick="toggleMenu('power-menu')" viewBox="0 0 24 24">
+                    <path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/>
+                </svg>
+                <div class="popup-menu" id="power-menu">
+                    <div class="menu-item narrate" data-text="Restart Computer" onclick="powerAction('restart')">
+                        <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                        Restart
+                    </div>
+                    <div class="menu-item narrate" data-text="Shut Down Computer" onclick="powerAction('shutdown')">
+                        <svg viewBox="0 0 24 24"><path d="M13 3h-2v10h2V3zm4.83 2.17l-1.42 1.42C17.99 7.86 19 9.81 19 12c0 3.87-3.13 7-7 7s-7-3.13-7-7c0-2.19 1.01-4.14 2.58-5.42L6.17 5.17C4.23 6.82 3 9.26 3 12c0 4.97 4.03 9 9 9s9-4.03 9-9c0-2.74-1.23-5.18-3.17-6.83z"/></svg>
+                        Shut Down
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+        /* --- CORE LOGIC & LOCAL STORAGE --- */
+        let systemPasscode = localStorage.getItem('os_lock_password');
+        
+        const setupView = document.getElementById('setup-view');
+        const setupPasswordInput = document.getElementById('setup-password-input');
+        const setupStatusMessage = document.getElementById('setup-status-message');
+        const setupInputGroup = document.getElementById('setup-input-group');
+
+        const timeView = document.getElementById('time-view');
+        const loginView = document.getElementById('login-view');
+        const clickHint = document.getElementById('click-hint');
+        const passwordInput = document.getElementById('password-input');
+        const statusMessage = document.getElementById('status-message');
+        const inputGroup = document.getElementById('input-group');
+
+        let inactivityTimer;
+        
+        // NEW STATE VARIABLES
+        let isLaggy = false;
+        let lagInterval; 
+        let isMagnified = false;
+        let isHighContrast = false;
+        let isNarratorOn = false;
+
+        // --- INITIALIZATION ---
+        // Check if a password exists in local storage on page load
+        if (systemPasscode) {
+            setupView.style.display = 'none'; // Hide setup if password exists
+        } else {
+            setupPasswordInput.focus(); // Focus the setup input if it's new
+        }
+
+        // --- PASSWORD SETUP FUNCTIONS ---
+        function handleSetupKeyPress(event) {
+            if (event.key === "Enter") saveNewPassword();
+        }
+
+        function saveNewPassword() {
+            const newPassword = setupPasswordInput.value;
+            
+            if (newPassword.trim() === "") {
+                setupStatusMessage.style.color = isHighContrast ? "#ffff00" : "#ff4d4d"; 
+                setupStatusMessage.innerText = "Password cannot be empty.";
+                setupInputGroup.classList.add('error-shake');
+                setTimeout(() => setupInputGroup.classList.remove('error-shake'), 400);
+                return;
+            }
+
+            // Save to Local Storage
+            localStorage.setItem('os_lock_password', newPassword);
+            systemPasscode = newPassword;
+            
+            // Fade out the setup screen
+            setupView.classList.add('hidden');
+            setTimeout(() => {
+                setupView.style.display = 'none';
+            }, 500); // Matches the 0.5s CSS transition
+        }
+
+        // --- LAG SIMULATION FUNCTION ---
+        function runWithLag(actionFunction) {
+            if (isLaggy) {
+                const lagTime = Math.floor(Math.random() * 800) + 200; 
+                setTimeout(actionFunction, lagTime);
+            } else {
+                actionFunction(); 
+            }
+        }
+
+        // --- CLOCK ---
+        function updateClock() {
+            const now = new Date();
+            let hours = now.getHours();
+            let minutes = now.getMinutes();
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            document.getElementById('clock').innerText = `${hours}:${minutes}`;
+            const options = { weekday: 'long', month: 'long', day: 'numeric' };
+            document.getElementById('date').innerText = now.toLocaleDateString('en-US', options);
+        }
+
+        // --- LOGIN TRANSITIONS ---
+        function showLogin() {
+            runWithLag(() => {
+                timeView.classList.add('slide-up');
+                clickHint.style.display = 'none'; 
+                setTimeout(() => {
+                    loginView.classList.add('active');
+                    passwordInput.focus(); 
+                    resetInactivityTimer();
+                    speak("Login screen active. Enter password.");
+                }, 300);
+            });
+        }
+
+        function hideLogin() {
+            runWithLag(() => {
+                loginView.classList.remove('active');
+                timeView.classList.remove('slide-up');
+                clickHint.style.display = 'block';
+                passwordInput.value = ""; 
+                statusMessage.innerText = ""; 
+                clearTimeout(inactivityTimer);
+                speak("Lock screen active.");
+            });
+        }
+
+        // --- INACTIVITY TIMER ---
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+            if (loginView.classList.contains('active')) {
+                inactivityTimer = setTimeout(hideLogin, 30000);
+            }
+        }
+
+        document.addEventListener('mousemove', resetInactivityTimer);
+        document.addEventListener('keydown', resetInactivityTimer);
+
+        // --- PASSCODE LOGIC ---
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                submitPasscode();
+            } else if (event.key === "Escape" && loginView.classList.contains('active')) {
+                hideLogin(); 
+            }
+        }
+
+        function submitPasscode() {
+            const enteredPasscode = passwordInput.value;
+            if (enteredPasscode === "") return;
+
+            runWithLag(() => {
+                // Now checking against the dynamically saved systemPasscode
+                if (enteredPasscode === systemPasscode) {
+                    statusMessage.style.color = isHighContrast ? "#ffff00" : "#00ff00"; 
+                    statusMessage.innerText = "Welcome...";
+                    speak("Welcome. Access granted.");
+                    clearTimeout(inactivityTimer);
+                    setTimeout(() => {
+                        document.body.style.opacity = "0";
+                    }, 800);
+                } else {
+                    statusMessage.style.color = isHighContrast ? "#ffff00" : "#ff4d4d"; 
+                    statusMessage.innerText = "The password is incorrect. Try again.";
+                    speak("Incorrect password. Try again.");
+                    passwordInput.value = ""; 
+                    inputGroup.classList.add('error-shake');
+                    setTimeout(() => {
+                        inputGroup.classList.remove('error-shake');
+                        passwordInput.focus(); 
+                    }, 400);
+                }
+            });
+        }
+
+        // --- SYSTEM TRAY & MENUS ---
+        function toggleMenu(menuId) {
+            const targetMenu = document.getElementById(menuId);
+            const isCurrentlyOpen = targetMenu.classList.contains('active');
+            
+            document.querySelectorAll('.popup-menu').forEach(menu => menu.classList.remove('active'));
+            
+            if (!isCurrentlyOpen) {
+                targetMenu.classList.add('active');
+                speak(menuId.replace('-menu', '') + " menu opened");
+            }
+        }
+
+        document.addEventListener('click', (event) => {
+            if (!event.target.closest('.system-tray')) {
+                document.querySelectorAll('.popup-menu').forEach(menu => {
+                    menu.classList.remove('active');
+                });
+            }
+        });
+
+        // 1. Wi-Fi Settings & TRUE LAG
+        function setWifi(type) {
+            if (type === 'lag') {
+                isLaggy = true;
+                speak("Connected to average Windows Wi-Fi. System lag initiated.");
+                
+                lagInterval = setInterval(() => {
+                    const start = Date.now();
+                    while(Date.now() - start < 150) {}
+                }, 1000);
+
+            } else {
+                isLaggy = false;
+                clearInterval(lagInterval); 
+                speak("Connected to Fast 5G.");
+            }
+            toggleMenu('wifi-menu'); 
+        }
+
+        // 2. Accessibility
+        function toggleMagnifier() {
+            isMagnified = !isMagnified;
+            const magBtn = document.getElementById('mag-btn');
+            
+            if (isMagnified) {
+                document.body.style.transform = "scale(1.8)";
+                magBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Magnifier (On)`;
+                speak("Magnifier turned on.");
+            } else {
+                document.body.style.transform = "scale(1)";
+                document.body.style.transformOrigin = "center center"; 
+                magBtn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg> Magnifier (Off)`;
+                speak("Magnifier turned off.");
+            }
+            toggleMenu('access-menu'); 
+        }
+
+        document.addEventListener('mousemove', (e) => {
+            if (isMagnified) {
+                const x = (e.clientX / window.innerWidth) * 100;
+                const y = (e.clientY / window.innerHeight) * 100;
+                document.body.style.transformOrigin = `${x}% ${y}%`;
+            }
+        });
+
+        // High Contrast Toggle
+        function toggleHighContrast() {
+            isHighContrast = !isHighContrast;
+            document.body.classList.toggle('high-contrast');
+            
+            const btn = document.getElementById('contrast-btn');
+            btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 22c5.52 0 10-4.48 10-10S17.52 2 12 2 2 6.48 2 12s4.48 10 10 10zm1-17.93c3.94.49 7 3.85 7 7.93s-3.05 7.44-7 7.93V4.07z"/></svg> High Contrast (${isHighContrast ? 'On' : 'Off'})`;
+            
+            speak(isHighContrast ? "High Contrast turned on." : "High Contrast turned off.");
+            toggleMenu('access-menu');
+        }
+
+        // Narrator Toggle & Logic
+        function toggleNarrator() {
+            isNarratorOn = !isNarratorOn;
+            
+            const btn = document.getElementById('narrator-btn');
+            btn.innerHTML = `<svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg> Narrator (${isNarratorOn ? 'On' : 'Off'})`;
+            
+            speak(isNarratorOn ? "Narrator turned on." : "Narrator turned off.");
+            toggleMenu('access-menu');
+        }
+
+        function speak(text) {
+            if (isNarratorOn && 'speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); 
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            }
+        }
+
+        document.querySelectorAll('.narrate').forEach(el => {
+            el.addEventListener('mouseenter', (e) => {
+                let textToRead = e.target.getAttribute('data-text') || e.target.innerText;
+                if (e.target.id === 'clock' || e.target.id === 'date') textToRead = e.target.innerText;
+                speak(textToRead);
+            });
+        });
+
+        // 3. Power Actions
+        function powerAction(action) {
+            toggleMenu('power-menu'); 
+            
+            if (action === 'shutdown') {
+                speak("Shutting down.");
+                document.querySelector('.screen-container').style.display = 'none';
+                document.body.style.background = 'black';
+                
+                document.getElementById('power-on-hint').style.display = 'block';
+
+                const wakeUp = () => location.reload();
+                
+                setTimeout(() => {
+                    document.addEventListener('click', wakeUp, {once: true});
+                    document.addEventListener('keydown', wakeUp, {once: true});
+                }, 500);
+
+            } else if (action === 'restart') {
+                speak("Restarting system.");
+                document.getElementById('restarting-screen').style.display = 'flex';
+                
+                setTimeout(() => {
+                    document.getElementById('restarting-screen').style.display = 'none';
+                    document.querySelector('.screen-container').style.display = 'none';
+                    document.body.style.background = 'black';
+                    
+                    setTimeout(() => {
+                        location.reload();
+                    }, 20000); 
+
+                }, 2500);
+            }
+        }
+
+        // Start Clock
+        setInterval(updateClock, 1000);
+        updateClock(); 
+    </script>
 </body>
 </html>
