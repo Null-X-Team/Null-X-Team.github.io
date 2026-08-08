@@ -3,95 +3,199 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lock Screen</title>
+<title>Windows Style Lock Screen</title>
 <style>
-body{margin:0;height:100vh;display:flex;justify-content:center;align-items:center;background:linear-gradient(135deg,#1a0033,#590099,#0a001a);font-family:"Segoe UI",Tahoma,sans-serif;color:#fff;overflow:hidden;user-select:none}
-.screen{width:100%;height:100%;position:relative;display:flex;flex-direction:column;justify-content:center;align-items:center}
-.time-view{position:absolute;bottom:10%;left:5%;transition:transform .6s,opacity .4s;cursor:pointer}
-.time-view.slide-up{transform:translateY(-100vh);opacity:0;pointer-events:none}
-#clock{font-size:6rem;font-weight:200;margin:0;line-height:1}
-#date{font-size:1.5rem;font-weight:300;margin-top:10px}
-.click-hint{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);opacity:.7;animation:pulse 2s infinite;cursor:pointer}
-@keyframes pulse{0%,100%{opacity:.3}50%{opacity:1}}
-.login-view{display:flex;flex-direction:column;align-items:center;opacity:0;transform:scale(.9);transition:all .5s;pointer-events:none}
-.login-view.active{opacity:1;transform:scale(1);pointer-events:all}
-.user-icon{width:120px;height:120px;background:rgba(255,255,255,.05);border-radius:50%;padding:20px;margin-bottom:20px}
-.user-name{font-size:1.8rem;margin-bottom:20px}
-.input-group{display:flex;align-items:center;background:rgba(0,0,0,.5);border:2px solid rgba(255,255,255,.2);border-radius:4px;overflow:hidden}
-.input-group:focus-within{border-color:#b533ff}
-input[type=password]{background:transparent;border:none;color:#fff;padding:12px 15px;font-size:1rem;width:200px;outline:none}
-.submit-btn{background:transparent;border:none;color:#fff;padding:0 15px;cursor:pointer}
-.submit-btn:hover{color:#b533ff}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-10px)}40%,80%{transform:translateX(10px)}}
-.error-shake{animation:shake .4s ease}
-#status-message{margin-top:15px;font-size:.9rem;height:20px}
+html, body {
+  margin: 0; padding: 0; width: 100%; height: 100%;
+  min-height: 100vh; box-sizing: border-box;
+}
+body {
+  display: flex; justify-content: center; align-items: center;
+  background: linear-gradient(135deg, #1a0033, #590099, #0a001a);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  color: #fff; overflow: hidden; user-select: none;
+}
+.screen {
+  width: 100%; height: 100%; position: relative;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+.time-view {
+  position: absolute; bottom: 12%; left: 5%; right: 5%;
+  cursor: pointer; transition: transform 0.6s ease, opacity 0.4s ease;
+}
+.time-view.slide-up {
+  transform: translateY(-100vh); opacity: 0; pointer-events: none;
+}
+#clock {
+  font-size: clamp(3.5rem, 12vw, 7rem);
+  font-weight: 200; margin: 0; line-height: 1;
+  text-shadow: 0 2px 24px rgba(0,0,0,0.45);
+}
+#date {
+  font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-weight: 300; margin-top: 12px;
+  text-shadow: 0 1px 12px rgba(0,0,0,0.4);
+}
+.click-hint {
+  position: absolute; bottom: 28px; left: 50%; transform: translateX(-50%);
+  font-size: 1rem; opacity: 0.75; animation: pulse 2s infinite; cursor: pointer;
+  white-space: nowrap;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+.login-view {
+  display: flex; flex-direction: column; align-items: center;
+  opacity: 0; transform: scale(0.92); transition: all 0.45s ease;
+  pointer-events: none; width: 100%;
+}
+.login-view.active {
+  opacity: 1; transform: scale(1); pointer-events: all;
+}
+.user-icon {
+  width: 110px; height: 110px;
+  background: rgba(255,255,255,0.08); border-radius: 50%;
+  padding: 18px; margin-bottom: 18px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+}
+.user-name { font-size: 1.7rem; font-weight: 400; margin-bottom: 18px; }
+.input-group {
+  display: flex; align-items: center;
+  background: rgba(0,0,0,0.55);
+  border: 2px solid rgba(255,255,255,0.25);
+  border-radius: 6px; overflow: hidden;
+  transition: border-color 0.2s;
+}
+.input-group:focus-within { border-color: #b533ff; }
+input[type="password"] {
+  background: transparent; border: none; color: #fff;
+  padding: 14px 16px; font-size: 1.05rem; width: 210px; outline: none;
+}
+.submit-btn {
+  background: transparent; border: none; color: #fff;
+  padding: 0 16px; cursor: pointer; display: flex; align-items: center;
+}
+.submit-btn:hover { color: #b533ff; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-8px); }
+  40%, 80% { transform: translateX(8px); }
+}
+.error-shake { animation: shake 0.4s ease; }
+#status-message {
+  margin-top: 14px; font-size: 0.95rem; min-height: 22px; text-align: center;
+}
 </style>
 </head>
 <body>
-<div class="screen">
-  <div class="time-view" id="time-view" onclick="showLogin()">
+<div class="screen" id="screen-root">
+  <div class="time-view" id="time-view">
     <div id="clock">12:00</div>
     <div id="date">Monday, January 1</div>
   </div>
-  <div class="click-hint" id="click-hint" onclick="showLogin()">Click anywhere to unlock</div>
+  <div class="click-hint" id="click-hint">Click anywhere to unlock</div>
   <div class="login-view" id="login-view">
-    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <svg class="user-icon" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+      <circle cx="12" cy="7" r="4"/>
+    </svg>
     <div class="user-name">Guest User</div>
     <div class="input-group" id="input-group">
-      <input type="password" id="password-input" placeholder="Password" onkeypress="handleKeyPress(event)">
-      <button class="submit-btn" onclick="submitPasscode()">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+      <input type="password" id="password-input" placeholder="Password" autocomplete="off">
+      <button type="button" class="submit-btn" id="submit-btn" aria-label="Submit">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/>
+        </svg>
       </button>
     </div>
     <div id="status-message"></div>
   </div>
 </div>
 <script>
-const CORRECT_PASSCODE = (function(){try{return localStorage.getItem("nxos_user_pin")||"1234"}catch(e){return"1234"}})();
-const timeView=document.getElementById("time-view");
-const loginView=document.getElementById("login-view");
-const clickHint=document.getElementById("click-hint");
-const passwordInput=document.getElementById("password-input");
-const statusMessage=document.getElementById("status-message");
-const inputGroup=document.getElementById("input-group");
-function updateClock(){
-  const now=new Date();
-  let h=now.getHours(),m=now.getMinutes();
-  h=h<10?"0"+h:h;m=m<10?"0"+m:m;
-  document.getElementById("clock").innerText=h+":"+m;
-  document.getElementById("date").innerText=now.toLocaleDateString("en-US",{weekday:"long",month:"long",day:"numeric"});
-}
-function showLogin(){
-  timeView.classList.add("slide-up");
-  clickHint.style.display="none";
-  setTimeout(function(){loginView.classList.add("active");passwordInput.focus()},300);
-}
-function handleKeyPress(e){if(e.key==="Enter")submitPasscode();else if(e.key==="Escape")hideLogin()}
-function hideLogin(){
-  loginView.classList.remove("active");
-  timeView.classList.remove("slide-up");
-  clickHint.style.display="block";
-  passwordInput.value="";statusMessage.innerText="";
-}
-function submitPasscode(){
-  const entered=passwordInput.value;
-  if(!entered)return;
-  if(entered===CORRECT_PASSCODE){
-    statusMessage.style.color="#00ff00";
-    statusMessage.innerText="Welcome...";
-    setTimeout(function(){
-      document.body.style.opacity="0";
-      try{if(window.parent&&window.parent!==window)window.parent.postMessage({type:"nxos-unlock"},"*")}catch(e){}
-    },600);
-  }else{
-    statusMessage.style.color="#ff4d4d";
-    statusMessage.innerText="The password is incorrect. Try again.";
-    passwordInput.value="";
-    inputGroup.classList.add("error-shake");
-    setTimeout(function(){inputGroup.classList.remove("error-shake");passwordInput.focus()},400);
+(function () {
+  var CORRECT_PASSCODE = "1234";
+  try {
+    CORRECT_PASSCODE = localStorage.getItem("nxos_user_pin") || "1234";
+  } catch (e) {}
+
+  var timeView = document.getElementById("time-view");
+  var loginView = document.getElementById("login-view");
+  var clickHint = document.getElementById("click-hint");
+  var passwordInput = document.getElementById("password-input");
+  var statusMessage = document.getElementById("status-message");
+  var inputGroup = document.getElementById("input-group");
+  var screenRoot = document.getElementById("screen-root");
+
+  function updateClock() {
+    var now = new Date();
+    var h = now.getHours();
+    var m = now.getMinutes();
+    h = h < 10 ? "0" + h : String(h);
+    m = m < 10 ? "0" + m : String(m);
+    document.getElementById("clock").textContent = h + ":" + m;
+    document.getElementById("date").textContent = now.toLocaleDateString("en-US", {
+      weekday: "long", month: "long", day: "numeric"
+    });
   }
-}
-setInterval(updateClock,1000);updateClock();
+
+  function showLogin() {
+    timeView.classList.add("slide-up");
+    clickHint.style.display = "none";
+    setTimeout(function () {
+      loginView.classList.add("active");
+      passwordInput.focus();
+    }, 280);
+  }
+
+  function hideLogin() {
+    loginView.classList.remove("active");
+    timeView.classList.remove("slide-up");
+    clickHint.style.display = "block";
+    passwordInput.value = "";
+    statusMessage.textContent = "";
+  }
+
+  function submitPasscode() {
+    var entered = passwordInput.value;
+    if (!entered) return;
+    if (entered === CORRECT_PASSCODE) {
+      statusMessage.style.color = "#00ff88";
+      statusMessage.textContent = "Welcome...";
+      setTimeout(function () {
+        document.body.style.opacity = "0";
+        try {
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage({ type: "nxos-unlock" }, "*");
+          }
+        } catch (e) {}
+      }, 500);
+    } else {
+      statusMessage.style.color = "#ff6b6b";
+      statusMessage.textContent = "The password is incorrect. Try again.";
+      passwordInput.value = "";
+      inputGroup.classList.add("error-shake");
+      setTimeout(function () {
+        inputGroup.classList.remove("error-shake");
+        passwordInput.focus();
+      }, 400);
+    }
+  }
+
+  timeView.addEventListener("click", showLogin);
+  clickHint.addEventListener("click", showLogin);
+  screenRoot.addEventListener("click", function (e) {
+    if (e.target === screenRoot && !loginView.classList.contains("active")) showLogin();
+  });
+  document.getElementById("submit-btn").addEventListener("click", submitPasscode);
+  passwordInput.addEventListener("keydown", function (e) {
+    if (e.key === "Enter") submitPasscode();
+    else if (e.key === "Escape") hideLogin();
+  });
+
+  setInterval(updateClock, 1000);
+  updateClock();
+})();
 </script>
 </body>
 </html>
