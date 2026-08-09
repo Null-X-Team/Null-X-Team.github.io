@@ -1,0 +1,181 @@
+name: Auto-Update Game Registry
+
+on:
+  push:
+    paths:
+      - 'Games/**'
+  workflow_dispatch:
+
+jobs:
+  update-registry:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Scan Games folder and generate registry
+        run: |
+          python3 << 'EOF'
+          import os
+          import json
+          import re
+          from pathlib import Path
+
+          games_dir = Path("Games")
+          registry = []
+          
+          # Common image extensions to look for
+          image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'}
+          
+          for game_folder in sorted(games_dir.iterdir()):
+              if not game_folder.is_dir():
+                  continue
+              
+              # Skip hidden folders
+              if game_folder.name.startswith('.'):
+                  continue
+              
+              # Find the main HTML file
+              html_file = None
+              for f in game_folder.rglob("*.html"):
+                  if f.name.lower() in ["index.html", "game.html", "main.html"] or "index" in f.name.lower():
+                      html_file = f
+                      break
+              
+              if not html_file:
+                  # Try any HTML file
+                  html_files = list(game_folder.rglob("*.html"))
+                  if html_files:
+                      html_file = html_files[0]
+              
+              if not html_file:
+                  continue
+              
+              # Find an image file in the same folder or subfolders
+              image_file = None
+              for f in game_folder.rglob("*"):
+                  if f.suffix.lower() in image_exts:
+                      image_file = f
+                      break
+              
+              # Generate a clean ID from folder name
+              folder_name = game_folder.name
+              game_id = re.sub(r'[^a-zA-Z0-9]', '_', folder_name.lower())
+              if game_id.startswith('_'):
+                  game_id = game_id[1:]
+              if not game_id:
+                  game_id = f"game_{len(registry)}"
+              
+              # Build relative paths from repo root
+              url_path = str(html_file).replace("\\", "/")
+              if not url_path.startswith("../"):
+                  url_path = "../" + url_path
+              
+              image_path = None
+              if image_file:
+                  image_path = str(image_file).replace("\\", "/")
+                  if not image_path.startswith("../"):
+                      image_path = "../" + image_path
+              
+              entry = {
+                  "id": game_id,
+                  "title": folder_name,
+                  "url": url_path,
+                  "desc": "Coming soon. Edit this description in main.js.",
+                  "popular": True
+              }
+              
+              if image_path:
+                  entry["image"] = image_path
+              
+              registry.append(entry)
+          
+          # Generate the JavaScript array
+          js_array = "let _0xData = [\n"
+          for entry in registry:
+              js_line = "  {"
+              js_line += f'id: "{entry["id"]}", title: "{entry["title"]}", url: "{entry["url"]}", desc: "{entry["desc"]}", popular: true'
+              if "image" in entry:
+                  js_line += f', image: "{entry["image"]}"'
+              js_line += " },\n"
+              js_array += js_line
+          js_array += "];"
+          
+          # Write to a temp file for the next step
+          with open("generated_registry.js", "w") as f:
+              f.write(js_array)
+          
+          print(f"Found {len(registry)} games")
+          EOF
+
+      - name: Update main.js with new registry
+        run: |
+          python3 << 'EOF'
+          import re
+          
+          # Read the generated registry
+          with open("generated_registry.js", "r") as f:
+              new_registry = f.read().strip()
+          
+          # Read main.js
+          with open("JS/main.js", "r") as f:
+              content = f.read()
+          
+          # Find and replace the _0xData array
+          # Match from "let _0xData = [" to the closing "];
+          pattern = r'let _0xData = \[.*?\];'
+          
+          if re.search(pattern, content, re.DOTALL):
+              updated_content = re.sub(pattern, new_registry, content, flags=re.DOTALL)
+              
+              with open("JS/main.js", "w") as f:
+                  f.write(updated_content)
+              
+              print("Successfully updated JS/main.js")
+          else:
+              print("Could not find _0xData array in main.js")
+              exit(1)
+          EOF
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add JS/main.js
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "🤖 Auto-update game registry from Games folder"
+            git push origin feature/auto-game-registry
+          fi
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "🤖 Auto-update game registry from Games folder"
+          title: "🤖 Auto-update game registry"
+          body: |
+            This PR automatically updates the `_0xData` array in `JS/main.js` based on the contents of your `Games` folder.
+            
+            **What this does:**
+            - Scans all subfolders in `Games/`
+            - Finds the main HTML file (prefers `index.html`)
+            - Looks for an image file in the same folder
+            - Sets description to "Coming soon. Edit this description in main.js."
+            - Generates clean IDs from folder names
+            
+            **To edit a game's description:**
+            After merging, just find the game in `_0xData` and change the `desc` field.
+          branch: feature/auto-game-registry
+          base: main
+          delete-branch: false
