@@ -116,7 +116,7 @@ let _0xData = [
   { id: "day_in_the_office", title: "A Day in the Office", url: "../Games/dayintheoffice/index.html", image: "../Games/dayintheoffice/images (1).jpeg", desc: "A surreal horror game where you navigate an endless work day that you can never escape.", popular: true },
   { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
-  { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
+  { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
