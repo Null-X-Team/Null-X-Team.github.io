@@ -154,7 +154,7 @@ jobs:
           if git diff --staged --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "🤖 Auto-update game registry from Games folder"
+            git commit -m "Auto-update game registry from Games folder"
             git push origin feature/auto-game-registry
           fi
 
@@ -162,8 +162,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "🤖 Auto-update game registry from Games folder"
-          title: "🤖 Auto-update game registry"
+          commit-message: "Auto-update game registry from Games folder"
+          title: "Auto-update game registry"
           body: |
             This PR automatically updates the `_0xData` array in `JS/main.js` based on the contents of your `Games` folder.
             
