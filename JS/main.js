@@ -442,13 +442,49 @@ function launchGame(gameId) {
 
       gameTab.document.close();
 
-      // Fix: Try to trick the browser into thinking this tab was opened by a script
-      window.open(location, '_self').close();
+      // More reliable original-tab close (browsers block the single-trick version inconsistently)
+      // Try several methods that work across Chrome/Firefox/Edge under different policies
+      function attemptCloseOriginalTab() {
+        try {
+          // Method 1: classic self-open + close (most common success case)
+          const selfWin = window.open(window.location.href, '_self');
+          if (selfWin) selfWin.close();
+        } catch (e) {}
 
-      // Ultimate Fallback: If the browser refuses to close the tab, instantly redirect to Google to hide the site.
+        try {
+          // Method 2: direct close
+          window.close();
+        } catch (e) {}
+
+        try {
+          // Method 3: top-level close (helps when framed)
+          if (window.top && window.top !== window) {
+            window.top.close();
+          }
+        } catch (e) {}
+
+        try {
+          // Method 4: open blank then close (some Chromium builds allow this)
+          window.open('', '_self');
+          window.close();
+        } catch (e) {}
+      }
+
+      // Run close attempts immediately and once more after a short delay
+      attemptCloseOriginalTab();
+      setTimeout(attemptCloseOriginalTab, 30);
+
+      // Ultimate fallback: if the tab is still open, hide the site by redirecting
+      // (gives the close attempts time to succeed before falling back)
       setTimeout(() => {
+        try {
+          // If we are still here, close failed — redirect away so the site is gone
           window.location.replace("https://www.google.com");
-      }, 50);
+        } catch (e) {
+          // last-ditch
+          window.location.href = "https://www.google.com";
+        }
+      }, 120);
 
     } else {
       alert("Pop-up blocked! Please allow popup permissions to play games.");
