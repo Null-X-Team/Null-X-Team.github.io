@@ -1,8 +1,3 @@
-+40
--4
-Lines changed: 40 additions & 4 deletions
-Original file line number	Diff line number	Diff line change
-@@ -1,1791 +1,1827 @@
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const isStealthMode = urlParams.get('mode') === 'stealth';
