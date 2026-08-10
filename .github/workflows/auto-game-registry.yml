@@ -137,7 +137,7 @@ jobs:
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
           commit-message: "Auto-update game registry"
           title: ${{ env.PR_TITLE || 'Auto-add new games to registry' }}
           body: ${{ env.PR_BODY || 'Checking for updates...' }}
@@ -149,4 +149,4 @@ jobs:
         if: steps.cpr.outputs.pull-request-operation == 'created' && steps.verify.outputs.has_deletions == 'false'
         run: gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
