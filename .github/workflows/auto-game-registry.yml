@@ -16,6 +16,9 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          # Needed so the PR action can push cleanly
+          fetch-depth: 0
 
       - name: Setup Python
         uses: actions/setup-python@v5
@@ -146,17 +149,10 @@ jobs:
               exit(1)
           EOF
 
-      - name: Commit and push changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add JS/main.js
-          if git diff --staged --quiet; then
-            echo "No changes to commit"
-          else
-            git commit -m "Auto-update game registry from Games folder"
-            git push origin feature/auto-game-registry
-          fi
+      # NOTE: Do NOT manually git commit/push here.
+      # peter-evans/create-pull-request will detect changes, create the branch,
+      # commit, push, and open the PR. The previous push to a non-existent
+      # local branch caused: "src refspec feature/auto-game-registry does not match any"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
