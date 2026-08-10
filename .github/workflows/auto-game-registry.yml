@@ -33,11 +33,11 @@ jobs:
 
           main_js_path = Path("JS/main.js")
           
-          # 1. Read existing main.js
+          # Read existing main.js
           with open(main_js_path, "r") as f:
               main_content = f.read()
 
-          # 2. Find existing game URLs to avoid duplicates
+          # Find existing game URLs to avoid duplicates
           existing_urls = re.findall(r'url:\s*["\']([^"\']+)["\']', main_content)
           existing_urls_normalized = [u.lower().replace("\\", "/") for u in existing_urls]
 
@@ -45,7 +45,7 @@ jobs:
           new_entries = []
           image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'}
           
-          # 3. Scan the Games folder
+          # Scan the Games folder
           for game_folder in sorted(games_dir.iterdir()):
               if not game_folder.is_dir() or game_folder.name.startswith('.'):
                   continue
@@ -71,7 +71,7 @@ jobs:
               if url_path.lower() in existing_urls_normalized:
                   continue
               
-              # 4. Process NEW games only
+              # Process NEW games only
               image_file = None
               for f in game_folder.rglob("*"):
                   if f.suffix.lower() in image_exts:
@@ -98,13 +98,13 @@ jobs:
               js_line += " },"
               new_entries.append(js_line)
 
-          # 5. Inject new games right before the closing bracket ];
+          # Inject new games right before the closing bracket ];
           if new_entries:
               pattern = r'(let _0xData = \[.*?)(];)'
               
               def insert_new_games(match):
                   # Keeps everything that was there, adds a newline, the new games, and closes it
-                  return match.group(1).rstrip() + "\n" + "\n".join(new_entries) + "\n];"
+                  return match.group(1) + "\n" + "\n".join(new_entries) + "\n];"
               
               updated_content = re.sub(pattern, insert_new_games, main_content, flags=re.DOTALL)
               
@@ -115,20 +115,38 @@ jobs:
               print("No new games found. Everything is up to date!")
           EOF
 
+      - name: Verify Deletions
+        id: verify
+        run: |
+          # Use git to check if any lines were deleted from main.js
+          DELETIONS=$(git diff --numstat JS/main.js | awk '{print $2}')
+          
+          if [ -z "$DELETIONS" ]; then
+            echo "has_deletions=false" >> $GITHUB_OUTPUT
+          elif [ "$DELETIONS" -gt 0 ]; then
+            echo "has_deletions=true" >> $GITHUB_OUTPUT
+            echo "PR_TITLE=NEEDS MANUAL REVIEW: Code was deleted" >> $GITHUB_ENV
+            echo "PR_BODY=The automated script deleted lines in JS/main.js. Please review manually to ensure no game data was accidentally removed." >> $GITHUB_ENV
+          else
+            echo "has_deletions=false" >> $GITHUB_OUTPUT
+            echo "PR_TITLE=Auto-add new games to registry" >> $GITHUB_ENV
+            echo "PR_BODY=Detected new games in the \`Games\` folder. They have been appended safely to the bottom of the list." >> $GITHUB_ENV
+          fi
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Auto-add new games to registry"
-          title: "Auto-add new games"
-          body: "Detected new games in the `Games` folder. They have been appended to the bottom of the list without modifying existing descriptions."
+          commit-message: "Auto-update game registry"
+          title: ${{ env.PR_TITLE || 'Auto-add new games to registry' }}
+          body: ${{ env.PR_BODY || 'Checking for updates...' }}
           branch: feature/auto-game-registry
           base: main
           delete-branch: true
 
       - name: Auto-Merge Pull Request
-        if: steps.cpr.outputs.pull-request-operation == 'created'
+        if: steps.cpr.outputs.pull-request-operation == 'created' && steps.verify.outputs.has_deletions == 'false'
         run: gh pr merge --auto --merge "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
