@@ -117,18 +117,8 @@ let _0xData = [
   { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
-
-  { id: "autoupdatefiletest", title: "Autoupdatefiletest", url: "../Games/Autoupdatefiletest/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/Autoupdatefiletest/images (9).jpeg" },
-  { id: "gamesavedata", title: "GameSaveData", url: "../Games/GameSaveData/GSD.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "jebieak", title: "JEBIEAK", url: "../Games/JEBIEAK/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "sortthecourt", title: "Sortthecourt", url: "../Games/Sortthecourt/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/Sortthecourt/index.apple-touch-icon.png" },
   { id: "airline", title: "airline", url: "../Games/airline/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/airline/images (4).png" },
-  { id: "baldisbasics", title: "baldisbasics", url: "../Games/baldisbasics/Baldisbasics.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "baseballbros", title: "baseballbros", url: "../Games/baseballbros/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/baseballbros/favicon.png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "eaglercraft", title: "eaglercraft", url: "../Games/eaglercraft/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
-  { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
