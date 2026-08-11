@@ -54,7 +54,7 @@ let _0xData = [
   { id: "d_dk", title: "Doki Doki Literature Club", url: "../Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true , image: "../Games/dokidoki/images (1).jpeg" },
   { id: "p_tr", title: "PolyTrack", url: "../Games/polytrack/index.html", desc: "A fast-paced low-poly racing game with crisp drifting controls.", popular: true , image: "../Games/polytrack/images (2).jpeg" },
   { id: "a_gr", title: "Agar.io", url: "../Games/agar/index.html", desc: "Multiplayer cells-eating battle arena. (May experience latency issues)", popular: true , image: "../Games/agar/images.png" },
-  { id: "t_ts", title: "Truck Sim", url: "../Games/trucksim/index.html", desc: "Navigate tricky roads transporting heavy structural cargo safely.", popular: true },
+  { id: "t_ts", title: "Truck Sim", url: "../Games/trucksim/index.html", desc: "Navigate tricky roads transporting heavy structural cargo safely.", popular: true , image: "../Games/trucksim/Screenshot 2026-08-11 08.23.04.png" },
   { id: "t_pa", title: "Throw a Potato", url: "../Games/TAPA/index.html", image: "../Games/TAPA/images (20).jpeg", desc: "Physics arcade game where you launch a potato over complex obstacles.", popular: true },
   { id: "t_p2", title: "Throw a Potato 2", url: "../Games/TAPA2/index.html", image: "../Games/TAPA2/images.png", desc: "The official sequel featuring refined launch engines and bigger stages.", popular: true },
   { id: "t_to", title: "Tung Tung Tung Sahur Obby", url: "../Games/T^3sahurobby/index.html", image: "../Games/T^3sahurobby/images (21).jpeg", desc: "Meme-inspired obstacle map built to test jumping accuracy.", popular: true },
