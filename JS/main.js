@@ -119,9 +119,6 @@ let _0xData = [
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
   { id: "airline", title: "airline", url: "../Games/airline/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/airline/images (4).png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true , image: "../Games/bitplanes/images.jpeg" },
-
-  { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
-  { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
