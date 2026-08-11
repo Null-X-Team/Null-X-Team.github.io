@@ -25,6 +25,7 @@ jobs:
           python-version: '3.11'
 
       - name: Smart Update main.js
+        id: smart_update
         run: |
           python3 << 'EOF'
           import os
@@ -45,7 +46,7 @@ jobs:
           new_entries = []
           image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'}
           
-          # 1. Define files and folders to explicitly exclude
+          # Define files and folders to explicitly exclude
           excluded_urls = [
               "../games/gamesavedata/gsd.html",
               "../games/gamesavedata/auto-save.js"
@@ -97,7 +98,7 @@ jobs:
                   if not image_path.startswith("../"):
                       image_path = "../" + image_path
               
-              # 2. Update existing entries if they are missing an image
+              # Update existing entries if they are missing an image
               if url_path.lower() in existing_urls_normalized:
                   if image_path:
                       for i, line in enumerate(lines):
@@ -145,24 +146,33 @@ jobs:
               print(f"Successfully added {len(new_entries)} new game(s) and updated {updates_made} existing image(s)!")
           else:
               print("No new games or images found. Everything is up to date!")
+              
+          # Export the exact number of image updates we intentionally made
+          with open(os.environ['GITHUB_OUTPUT'], "a") as f:
+              f.write(f"updates_made={updates_made}\n")
           EOF
 
       - name: Verify Deletions
         id: verify
         run: |
-          # Use git to check if any lines were deleted from main.js
+          # Use git to check how many lines Git thinks were deleted
           DELETIONS=$(git diff --numstat JS/main.js | awk '{print $2}')
+          DELETIONS=${DELETIONS:-0} # If empty, make it 0
           
-          if [ -z "$DELETIONS" ]; then
-            echo "has_deletions=false" >> $GITHUB_OUTPUT
-          elif [ "$DELETIONS" -gt 0 ]; then
-            echo "has_deletions=true" >> $GITHUB_OUTPUT
-            echo "PR_TITLE=🚨 NEEDS MANUAL REVIEW: Code was deleted or modified" >> $GITHUB_ENV
-            echo "PR_BODY=The automated script deleted or modified lines in JS/main.js (this happens if an image tag was added to an existing game). Please review manually to ensure no data was accidentally removed." >> $GITHUB_ENV
-          else
+          # Get the exact number of intentional image updates from Python
+          INTENTIONAL_UPDATES=${{ steps.smart_update.outputs.updates_made }}
+          INTENTIONAL_UPDATES=${INTENTIONAL_UPDATES:-0}
+          
+          if [ "$DELETIONS" -eq "$INTENTIONAL_UPDATES" ]; then
+            # The only "deletions" were our exact intended image updates! Perfect match.
             echo "has_deletions=false" >> $GITHUB_OUTPUT
             echo "PR_TITLE=Auto-add new games to registry" >> $GITHUB_ENV
-            echo "PR_BODY=Detected new games in the \`Games\` folder. They have been appended safely to the bottom of the list." >> $GITHUB_ENV
+            echo "PR_BODY=Detected new games or updated missing images. No existing data was lost." >> $GITHUB_ENV
+          else
+            # Uh oh, Git saw MORE deletions than we intended! Trip the safety net!
+            echo "has_deletions=true" >> $GITHUB_OUTPUT
+            echo "PR_TITLE=NEEDS MANUAL REVIEW: Code was unexpectedly deleted" >> $GITHUB_ENV
+            echo "PR_BODY=The automated script deleted lines in JS/main.js that were NOT part of a standard image update. Please review manually to ensure no data was accidentally removed." >> $GITHUB_ENV
           fi
 
       - name: Create Pull Request
