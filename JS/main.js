@@ -50,7 +50,7 @@ let _0xData = [
   { id: "c_cc", title: "Cookie Clicker", url: "../Games/cookieclicker/cookieclicker.html", jsbin: "https://codepen.io/Glaeesas/embed/EaZpPeO?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/cookieclicker/images (35).jpeg", desc: "Click cookies to build an industrial empire.", popular: true },
   { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", image: "../Games/basketrandom/images (5).jpeg", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
   { id: "r_bw", title: "Retro Bowl", url: "../Games/retrobowl/Retrobowl.html", image: "/Games/retrobowl/images (6).jpeg", desc: "Manage your team and lead them to gridiron glory.", popular: true },
-  { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true },
+  { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true , image: "../Games/amongus/images (7).jpeg" },
   { id: "d_dk", title: "Doki Doki Literature Club", url: "../Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true },
   { id: "p_tr", title: "PolyTrack", url: "../Games/polytrack/index.html", desc: "A fast-paced low-poly racing game with crisp drifting controls.", popular: true },
   { id: "a_gr", title: "Agar.io", url: "../Games/agar/index.html", desc: "Multiplayer cells-eating battle arena. (May experience latency issues)", popular: true },
@@ -68,7 +68,7 @@ let _0xData = [
   { id: "v_7", title: "Vex 7", url: "../Games/Vex/Vex7/index.html", desc: "Complex levels engineered to test your reflexes.", popular: true },
   { id: "v_8", title: "Vex 8", url: "../Games/Vex/Vex8/index.html", desc: "The absolute latest installment in the Vex platforming franchise.", popular: true },
   { id: "v_ch", title: "Vex Challenges", url: "../Games/Vex/VexChallenges/index.html", desc: "Bite-sized high-speed speedrunning tasks for testing agility.", popular: true },
-  { id: "v_x2", title: "Vex x3m 2", url: "../Games/Vex/Vexx3m2/index.html", desc: "Extreme driving mechanics combined with classic Vex obstacle formats.", popular: true },
+  { id: "v_x2", title: "Vex x3m 2", url: "../Games/Vex/Vexx3m2/index.html", desc: "Extreme driving mechanics combined with classic Vex obstacle formats.", popular: true , image: "../Games/Vex/Vex3/images (22).jpeg" },
   { id: "v_xm", title: "Vex x3m", url: "../Games/Vex/Vexx3m/index.html", desc: "Blast through motorcycle speed trials with tight balance adjustments.", popular: true },
   { id: "v_3", title: "Vex 3", url: "../Games/Vex/Vex3/index.html", image: "../Games/Vex/Vex3/images (22).jpeg", desc: "The iconic original entry into the parkour system.", popular: true },
   { id: "slice_master", title: "Slice Master", url: "../Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
@@ -83,7 +83,7 @@ let _0xData = [
   { id: "b_md", title: "Bacon May Die", url: "../Games/bakonmaydie/index.html", desc: "Fast-paced side-scrolling brawler where a fearless pig battles endless enemy waves using melee attacks and powerful weapons.", popular: true },
   { id: "a_df", title: "A Dance of Fire and Ice", url: "../Games/ADOFAI/ADOFAI.html", image: "../Games/ADOFAI/ADOFAI.jpeg", desc: "Rhythm-based precision game where you guide two orbiting planets through challenging musical tracks.", popular: true },
   { id: "a_sr", title: "Amazing Strange Rope Police", url: "../Games/ASRP/index.html", image: "../Games/ASRP/images (1).jpeg", desc: "Open-world action game where you use superhuman abilities, vehicles, and gadgets to fight crime across a massive city.", popular: true },
-  { id: "a_oc", title: "Ages of Conflict", url: "../Games/AOC/index.html", desc: "Strategic world simulation where nations wage wars, form alliances, and reshape the map through dynamic conflicts.", popular: true },
+  { id: "a_oc", title: "Ages of Conflict", url: "../Games/AOC/index.html", desc: "Strategic world simulation where nations wage wars, form alliances, and reshape the map through dynamic conflicts.", popular: true , image: "../Games/AOC/images.jpeg" },
   { id: "mx3", title: "Moto X3M", url: "../Games/MotoX3m/MotoX3m/index.html", image: "../Games/MotoX3m/MotoX3m/images (14).jpeg", desc: "Race through explosive obstacle courses packed with ramps, traps, and high-speed motorcycle stunts.", popular: true },
   { id: "mx3_2", title: "Moto X3M 2", url: "../Games/MotoX3m/MotoX3m2/index.html", image: "../Games/MotoX3m/MotoX3m2/images (15).jpeg", desc: "The sequel featuring tougher tracks, bigger jumps, and even more dangerous stunt challenges.", popular: true },
   { id: "mx3_3", title: "Moto X3M 3", url: "../Games/MotoX3m/MotoX3m3/index.html", image: "../Games/MotoX3m/MotoX3m3/images (16).jpeg", desc: "Take on intense new levels filled with hazards, precision jumps, and fast-paced motorcycle action.", popular: true },
@@ -118,7 +118,10 @@ let _0xData = [
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
   { id: "airline", title: "airline", url: "../Games/airline/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/airline/images (4).png" },
-  { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true , image: "../Games/bitplanes/images.jpeg" },
+
+  { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
+  { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
