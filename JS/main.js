@@ -106,7 +106,7 @@ let _0xData = [
   { id: "baby_sniper_vietnam", title: "Baby Sniper in Vietnam", url: "../Games/BSV/index.html", image: "../Games/BSV/images (2).jpeg", desc: "Take on critical missions, hone your long-range accuracy, and clear strategic targets under the cover of dense jungle terrain in this tactical sniping simulation.", popular: true },
   { id: "backrooms", title: "The Backrooms", url: "../Games/backrooms/index.html", desc: "Explore the eerie, endless yellow hallways of the Backrooms while trying to find an exit and avoid the terrifying entities lurking in the shadows.", popular: true },
   { id: "bad_bodyguard", title: "Bad Bodyguard", url: "../Games/badbodyguard/index.html", desc: "Navigate chaotic security situations, make split-second defensive decisions, and protect your high-profile clients from wild incoming hazards in this unpredictable simulation.", popular: true },
-  { id: "car_crash_3", title: "Car Crash 3", url: "../Games/carcrash3/index.html", desc: "Test the limits of high-speed structural physics, unleash vehicle destruction across sandbox stunt arenas, and watch realistic damage dynamics play out in this high-impact driving simulator.", popular: true },
+  { id: "car_crash_3", title: "Car Crash 3", url: "../Games/carcrash3/index.html", desc: "Test the limits of high-speed structural physics, unleash vehicle destruction across sandbox stunt arenas, and watch realistic damage dynamics play out in this high-impact driving simulator.", popular: true , image: "../Games/carcrash3/Screenshot 2026-08-10 21.04.55.png" },
   { id: "stick_merge", title: "Stick Merge", url: "../Games/stickmerge/index.html", image: "../Games/stickmerge/images (31).jpeg", desc: "Merge various weapons together to create more powerful firearms and eliminate targets.", popular: true },
   { id: "strike_force_kitty", title: "Strike Force Kitty", url: "../Games/strikeforcekitty/index.html", image: "../Games/strikeforcekitty/images (32).jpeg", desc: "Lead a squad of adorable kittens to rescue the princess, defeating enemies and collecting outfits along the way.", popular: true },
   { id: "superhot", title: "SUPERHOT", url: "../Games/superhot/index.html", image: "../Games/superhot/images (33).jpeg", desc: "An innovative first-person shooter where time moves only when you move.", popular: true },
@@ -119,6 +119,9 @@ let _0xData = [
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
   { id: "airline", title: "airline", url: "../Games/airline/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/airline/images (4).png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true , image: "../Games/bitplanes/images.jpeg" },
+
+  { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
+  { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
