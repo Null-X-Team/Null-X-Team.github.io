@@ -51,7 +51,7 @@ let _0xData = [
   { id: "b_rd", title: "Basket Random", url: "../Games/basketrandom/Basketrandom.html", image: "../Games/basketrandom/images (5).jpeg", desc: "Fun basketball game featuring completely random physics parameters.", popular: true },
   { id: "r_bw", title: "Retro Bowl", url: "../Games/retrobowl/Retrobowl.html", image: "/Games/retrobowl/images (6).jpeg", desc: "Manage your team and lead them to gridiron glory.", popular: true },
   { id: "a_us", title: "Among Us", url: "../Games/amongus/Amongus.html", desc: "Complete tasks while avoiding hidden impostors.", popular: true , image: "../Games/amongus/images (7).jpeg" },
-  { id: "d_dk", title: "Doki Doki Literature Club", url: "../Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true },
+  { id: "d_dk", title: "Doki Doki Literature Club", url: "../Games/dokidoki/index.html", desc: "A deep psychological horror visual novel experience.", popular: true , image: "../Games/dokidoki/images (1).jpeg" },
   { id: "p_tr", title: "PolyTrack", url: "../Games/polytrack/index.html", desc: "A fast-paced low-poly racing game with crisp drifting controls.", popular: true },
   { id: "a_gr", title: "Agar.io", url: "../Games/agar/index.html", desc: "Multiplayer cells-eating battle arena. (May experience latency issues)", popular: true },
   { id: "t_ts", title: "Truck Sim", url: "../Games/trucksim/index.html", desc: "Navigate tricky roads transporting heavy structural cargo safely.", popular: true },
