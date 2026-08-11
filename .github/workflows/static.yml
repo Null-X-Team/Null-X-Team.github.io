@@ -31,6 +31,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Fetch all history so the force-push knows exactly what it is replacing
+          fetch-depth: 0
 
       # --- AUTOMATED VERSION STAMP INJECTION ---
       - name: Generate Live Timestamp and Overwrite version.json
@@ -41,14 +44,20 @@ jobs:
 
       - name: Commit version.json back to repo
         run: |
-          git config --global user.name "Version[bot]"
+          # Git requires a committer identity, even when amending. 
+          # The original AUTHOR of the commit will remain you!
+          git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
           git add version.json
-          # Commit only if changed; use [skip ci] so this automatic commit doesn't trigger a duplicate run
+          
+          # Commit only if changed
           if ! git diff-index --quiet HEAD; then
-            git commit -m "Update version stamp [skip ci]"
-            git pull --rebase origin main
-            git push origin main
+            # Amend the previous commit, keeping the original message and author intact
+            git commit --amend --no-edit
+            
+            # Force push the amended commit back to the main branch
+            git push --force origin HEAD:main
           fi
       # ------------------------------------------
 
