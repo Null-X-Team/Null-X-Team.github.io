@@ -122,7 +122,7 @@ let _0xData = [
   { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
   { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
-  { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true , image: "../Games/cloverpit/images.jpeg" },
+  { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Clover Pit is a roguelite gambling game where you spin, bet, and upgrade your way through increasingly risky rounds, chasing huge payouts while trying not to go broke.", popular: true , image: "../Games/cloverpit/images.jpeg" },
 ];
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
