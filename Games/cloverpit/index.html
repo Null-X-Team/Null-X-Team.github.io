@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+  <base href="https://cdn.jsdelivr.net/gh/web-ports/clover-pit@main/">
+
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+
+  <meta name="viewport"
+        content="width=device-width, height=device-height, initial-scale=1.0,
+                 user-scalable=no, shrink-to-fit=yes">
+
+  <title>Unity Web Player | CloverPit</title>
+
+  <link rel="shortcut icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+</head>
+
+<body>
+
+  <div id="loading-text"
+       style="
+         color: white;
+         font-size: 48px;
+         font-family: cursive;
+         text-align: center;
+         margin-top: 20px;
+       ">
+    LOADING...
+  </div>
+
+  <div id="unity-container">
+
+    <canvas
+      id="unity-canvas"
+      width="960"
+      height="540"
+      tabindex="-1">
+    </canvas>
+
+    <div id="unity-loading-bar">
+      <div id="unity-logo"></div>
+
+      <div id="unity-progress-bar-empty">
+        <div id="unity-progress-bar-full"></div>
+      </div>
+    </div>
+
+    <div id="unity-warning"></div>
+
+  </div>
+
+
+  <script>
+
+    // ============================================================
+    // ELEMENTS
+    // ============================================================
+
+    const loadingText =
+      document.querySelector("#loading-text");
+
+    const container =
+      document.querySelector("#unity-container");
+
+    const canvas =
+      document.querySelector("#unity-canvas");
+
+    const loadingBar =
+      document.querySelector("#unity-loading-bar");
+
+    const progressBarFull =
+      document.querySelector("#unity-progress-bar-full");
+
+    const warningBanner =
+      document.querySelector("#unity-warning");
+
+
+    // ============================================================
+    // SETTINGS
+    // ============================================================
+
+    // Total expected size shown to the user.
+    // Change this if the actual game size changes.
+    const totalMB = "86.96";
+
+    let loadedBytes = 0;
+
+
+    // ============================================================
+    // FETCH A FILE WITH PROGRESS
+    // ============================================================
+
+    async function fetchWithProgress(url) {
+
+      console.log("[CloverPit] Fetching:", url);
+
+      let response;
+
+      try {
+        response = await fetch(url);
+      } catch (error) {
+
+        console.error(
+          "[CloverPit] Network error while fetching:",
+          url,
+          error
+        );
+
+        throw new Error(
+          "Network error while downloading " + url
+        );
+      }
+
+
+      // Check HTTP status.
+
+      if (!response.ok) {
+
+        console.error(
+          "[CloverPit] HTTP error:",
+          response.status,
+          response.statusText,
+          url
+        );
+
+        throw new Error(
+          `HTTP ${response.status} ${response.statusText} while downloading ${url}`
+        );
+      }
+
+
+      // Make sure streaming is available.
+
+      if (!response.body) {
+
+        throw new Error(
+          "Browser did not provide a response body for " + url
+        );
+      }
+
+
+      const reader =
+        response.body.getReader();
+
+      const chunks = [];
+
+      let received = 0;
+
+
+      // Download chunks.
+
+      while (true) {
+
+        const {
+          done,
+          value
+        } = await reader.read();
+
+
+        if (done) {
+          break;
+        }
+
+
+        if (value) {
+
+          received += value.length;
+          loadedBytes += value.length;
+
+          chunks.push(value);
+
+
+          // Update loading text.
+
+          const mbDone =
+            (loadedBytes / (1024 * 1024)).toFixed(2);
+
+          loadingText.textContent =
+            `LOADING... ${mbDone} MB / ${totalMB} MB`;
+        }
+      }
+
+
+      console.log(
+        "[CloverPit] Finished:",
+        url,
+        `(${(received / (1024 * 1024)).toFixed(2)} MB)`
+      );
+
+
+      // Combine chunks.
+
+      const fullBuffer =
+        new Uint8Array(received);
+
+      let offset = 0;
+
+
+      for (const chunk of chunks) {
+
+        fullBuffer.set(
+          chunk,
+          offset
+        );
+
+        offset += chunk.length;
+      }
+
+
+      return fullBuffer.buffer;
+    }
+
+
+    // ============================================================
+    // MERGE FILE PARTS
+    // ============================================================
+
+    async function mergeFiles(fileParts) {
+
+      console.log(
+        "[CloverPit] Merging parts:",
+        fileParts
+      );
+
+
+      const buffers =
+        await Promise.all(
+          fileParts.map(
+            part => fetchWithProgress(part)
+          )
+        );
+
+
+      console.log(
+        "[CloverPit] All parts downloaded."
+      );
+
+
+      const mergedBlob =
+        new Blob(buffers);
+
+
+      const objectUrl =
+        URL.createObjectURL(mergedBlob);
+
+
+      console.log(
+        "[CloverPit] Created object URL:",
+        objectUrl
+      );
+
+
+      return objectUrl;
+    }
+
+
+    // ============================================================
+    // GET PART FILE NAMES
+    // ============================================================
+
+    function getParts(file, start, end) {
+
+      const parts = [];
+
+      for (
+        let i = start;
+        i <= end;
+        i++
+      ) {
+
+        parts.push(
+          file + ".part" + i
+        );
+      }
+
+      return parts;
+    }
+
+
+    // ============================================================
+    // UNITY WARNING BANNER
+    // ============================================================
+
+    function unityShowBanner(msg, type) {
+
+      if (!warningBanner) {
+        return;
+      }
+
+
+      warningBanner.innerHTML = msg;
+
+      warningBanner.style.display = "block";
+
+
+      if (type === "error") {
+
+        warningBanner.style.background =
+          "#ff0000";
+
+      } else if (type === "warning") {
+
+        warningBanner.style.background =
+          "#ffc107";
+
+      } else {
+
+        warningBanner.style.background =
+          "#333";
+      }
+    }
+
+
+    // ============================================================
+    // MAIN LOADER
+    // ============================================================
+
+    (async function () {
+
+      try {
+
+        console.log(
+          "[CloverPit] Starting game download..."
+        );
+
+
+        // --------------------------------------------------------
+        // DOWNLOAD / MERGE DATA
+        // --------------------------------------------------------
+
+        const dataParts =
+          getParts(
+            "Build/CloverPit.data",
+            1,
+            3
+          );
+
+
+        const wasmParts =
+          getParts(
+            "Build/CloverPit.wasm",
+            1,
+            3
+          );
+
+
+        console.log(
+          "[CloverPit] Data parts:",
+          dataParts
+        );
+
+        console.log(
+          "[CloverPit] WASM parts:",
+          wasmParts
+        );
+
+
+        const [
+          dataUrl,
+          wasmUrl
+        ] = await Promise.all([
+
+          mergeFiles(dataParts),
+
+          mergeFiles(wasmParts)
+
+        ]);
+
+
+        console.log(
+          "[CloverPit] Game files downloaded successfully."
+        );
+
+
+        // --------------------------------------------------------
+        // UNITY CONFIG
+        // --------------------------------------------------------
+
+        const buildUrl =
+          "Build";
+
+        const loaderUrl =
+          buildUrl +
+          "/CloverPit.loader.js";
+
+
+        const config = {
+
+          arguments: [],
+
+          dataUrl:
+            dataUrl,
+
+          frameworkUrl:
+            buildUrl +
+            "/CloverPit.framework.js",
+
+          codeUrl:
+            wasmUrl,
+
+          streamingAssetsUrl:
+            "StreamingAssets",
+
+          companyName:
+            "Panik Arcade",
+
+          productName:
+            "CloverPit",
+
+          productVersion:
+            "1.3",
+
+          showBanner:
+            unityShowBanner
+        };
+
+
+        // --------------------------------------------------------
+        // MOBILE SETTINGS
+        // --------------------------------------------------------
+
+        if (
+          /iPhone|iPad|iPod|Android/i.test(
+            navigator.userAgent
+          )
+        ) {
+
+          const meta =
+            document.createElement("meta");
+
+          meta.name =
+            "viewport";
+
+          meta.content =
+            "width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes";
+
+          document
+            .getElementsByTagName("head")[0]
+            .appendChild(meta);
+        }
+
+
+        // --------------------------------------------------------
+        // SHOW UNITY LOADING BAR
+        // --------------------------------------------------------
+
+        loadingBar.style.display =
+          "block";
+
+
+        // --------------------------------------------------------
+        // LOAD UNITY LOADER
+        // --------------------------------------------------------
+
+        console.log(
+          "[CloverPit] Loading Unity loader:",
+          loaderUrl
+        );
+
+
+        const script =
+          document.createElement("script");
+
+
+        script.src =
+          loaderUrl;
+
+
+        // --------------------------------------------------------
+        // LOADER SUCCESS
+        // --------------------------------------------------------
+
+        script.onload = function () {
+
+          console.log(
+            "[CloverPit] Unity loader loaded."
+          );
+
+
+          if (
+            typeof createUnityInstance !==
+            "function"
+          ) {
+
+            throw new Error(
+              "createUnityInstance() was not found."
+            );
+          }
+
+
+          console.log(
+            "[CloverPit] Starting Unity..."
+          );
+
+
+          createUnityInstance(
+
+            canvas,
+
+            config,
+
+            function (progress) {
+
+              const percent =
+                Math.round(
+                  progress * 100
+                );
+
+
+              progressBarFull.style.width =
+                percent + "%";
+
+
+              loadingText.textContent =
+                `STARTING GAME... ${percent}%`;
+
+            }
+
+          )
+
+          .then(function (unityInstance) {
+
+            console.log(
+              "[CloverPit] Unity started successfully!"
+            );
+
+
+            loadingBar.style.display =
+              "none";
+
+
+            loadingText.style.display =
+              "none";
+
+          })
+
+          .catch(function (error) {
+
+            console.error(
+              "[CloverPit] Unity initialization failed:",
+              error
+            );
+
+
+            loadingText.textContent =
+              "UNITY FAILED TO START — CHECK CONSOLE";
+
+
+            unityShowBanner(
+              "Unity failed to start. Check the browser console.",
+              "error"
+            );
+          });
+        };
+
+
+        // --------------------------------------------------------
+        // LOADER FAILURE
+        // --------------------------------------------------------
+
+        script.onerror = function () {
+
+          console.error(
+            "[CloverPit] Failed to load Unity loader:",
+            loaderUrl
+          );
+
+
+          loadingText.textContent =
+            "UNITY LOADER FAILED — CHECK CONSOLE";
+
+
+          unityShowBanner(
+            "Failed to load CloverPit.loader.js",
+            "error"
+          );
+        };
+
+
+        // ========================================================
+        // IMPORTANT:
+        // Append the script HERE, while `script` is in scope.
+        // ========================================================
+
+        document.body.appendChild(script);
+
+
+        console.log(
+          "[CloverPit] Unity loader script added to page."
+        );
+
+      }
+
+      // ==========================================================
+      // ANY DOWNLOAD / INITIALIZATION ERROR
+      // ==========================================================
+
+      catch (error) {
+
+        console.error(
+          "================================================"
+        );
+
+        console.error(
+          "[CloverPit] GAME LOADING FAILED"
+        );
+
+        console.error(
+          error
+        );
+
+        console.error(
+          "================================================"
+        );
+
+
+        loadingText.textContent =
+          "GAME FAILED TO LOAD — CHECK CONSOLE";
+
+
+        unityShowBanner(
+          error.message ||
+          "Unknown loading error.",
+          "error"
+        );
+      }
+
+    })();
+
+  </script>
+
+</body>
+</html>
