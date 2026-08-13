@@ -409,7 +409,7 @@ function launchGame(gameId) {
           </head>
           <body>
             <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
-            <iframe src="${game.jsbin}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe src="${game.jsbin}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
           </body>
           </html>
         `);
@@ -435,7 +435,7 @@ function launchGame(gameId) {
           </head>
           <body>
             <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
-            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms"></iframe>
+            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
           </body>
           </html>
         `);
