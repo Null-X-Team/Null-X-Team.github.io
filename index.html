@@ -993,7 +993,6 @@
 
       } catch (err) {
         msgBox.textContent = 'Connection error: ' + err.message;
-        msgBox.className = 'modal-msg-box error';
       }
     }
 
@@ -1060,6 +1059,8 @@
   <script src="debug.js"></script>
   
   <script type="module" src="JS/main.js"></script>
+  <!-- Pointer lock: overrides launchGame after main.js is ready (does not edit main.js) -->
+  <script src="JS/game-pointer-lock.js"></script>
   <script src="customcrosshair/loader.js"></script>
 
   <script src="themes/themes.js"></script>
