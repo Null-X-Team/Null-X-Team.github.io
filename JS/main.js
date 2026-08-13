@@ -117,14 +117,8 @@ let _0xData = [
   { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
-  { id: "airline", title: "airline", url: "../Games/airline/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/airline/images (4).png" },
-  { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true , image: "../Games/bitplanes/images.jpeg" },
-
-  { id: "pokemon_emerald", title: "pokemon-emerald", url: "../Games/pokemon-emerald/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/pokemon-emerald/thumbnail.webp" },
-  { id: "rocket", title: "rocket", url: "../Games/rocket/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-
-  { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Clover Pit is a roguelite gambling game where you spin, bet, and upgrade your way through increasingly risky rounds, chasing huge payouts while trying not to go broke.", popular: true , image: "../Games/cloverpit/images.jpeg" },
-];
+  { id: "airline", title: "airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
+  { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
 
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
