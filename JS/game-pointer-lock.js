@@ -1,13 +1,11 @@
 /**
  * Auto pointer-lock for game launches.
- * Linked from main.js (window.launchGame). No UI button — locks on first click in the game.
- * Browsers require a user gesture; the first click/tap while playing is that gesture.
+ * Loaded via main.js link (or index). No button — locks on first click in the game.
+ * Rebinds game cards so module-scoped launchGame is replaced by this launcher.
  */
 (function () {
   function install() {
-    if (typeof window.launchGame !== 'function' || typeof _0xData === 'undefined') {
-      return false;
-    }
+    if (typeof _0xData === 'undefined') return false;
     if (window.__nxPointerLockInstalled) return true;
     window.__nxPointerLockInstalled = true;
 
@@ -184,13 +182,29 @@
       }, 120);
     };
 
-    console.log('[Null_X] Auto pointer-lock linked via main.js');
+    function rebindGameCards() {
+      document.querySelectorAll('.game-card[data-game-id]').forEach(function (card) {
+        var id = card.getAttribute('data-game-id');
+        card.onclick = function () { window.launchGame(id); };
+      });
+      var rnd = document.getElementById('randomBtn');
+      if (rnd) {
+        rnd.onclick = function () {
+          if (!_0xData.length) return;
+          window.launchGame(_0xData[Math.floor(Math.random() * _0xData.length)].id);
+        };
+      }
+    }
+    rebindGameCards();
+    setInterval(rebindGameCards, 1500);
+
+    console.log('[Null_X] Auto pointer-lock active (no button)');
     return true;
   }
 
   var tries = 0;
   var timer = setInterval(function () {
     tries++;
-    if (install() || tries > 150) clearInterval(timer);
+    if (install() || tries > 200) clearInterval(timer);
   }, 40);
 })();
