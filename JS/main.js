@@ -64,7 +64,7 @@ let _0xData = [
   { id: "v_4", title: "Vex 4", url: "../Games/Vex/Vex4/index.html", desc: "Sprint, leap, and dodge deadly stage traps dynamically.", popular: true },
   { id: "v_5", title: "Vex 5", url: "../Games/Vex/Vex5/index.html", desc: "Hardcore level obstacles matching elite timing requirements.", popular: true },
   { id: "v_6", title: "Vex 6", url: "../Games/Vex/Vex6/index.html", desc: "Refined stickman parkour tracks with brand new stage assets.", popular: true },
-  { id: "v_7", title: "Vex 7", url: "../Games/Vex/Vex7/index.html", desc: "Complex levels engineered to test your reflexes.", popular: true },
+  { id: "v_7", title: "Vex 7", url: "../Games/Vex/Vex7/index.html", desc: "Complex levels engineered to test your reflexes.", popular: true , image: "../Games/Vex/Vex7/images (7).jpeg" },
   { id: "v_8", title: "Vex 8", url: "../Games/Vex/Vex8/index.html", desc: "The absolute latest installment in the Vex platforming franchise.", popular: true },
   { id: "v_ch", title: "Vex Challenges", url: "../Games/Vex/VexChallenges/index.html", desc: "Bite-sized high-speed speedrunning tasks for testing agility.", popular: true },
   { id: "v_x2", title: "Vex x3m 2", url: "../Games/Vex/Vexx3m2/index.html", desc: "Extreme driving mechanics combined with classic Vex obstacle formats.", popular: true , image: "../Games/Vex/Vex3/images (22).jpeg" },
