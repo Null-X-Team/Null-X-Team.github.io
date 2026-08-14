@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en"><head><base href="https://cdn.jsdelivr.net/gh/GrassPorts/A-Game-About-Feeding-A-Black-Hole/"><script>(function () { (() => { function t(t) { const e = { B: 1, KB: 1024, MB: 1048576, GB: 1024 ** 3, TB: 1024 ** 4, PB: 1024 ** 5 }; if ("string" == typeof t) { const n = t.trim().match(/^([\d.]+)\s*([BKMGTP])?B?$/i); if (!n) throw new Error(`bad size: ${t}`); const [, o, r = "B"] = n; return Math.round(parseFloat(o) * e[r.toUpperCase()]) } const n = ["B", "KB", "MB", "GB", "TB", "PB"]; let o = t, r = 0; for (; o >= 1024 && r < n.length - 1;)o /= 1024, r++; return `${o >= 100 || 0 === r ? o.toFixed(0) : o.toFixed(2)}${n[r]}` } window.snProgress = { loaded: 0, total: "50.62MB" }; const e = window.fetch.bind(window), n = window.XMLHttpRequest, o = n.prototype.open, r = n.prototype.send, a = new Map, s = new Map; function l(t) { return a.has(t) || a.set(t, (async () => { try { return (await e(t + ".part000", { method: "HEAD" })).ok } catch { return !1 } })()), a.get(t) } function c(t) { return s.has(t) || s.set(t, (async () => { const n = []; for (let o = 0; ; o++) { const r = t + ".part" + String(o).padStart(3, "0"); let a; try { a = await e(r, { method: "HEAD" }) } catch { break } if (!a.ok) break; const s = parseInt(a.headers.get("Content-Length") || "", 10); if (!Number.isFinite(s)) return null; n.push(s) } return n.length ? n : null })()), s.get(t) } async function* i(t) { for (let n = 0; ; n++) { const o = t + ".part" + String(n).padStart(3, "0"); let r; try { r = await e(o) } catch { return } if (!r.ok) return; const a = r.body.getReader(); for (; ;) { const { value: t, done: e } = await a.read(); if (e) break; yield t } } } window.fetch = async function (t, n = {}) { const o = "string" == typeof t ? t : t.url, r = (n.method || t && t.method || "GET").toUpperCase(); if (("GET" === r || "HEAD" === r) && await l(o)) { if ("HEAD" === r) { const t = await c(o), e = new Headers({ "Content-Type": "application/octet-stream" }); return t && e.set("Content-Length", String(t.reduce((t, e) => t + e, 0))), new Response(null, { status: 200, statusText: "OK", headers: e }) } const t = await c(o), e = new Headers({ "Content-Type": "application/octet-stream" }); return t && e.set("Content-Length", String(t.reduce((t, e) => t + e, 0))), new Response(function (t) { const e = i(t); return new ReadableStream({ async pull(t) { const { value: n, done: o } = await e.next(); o ? t.close() : t.enqueue(n) }, async cancel(t) { try { await e.return(t) } catch { } } }) }(o), { status: 200, statusText: "OK", headers: e }) } return e(t, n) }, n.prototype.open = function (t, e, ...n) { return this._snMethod = (t || "GET").toUpperCase(), this._snUrl = e, o.call(this, t, e, ...n) }, n.prototype.send = function (e) { const n = this, o = n._snUrl, a = n._snMethod, s = arguments; if ("GET" !== a && "HEAD" !== a) return r.apply(n, s); l(o).then(async e => { if (!e) return r.apply(n, s); const l = (t, e, o) => { const r = new e(t, o); n.dispatchEvent(r); const a = n["on" + t]; if ("function" == typeof a) try { a.call(n, r) } catch { } }, d = await c(o), u = d ? d.reduce((t, e) => t + e, 0) : 0, g = !!d; if ("HEAD" === a) { try { Object.defineProperties(n, { status: { configurable: !0, get: () => 200 }, statusText: { configurable: !0, get: () => "OK" }, readyState: { configurable: !0, get: () => 4 }, response: { configurable: !0, get: () => null } }) } catch { } return l("readystatechange", Event, {}), l("load", ProgressEvent, { lengthComputable: g, loaded: u, total: u }), void l("loadend", ProgressEvent, { lengthComputable: g, loaded: u, total: u }) } const p = []; let f = 0, h = !1; const y = () => { h = !0 }; n.addEventListener("abort", y); let w = 0; try { for await (const e of i(o)) { if (h) return; p.push(e), f += e.byteLength; const n = performance.now(); if (n - w > 100) { l("progress", ProgressEvent, { lengthComputable: g, loaded: f, total: u || f }), w = n; const e = document.getElementById("snMbText"); e && (e.textContent = t(f) + " / " + window.snProgress.total) } } l("progress", ProgressEvent, { lengthComputable: g, loaded: f, total: u || f }); const e = document.getElementById("snMbText"); e && (e.textContent = t(f) + " / " + window.snProgress.total); const n = document.getElementById("snLoadingBG"), r = document.getElementById("snLoadingTextHolder"); n && (n.style.visibility = "hidden"), r && (r.style.visibility = "hidden") } catch (t) { return l("error", ProgressEvent, { lengthComputable: !1, loaded: f, total: 0 }), void l("loadend", ProgressEvent, { lengthComputable: !1, loaded: f, total: 0 }) } finally { n.removeEventListener("abort", y) } const b = f, m = () => { const t = new Uint8Array(b); let e = 0; for (const n of p) t.set(n, e), e += n.byteLength; return t }, E = n.responseType; let B, v = null; if ("arraybuffer" === E) B = m().buffer; else if ("blob" === E) B = new Blob(p); else if ("json" === E) try { B = JSON.parse((new TextDecoder).decode(m())) } catch { B = null } else { const t = (new TextDecoder).decode(m()); B = t, v = () => t } try { const t = { status: { configurable: !0, get: () => 200 }, statusText: { configurable: !0, get: () => "OK" }, readyState: { configurable: !0, get: () => 4 }, response: { configurable: !0, get: () => B } }; v && (t.responseText = { configurable: !0, get: v }), Object.defineProperties(n, t) } catch { } window.snProgress.loaded = f, l("readystatechange", Event, {}), l("load", ProgressEvent, { lengthComputable: g, loaded: b, total: u || b }), l("loadend", ProgressEvent, { lengthComputable: g, loaded: b, total: u || b }) }) } })(); })();</script>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+		<title>A Game About Feeding A Black Hole</title>
+		<style>
+html, body, #canvas {
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+body {
+	color: white;
+	background-color: black;
+	overflow: hidden;
+	touch-action: none;
+}
+
+#canvas {
+	display: block;
+}
+
+#canvas:focus {
+	outline: none;
+}
+
+#status, #status-splash, #status-progress {
+	position: absolute;
+	left: 0;
+	right: 0;
+}
+
+#status, #status-splash {
+	top: 0;
+	bottom: 0;
+}
+
+#status {
+	background-color: #525254;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	visibility: hidden;
+}
+
+#status-splash {
+	max-height: 100%;
+	max-width: 100%;
+	margin: auto;
+}
+
+#status-splash.show-image--false {
+	display: none;
+}
+
+#status-splash.fullsize--true {
+	height: 100%;
+	width: 100%;
+	object-fit: contain;
+}
+
+#status-splash.use-filter--false {
+	image-rendering: pixelated;
+}
+
+#status-progress, #status-notice {
+	display: none;
+}
+
+#status-progress {
+	bottom: 10%;
+	width: 50%;
+	margin: 0 auto;
+}
+
+#status-notice {
+	background-color: #5b3943;
+	border-radius: 0.5rem;
+	border: 1px solid #9b3943;
+	color: #e0e0e0;
+	font-family: 'Noto Sans', 'Droid Sans', Arial, sans-serif;
+	line-height: 1.3;
+	margin: 0 2rem;
+	overflow: hidden;
+	padding: 1rem;
+	text-align: center;
+	z-index: 1;
+}
+		</style>
+		<link id="-gd-engine-icon" rel="icon" type="image/png" href="A Game About Feeding A Black Hole.icon.png">
+<link rel="apple-touch-icon" href="A Game About Feeding A Black Hole.apple-touch-icon.png">
+
+	<style>#snLoadingBG,#snLoadingTextHolder{width:100%;height:100%;position:absolute;z-index:9998}.snLoadingText,body,html{overflow:hidden}#snLoadingBG{margin:auto;background-color:#0f172a}#snLoadingTextHolder{display:flex;align-items:center;justify-content:center}@keyframes slide{from{background-position:0 50%}to{background-position:200% 50%}}.snLoadingText{position:relative;display:inline-block;color:transparent;-webkit-background-clip:text;background-clip:text;background-image:linear-gradient(90deg,oklch(.7 .25 30),oklch(.7 .25 90),oklch(.7 .25 150),oklch(.7 .25 220),oklch(.7 .25 310),oklch(.7 .25 30));background-size:200% 100%;animation:4s linear infinite slide;will-change:transform;transform:translateZ(0);text-align:center;font-size:3em;font-family:'Trebuchet MS','Lucida Sans Unicode','Lucida Grande','Lucida Sans',Arial,sans-serif}#snLoadingText{position:fixed;margin-bottom:20%}#snMbText{position:fixed;margin-top:20%}</style></head>
+	<body>
+		<canvas id="canvas">
+			Your browser does not support the canvas tag.
+		</canvas>
+
+		<noscript>
+			Your browser does not support JavaScript.
+		</noscript>
+
+		<div id="status">
+			<img id="status-splash" class="show-image--false fullsize--true use-filter--true" src="A Game About Feeding A Black Hole.png" alt="">
+			<progress id="status-progress"></progress>
+			<div id="status-notice"></div>
+		</div>
+
+		<script src="A Game About Feeding A Black Hole.js"></script>
+		<script>
+const GODOT_CONFIG = {"args":[],"canvasResizePolicy":2,"emscriptenPoolSize":8,"ensureCrossOriginIsolationHeaders":false,"executable":"A Game About Feeding A Black Hole","experimentalVK":false,"fileSizes":{"A Game About Feeding A Black Hole.pck":211944996,"A Game About Feeding A Black Hole.wasm":1508102},"focusCanvas":true,"gdextensionLibs":[],"godotPoolSize":4};
+const GODOT_THREADS_ENABLED = false;
+const engine = new Engine(GODOT_CONFIG);
+
+(function () {
+	const statusOverlay = document.getElementById('status');
+	const statusProgress = document.getElementById('status-progress');
+	const statusNotice = document.getElementById('status-notice');
+
+	let initializing = true;
+	let statusMode = '';
+
+	function setStatusMode(mode) {
+		if (statusMode === mode || !initializing) {
+			return;
+		}
+		if (mode === 'hidden') {
+			statusOverlay.remove();
+			initializing = false;
+			return;
+		}
+		statusOverlay.style.visibility = 'visible';
+		statusProgress.style.display = mode === 'progress' ? 'block' : 'none';
+		statusNotice.style.display = mode === 'notice' ? 'block' : 'none';
+		statusMode = mode;
+	}
+
+	function setStatusNotice(text) {
+		while (statusNotice.lastChild) {
+			statusNotice.removeChild(statusNotice.lastChild);
+		}
+		const lines = text.split('\n');
+		lines.forEach((line) => {
+			statusNotice.appendChild(document.createTextNode(line));
+			statusNotice.appendChild(document.createElement('br'));
+		});
+	}
+
+	function displayFailureNotice(err) {
+		console.error(err);
+		if (err instanceof Error) {
+			setStatusNotice(err.message);
+		} else if (typeof err === 'string') {
+			setStatusNotice(err);
+		} else {
+			setStatusNotice('An unknown error occurred.');
+		}
+		setStatusMode('notice');
+		initializing = false;
+	}
+
+	const missing = Engine.getMissingFeatures({
+		threads: GODOT_THREADS_ENABLED,
+	});
+
+	if (missing.length !== 0) {
+		if (GODOT_CONFIG['serviceWorker'] && GODOT_CONFIG['ensureCrossOriginIsolationHeaders'] && 'serviceWorker' in navigator) {
+			let serviceWorkerRegistrationPromise;
+			try {
+				serviceWorkerRegistrationPromise = navigator.serviceWorker.getRegistration();
+			} catch (err) {
+				serviceWorkerRegistrationPromise = Promise.reject(new Error('Service worker registration failed.'));
+			}
+			// There's a chance that installing the service worker would fix the issue
+			Promise.race([
+				serviceWorkerRegistrationPromise.then((registration) => {
+					if (registration != null) {
+						return Promise.reject(new Error('Service worker already exists.'));
+					}
+					return registration;
+				}).then(() => engine.installServiceWorker()),
+				// For some reason, `getRegistration()` can stall
+				new Promise((resolve) => {
+					setTimeout(() => resolve(), 2000);
+				}),
+			]).then(() => {
+				// Reload if there was no error.
+				window.location.reload();
+			}).catch((err) => {
+				console.error('Error while registering service worker:', err);
+			});
+		} else {
+			// Display the message as usual
+			const missingMsg = 'Error\nThe following features required to run Godot projects on the Web are missing:\n';
+			displayFailureNotice(missingMsg + missing.join('\n'));
+		}
+	} else {
+		setStatusMode('progress');
+		engine.startGame({
+			'onProgress': function (current, total) {
+				if (current > 0 && total > 0) {
+					statusProgress.value = current;
+					statusProgress.max = total;
+				} else {
+					statusProgress.removeAttribute('value');
+					statusProgress.removeAttribute('max');
+				}
+			},
+		}).then(() => {
+			setStatusMode('hidden');
+		}, displayFailureNotice);
+	}
+}());
+		</script>
+	
+
+
+<div id="snLoadingBG" style="visibility: hidden"></div><div id="snLoadingTextHolder" style="visibility: hidden"><div id="snLoadingText" style="visibility: hidden" class="snLoadingText">loading...</div><div id="snMbText" class="snLoadingText">0MB / 241MB</div></div><script>const unityEl=document.getElementById("unity-loading-bar");unityEl&&(unityEl.style.visibility="hidden");</script></body></html>
