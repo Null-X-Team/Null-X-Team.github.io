@@ -119,7 +119,9 @@ let _0xData = [
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
   { id: "airline", title: "airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
-    ];
+    
+  { id: "feedingablackhole", title: "feedingablackhole", url: "../Games/feedingablackhole/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/feedingablackhole/images (1).jpeg" },
+];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
 
