@@ -40,6 +40,7 @@
 let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "../Games/brotatoAPNG/Brotato.html", image: "../Games/brotatoAPNG/images (23).jpeg", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
 { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Clover Pit is a roguelite gambling game where you spin, bet, and chase huge payouts while trying not to go broke.", popular: true , image: "../Games/cloverpit/images.jpeg" },
+    { id: "feedingablackhole", title: "A Game About Feeding A Black Hole", url: "../Games/feedingablackhole/index.html", desc: "Feed a growing black hole, consume objects, and explore the world to become bigger and more powerful.", popular: true, image: "../Games/feedingablackhole/images (1).jpeg" },
   { id: "y_io", title: "Yohoho.io", url: "../Games/yohoho/index.html", image: "../Games/yohoho/images (24).jpeg", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
   { id: "b_er", title: "Bitcoin Clicker", url: "../Games/Bitcoin/index.html", image: "../Games/Bitcoin/images (4).jpeg", jsbin: "https://glaxyias.github.io/Bitcoin-clicker/", isEmbedCode: true, desc: "A Homemade Special.", popular: true },
   { id: "s_lp", title: "Slope", url: "../Games/slope/index.html", image: "../Games/slope/images (25).jpeg", desc: "A fast-paced 3D platformer. Stay on the track!", popular: true },
@@ -119,8 +120,6 @@ let _0xData = [
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
   { id: "airline", title: "airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
-    
-  { id: "feedingablackhole", title: "feedingablackhole", url: "../Games/feedingablackhole/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/feedingablackhole/images (1).jpeg" },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
