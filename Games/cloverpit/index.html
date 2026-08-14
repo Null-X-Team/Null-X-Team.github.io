@@ -710,5 +710,63 @@
 
   </script>
 
+  <script>
+    // Auto pointer-lock on the Unity canvas so look uses relative deltas
+    // (prevents mouse stopping at screen edges). No UI button.
+    (function () {
+      function getCanvas() {
+        return document.querySelector("#unity-canvas");
+      }
+
+      function requestLock(el) {
+        if (!el || document.pointerLockElement === el) return;
+        const opts = { unadjustedMovement: true };
+        try {
+          const p = el.requestPointerLock(opts);
+          if (p && typeof p.catch === "function") {
+            p.catch(function () {
+              // Fallback if unadjustedMovement is unsupported
+              try { el.requestPointerLock(); } catch (e) {}
+            });
+          }
+        } catch (e) {
+          try { el.requestPointerLock(); } catch (e2) {}
+        }
+      }
+
+      function onUserGesture(e) {
+        const canvas = getCanvas();
+        if (!canvas) return;
+        // Prefer locking the canvas even if click was on a child/overlay
+        requestLock(canvas);
+      }
+
+      // Capture first interaction and any later clicks to re-lock if lost
+      document.addEventListener("pointerdown", onUserGesture, true);
+      document.addEventListener("click", onUserGesture, true);
+
+      // Keep canvas focusable for keyboard + lock
+      document.addEventListener("DOMContentLoaded", function () {
+        const canvas = getCanvas();
+        if (canvas) {
+          if (!canvas.hasAttribute("tabindex")) canvas.setAttribute("tabindex", "0");
+          canvas.style.outline = "none";
+          canvas.style.cursor = "none";
+        }
+      });
+
+      // If Unity recreates/replaces the canvas, rebind when it appears
+      const observer = new MutationObserver(function () {
+        const canvas = getCanvas();
+        if (canvas && !canvas.dataset.plBound) {
+          canvas.dataset.plBound = "1";
+          if (!canvas.hasAttribute("tabindex")) canvas.setAttribute("tabindex", "0");
+          canvas.style.outline = "none";
+        }
+      });
+      observer.observe(document.documentElement, { childList: true, subtree: true });
+    })();
+  </script>
+
 </body>
 </html>
