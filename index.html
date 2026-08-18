@@ -7,9 +7,6 @@
   <link rel="icon" type="image/png" href="https://glaxyias.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png">
   <link rel="stylesheet" href="CSS/style.css">
   <link rel="stylesheet" href="themes/themes.css">
-  
-  <!-- ADDED: Driver.js CSS for the walkthrough styling -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
 
   <script>
     (function() {
@@ -26,6 +23,112 @@
   <script src="Games/GameSaveData/auto-save.js"></script>
 
   <style>
+    /* =========================================================
+       DRIVER.JS WALKTHROUGH EMBEDDED STYLES & THEME OVERRIDES
+       ========================================================= */
+    .driver-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 10000;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .driver-active-element {
+      position: relative !important;
+      z-index: 1000002 !important;
+    }
+
+    .driver-popover {
+      position: absolute;
+      background: #12091c !important;
+      color: #ffffff !important;
+      padding: 18px !important;
+      border-radius: 12px !important;
+      border: 1px solid #8b00ff !important;
+      box-shadow: 0 0 30px rgba(139, 0, 255, 0.45) !important;
+      max-width: 320px !important;
+      min-width: 250px !important;
+      font-family: system-ui, -apple-system, sans-serif !important;
+      z-index: 10000000 !important;
+    }
+
+    .driver-popover-title {
+      font-size: 1.1rem !important;
+      font-weight: 700 !important;
+      color: #ffffff !important;
+      margin-bottom: 8px !important;
+    }
+
+    .driver-popover-description {
+      font-size: 0.85rem !important;
+      color: #b0a8c0 !important;
+      line-height: 1.4 !important;
+      margin-bottom: 14px !important;
+    }
+
+    .driver-popover-footer {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: space-between !important;
+      margin-top: 10px !important;
+    }
+
+    .driver-popover-progress-text {
+      font-size: 0.75rem !important;
+      color: #b056ff !important;
+      font-weight: bold !important;
+    }
+
+    .driver-popover-navigation-btns {
+      display: flex !important;
+      gap: 6px !important;
+    }
+
+    .driver-popover-prev-btn,
+    .driver-popover-next-btn,
+    .driver-popover-close-btn {
+      background: #8b00ff !important;
+      color: #ffffff !important;
+      border: none !important;
+      padding: 6px 12px !important;
+      border-radius: 6px !important;
+      font-size: 0.8rem !important;
+      font-weight: bold !important;
+      cursor: pointer !important;
+      transition: background 0.2s !important;
+      text-shadow: none !important;
+    }
+
+    .driver-popover-prev-btn:hover,
+    .driver-popover-next-btn:hover {
+      background: #a033ff !important;
+    }
+
+    .driver-popover-close-btn {
+      background: transparent !important;
+      color: #888 !important;
+    }
+
+    .driver-popover-close-btn:hover {
+      color: #fff !important;
+    }
+
+    .driver-popover-arrow {
+      content: "";
+      position: absolute;
+      border: 5px solid transparent;
+    }
+
+    .driver-popover-arrow-side-left { border-right-color: #8b00ff !important; }
+    .driver-popover-arrow-side-right { border-left-color: #8b00ff !important; }
+    .driver-popover-arrow-side-top { border-bottom-color: #8b00ff !important; }
+    .driver-popover-arrow-side-bottom { border-top-color: #8b00ff !important; }
+
     /* Absolute overlay positioning for the countdown clock container */
     .countdown-overlay-container {
       position: absolute;
@@ -303,7 +406,7 @@
       background: #ff6666;
     }
 
-    /* ADDED: Style for the custom Tour Button to match your sidebar theme */
+    /* Style for the custom Tour Button to match sidebar theme */
     .tour-trigger-btn {
       background: rgba(139, 0, 255, 0.1);
       color: #b056ff;
@@ -527,12 +630,9 @@
         <button class="cloak-btn" id="stealthOpener">Stealth Mode</button>
       </div>
 
-      <!-- ADDED: Custom Site Tour Button with hand-crafted SVG -->
       <button id="start-tour-btn" class="tour-trigger-btn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <!-- Outer circle -->
           <circle cx="12" cy="12" r="10"></circle>
-          <!-- Inner info path -->
           <path d="M12 16v-4"></path>
           <path d="M12 8h.01"></path>
         </svg>
@@ -888,7 +988,6 @@
   <button id="console-toggle-btn">Console</button>
 
   <script>
-    // THESE ARE YOUR ACTUAL CREDENTIALS FROM YOUR LOGIN HTML
     const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
@@ -904,9 +1003,8 @@
       if (targetTextNode.textContent !== paddedValue) {
         targetTextNode.textContent = paddedValue;
         
-        // Trigger micro-interaction animation loop cleanly
         cardContainer.classList.remove('pulse');
-        void cardContainer.offsetWidth; // Force layout recalculation engine
+        void cardContainer.offsetWidth; 
         cardContainer.classList.add('pulse');
       }
     }
@@ -956,7 +1054,6 @@
     setInterval(runCountdown, 1000);
     runCountdown();
 
-    // Check if current user is missing a handler
     async function checkForMissingHandler(username) {
       if (!username || username === 'Guest') return;
       try {
@@ -974,7 +1071,6 @@
 
         const data = await response.json();
         
-        // This targets the null field directly from your database
         if (data.length > 0 && (data[0].handler === null || data[0].handler.trim() === '')) {
           document.getElementById('handlerModal').classList.remove('hidden');
         }
@@ -983,7 +1079,6 @@
       }
     }
 
-    // Submit user handler update from custom modal
     async function submitNewHandler(event) {
       event.preventDefault();
       
@@ -1041,7 +1136,6 @@
       }
     }
 
-    // Check if user has an unacknowledged admin warning
     async function checkForWarnings(username) {
       if (!username || username === 'Guest') return;
       try {
@@ -1059,7 +1153,6 @@
 
         const data = await response.json();
         
-        // If a warning flag is active, lock the screen with the modal
         if (data.length > 0 && data[0].warned === true) {
           const overlay = document.getElementById('warning-modal-overlay');
           const reasonBox = document.getElementById('warning-reason-text');
@@ -1067,13 +1160,11 @@
           reasonBox.textContent = data[0].last_action_reason || "Violation of community guidelines.";
           overlay.classList.remove('hidden');
 
-          // Handle the acknowledgment click
           document.getElementById('warning-ack-btn').onclick = async () => {
             const btn = document.getElementById('warning-ack-btn');
             btn.textContent = "Dismissing...";
             btn.disabled = true;
             
-            // Reset the warning flag in Supabase so it doesn't show up again next refresh
             await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}`, {
               method: 'PATCH',
               headers: {
@@ -1091,7 +1182,6 @@
       }
     }
 
-    // Auto trigger check when page completes loading
     document.addEventListener('DOMContentLoaded', () => {
       const loggedUser = localStorage.getItem('chatUser');
       if (loggedUser) {
@@ -1101,15 +1191,11 @@
     });
   </script>
   
-  <!-- ADDED: Driver.js script library -->
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
 
-  <!-- ADDED: The walkthrough configuration logic -->
   <script>
-    // Initialize the Driver.js engine
     const driver = window.driver.js.driver;
 
-    // Define the specific steps based on your current HTML IDs
     const tour = driver({
       showProgress: true,
       animate: true,
@@ -1152,13 +1238,10 @@
       ]
     });
 
-    // Check localStorage to see if it is their first visit
     function checkFirstTimeUser() {
       const hasSeenTour = localStorage.getItem('hasSeenNullXTour');
       
-      // If no key exists, run the tour and set the key
       if (!hasSeenTour) {
-        // Slight delay allows the countdown clock and resources to render first
         setTimeout(() => {
           tour.drive();
         }, 1500); 
@@ -1166,10 +1249,8 @@
       }
     }
 
-    // Trigger check on load
     document.addEventListener('DOMContentLoaded', checkFirstTimeUser);
 
-    // Event listener for our new SVG button
     const startTourBtn = document.getElementById('start-tour-btn');
     if (startTourBtn) {
       startTourBtn.addEventListener('click', () => {
@@ -1187,7 +1268,6 @@
   
   <script src="./BAN/guard.js"></script>
   <script>
-    // Fetch automated version.json file (preventing cache)
     fetch('version.json', { cache: 'no-store' })
       .then(response => response.json())
       .then(data => {
@@ -1217,7 +1297,6 @@
 
         if (!consoleContainer || !toggleBtn) return;
 
-        // Toggle console open/close
         toggleBtn.addEventListener('click', () => {
           consoleContainer.style.display = consoleContainer.style.display === 'none' ? 'flex' : 'none';
         });
@@ -1230,7 +1309,6 @@
           outputDiv.innerHTML = '';
         });
 
-        // Helper function to append log messages to output window
         function appendLog(msg, type = 'log') {
           const entry = document.createElement('div');
           entry.className = `console-entry ${type}`;
@@ -1239,7 +1317,6 @@
           outputDiv.scrollTop = outputDiv.scrollHeight;
         }
 
-        // Intercept native browser console outputs
         const origLog = console.log;
         const origError = console.error;
         const origWarn = console.warn;
@@ -1259,7 +1336,6 @@
           appendLog(args.join(' '), 'warn');
         };
 
-        // Command execution logic
         inputEl?.addEventListener('keydown', (e) => {
           if (e.key === 'Enter') {
             const cmd = inputEl.value.trim();
