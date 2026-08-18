@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="CSS/style.css">
   <link rel="stylesheet" href="themes/themes.css">
   
+  <!-- ADDED: Driver.js CSS for the walkthrough styling -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.css"/>
+
   <script>
     (function() {
       const savedTheme = localStorage.getItem('selectedTheme') || 'default';
@@ -299,6 +302,30 @@
     .warning-ack-btn:hover {
       background: #ff6666;
     }
+
+    /* ADDED: Style for the custom Tour Button to match your sidebar theme */
+    .tour-trigger-btn {
+      background: rgba(139, 0, 255, 0.1);
+      color: #b056ff;
+      border: 1px solid rgba(139, 0, 255, 0.3);
+      padding: 10px 15px;
+      border-radius: 6px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .tour-trigger-btn:hover {
+      background: rgba(139, 0, 255, 0.2);
+      color: #ffffff;
+    }
   </style>
 </head>
 <body>
@@ -499,6 +526,18 @@
       <div class="stealth-menu-wrapper">
         <button class="cloak-btn" id="stealthOpener">Stealth Mode</button>
       </div>
+
+      <!-- ADDED: Custom Site Tour Button with hand-crafted SVG -->
+      <button id="start-tour-btn" class="tour-trigger-btn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <!-- Outer circle -->
+          <circle cx="12" cy="12" r="10"></circle>
+          <!-- Inner info path -->
+          <path d="M12 16v-4"></path>
+          <path d="M12 8h.01"></path>
+        </svg>
+        Site Tour
+      </button>
         
       <button class="signin-btn" id="signInBtn">Sign In</button>
       
@@ -1062,6 +1101,83 @@
     });
   </script>
   
+  <!-- ADDED: Driver.js script library -->
+  <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
+
+  <!-- ADDED: The walkthrough configuration logic -->
+  <script>
+    // Initialize the Driver.js engine
+    const driver = window.driver.js.driver;
+
+    // Define the specific steps based on your current HTML IDs
+    const tour = driver({
+      showProgress: true,
+      animate: true,
+      steps: [
+        { 
+          element: '.left-nav', 
+          popover: { 
+            title: 'Navigation Menu', 
+            description: 'Access your games, favorites, and profile from this sidebar.' 
+          } 
+        },
+        { 
+          element: '#searchBar', 
+          popover: { 
+            title: 'Find Games Fast', 
+            description: 'Use this search bar to quickly locate specific titles on the dashboard.' 
+          } 
+        },
+        { 
+          element: '#heroSection', 
+          popover: { 
+            title: 'Featured Content', 
+            description: 'Check out the currently featured game and active system updates right here.' 
+          } 
+        },
+        { 
+          element: '#signInBtn', 
+          popover: { 
+            title: 'Save Your Progress', 
+            description: 'Sign in here to sync your user data to the cloud and keep your progress safe.' 
+          } 
+        },
+        { 
+          element: '#stealthOpener', 
+          popover: { 
+            title: 'Stealth Mode', 
+            description: 'Use this feature to quickly hide your current screen if necessary.' 
+          } 
+        }
+      ]
+    });
+
+    // Check localStorage to see if it is their first visit
+    function checkFirstTimeUser() {
+      const hasSeenTour = localStorage.getItem('hasSeenNullXTour');
+      
+      // If no key exists, run the tour and set the key
+      if (!hasSeenTour) {
+        // Slight delay allows the countdown clock and resources to render first
+        setTimeout(() => {
+          tour.drive();
+        }, 1500); 
+        localStorage.setItem('hasSeenNullXTour', 'true');
+      }
+    }
+
+    // Trigger check on load
+    document.addEventListener('DOMContentLoaded', checkFirstTimeUser);
+
+    // Event listener for our new SVG button
+    const startTourBtn = document.getElementById('start-tour-btn');
+    if (startTourBtn) {
+      startTourBtn.addEventListener('click', () => {
+        tour.drive();
+      });
+    }
+  </script>
+
   <script src="debug.js"></script>
   
   <script type="module" src="JS/main.js"></script>
