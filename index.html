@@ -1200,30 +1200,53 @@
   <script>
   const driver = window.driver.js.driver;
 
-  let tour;
-  let tourRunning = false;
-  let waitingFor = null;
+  function clickNav(id) {
+    document.getElementById(id)?.click();
+  }
 
-  function getVisibleGameCard() {
+  function getGameCard() {
     return document.querySelector(
       "#gameGrid .game-card, #gameGrid .game-item, #gameGrid > *"
     );
   }
 
-  function startTour() {
-    tourRunning = true;
-    waitingFor = null;
+  function openGameMenu(gameCard) {
+    const menu = document.getElementById("custom-context-menu");
 
-    tour.setSteps([
-      {
-        element: ".dashboard",
-        popover: {
-          title: "Welcome to NullX",
-          description: "This tour will guide you through the main features.",
-          side: "bottom",
-          align: "center"
-        }
-      },
+    if (!gameCard || !menu) return;
+
+    const rect = gameCard.getBoundingClientRect();
+
+    gameCard.dispatchEvent(new MouseEvent("contextmenu", {
+      bubbles: true,
+      cancelable: true,
+      clientX: rect.left + Math.min(40, rect.width / 2),
+      clientY: rect.top + Math.min(40, rect.height / 2)
+    }));
+  }
+
+  const tour = driver({
+    showProgress: true,
+    animate: true,
+    overlayOpacity: 0.72,
+
+    /* Clicking outside the guide cannot close it */
+    allowClose: false,
+    overlayClickBehavior: () => {},
+
+    /* Allows clicking the highlighted item */
+    disableActiveInteraction: false,
+
+    nextBtnText: "Next",
+    prevBtnText: "Back",
+    doneBtnText: "Finish",
+    progressText: "{{current}} / {{total}}",
+
+    onDestroyStarted: () => {
+      tour.destroy();
+    },
+
+    steps: [
       {
         element: ".left-nav",
         popover: {
@@ -1236,239 +1259,144 @@
       {
         element: "#nav-games",
         popover: {
-          title: "Open Games",
-          description: "Click Games now to continue.",
+          title: "Games",
+          description: "The tour is opening Games for you.",
           side: "right",
-          align: "center",
-          showButtons: ["previous", "close"]
+          align: "center"
         },
         onHighlightStarted: () => {
-          waitingFor = "games";
+          setTimeout(() => clickNav("nav-games"), 250);
         }
-      }
-    ]);
-
-    tour.drive();
-  }
-
-  function continueGamesTour() {
-    if (!tourRunning || waitingFor !== "games") return;
-
-    waitingFor = "game-card";
-
-    setTimeout(() => {
-      const gameCard = getVisibleGameCard();
-
-      if (!gameCard) {
-        tour.destroy();
-        alert("Games are still loading. Please restart the Site Tour once they appear.");
-        return;
-      }
-
-      tour.setSteps([
-        {
-          element: gameCard,
-          popover: {
-            title: "Choose a Game",
-            description: "Right-click any game card to open its menu.",
-            side: "bottom",
-            align: "center",
-            showButtons: ["previous", "close"]
-          },
-          onHighlightStarted: () => {
-            waitingFor = "context-menu";
-          }
+      },
+      {
+        element: () => getGameCard(),
+        popover: {
+          title: "Game Cards",
+          description: "Click a card to play. Right-clicking opens actions.",
+          side: "bottom",
+          align: "center"
         }
-      ]);
-
-      tour.drive(0);
-    }, 350);
-  }
-
-  function continueContextMenuTour() {
-    if (!tourRunning || waitingFor !== "context-menu") return;
-
-    const favoriteOption = document.getElementById("ctx-favorite");
-
-    if (!favoriteOption || getComputedStyle(favoriteOption.parentElement).display === "none") {
-      return;
-    }
-
-    waitingFor = "favorite-option";
-
-    tour.setSteps([
+      },
+      {
+        element: () => getGameCard(),
+        popover: {
+          title: "Game Actions",
+          description: "The menu is opening now. You can also right-click cards yourself.",
+          side: "bottom",
+          align: "center"
+        },
+        onHighlightStarted: () => {
+          setTimeout(() => openGameMenu(getGameCard()), 250);
+        }
+      },
       {
         element: "#ctx-favorite",
         popover: {
-          title: "Save a Favorite",
-          description: "Click Favorite Game to save this title.",
+          title: "Favorite Game",
+          description: "Click this to save the game. It stays clickable during the tour.",
           side: "right",
-          align: "center",
-          showButtons: ["previous", "close"]
+          align: "center"
+        }
+      },
+      {
+        element: "#nav-favorites",
+        popover: {
+          title: "Favorites",
+          description: "The tour is opening your saved games.",
+          side: "right",
+          align: "center"
         },
         onHighlightStarted: () => {
-          waitingFor = "favorite-option";
+          setTimeout(() => {
+            document.getElementById("custom-context-menu").style.display = "none";
+            clickNav("nav-favorites");
+          }, 250);
+        }
+      },
+      {
+        element: "#favoritesGrid",
+        popover: {
+          title: "Saved Games",
+          description: "Games you favorite appear here.",
+          side: "top",
+          align: "center"
+        }
+      },
+      {
+        element: "#searchBar",
+        popover: {
+          title: "Search",
+          description: "Type a title here to find games faster.",
+          side: "bottom",
+          align: "center"
+        }
+      },
+      {
+        element: "#randomBtn",
+        popover: {
+          title: "Random Game",
+          description: "Use this for a quick random pick.",
+          side: "bottom",
+          align: "center"
+        }
+      },
+      {
+        element: "#nav-profile",
+        popover: {
+          title: "Profile",
+          description: "Update your picture, bio, and account details here.",
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: "#nav-unblockers",
+        popover: {
+          title: "Unblockers",
+          description: "Open available tools from this page.",
+          side: "right",
+          align: "center"
+        }
+      },
+      {
+        element: "#signInBtn",
+        popover: {
+          title: "Sign In",
+          description: "Sign in for supported account features.",
+          side: "left",
+          align: "center"
+        }
+      },
+      {
+        element: "#settingsBtn",
+        popover: {
+          title: "Settings",
+          description: "Change themes and preferences here.",
+          side: "left",
+          align: "center"
+        }
+      },
+      {
+        element: "#start-tour-btn",
+        popover: {
+          title: "Finished",
+          description: "Use Site Tour anytime to run this guide again.",
+          side: "left",
+          align: "center"
         }
       }
-    ]);
-
-    tour.drive(0);
-  }
-
-  function continueFavoritesTour() {
-    if (!tourRunning || waitingFor !== "favorite-option") return;
-
-    waitingFor = "favorites";
-
-    setTimeout(() => {
-      tour.setSteps([
-        {
-          element: "#nav-favorites",
-          popover: {
-            title: "Open Favorites",
-            description: "Click Favorites to view saved games.",
-            side: "right",
-            align: "center",
-            showButtons: ["previous", "close"]
-          },
-          onHighlightStarted: () => {
-            waitingFor = "favorites";
-          }
-        }
-      ]);
-
-      tour.drive(0);
-    }, 250);
-  }
-
-  function finishTour() {
-    if (!tourRunning || waitingFor !== "favorites") return;
-
-    waitingFor = null;
-
-    setTimeout(() => {
-      tour.setSteps([
-        {
-          element: "#favoritesGrid",
-          popover: {
-            title: "Your Favorites",
-            description: "Saved games appear here.",
-            side: "top",
-            align: "center"
-          }
-        },
-        {
-          element: "#searchBar",
-          popover: {
-            title: "Search",
-            description: "Search for a game by name.",
-            side: "bottom",
-            align: "center"
-          }
-        },
-        {
-          element: "#randomBtn",
-          popover: {
-            title: "Random Game",
-            description: "Use this when you want a surprise.",
-            side: "bottom",
-            align: "center"
-          }
-        },
-        {
-          element: "#nav-profile",
-          popover: {
-            title: "Profile",
-            description: "Edit your picture, bio, and account details here.",
-            side: "right",
-            align: "center"
-          }
-        },
-        {
-          element: "#nav-unblockers",
-          popover: {
-            title: "Unblockers",
-            description: "Open available site tools from this section.",
-            side: "right",
-            align: "center"
-          }
-        },
-        {
-          element: "#signInBtn",
-          popover: {
-            title: "Sign In",
-            description: "Sign in to use account-based features.",
-            side: "left",
-            align: "center"
-          }
-        },
-        {
-          element: "#settingsBtn",
-          popover: {
-            title: "Settings",
-            description: "Change themes and site preferences here.",
-            side: "left",
-            align: "center"
-          }
-        },
-        {
-          element: "#start-tour-btn",
-          popover: {
-            title: "Tour Complete",
-            description: "Use Site Tour anytime to run this guide again.",
-            side: "left",
-            align: "center"
-          }
-        }
-      ]);
-
-      tour.drive(0);
-    }, 350);
-  }
-
-  tour = driver({
-    showProgress: true,
-    animate: true,
-    overlayOpacity: 0.72,
-
-    /* Prevent click-away and Escape from ending the tour */
-    allowClose: false,
-    overlayClickBehavior: "none",
-
-    nextBtnText: "Next",
-    prevBtnText: "Back",
-    doneBtnText: "Finish",
-    progressText: "{{current}} / {{total}}",
-
-    onDestroyed: () => {
-      tourRunning = false;
-      waitingFor = null;
-    }
+    ]
   });
+
+  function startTour() {
+    document.getElementById("custom-context-menu").style.display = "none";
+    tour.drive();
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     const startTourBtn = document.getElementById("start-tour-btn");
-    const gamesButton = document.getElementById("nav-games");
-    const favoritesButton = document.getElementById("nav-favorites");
-    const favoriteOption = document.getElementById("ctx-favorite");
 
     startTourBtn?.addEventListener("click", startTour);
-
-    gamesButton?.addEventListener("click", () => {
-      setTimeout(continueGamesTour, 200);
-    });
-
-    document.addEventListener("contextmenu", () => {
-      setTimeout(continueContextMenuTour, 50);
-    });
-
-    favoriteOption?.addEventListener("click", () => {
-      setTimeout(continueFavoritesTour, 150);
-    });
-
-    favoritesButton?.addEventListener("click", () => {
-      setTimeout(finishTour, 200);
-    });
 
     const hasSeenTour = localStorage.getItem("hasSeenNullXTour");
 
@@ -1479,28 +1407,7 @@
       }, 1500);
     }
   });
-</script>
-
-  function checkFirstTimeUser() {
-    const hasSeenTour = localStorage.getItem("hasSeenNullXTour");
-
-    if (!hasSeenTour) {
-      setTimeout(() => {
-        tour.drive();
-        localStorage.setItem("hasSeenNullXTour", "true");
-      }, 1500);
-    }
-  }
-
-  document.addEventListener("DOMContentLoaded", checkFirstTimeUser);
-
-  const startTourBtn = document.getElementById("start-tour-btn");
-  if (startTourBtn) {
-    startTourBtn.addEventListener("click", () => {
-      tour.drive();
-    });
-  }
-</script>
+  </script>
 
   <script src="debug.js"></script>
   
