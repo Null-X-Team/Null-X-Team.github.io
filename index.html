@@ -38,10 +38,14 @@
       transition: opacity 0.3s ease;
     }
 
-    .driver-active-element {
-      position: relative !important;
-      z-index: 1000002 !important;
-    }
+    .driver-active-element,
+.driver-active-element * {
+  pointer-events: auto !important;
+}
+
+#custom-context-menu {
+  z-index: 10000050 !important;
+}
 
     .driver-popover {
       position: absolute;
@@ -1196,22 +1200,26 @@
   <script>
   const driver = window.driver.js.driver;
 
-  const tour = driver({
-    showProgress: true,
-    animate: true,
-    overlayOpacity: 0.72,
-    allowClose: true,
-    doneBtnText: "Finish Tour",
-    nextBtnText: "Next",
-    prevBtnText: "Back",
-    progressText: "{{current}} of {{total}}",
+  let tour;
+  let tourRunning = false;
+  let waitingFor = null;
 
-    steps: [
+  function getVisibleGameCard() {
+    return document.querySelector(
+      "#gameGrid .game-card, #gameGrid .game-item, #gameGrid > *"
+    );
+  }
+
+  function startTour() {
+    tourRunning = true;
+    waitingFor = null;
+
+    tour.setSteps([
       {
         element: ".dashboard",
         popover: {
           title: "Welcome to NullX",
-          description: "This is your dashboard: the main place to browse games, manage your account, access available tools, and keep up with site updates. You can reopen this tour anytime by pressing the Site Tour button in the right sidebar.",
+          description: "This tour will guide you through the main features.",
           side: "bottom",
           align: "center"
         }
@@ -1219,221 +1227,259 @@
       {
         element: ".left-nav",
         popover: {
-          title: "Navigation Menu",
-          description: "Use the left sidebar to move between the major parts of the site. Home returns you to the dashboard, Games shows the playable library, Favorites shows games you saved, and the other links open your tools and account areas.",
+          title: "Navigation",
+          description: "Use this menu to move around the site.",
           side: "right",
           align: "start"
-        }
-      },
-      {
-        element: "#nav-home",
-        popover: {
-          title: "Home",
-          description: "Home is the default dashboard. It contains the featured game, quick actions, game browsing area, search bar, site news, account controls, and shortcuts to the most-used features.",
-          side: "right",
-          align: "center"
         }
       },
       {
         element: "#nav-games",
         popover: {
-          title: "Games Library",
-          description: "Press Games whenever you want to browse the available titles. Games may load in a new page or tab depending on how that title is configured. If a game takes longer on its first launch, wait a moment before assuming it failed.",
+          title: "Open Games",
+          description: "Click Games now to continue.",
           side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#nav-favorites",
-        popover: {
-          title: "Favorites",
-          description: "Favorites is your personal saved-games room. To add a game, right-click a game card and choose Favorite Game. You can return here later to launch saved titles more quickly. Right-clicking saved content may also give you a delete option.",
-          side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#nav-unblockers",
-        popover: {
-          title: "Unblockers Portal",
-          description: "This section is the portal for any web-proxy or private-environment tools that the site makes available. Open it from the navigation menu to see the currently configured options. Use online tools responsibly and follow the rules that apply to your network, school, workplace, and region.",
-          side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#nav-profile",
-        popover: {
-          title: "Your Profile",
-          description: "Profile is where you manage locally stored account details. You can upload a profile picture, edit your About Me bio, check your account name and joined date, and save your changes from the profile page.",
-          side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#nav-communications",
-        popover: {
-          title: "Communications",
-          description: "Communications is the area for community-related features such as messages, friend activity, requests, or other social tools when they are enabled. Sign in first if the feature asks for an account.",
-          side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#nav-calculator",
-        popover: {
-          title: "Calculator",
-          description: "The Calculator link opens an in-page calculator for quick calculations without leaving the dashboard. It loads inside the site, so you can return to games or other sections whenever you are done.",
-          side: "right",
-          align: "center"
-        }
-      },
-      {
-        element: "#welcome-text",
-        popover: {
-          title: "Dashboard Greeting",
-          description: "This greeting reflects the currently recognized user. If it says Guest, you are browsing without an active signed-in account. Signing in can enable account-specific features and data syncing where those features are available.",
-          side: "bottom",
-          align: "start"
-        }
-      },
-      {
-        element: "#searchBar",
-        popover: {
-          title: "Find Games Fast",
-          description: "Type a game name or a keyword here to filter the game library. This is the fastest way to find a specific title when the dashboard has many game cards available.",
-          side: "bottom",
-          align: "center"
-        }
-      },
-      {
-        element: ".top-bar-stats",
-        popover: {
-          title: "Status Widgets",
-          description: "The top-right widgets show quick information such as the battery indicator and the New York time display. These widgets are informational and do not change your account or game settings.",
-          side: "bottom",
-          align: "end"
-        }
-      },
-      {
-        element: "#heroSection",
-        popover: {
-          title: "Featured Content",
-          description: "The large featured panel highlights a selected game or current site content. The system-update display may appear over this area while updates are being announced. Read the title and description for what is currently featured.",
-          side: "bottom",
-          align: "center"
-        }
-      },
-      {
-        element: "#playFeatured",
-        popover: {
-          title: "Play Featured",
-          description: "Use Play Now to launch the featured game directly. If the title opens in a separate page or takes time to initialize, keep the tab open while it loads and avoid repeatedly pressing the button.",
-          side: "bottom",
-          align: "center"
-        }
-      },
-      {
-        element: "#randomBtn",
-        popover: {
-          title: "Random Game",
-          description: "Not sure what to play? Press Random Game and the dashboard will choose a title for you. It is useful for discovering games you might otherwise skip while browsing.",
-          side: "bottom",
-          align: "center"
-        }
-      },
-      {
-        element: "#gameGrid",
-        popover: {
-          title: "Game Cards",
-          description: "This is the main game grid. Click a game card to open it. You can also right-click a card to open its action menu, where you can save the game to Favorites when that option is available.",
-          side: "top",
-          align: "center"
-        }
-      },
-      {
-        element: "#favoritesGrid",
-        popover: {
-          title: "Saved Games Area",
-          description: "When you select Favorites in the left sidebar, saved games appear in this grid. If the room is empty, return to the Games view, right-click a game, and choose Favorite Game to add it here.",
-          side: "top",
-          align: "center"
-        }
-      },
-      {
-        element: "#stealthOpener",
-        popover: {
-          title: "Stealth Mode",
-          description: "Stealth Mode is a quick privacy-oriented screen tool. Open it only when you understand what it changes, and remember that it does not override device management, browser history, network monitoring, or local rules.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: "#start-tour-btn",
-        popover: {
-          title: "Replay This Tour",
-          description: "You never have to remember every feature at once. Press Site Tour anytime to restart this walkthrough. It is especially helpful after updates or when you want to show someone else around the dashboard.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: "#signInBtn",
-        popover: {
-          title: "Sign In",
-          description: "Press Sign In to access account-based features. A signed-in account may allow your profile, preferences, saves, handler, messages, or other supported data to be associated with you. Avoid sharing your password or personal information with anyone.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: "#settingsBtn",
-        popover: {
-          title: "Settings",
-          description: "Settings opens the configuration page for options such as available themes and site preferences. If you change a visual setting, it may be stored in your browser so the dashboard can use it again on later visits.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: "#dashboard-sync-msg",
-        popover: {
-          title: "Cloud Save Controls",
-          description: "This area reports the status of cloud-save actions. Use Import Save to retrieve supported saved data, and Export Save to upload or back up your current supported save data. Make sure you are signed in and wait for a success or error message before leaving the page.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: ".news-sidebar",
-        popover: {
-          title: "System News",
-          description: "The System News feed lists announcements, maintenance notes, new features, fixes, and known issues. Check this panel when something changes, a feature is temporarily unavailable, or you want to see what has recently been added.",
-          side: "left",
-          align: "start"
-        }
-      },
-      {
-        element: ".right-sidebar",
-        popover: {
-          title: "Quick Controls",
-          description: "The right sidebar collects the account, tour, stealth, settings, cloud-save, and news controls in one place. If you are new, this sidebar is a good place to check after signing in or when you need help finding a dashboard option.",
-          side: "left",
-          align: "center"
-        }
-      },
-      {
-        element: "body",
-        popover: {
-          title: "You’re Ready",
-          description: "You now know the main parts of NullX. Start by browsing Games, use search when you know what you want, right-click game cards to save favorites, sign in for supported account features, review System News for updates, and reopen Site Tour whenever you need a refresher.",
-          side: "top",
-          align: "center"
+          align: "center",
+          showButtons: ["previous", "close"]
+        },
+        onHighlightStarted: () => {
+          waitingFor = "games";
         }
       }
-    ]
+    ]);
+
+    tour.drive();
+  }
+
+  function continueGamesTour() {
+    if (!tourRunning || waitingFor !== "games") return;
+
+    waitingFor = "game-card";
+
+    setTimeout(() => {
+      const gameCard = getVisibleGameCard();
+
+      if (!gameCard) {
+        tour.destroy();
+        alert("Games are still loading. Please restart the Site Tour once they appear.");
+        return;
+      }
+
+      tour.setSteps([
+        {
+          element: gameCard,
+          popover: {
+            title: "Choose a Game",
+            description: "Right-click any game card to open its menu.",
+            side: "bottom",
+            align: "center",
+            showButtons: ["previous", "close"]
+          },
+          onHighlightStarted: () => {
+            waitingFor = "context-menu";
+          }
+        }
+      ]);
+
+      tour.drive(0);
+    }, 350);
+  }
+
+  function continueContextMenuTour() {
+    if (!tourRunning || waitingFor !== "context-menu") return;
+
+    const favoriteOption = document.getElementById("ctx-favorite");
+
+    if (!favoriteOption || getComputedStyle(favoriteOption.parentElement).display === "none") {
+      return;
+    }
+
+    waitingFor = "favorite-option";
+
+    tour.setSteps([
+      {
+        element: "#ctx-favorite",
+        popover: {
+          title: "Save a Favorite",
+          description: "Click Favorite Game to save this title.",
+          side: "right",
+          align: "center",
+          showButtons: ["previous", "close"]
+        },
+        onHighlightStarted: () => {
+          waitingFor = "favorite-option";
+        }
+      }
+    ]);
+
+    tour.drive(0);
+  }
+
+  function continueFavoritesTour() {
+    if (!tourRunning || waitingFor !== "favorite-option") return;
+
+    waitingFor = "favorites";
+
+    setTimeout(() => {
+      tour.setSteps([
+        {
+          element: "#nav-favorites",
+          popover: {
+            title: "Open Favorites",
+            description: "Click Favorites to view saved games.",
+            side: "right",
+            align: "center",
+            showButtons: ["previous", "close"]
+          },
+          onHighlightStarted: () => {
+            waitingFor = "favorites";
+          }
+        }
+      ]);
+
+      tour.drive(0);
+    }, 250);
+  }
+
+  function finishTour() {
+    if (!tourRunning || waitingFor !== "favorites") return;
+
+    waitingFor = null;
+
+    setTimeout(() => {
+      tour.setSteps([
+        {
+          element: "#favoritesGrid",
+          popover: {
+            title: "Your Favorites",
+            description: "Saved games appear here.",
+            side: "top",
+            align: "center"
+          }
+        },
+        {
+          element: "#searchBar",
+          popover: {
+            title: "Search",
+            description: "Search for a game by name.",
+            side: "bottom",
+            align: "center"
+          }
+        },
+        {
+          element: "#randomBtn",
+          popover: {
+            title: "Random Game",
+            description: "Use this when you want a surprise.",
+            side: "bottom",
+            align: "center"
+          }
+        },
+        {
+          element: "#nav-profile",
+          popover: {
+            title: "Profile",
+            description: "Edit your picture, bio, and account details here.",
+            side: "right",
+            align: "center"
+          }
+        },
+        {
+          element: "#nav-unblockers",
+          popover: {
+            title: "Unblockers",
+            description: "Open available site tools from this section.",
+            side: "right",
+            align: "center"
+          }
+        },
+        {
+          element: "#signInBtn",
+          popover: {
+            title: "Sign In",
+            description: "Sign in to use account-based features.",
+            side: "left",
+            align: "center"
+          }
+        },
+        {
+          element: "#settingsBtn",
+          popover: {
+            title: "Settings",
+            description: "Change themes and site preferences here.",
+            side: "left",
+            align: "center"
+          }
+        },
+        {
+          element: "#start-tour-btn",
+          popover: {
+            title: "Tour Complete",
+            description: "Use Site Tour anytime to run this guide again.",
+            side: "left",
+            align: "center"
+          }
+        }
+      ]);
+
+      tour.drive(0);
+    }, 350);
+  }
+
+  tour = driver({
+    showProgress: true,
+    animate: true,
+    overlayOpacity: 0.72,
+
+    /* Prevent click-away and Escape from ending the tour */
+    allowClose: false,
+    overlayClickBehavior: "none",
+
+    nextBtnText: "Next",
+    prevBtnText: "Back",
+    doneBtnText: "Finish",
+    progressText: "{{current}} / {{total}}",
+
+    onDestroyed: () => {
+      tourRunning = false;
+      waitingFor = null;
+    }
   });
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const startTourBtn = document.getElementById("start-tour-btn");
+    const gamesButton = document.getElementById("nav-games");
+    const favoritesButton = document.getElementById("nav-favorites");
+    const favoriteOption = document.getElementById("ctx-favorite");
+
+    startTourBtn?.addEventListener("click", startTour);
+
+    gamesButton?.addEventListener("click", () => {
+      setTimeout(continueGamesTour, 200);
+    });
+
+    document.addEventListener("contextmenu", () => {
+      setTimeout(continueContextMenuTour, 50);
+    });
+
+    favoriteOption?.addEventListener("click", () => {
+      setTimeout(continueFavoritesTour, 150);
+    });
+
+    favoritesButton?.addEventListener("click", () => {
+      setTimeout(finishTour, 200);
+    });
+
+    const hasSeenTour = localStorage.getItem("hasSeenNullXTour");
+
+    if (!hasSeenTour) {
+      setTimeout(() => {
+        startTour();
+        localStorage.setItem("hasSeenNullXTour", "true");
+      }, 1500);
+    }
+  });
+</script>
 
   function checkFirstTimeUser() {
     const hasSeenTour = localStorage.getItem("hasSeenNullXTour");
