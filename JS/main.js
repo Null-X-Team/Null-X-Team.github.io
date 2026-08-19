@@ -124,6 +124,8 @@ let _0xData = [
   { id: "jailbreakobby", title: "jailbreakobby", url: "../Games/jailbreakobby/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "luckyblockobby", title: "luckyblockobby", url: "../Games/luckyblockobby/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+
+  { id: "ninjaobby", title: "ninjaobby", url: "../Games/ninjaobby/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
