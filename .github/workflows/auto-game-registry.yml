@@ -9,6 +9,7 @@ on:
 jobs:
   update-registry:
     runs-on: ubuntu-latest
+
     permissions:
       contents: write
       pull-requests: write
@@ -33,146 +34,229 @@ jobs:
           from pathlib import Path
 
           main_js_path = Path("JS/main.js")
-          
-          # Read existing main.js and normalize line endings to prevent false Git deletions
+          games_dir = Path("Games")
+
+          if not main_js_path.exists():
+              raise FileNotFoundError("JS/main.js was not found.")
+
+          if not games_dir.exists():
+              raise FileNotFoundError("Games folder was not found.")
+
           with open(main_js_path, "r", encoding="utf-8") as f:
               main_content = f.read().replace("\r\n", "\n")
 
-          # Find existing game URLs to avoid duplicates
-          existing_urls = re.findall(r'url:\s*["\']([^"\']+)["\']', main_content)
-          existing_urls_normalized = [u.lower().replace("\\", "/") for u in existing_urls]
+          existing_urls = re.findall(
+              r'url:\s*["\']([^"\']+)["\']',
+              main_content
+          )
 
-          games_dir = Path("Games")
-          new_entries = []
-          image_exts = {'.jpg', '.jpeg', '.png', '.gif', '.webp', '.bmp', '.svg'}
-          
-          # Define files and folders to explicitly exclude
-          excluded_urls = [
+          existing_urls_normalized = {
+              url.lower().replace("\\", "/")
+              for url in existing_urls
+          }
+
+          image_exts = {
+              ".jpg",
+              ".jpeg",
+              ".png",
+              ".gif",
+              ".webp",
+              ".bmp",
+              ".svg"
+          }
+
+          entry_file_names = {
+              "index.html",
+              "game.html",
+              "main.html"
+          }
+
+          excluded_folder_names = {
+              "gamesavedata"
+          }
+
+          excluded_urls = {
               "../games/gamesavedata/gsd.html",
               "../games/gamesavedata/auto-save.js"
-          ]
-          
-          updates_made = 0
-          lines = main_content.split('\n')
+          }
 
-          # Scan the Games folder
-          for game_folder in sorted(games_dir.iterdir()):
-              if not game_folder.is_dir() or game_folder.name.startswith('.'):
+          new_entries = []
+          updates_made = 0
+          lines = main_content.split("\n")
+          seen_urls_this_run = set()
+
+          html_candidates = sorted(
+              file
+              for file in games_dir.rglob("*.html")
+              if file.is_file()
+          )
+
+          for html_file in html_candidates:
+              relative_to_games = html_file.relative_to(games_dir)
+              relative_parts = relative_to_games.parts
+
+              if not relative_parts:
                   continue
-              
-              # Extra safety: Skip the GameSaveData folder entirely
-              if game_folder.name.lower() == "gamesavedata":
+
+              if any(
+                  part.lower() in excluded_folder_names
+                  for part in relative_parts
+              ):
                   continue
-              
-              # Find HTML file
-              html_file = None
-              for f in game_folder.rglob("*.html"):
-                  if f.name.lower() in ["index.html", "game.html", "main.html"] or "index" in f.name.lower():
-                      html_file = f
-                      break
-              if not html_file:
-                  html_files = list(game_folder.rglob("*.html"))
-                  if html_files:
-                      html_file = html_files[0]
-              if not html_file:
+
+              file_name = html_file.name.lower()
+
+              is_game_entry = (
+                  file_name in entry_file_names
+                  or "index" in file_name
+              )
+
+              if not is_game_entry:
                   continue
-              
-              url_path = str(html_file).replace("\\", "/")
-              if not url_path.startswith("../"):
-                  url_path = "../" + url_path
-              
-              # Skip excluded files
-              if url_path.lower() in excluded_urls:
+
+              url_path = "../" + html_file.as_posix()
+              normalized_url = url_path.lower().replace("\\", "/")
+
+              if normalized_url in excluded_urls:
                   continue
-              
-              # Find image file
-              image_file = None
-              for f in game_folder.rglob("*"):
-                  if f.suffix.lower() in image_exts:
-                      image_file = f
-                      break
-              
+
+              if normalized_url in seen_urls_this_run:
+                  continue
+
+              seen_urls_this_run.add(normalized_url)
+
+              game_folder = html_file.parent
+              folder_parts = game_folder.relative_to(games_dir).parts
+
+              if not folder_parts:
+                  continue
+
+              title_parts = [
+                  part.replace("_", " ").replace("-", " ")
+                  for part in folder_parts
+              ]
+
+              folder_name = " - ".join(title_parts)
+
+              image_file = next(
+                  (
+                      file
+                      for file in sorted(game_folder.rglob("*"))
+                      if file.is_file()
+                      and file.suffix.lower() in image_exts
+                  ),
+                  None
+              )
+
               image_path = None
+
               if image_file:
-                  image_path = str(image_file).replace("\\", "/")
-                  if not image_path.startswith("../"):
-                      image_path = "../" + image_path
-              
-              # Update existing entries if they are missing an image
-              if url_path.lower() in existing_urls_normalized:
+                  image_path = "../" + image_file.as_posix()
+
+              if normalized_url in existing_urls_normalized:
                   if image_path:
                       for i, line in enumerate(lines):
-                          if f'"{url_path}"' in line or f"'{url_path}'" in line:
-                              # If there is no image tag yet, safely inject it
-                              if 'image:' not in line:
-                                  last_brace = line.rfind('}')
-                                  if last_brace != -1:
-                                      lines[i] = line[:last_brace] + f', image: "{image_path}" ' + line[last_brace:]
-                                      updates_made += 1
+                          url_exists_on_line = (
+                              f'"{url_path}"' in line
+                              or f"'{url_path}'" in line
+                          )
+
+                          if url_exists_on_line and "image:" not in line:
+                              last_brace = line.rfind("}")
+
+                              if last_brace != -1:
+                                  lines[i] = (
+                                      line[:last_brace]
+                                      + f', image: "{image_path}" '
+                                      + line[last_brace:]
+                                  )
+
+                                  updates_made += 1
+
                   continue
-              
-              # Process NEW games only
-              folder_name = game_folder.name
-              game_id = re.sub(r'[^a-zA-Z0-9]', '_', folder_name.lower())
-              if game_id.startswith('_'):
-                  game_id = game_id[1:]
+
+              game_id = re.sub(
+                  r"[^a-zA-Z0-9]+",
+                  "_",
+                  "_".join(folder_parts).lower()
+              ).strip("_")
+
               if not game_id:
                   game_id = f"game_new_{len(new_entries)}"
-              
-              # Build the new JS string
-              js_line = f'  {{ id: "{game_id}", title: "{folder_name}", url: "{url_path}", desc: "Coming soon. Edit this description in main.js.", popular: true'
+
+              js_line = (
+                  f'  {{ id: "{game_id}", '
+                  f'title: "{folder_name}", '
+                  f'url: "{url_path}", '
+                  f'desc: "Coming soon. Edit this description in main.js.", '
+                  f'popular: true'
+              )
+
               if image_path:
                   js_line += f', image: "{image_path}"'
+
               js_line += " },"
+
               new_entries.append(js_line)
 
-          # Rebuild the file content with any image updates
-          main_content = '\n'.join(lines)
+          main_content = "\n".join(lines)
 
-          # Inject new games right before the closing bracket ];
           if new_entries or updates_made > 0:
               if new_entries:
-                  pattern = r'(let _0xData = \[.*?)(];)'
-                  
+                  pattern = r"(let _0xData = \[.*?)(];)"
+
                   def insert_new_games(match):
-                      return match.group(1) + "\n" + "\n".join(new_entries) + "\n];"
-                  
-                  updated_content = re.sub(pattern, insert_new_games, main_content, flags=re.DOTALL)
+                      return (
+                          match.group(1)
+                          + "\n"
+                          + "\n".join(new_entries)
+                          + "\n];"
+                      )
+
+                  updated_content = re.sub(
+                      pattern,
+                      insert_new_games,
+                      main_content,
+                      flags=re.DOTALL
+                  )
               else:
                   updated_content = main_content
-                  
-              with open(main_js_path, "w", encoding="utf-8") as f:
+
+              with open(main_js_path, "w", encoding="utf-8", newline="\n") as f:
                   f.write(updated_content)
-              print(f"Successfully added {len(new_entries)} new game(s) and updated {updates_made} existing image(s)!")
+
+              print(
+                  f"Successfully added {len(new_entries)} new game(s) "
+                  f"and updated {updates_made} existing image(s)."
+              )
           else:
-              print("No new games or images found. Everything is up to date!")
-              
-          # Export the exact number of image updates we intentionally made
-          with open(os.environ['GITHUB_OUTPUT'], "a") as f:
+              print("No new games or images found. Everything is up to date.")
+
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write(f"updates_made={updates_made}\n")
+              f.write(f"new_games={len(new_entries)}\n")
           EOF
 
       - name: Verify Deletions
         id: verify
         run: |
-          # Use git to check how many lines Git thinks were deleted
           DELETIONS=$(git diff --numstat JS/main.js | awk '{print $2}')
-          DELETIONS=${DELETIONS:-0} # If empty, make it 0
-          
-          # Get the exact number of intentional image updates from Python
+          DELETIONS=${DELETIONS:-0}
+
           INTENTIONAL_UPDATES=${{ steps.smart_update.outputs.updates_made }}
           INTENTIONAL_UPDATES=${INTENTIONAL_UPDATES:-0}
-          
-          if [ "$DELETIONS" -eq "$INTENTIONAL_UPDATES" ]; then
-            # The only "deletions" were our exact intended image updates! Perfect match.
+
+          NEW_GAMES=${{ steps.smart_update.outputs.new_games }}
+          NEW_GAMES=${NEW_GAMES:-0}
+
+          if [ "$DELETIONS" -le "$INTENTIONAL_UPDATES" ]; then
             echo "has_deletions=false" >> $GITHUB_OUTPUT
             echo "PR_TITLE=Auto-add new games to registry" >> $GITHUB_ENV
-            echo "PR_BODY=Detected new games or updated missing images. No existing data was lost." >> $GITHUB_ENV
+            echo "PR_BODY=Detected ${NEW_GAMES} new game(s) and ${INTENTIONAL_UPDATES} missing image update(s). No unexpected code deletion was detected." >> $GITHUB_ENV
           else
-            # Uh oh, Git saw MORE deletions than we intended! Trip the safety net!
             echo "has_deletions=true" >> $GITHUB_OUTPUT
-            echo "PR_TITLE=NEEDS MANUAL REVIEW: Code was unexpectedly deleted" >> $GITHUB_ENV
-            echo "PR_BODY=The automated script deleted lines in JS/main.js that were NOT part of a standard image update. Please review manually to ensure no data was accidentally removed." >> $GITHUB_ENV
+            echo "PR_TITLE=NEEDS MANUAL REVIEW: Unexpected code deletion" >> $GITHUB_ENV
+            echo "PR_BODY=Git detected ${DELETIONS} deleted line(s), but only ${INTENTIONAL_UPDATES} image update(s) were expected. Review JS/main.js before merging." >> $GITHUB_ENV
           fi
 
       - name: Create Pull Request
@@ -181,8 +265,8 @@ jobs:
         with:
           token: ${{ secrets.PAT_TOKEN }}
           commit-message: "Auto-update game registry"
-          title: ${{ env.PR_TITLE || 'Auto-add new games to registry' }}
-          body: ${{ env.PR_BODY || 'Checking for updates...' }}
+          title: ${{ env.PR_TITLE }}
+          body: ${{ env.PR_BODY }}
           branch: feature/auto-game-registry
           base: main
           delete-branch: true
