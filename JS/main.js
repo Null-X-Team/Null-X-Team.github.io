@@ -72,7 +72,7 @@ let _0xData = [
   { id: "v_x2", title: "Vex x3m 2", url: "../Games/Vex/Vexx3m2/index.html", desc: "Extreme driving mechanics combined with classic Vex obstacle formats.", popular: true , image: "../Games/Vex/Vex3/images (22).jpeg" },
   { id: "v_xm", title: "Vex x3m", url: "../Games/Vex/Vexx3m/index.html", desc: "Blast through motorcycle speed trials with tight balance adjustments.", popular: true },
   { id: "v_3", title: "Vex 3", url: "../Games/Vex/Vex3/index.html", image: "../Games/Vex/Vex3/images (22).jpeg", desc: "The iconic original entry into the parkour system.", popular: true },
-  { id: "slice_master", title: "Slice Master", url: "../Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true },
+  { id: "slice_master", title: "Slice Master", url: "../Games/slicemaster/index.html", desc: "Flip your blades accurately to chop items clean in half down the line.", popular: true , image: "../Games/slicemaster/images (2).jpeg" },
   { id: "skinwalker", title: "Skinwalker", url: "../Games/skinwalker/index.html", desc: "Atmospheric survival horror centered around staying undetected outdoors.", popular: true },
   { id: "skib_shooter", title: "Skib Shooters", url: "../Games/skibshooter/index.html", desc: "Dynamic target arena where waves of attackers stream in continuously.", popular: true },
   { id: "ragdoll_drop", title: "Ragdoll Drop", url: "../Games/ragdrop/index.html", jsbin: "https://codepen.io/Glaeesas/embed/OPWZjEg?default-tab=result&theme-id=dark", isEmbedCode: true, desc: "Drop your structural targets down pins to clear high score records.", popular: true },
