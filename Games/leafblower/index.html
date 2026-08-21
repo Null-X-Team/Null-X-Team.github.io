@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Leaf Blower Revolution</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+    canvas { display: block; width: 100vw; height: 100vh; object-fit: contain; }
+    #loading { position: fixed; inset: 0; background: #111; color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: sans-serif; font-size: 18px; z-index: 999; gap: 16px; }
+    #loading-bar-wrap { width: 300px; height: 10px; background: #333; border-radius: 5px; overflow: hidden; }
+    #loading-bar { height: 100%; width: 0%; background: #4af; transition: width 0.2s; border-radius: 5px; }
+    #loading.hidden { display: none; }
+  </style>
+  <script>
+    var CDN = 'https://cdn.jsdelivr.net/gh/eazy-man/shHH@main/leaf/';
+
+    (function() {
+      var SUPPRESS = 'uninitialised yyal';
+      ['error','warn','log'].forEach(function(m) {
+        var orig = console[m].bind(console);
+        console[m] = function() {
+          if (typeof arguments[0] === 'string' && arguments[0].indexOf(SUPPRESS) !== -1) return;
+          orig.apply(console, arguments);
+        };
+      });
+    })();
+
+    var _fileCache = {};
+    function _fetchFile(name) {
+      if (_fileCache[name]) return _fileCache[name];
+      if (name === 'game.unx') {
+        _fileCache[name] = Promise.all([
+          fetch(CDN + 'game.unx.part1').then(function(r) { return r.arrayBuffer(); }),
+          fetch(CDN + 'game.unx.part2').then(function(r) { return r.arrayBuffer(); }),
+          fetch(CDN + 'game.unx.part3').then(function(r) { return r.arrayBuffer(); })
+        ]).then(function(parts) {
+          var total = parts.reduce(function(n, p) { return n + p.byteLength; }, 0);
+          var merged = new Uint8Array(total);
+          var offset = 0;
+          parts.forEach(function(p) { merged.set(new Uint8Array(p), offset); offset += p.byteLength; });
+          return merged.buffer;
+        });
+        return _fileCache[name];
+      }
+      _fileCache[name] = fetch(CDN + name).then(function(r) {
+        if (!r.ok) throw new Error('Failed to fetch ' + name);
+        return r.arrayBuffer();
+      });
+      return _fileCache[name];
+    }
+
+    window.oprt = {
+      gameFiles: {
+        keys: function() { return Promise.resolve([]); },
+        fetchAndCache: function(fileId, version, request) {
+          var name = fileId.split(':')[0];
+          return _fetchFile(name).then(function(buf) { return new Response(buf); });
+        },
+        match: function(fileId, version) {
+          var name = fileId.split(':')[0];
+          return _fetchFile(name).then(function(buf) { return new Response(buf); });
+        },
+        delete: function() { return Promise.resolve(); }
+      },
+      gameStorage: {
+        open: function(path) {
+          var prefix = 'gmsave:' + path + ':';
+          return {
+            path: path,
+            list: function() {
+              var entries = {};
+              for (var i = 0; i < localStorage.length; i++) {
+                var k = localStorage.key(i);
+                if (k && k.indexOf(prefix) === 0) {
+                  var name = k.slice(prefix.length);
+                  entries[name] = { timestamp: new Date(0), contents: localStorage.getItem(k) };
+                }
+              }
+              return Promise.resolve(entries);
+            },
+            getItem: function(name) { return Promise.resolve(localStorage.getItem(prefix + name)); },
+            setItem: function(name, data) { localStorage.setItem(prefix + name, data); return Promise.resolve(); },
+            removeItem: function(name) { localStorage.removeItem(prefix + name); return Promise.resolve(); },
+            close: function() {}
+          };
+        }
+      }
+    };
+
+    (function() {
+      var OrigAC = window.AudioContext || window.webkitAudioContext;
+      if (!OrigAC) return;
+      var workletCode = `registerProcessor('audio-worklet',class extends AudioWorkletProcessor{constructor(){super();this.shouldExit=false;this.port.onmessage=(event)=>{this.shouldExit=event.data;};}Float32ToInt16(n){return(n>0)?n*32767:n*32768;}process(inputs,outputs,parameters){const input=inputs[0];const output=[];if(input[0]!=undefined){for(let i=0;i<input[0].length;++i){const sample=this.Float32ToInt16(input[0][i]);output.push(sample);}this.port.postMessage(output);}return(!this.shouldExit);}});`;
+      var workletBlobURL = URL.createObjectURL(new Blob([workletCode], {type:'application/javascript'}));
+      var instances = [];
+      function resumeAll() {
+        instances.forEach(function(ctx) { if (ctx && ctx.state === 'suspended') ctx.resume(); });
+      }
+      ['click','pointerdown','mousedown','keydown','touchstart'].forEach(function(ev) {
+        document.addEventListener(ev, resumeAll, {capture:true});
+      });
+      function patchContext(ctx) {
+        instances.push(ctx);
+        var origAddModule = ctx.audioWorklet.addModule.bind(ctx.audioWorklet);
+        ctx.audioWorklet.addModule = function(url) {
+          if (typeof url === 'string' && (url.indexOf('audio-worklet') !== -1 || url.startsWith('file:')))
+            return origAddModule(workletBlobURL);
+          return origAddModule(url);
+        };
+        return ctx;
+      }
+      var PatchedAC = function(opts) { return patchContext(opts ? new OrigAC(opts) : new OrigAC()); };
+      Object.setPrototypeOf(PatchedAC, OrigAC);
+      PatchedAC.prototype = OrigAC.prototype;
+      window.AudioContext = PatchedAC;
+      if (window.webkitAudioContext) window.webkitAudioContext = PatchedAC;
+    })();
+  </script>
+</head>
+<body>
+  <div id="loading">
+    <div>Loading Leaf Blower Revolution...</div>
+    <div id="loading-bar-wrap"><div id="loading-bar"></div></div>
+    <div id="loading-status">Initializing...</div>
+  </div>
+  <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+  <script>
+    var Module = {
+      canvas: (function() {
+        var canvas = document.getElementById('canvas');
+        canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. Please reload.'); e.preventDefault(); }, false);
+        return canvas;
+      })(),
+      setStatus: function(text) {
+        var el = document.getElementById('loading-status');
+        if (el) el.textContent = text || 'Running...';
+      },
+      monitorRunDependencies: function(left) {
+        var bar = document.getElementById('loading-bar');
+        if (!Module._totalDeps) Module._totalDeps = left;
+        if (bar && Module._totalDeps > 0) bar.style.width = Math.round((1 - left / Module._totalDeps) * 100) + '%';
+        if (left === 0) { var o = document.getElementById('loading'); if (o) o.classList.add('hidden'); }
+      },
+      onRuntimeInitialized: function() {
+        var o = document.getElementById('loading'); if (o) o.classList.add('hidden');
+      },
+      print:    function(t) { console.log(t); },
+      printErr: function(t) { console.error(t); },
+      locateFile: function(path) { return CDN + path; },
+      noInitialRun: false,
+    };
+    window.manifestFiles = function() { return "runner.data;runner.js;runner.wasm;audio-worklet.js;game.unx"; };
+    window.manifestFilesMD5 = function() { return "376106ee3abe5c122a94eb521c669f06;3c9d7e5d0fca31379217e19ef59052dc;9f2d2ae08c0bc749b040f83f74427502;e8f1e8db8cf996f8715a6f2164c2e44e;c920d3b018092c41fb0a1619af598ba5"; };
+    var g_pAddAsyncMethod = 0;
+    window.setAddAsyncMethod = function(ptr) { g_pAddAsyncMethod = ptr; };
+    window.__gx_prepare_cache = function(a) {
+      if (window.C && window.C.__gx_prepare_cache) return window.C.__gx_prepare_cache(a);
+      return Promise.resolve({cachedFiles:{}, allFiles:[]});
+    };
+    window.__gx_check_cache = function(a, b) {
+      if (window.C && window.C.__gx_check_cache) return window.C.__gx_check_cache(a, b);
+      return false;
+    };
+    window.__gx_async_wget2 = function(a, b, c, d, e, f, g, h) {
+      if (window.C && window.C.__gx_async_wget2) return window.C.__gx_async_wget2(a, b, c, d, e, f, g, h);
+    };
+    window.gxc_request_room = function() {};
+    window.gxc_join_room = function() {};
+    window.__call_override_script_function = function() { return ""; };
+    window.hasJSExceptionHandler = function() { return false; };
+    window.doJSExceptionHandler = function() {};
+    window.onGameSetWindowSize = function() {};
+    window.g_pWadLoadCallback = null;
+    window.g_stackEXTEnv = [];
+  </script>
+  <script src="https://cdn.jsdelivr.net/gh/eazy-man/shHH@main/leaf/runner.js"></script>
+</body>
+</html>
