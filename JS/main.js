@@ -132,6 +132,8 @@ let _0xData = [
   { id: "obbyforbrainrot", title: "obbyforbrainrot", url: "../Games/obbyforbrainrot/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "leafblower", title: "leafblower", url: "../Games/leafblower/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/leafblower/images (11).jpeg" },
+
+  { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
