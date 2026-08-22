@@ -41,6 +41,7 @@ let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "../Games/brotatoAPNG/Brotato.html", image: "../Games/brotatoAPNG/images (23).jpeg", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
 { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Clover Pit is a roguelite gambling game where you spin, bet, and chase huge payouts while trying not to go broke.", popular: true , image: "../Games/cloverpit/images.jpeg" },
     { id: "feedingablackhole", title: "Feeding A Black Hole", url: "../Games/feedingablackhole/index.html", desc: "Feed a growing black hole, consume objects, and explore the world to become bigger and more powerful.", popular: true, image: "../Games/feedingablackhole/images (1).jpeg" },
+    { id: "deadsignal", title: "DeadSignal", url: "../Games/DeadSignal/index.html", desc: "A Null-X-Team Special Creation!", popular: true },
   { id: "y_io", title: "Yohoho.io", url: "../Games/yohoho/index.html", image: "../Games/yohoho/images (24).jpeg", desc: "A pirate battle royale game where you collect gold and fight opponents.", popular: true },
   { id: "b_er", title: "Bitcoin Clicker", url: "../Games/Bitcoin/index.html", image: "../Games/Bitcoin/images (4).jpeg", jsbin: "https://glaxyias.github.io/Bitcoin-clicker/", isEmbedCode: true, desc: "A Homemade Special.", popular: true },
   { id: "s_lp", title: "Slope", url: "../Games/slope/index.html", image: "../Games/slope/images (25).jpeg", desc: "A fast-paced 3D platformer. Stay on the track!", popular: true },
@@ -136,8 +137,6 @@ let _0xData = [
   { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "halflife", title: "halflife", url: "../Games/halflife/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-
-  { id: "deadsignal", title: "DeadSignal", url: "../Games/DeadSignal/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
