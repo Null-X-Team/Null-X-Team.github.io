@@ -2,8 +2,6 @@
 (function () {
     const IMG_MARKER = "[[IMG]]";
 
-    // Override message body rendering so clicks open the in-page lightbox
-    // (chat.js also patched to call openImageLightbox directly)
     window.renderMessageBody = function (content) {
         if (typeof content === "string" && content.startsWith(IMG_MARKER)) {
             const url = content.slice(IMG_MARKER.length);
@@ -184,4 +182,35 @@
     } else {
         bindOnce();
     }
+})();
+
+// Rewrite attached images so they open the lightbox even if chat.js uses window.open
+(function watchChatImages() {
+    function upgrade(img) {
+        if (!img || img.dataset.lbUpgraded === "1") return;
+        if (!img.classList.contains("chat-attached-image")) return;
+        img.dataset.lbUpgraded = "1";
+        img.title = img.title || "Click to enlarge";
+        img.addEventListener("click", function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+            var src = img.getAttribute("data-full-src") || img.src;
+            if (window.openImageLightbox) window.openImageLightbox(src);
+        }, true);
+        img.removeAttribute("onclick");
+    }
+    function scan(root) {
+        (root.querySelectorAll ? root.querySelectorAll("img.chat-attached-image") : []).forEach(upgrade);
+    }
+    scan(document);
+    var mo = new MutationObserver(function (mutations) {
+        mutations.forEach(function (m) {
+            m.addedNodes.forEach(function (n) {
+                if (n.nodeType !== 1) return;
+                if (n.matches && n.matches("img.chat-attached-image")) upgrade(n);
+                scan(n);
+            });
+        });
+    });
+    mo.observe(document.documentElement, { childList: true, subtree: true });
 })();
