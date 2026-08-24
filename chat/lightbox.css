@@ -1,0 +1,117 @@
+/* IMAGE LIGHTBOX (click-to-enlarge + zoom) */
+.image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 300000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    pointer-events: auto;
+}
+.image-lightbox.hidden { display: none !important; }
+
+.image-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    cursor: zoom-out;
+}
+
+.image-lightbox-toolbar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    padding: 8px 14px;
+    background: var(--bg-panel);
+    border: 1px solid var(--accent-border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+.image-lightbox-toolbar button {
+    background: #2a1f1a;
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+    width: auto;
+    min-width: 36px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    line-height: 1;
+}
+.image-lightbox-toolbar button:hover {
+    color: white;
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+.lightbox-close-btn {
+    margin-left: 8px;
+    color: #ff8888 !important;
+}
+.lightbox-close-btn:hover {
+    color: #ff4444 !important;
+    border-color: #ff4444 !important;
+}
+
+#lightbox-zoom-label {
+    min-width: 52px;
+    text-align: center;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    user-select: none;
+}
+
+.image-lightbox-stage {
+    position: relative;
+    z-index: 1;
+    max-width: 92vw;
+    max-height: 78vh;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    border-radius: 8px;
+    touch-action: none;
+}
+.image-lightbox-stage.is-dragging {
+    cursor: grabbing;
+}
+
+#lightbox-img {
+    max-width: 92vw;
+    max-height: 78vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    transform-origin: center center;
+    user-select: none;
+    -webkit-user-drag: none;
+    transition: transform 0.05s ease-out;
+}
+
+.image-lightbox-hint {
+    position: relative;
+    z-index: 2;
+    margin: 14px 0 0;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-align: center;
+    pointer-events: none;
+}
+
+.message-text-bubble img.chat-attached-image {
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.message-text-bubble img.chat-attached-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 2px var(--accent);
+}
