@@ -370,3 +370,103 @@
 --text-main: #f2f2f2;
 --text-muted: #a6a6a6;
 }
+/* ==========================================================
+   ANIMATED THEMES PACK (6 NEW THEMES)
+   ========================================================== */
+
+/* 34. ELECTRIC SURGE */
+@keyframes surge-pulse {
+  0%, 100% { --accent-color: #00aaff; --accent-hover: #33cfff; }
+  50% { --accent-color: #0088ff; --accent-hover: #55d4ff; }
+}
+[data-theme="surge"], body.theme-surge {
+  --bg-dashboard: #02040a;
+  --bg-sidebar: #060b14;
+  --border-color: rgba(0, 170, 255, 0.25);
+  --text-main: #e6f7ff;
+  --text-muted: #7fa3c2;
+  animation: surge-pulse 3s infinite ease-in-out;
+}
+
+/* 35. VOID RIPPLE */
+@keyframes void-ripple {
+  0% { --accent-color: #5500ff; }
+  25% { --accent-color: #330088; }
+  50% { --accent-color: #110033; }
+  75% { --accent-color: #330088; }
+  100% { --accent-color: #5500ff; }
+}
+[data-theme="void"], body.theme-void {
+  --bg-dashboard: #050007;
+  --bg-sidebar: #0a0010;
+  --accent-hover: #7f33ff;
+  --border-color: rgba(85, 0, 255, 0.25);
+  --text-main: #f0e6ff;
+  --text-muted: #8c6fa8;
+  animation: void-ripple 5s infinite linear;
+}
+
+/* 36. AETHER FLOW */
+@keyframes aether-flow {
+  0% { --accent-color: #66ffe0; }
+  50% { --accent-color: #99ffea; }
+  100% { --accent-color: #66ffe0; }
+}
+[data-theme="aether"], body.theme-aether {
+  --bg-dashboard: #0a0f12;
+  --bg-sidebar: #101820;
+  --accent-hover: #b3fff2;
+  --border-color: rgba(102, 255, 224, 0.25);
+  --text-main: #eafff7;
+  --text-muted: #9bb3b8;
+  animation: aether-flow 6s infinite ease-in-out;
+}
+
+/* 37. INFERNO BREATH */
+@keyframes inferno-flicker {
+  0%, 100% { --accent-color: #ff3300; }
+  40% { --accent-color: #ff5500; }
+  60% { --accent-color: #ff2200; }
+}
+[data-theme="inferno"], body.theme-inferno {
+  --bg-dashboard: #140600;
+  --bg-sidebar: #240a02;
+  --accent-hover: #ff7733;
+  --border-color: rgba(255, 51, 0, 0.25);
+  --text-main: #ffe6d9;
+  --text-muted: #b38a7a;
+  animation: inferno-flicker 1.8s infinite ease-in-out;
+}
+
+/* 38. CRYO PULSE */
+@keyframes cryo-pulse {
+  0%, 100% { --accent-color: #00eaff; }
+  50% { --accent-color: #66f7ff; }
+}
+[data-theme="cryo"], body.theme-cryo {
+  --bg-dashboard: #0b1418;
+  --bg-sidebar: #132228;
+  --accent-hover: #99faff;
+  --border-color: rgba(0, 234, 255, 0.25);
+  --text-main: #e6fdff;
+  --text-muted: #8ca3a6;
+  animation: cryo-pulse 3.5s infinite ease-in-out;
+}
+
+/* 39. TECHNOMORPH */
+@keyframes techno-sweep {
+  0% { --accent-color: #00ff88; }
+  33% { --accent-color: #00ffaa; }
+  66% { --accent-color: #00ffcc; }
+  100% { --accent-color: #00ff88; }
+}
+[data-theme="techno"], body.theme-techno {
+  --bg-dashboard: #040d08;
+  --bg-sidebar: #0a1a11;
+  --accent-hover: #55ffcc;
+  --border-color: rgba(0, 255, 136, 0.25);
+  --text-main: #e6fff5;
+  --text-muted: #7fb3a3;
+  animation: techno-sweep 4s infinite linear;
+}
+
