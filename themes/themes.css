@@ -278,3 +278,95 @@
   --text-main: #fff7e6;
   --text-muted: #948269;
 }
+/*24. Cosmic*/
+[data-theme="cosmic"], body.theme-cosmic {
+--bg-dashboard: #05010a;
+--bg-sidebar: #0b0414;
+--accent-color: #7f00ff;
+--accent-hover: #b266ff;
+--border-color: rgba(127, 0, 255, 0.25);
+--text-main: #e6d7ff;
+--text-muted: #8c6fa8;
+}
+/* Magma */
+[data-theme="magma"], body.theme-magma {
+--bg-dashboard: #1a0a00;
+--bg-sidebar: #260f02;
+--accent-color: #ff3b00;
+--accent-hover: #ff6a33;
+--border-color: rgba(255, 59, 0, 0.25);
+--text-main: #ffe6d9;
+--text-muted: #b38a7a;
+}
+[data-theme="glacial"], body.theme-glacial {
+--bg-dashboard: #0a1116;
+--bg-sidebar: #122028;
+--accent-color: #7fe9ff;
+--accent-hover: #b3f4ff;
+--border-color: rgba(127, 233, 255, 0.25);
+--text-main: #e9fcff;
+--text-muted: #9bb3b8;
+}
+[data-theme="titanium"], body.theme-titanium {
+--bg-dashboard: #0c0c0e;
+--bg-sidebar: #161618;
+--accent-color: #c0c0c0;
+--accent-hover: #e0e0e0;
+--border-color: rgba(192, 192, 192, 0.25);
+--text-main: #f5f5f5;
+--text-muted: #8c8c8c;
+}
+[data-theme="aurora"], body.theme-aurora {
+--bg-dashboard: #050a12;
+--bg-sidebar: #0c1520;
+--accent-color: #00ffa6;
+--accent-hover: #66ffcc;
+--border-color: rgba(0, 255, 166, 0.25);
+--text-main: #eafff7;
+--text-muted: #7fb3a3;
+}
+[data-theme="starforge"], body.theme-starforge {
+--bg-dashboard: #0a0014;
+--bg-sidebar: #140024;
+--accent-color: #ff00c8;
+--accent-hover: #ff4dd9;
+--border-color: rgba(255, 0, 200, 0.25);
+--text-main: #f7e6ff;
+--text-muted: #a66fb3;
+}
+[data-theme="lab"], body.theme-lab {
+--bg-dashboard: #0d0f12;
+--bg-sidebar: #181b20;
+--accent-color: #c8e6ff;
+--accent-hover: #e1f3ff;
+--border-color: rgba(200, 230, 255, 0.25);
+--text-main: #f5faff;
+--text-muted: #9aa6b3;
+}
+[data-theme="dragon"], body.theme-dragon {
+--bg-dashboard: #0b0f08;
+--bg-sidebar: #141c10;
+--accent-color: #cc0000;
+--accent-hover: #ff3333;
+--border-color: rgba(204, 0, 0, 0.25);
+--text-main: #f7e6e6;
+--text-muted: #a67a7a;
+}
+[data-theme="storm"], body.theme-storm {
+--bg-dashboard: #0a0d12;
+--bg-sidebar: #141820;
+--accent-color: #7fb2ff;
+--accent-hover: #a6caff;
+--border-color: rgba(127, 178, 255, 0.25);
+--text-main: #eaf1ff;
+--text-muted: #8c9bb3;
+}
+[data-theme="chrome"], body.theme-chrome {
+--bg-dashboard: #0c0c0c;
+--bg-sidebar: #1a1a1a;
+--accent-color: #d9d9d9;
+--accent-hover: #ffffff;
+--border-color: rgba(217, 217, 217, 0.25);
+--text-main: #f2f2f2;
+--text-muted: #a6a6a6;
+}
