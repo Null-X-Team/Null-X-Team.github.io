@@ -1,7 +1,29 @@
 // Master Dynamic Theme Switcher Engine
 // Keeps data-theme, theme-* body classes, and storage keys in sync.
+// Also guards against debug.js leaking --nx-* vars onto :root.
+
+function nxScopeDebugStyles() {
+  const style = document.getElementById('nx-v102-styles');
+  if (!style || !style.textContent) return;
+  if (style.dataset.nxScoped === '1') return;
+  // Debug menu used to inject :root{--nx-accent:...} which overwrote site theme colors.
+  // Scope those variables to the debug UI only.
+  style.textContent = style.textContent.replace(
+    /:root\s*\{(--nx-[^}]+)\}/,
+    '#nx-hud,#nx-trigger,#nx-inspector-overlay,#nx-toast-wrap,#nx-matrix-canvas,.nx-toast-wrap{$1}'
+  );
+  style.dataset.nxScoped = '1';
+  // Clear any leaked inline/custom props on the document root
+  const root = document.documentElement;
+  ['--nx-bg','--nx-panel','--nx-border','--nx-accent','--nx-text','--nx-muted','--nx-danger','--nx-warning','--nx-success'].forEach(function (v) {
+    root.style.removeProperty(v);
+  });
+}
+
 window.applyTheme = function(themeName) {
   const name = themeName || 'default';
+
+  nxScopeDebugStyles();
 
   // Remove previous theme-* classes
   const classesToRemove = Array.from(document.body.classList).filter(cls =>
@@ -11,7 +33,7 @@ window.applyTheme = function(themeName) {
 
   // Apply class for themes.css selectors that use body.theme-*
   if (name && name !== 'default') {
-    document.body.classList.add(`theme-${name}`);
+    document.body.classList.add('theme-' + name);
   }
 
   // Apply data-theme for themes.css selectors that use [data-theme="..."]
@@ -25,6 +47,13 @@ window.applyTheme = function(themeName) {
 };
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Run guard early and keep watching in case debug injects styles later
+  nxScopeDebugStyles();
+  try {
+    const mo = new MutationObserver(function () { nxScopeDebugStyles(); });
+    mo.observe(document.head || document.documentElement, { childList: true, subtree: true });
+  } catch (e) {}
+
   const savedTheme =
     localStorage.getItem('selectedTheme') ||
     localStorage.getItem('nullx-theme') ||
