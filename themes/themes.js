@@ -1,23 +1,42 @@
 // Master Dynamic Theme Switcher Engine
+// Keeps data-theme, theme-* body classes, and storage keys in sync.
 window.applyTheme = function(themeName) {
+  const name = themeName || 'default';
+
+  // Remove previous theme-* classes
   const classesToRemove = Array.from(document.body.classList).filter(cls =>
     cls.startsWith('theme-')
   );
   classesToRemove.forEach(cls => document.body.classList.remove(cls));
-  if (themeName && themeName !== 'default') {
-    document.body.classList.add(`theme-${themeName}`);
+
+  // Apply class for themes.css selectors that use body.theme-*
+  if (name && name !== 'default') {
+    document.body.classList.add(`theme-${name}`);
   }
-  localStorage.setItem('nullx-theme', themeName);
+
+  // Apply data-theme for themes.css selectors that use [data-theme="..."]
+  document.documentElement.setAttribute('data-theme', name);
+  document.body.setAttribute('data-theme', name);
+
+  // Keep all historical storage keys in sync so settings/debug/newsettings agree
+  localStorage.setItem('nullx-theme', name);
+  localStorage.setItem('selectedTheme', name);
+  localStorage.setItem('nxos_theme', name);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  const savedTheme = localStorage.getItem('nullx-theme') || 'default';
+  const savedTheme =
+    localStorage.getItem('selectedTheme') ||
+    localStorage.getItem('nullx-theme') ||
+    localStorage.getItem('nxos_theme') ||
+    'default';
+
   window.applyTheme(savedTheme);
 
   document.addEventListener('click', (e) => {
-    const card = e.target.closest('.theme-card');
+    const card = e.target.closest('.theme-card, .theme-option');
     if (card) {
-      const selectedTheme = card.getAttribute('data-theme');
+      const selectedTheme = card.getAttribute('data-theme') || card.dataset.theme;
       if (selectedTheme) window.applyTheme(selectedTheme);
     }
   });
