@@ -950,35 +950,13 @@
             }
 
             autoSaveTimer = setInterval(() => {
-                if (
-                    isEducationalCloakActive() ||
-                    exportPaused ||
-                    !hasCompletedImportForCurrentUser() ||
-                    isProgressCacheEmpty()
-                ) {
+                if (window.isCloudExportPaused()) {
                     return;
                 }
 
+                // Automatic background save to cloud.
                 window.cloudSave('dashboard-sync-msg', false);
-            }, 30000);
-        }, 5000);
-    });
-
-    window.addEventListener('beforeunload', () => {
-        /*
-         * Do not depend on an async fetch here for important data; browsers
-         * may terminate it. This is only a best-effort final autosave.
-         */
-        if (
-            exportPaused ||
-            !autoSaveReady ||
-            isEducationalCloakActive() ||
-            !hasCompletedImportForCurrentUser() ||
-            isProgressCacheEmpty()
-        ) {
-            return;
-        }
-
-        window.cloudSave(null, false);
+            }, 60000); // every 60 seconds
+        }, 5000); // initial grace period before auto-save becomes eligible
     });
 })();
