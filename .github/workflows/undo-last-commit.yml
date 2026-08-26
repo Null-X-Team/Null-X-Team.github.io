@@ -1,0 +1,26 @@
+name: Undo Last Commit
+
+on:
+  workflow_dispatch:
+
+jobs:
+  undo:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Revert last commit
+        run: |
+          git revert HEAD --no-edit
+          git push
