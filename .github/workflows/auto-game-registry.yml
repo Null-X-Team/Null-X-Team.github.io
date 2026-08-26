@@ -56,12 +56,19 @@ jobs:
           }
 
           image_exts = {
-              ".jpg", ".jpeg", ".png", ".gif",
-              ".webp", ".bmp", ".svg"
+              ".jpg",
+              ".jpeg",
+              ".png",
+              ".gif",
+              ".webp",
+              ".bmp",
+              ".svg"
           }
 
           entry_file_names = {
-              "index.html", "game.html", "main.html"
+              "index.html",
+              "game.html",
+              "main.html"
           }
 
           excluded_folder_names = {
@@ -196,9 +203,7 @@ jobs:
 
           if new_entries or updates_made > 0:
               if new_entries:
-                  pattern = r"(let _0xData = 
-
-\[)([\s\S]*?)(];)"
+                  pattern = r"(let _0xData = \[.*?)(];)"
 
                   def insert_new_games(match):
                       return (
@@ -232,20 +237,42 @@ jobs:
               f.write(f"new_games={len(new_entries)}\n")
           EOF
 
+      - name: Verify Deletions
+        id: verify
+        run: |
+          DELETIONS=$(git diff --numstat JS/main.js | awk '{print $2}')
+          DELETIONS=${DELETIONS:-0}
+
+          INTENTIONAL_UPDATES=${{ steps.smart_update.outputs.updates_made }}
+          INTENTIONAL_UPDATES=${INTENTIONAL_UPDATES:-0}
+
+          NEW_GAMES=${{ steps.smart_update.outputs.new_games }}
+          NEW_GAMES=${NEW_GAMES:-0}
+
+          if [ "$DELETIONS" -le "$INTENTIONAL_UPDATES" ]; then
+            echo "has_deletions=false" >> $GITHUB_OUTPUT
+            echo "PR_TITLE=Auto-add new games to registry" >> $GITHUB_ENV
+            echo "PR_BODY=Detected ${NEW_GAMES} new game(s) and ${INTENTIONAL_UPDATES} missing image update(s). No unexpected code deletion was detected." >> $GITHUB_ENV
+          else
+            echo "has_deletions=true" >> $GITHUB_OUTPUT
+            echo "PR_TITLE=NEEDS MANUAL REVIEW: Unexpected code deletion" >> $GITHUB_ENV
+            echo "PR_BODY=Git detected ${DELETIONS} deleted line(s), but only ${INTENTIONAL_UPDATES} image update(s) were expected. Review JS/main.js before merging." >> $GITHUB_ENV
+          fi
+
       - name: Create Pull Request
         id: cpr
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.PAT_TOKEN }}
           commit-message: "Auto-update game registry"
-          title: "Auto-add new games to registry"
-          body: "Automatically updated game registry."
+          title: ${{ env.PR_TITLE }}
+          body: ${{ env.PR_BODY }}
           branch: feature/auto-game-registry
           base: main
           delete-branch: true
 
       - name: Auto-Merge Pull Request
-        if: steps.cpr.outputs.pull-request-operation == 'created'
+        if: steps.cpr.outputs.pull-request-operation == 'created' && steps.verify.outputs.has_deletions == 'false'
         run: gh pr merge --merge --delete-branch "${{ steps.cpr.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
