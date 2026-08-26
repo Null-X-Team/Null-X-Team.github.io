@@ -406,65 +406,183 @@ function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (game) {
     const rootUrl = "https://glaxyias.github.io/";
-    const gameTab = window.open('about:blank', '_blank');
+    const gameTab = window.open("about:blank", "_blank");
 
     if (gameTab) {
       gameTab.document.title = "Google Docs";
       gameTab.document.open();
 
-      if (game.isEmbedCode) {
-        // Enforcing sandbox security parameters to prevent escapes/top window redirect hijacking
-        gameTab.document.write(`
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <title>${game.title}</title>
-            <style>
-              body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#fff; }
-              iframe { width:100%; height:100vh; display:block; border:none; }
-              .back-btn {
-                position: fixed; top: 15px; left: 15px; z-index: 99999999;
-                background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
-                padding: 8px 14px; font-weight: bold; border-radius: 6px;
-                cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
-                font-family: sans-serif; text-decoration: none; display: inline-block;
+      const isEmbed = game.isEmbedCode;
+      const gameSrc = isEmbed ? game.jsbin : (rootUrl + game.url.replace(/^\.\.\//, ""));
+
+      gameTab.document.write(`
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <title>${game.title}</title>
+          <style>
+            body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; color:#fff; }
+            iframe { width:100%; height:100vh; display:block; border:none; }
+
+            .back-btn {
+              position: fixed; top: 15px; left: 15px; z-index: 99999999;
+              background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
+              padding: 8px 14px; font-weight: bold; border-radius: 6px;
+              cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
+              font-family: sans-serif; text-decoration: none; display: inline-block;
+            }
+
+            #back-btn-hint {
+              position: fixed;
+              top: 60px;
+              left: 15px;
+              background: #0a0a0a;
+              color: #8b00ff;
+              padding: 6px 10px;
+              border: 2px solid #8b00ff;
+              border-radius: 6px;
+              font-family: sans-serif;
+              z-index: 99999999;
+              box-shadow: 0 0 10px rgba(139,0,255,0.5);
+            }
+
+            #back-btn-menu {
+              position: fixed;
+              background: #0a0a0a;
+              color: #8b00ff;
+              border: 2px solid #8b00ff;
+              border-radius: 6px;
+              padding: 6px;
+              font-family: sans-serif;
+              z-index: 99999999;
+              box-shadow: 0 0 10px rgba(139,0,255,0.5);
+            }
+
+            #back-btn-menu div {
+              padding: 4px 6px;
+              cursor: pointer;
+            }
+          </style>
+        </head>
+        <body>
+          <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
+          <iframe src="${gameSrc}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
+
+          <script>
+            // First-time hint
+            (function initBackButtonHint() {
+              if (!localStorage.getItem("backBtnHintShown")) {
+                const hint = document.createElement("div");
+                hint.id = "back-btn-hint";
+                hint.textContent = "Hate the positioning? Right-click to move it.";
+                document.body.appendChild(hint);
               }
-            </style>
-          </head>
-          <body>
-            <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
-            <iframe src="${game.jsbin}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
-          </body>
-          </html>
-        `);
-      } else {
-        const gameFullUrl = rootUrl + game.url.replace(/^\.\.\//, "");
-        gameTab.document.write(`
-          <!DOCTYPE html>
-          <html lang="en">
-          <head>
-            <meta charset="UTF-8">
-            <title>${game.title}</title>
-            <style>
-              body, html { margin:0; padding:0; width:100%; height:100%; overflow:hidden; background:#000; }
-              iframe { width:100%; height:100%; border:none; display:block; }
-              .back-btn {
-                position: fixed; top: 15px; left: 15px; z-index: 99999999;
-                background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
-                padding: 8px 14px; font-weight: bold; border-radius: 6px;
-                cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
-                font-family: sans-serif; text-decoration: none; display: inline-block;
-              }
-            </style>
-          </head>
-          <body>
-            <a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
-            <iframe src="${gameFullUrl}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
-          </body>
-          </html>
-        `);
-      }
+            })();
+
+            window.addEventListener("load", () => {
+              const backBtn = document.querySelector(".back-btn");
+              if (!backBtn) return;
+
+              backBtn.style.position = "fixed";
+
+              backBtn.addEventListener("contextmenu", (e) => {
+                e.preventDefault();
+                const hint = document.getElementById("back-btn-hint");
+                if (hint) {
+                  hint.remove();
+                  localStorage.setItem("backBtnHintShown", "true");
+                }
+                showBackBtnMenu(e.pageX, e.pageY, backBtn);
+              });
+            });
+
+            function showBackBtnMenu(x, y, backBtn) {
+              const oldMenu = document.getElementById("back-btn-menu");
+              if (oldMenu) oldMenu.remove();
+
+              const menu = document.createElement("div");
+              menu.id = "back-btn-menu";
+              menu.style.top = y + "px";
+              menu.style.left = x + "px";
+
+              const options = [
+                { label: "Top Left", pos: () => setBackBtnPos(backBtn, "15px", null, null, "15px") },
+                { label: "Top Center", pos: () => setBackBtnCenter(backBtn, "15px") },
+                { label: "Top Right", pos: () => setBackBtnPos(backBtn, "15px", null, "15px", null) },
+                { label: "Bottom Left", pos: () => setBackBtnPos(backBtn, null, "15px", null, "15px") },
+                { label: "Bottom Center", pos: () => setBackBtnCenter(backBtn, null, "15px") },
+                { label: "Bottom Right", pos: () => setBackBtnPos(backBtn, null, "15px", "15px", null) },
+                { label: "Custom (Drag)", pos: () => enableBackBtnDrag(backBtn) }
+              ];
+
+              options.forEach(opt => {
+                const item = document.createElement("div");
+                item.textContent = opt.label;
+                item.addEventListener("click", () => {
+                  opt.pos();
+                  menu.remove();
+                });
+                menu.appendChild(item);
+              });
+
+              document.body.appendChild(menu);
+
+              document.addEventListener("click", () => menu.remove(), { once: true });
+            }
+
+            function setBackBtnPos(btn, top = null, bottom = null, right = null, left = null) {
+              btn.style.top = top;
+              btn.style.bottom = bottom;
+              btn.style.right = right;
+              btn.style.left = left;
+              btn.style.transform = "";
+            }
+
+            function setBackBtnCenter(btn, top = null, bottom = null) {
+              btn.style.top = top;
+              btn.style.bottom = bottom;
+              btn.style.left = "50%";
+              btn.style.right = null;
+              btn.style.transform = "translateX(-50%)";
+            }
+
+            function enableBackBtnDrag(btn) {
+              btn.style.cursor = "move";
+              btn.style.transform = "";
+
+              let dragging = false;
+
+              const startDrag = (e) => {
+                dragging = true;
+                document.addEventListener("mousemove", drag);
+                document.addEventListener("mouseup", stopDrag);
+              };
+
+              const drag = (e) => {
+                if (!dragging) return;
+                btn.style.left = e.pageX + "px";
+                btn.style.top = e.pageY + "px";
+                btn.style.right = null;
+                btn.style.bottom = null;
+              };
+
+              const stopDrag = () => {
+                dragging = false;
+                btn.style.cursor = "pointer";
+                document.removeEventListener("mousemove", drag);
+                document.removeEventListener("mouseup", stopDrag);
+              };
+
+              btn.addEventListener("mousedown", startDrag, { once: true });
+            }
+          </script>
+        </body>
+        </html>
+      `);
+    }
+  }
+}
 
       gameTab.document.close();
       // More reliable original-tab close (browsers block the single-trick version inconsistently)
