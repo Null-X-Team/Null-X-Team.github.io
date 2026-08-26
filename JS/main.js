@@ -122,11 +122,11 @@ let _0xData = [
   { id: "airline", title: "airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
   { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
 
-  { id: "jailbreakobby", title: "jailbreakobby", url: "../Games/jailbreakobby/index.html", desc: "Parkour through a prison complex, dodge guards, and race for freedom in this high-stakes escape obby.", popular: true },
+  { id: "jailbreakobby", title: "jailbreakobby", url: "../Games/jailbreakobby/index.html", desc: "Parkour through a prison complex, dodge guards, and race for freedom in this high-stakes escape obby.", popular: true , image: "../Games/jailbreakobby/images.jpeg" },
 
-  { id: "luckyblockobby", title: "luckyblockobby", url: "../Games/luckyblockobby/index.html", desc: "Jump through obstacle courses packed with lucky blocks, random rewards, and surprise challenges.", popular: true },
+  { id: "luckyblockobby", title: "luckyblockobby", url: "../Games/luckyblockobby/index.html", desc: "Jump through obstacle courses packed with lucky blocks, random rewards, and surprise challenges.", popular: true , image: "../Games/luckyblockobby/images (1).jpeg" },
 
-  { id: "ninjaobby", title: "ninjaobby", url: "../Games/ninjaobby/index.html", desc: "Leap across rooftops, dodge traps, and master precise parkour moves in this ninja-themed obstacle course.", popular: true },
+  { id: "ninjaobby", title: "ninjaobby", url: "../Games/ninjaobby/index.html", desc: "Leap across rooftops, dodge traps, and master precise parkour moves in this ninja-themed obstacle course.", popular: true , image: "../Games/ninjaobby/images (2).jpeg" },
 
   { id: "clickerobby", title: "clickerobby", url: "../Games/clickerobby/index.html", desc: "Combine clicker progression with parkour stages—level up your power as you race through challenging maps.", popular: true },
 
@@ -136,11 +136,14 @@ let _0xData = [
 
   { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "A hyper-violent, style-focused FPS where every kill chains into the next—move fast, shoot faster, and stay stylish.", popular: true },
 
-  { id: "halflife", title: "halflife", url: "../Games/halflife/index.html", desc: "Step into the classic sci-fi shooter: fight through Black Mesa, battle aliens, and uncover a conspiracy that changes everything.", popular: true },
+  { id: "halflife", title: "halflife", url: "../Games/halflife/index.html", desc: "Step into the classic sci-fi shooter: fight through Black Mesa, battle aliens, and uncover a conspiracy that changes everything.", popular: true , image: "../Games/halflife/images (3).jpeg" },
 
   { id: "blackjack", title: "blackjack", url: "../Games/blackjack/index.html", desc: "Play classic casino blackjack—hit, stand, and double down as you try to beat the dealer without going over 21.", popular: true },
 
   { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+
+  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
