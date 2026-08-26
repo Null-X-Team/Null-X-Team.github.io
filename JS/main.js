@@ -399,6 +399,11 @@ function launchStealthWindow(maskType, targetEnv) {
     alert("Pop-ups must be enabled to launch the Stealth Environment.");
   }
 }
+// Redirect original tab to the mask target
+window.location.replace(escapeRedirect);
+} else {
+  alert("Pop-ups must be enabled to launch the Stealth Environment.");
+}
 // ========================================================
 // CORE GAME LAUNCH ENGINE WITH STABILIZED CONTROLS
 // ========================================================
@@ -408,7 +413,10 @@ function launchGame(gameId) {
 
   const rootUrl = "https://glaxyias.github.io/";
   const gameTab = window.open("about:blank", "_blank");
-  if (!gameTab) return;
+  if (!gameTab) {
+    alert("Pop-up blocked! Please allow popup permissions to play games.");
+    return;
+  }
 
   gameTab.document.title = "Google Docs";
   gameTab.document.open();
@@ -589,50 +597,39 @@ function enableBackBtnDrag(btn) {
 </body>
 </html>
 `);
-}
-}
 
-      gameTab.document.close();
-      // More reliable original-tab close (browsers block the single-trick version inconsistently)
-      // Try several methods that work across Chrome/Firefox/Edge under different policies
-      function attemptCloseOriginalTab() {
-        try {
-          // Method 1: classic self-open + close (most common success case)
-          const selfWin = window.open(window.location.href, '_self');
-          if (selfWin) selfWin.close();
-        } catch (e) {}
-        try {
-          // Method 2: direct close
-          window.close();
-        } catch (e) {}
-        try {
-          // Method 3: top-level close (helps when framed)
-          if (window.top && window.top !== window) {
-            window.top.close();
-          }
-        } catch (e) {}
+  gameTab.document.close();
 
-
-        try {
-          // Method 4: open blank then close (some Chromium builds allow this)
-          window.open('', '_self');
-          window.close();
-        } catch (e) {}
+  // More reliable original-tab close
+  function attemptCloseOriginalTab() {
+    try {
+      const selfWin = window.open(window.location.href, "_self");
+      if (selfWin) selfWin.close();
+    } catch (e) {}
+    try {
+      window.close();
+    } catch (e) {}
+    try {
+      if (window.top && window.top !== window) {
+        window.top.close();
       }
-      // Run close attempts immediately and once more after a short delay
-      attemptCloseOriginalTab();
-      setTimeout(attemptCloseOriginalTab, 30);
-      // Ultimate fallback: if the tab is still open, hide the site by redirecting
-      // (gives the close attempts time to succeed before falling back)
-      setTimeout(() => {
-        try {
-          // If we are still here, close failed — redirect away so the site is gone
-          window.location.replace("https://www.google.com");
-        } catch (e) {
-          // last-ditch
-          window.location.href = "https://www.google.com";
-        }
-      }, 120);
+    } catch (e) {}
+    try {
+      window.open("", "_self");
+      window.close();
+    } catch (e) {}
+  }
+
+  attemptCloseOriginalTab();
+  setTimeout(attemptCloseOriginalTab, 30);
+
+  setTimeout(function() {
+    try {
+      window.location.replace("https://www.google.com");
+    } catch (e) {
+      window.location.href = "https://www.google.com";
+    }
+  }, 120);
 
     } else {
       alert("Pop-up blocked! Please allow popup permissions to play games.");
