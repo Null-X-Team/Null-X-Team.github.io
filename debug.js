@@ -58,10 +58,10 @@
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
   const escapeHTML = (value) => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
+    .replace(/&/g, "&")
+    .replace(/</g, "<")
+    .replace(/>/g, ">")
+    .replace(/"/g, """)
     .replace(/'/g, "&#039;");
   const bytes = (value) => {
     if (!Number.isFinite(value) || value < 0) return "N/A";
@@ -351,7 +351,7 @@
     try {
       const estimate = await navigator.storage?.estimate?.();
       $("#nx-storage-usage").textContent = estimate ? `${bytes(estimate.usage || 0)} / ${bytes(estimate.quota || 0)}` : "Unsupported";
-    } catch { $("#nx-storage-usage").textContent = "Unavailable"; }
+    } catch { $("#nx-storage-usage").textContent = "Unsupported"; }
     try {
       const registrations = await navigator.serviceWorker?.getRegistrations?.();
       $("#nx-sw-count").textContent = registrations ? String(registrations.length) : "Unsupported";
@@ -732,3 +732,320 @@
       const target = event.target;
       if (!target || target === overlay || target.id === "nx-hud" || target.closest("#nx-hud")) return;
       const rect = target.getBoundingClientRect();
+      overlay.style.display = "block";
+      overlay.style.left = rect.left + "px";
+      overlay.style.top = rect.top + "px";
+      overlay.style.width = rect.width + "px";
+      overlay.style.height = rect.height + "px";
+    }
+
+    function onClick(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      const target = event.target;
+      if (!target || target.closest("#nx-hud")) return;
+      STATE.selectedElement = target;
+      const tag = target.tagName.toLowerCase();
+      const id = target.id ? "#" + target.id : "";
+      const cls = target.className && typeof target.className === "string" ? "." + target.className.trim().split(/\s+/).join(".") : "";
+      const selector = tag + id + cls;
+      $("#nx-selected-tag").textContent = tag;
+      $("#nx-selected-selector").textContent = selector;
+      const details = $["#nx-inspector-details"];
+      if (details) {
+        details.textContent = `Tag: ${tag}\nID: ${target.id || "(none)"}\nClass: ${target.className || "(none)"}\nOuter HTML (trimmed):\n${(target.outerHTML || "").slice(0, 800)}`;
+      }
+      stopPicker();
+    }
+
+    function startPicker() {
+      if (STATE.pickerActive) return;
+      STATE.pickerActive = true;
+      toggleBtn.textContent = "Stop Element Picker";
+      document.addEventListener("mousemove", onHover, true);
+      document.addEventListener("click", onClick, true);
+      STATE.pickerHandlers = { onHover, onClick };
+      toast("Element picker active — click any element.", "info");
+    }
+
+    function stopPicker() {
+      if (!STATE.pickerActive) return;
+      STATE.pickerActive = false;
+      toggleBtn.textContent = "Start Element Picker";
+      if (STATE.pickerHandlers) {
+        document.removeEventListener("mousemove", STATE.pickerHandlers.onHover, true);
+        document.removeEventListener("click", STATE.pickerHandlers.onClick, true);
+        STATE.pickerHandlers = null;
+      }
+      overlay.style.display = "none";
+    }
+
+    toggleBtn.addEventListener("click", () => {
+      if (STATE.pickerActive) stopPicker();
+      else startPicker();
+    });
+
+    $("#nx-copy-selector")?.addEventListener("click", () => {
+      const sel = $("#nx-selected-selector")?.textContent;
+      if (sel && sel !== "None") copy(sel, "Selector copied.");
+      else toast("No element selected.", "warn");
+    });
+
+    $("#nx-copy-html")?.addEventListener("click", () => {
+      if (STATE.selectedElement) copy(STATE.selectedElement.outerHTML || "", "Outer HTML copied.");
+      else toast("No element selected.", "warn");
+    });
+  }
+
+  function installToolsActions() {
+    $("#nx-hard-reload")?.addEventListener("click", () => location.reload(true));
+    $("#nx-force-guest")?.addEventListener("click", () => {
+      try {
+        localStorage.removeItem("nullx_user");
+        sessionStorage.clear();
+        toast("Forced guest mode — reload to apply.", "warn");
+      } catch { toast("Could not clear auth storage.", "error"); }
+    });
+    $("#nx-cycle-theme")?.addEventListener("click", () => {
+      if (typeof window.cycleTheme === "function") window.cycleTheme();
+      else if (typeof window.toggleTheme === "function") window.toggleTheme();
+      else toast("No theme cycler found on page.", "info");
+      syncThemeFromSite();
+    });
+    $("#nx-version")?.addEventListener("click", () => toast("NULL X DevTools v" + CONFIG.version, "info"));
+    $("#nx-calculator")?.addEventListener("click", () => {
+      const expr = prompt("Enter expression:");
+      if (expr == null) return;
+      try { toast("Result: " + eval(expr), "success"); }
+      catch (e) { toast("Error: " + e.message, "error"); }
+    });
+    $("#nx-scroll-top")?.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    $("#nx-scroll-bottom")?.addEventListener("click", () => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" }));
+    $("#nx-toggle-fullscreen")?.addEventListener("click", () => {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+      else document.exitFullscreen?.();
+    });
+    $("#nx-copy-title")?.addEventListener("click", () => copy(document.title, "Title copied."));
+    $("#nx-copy-html-page")?.addEventListener("click", () => copy(document.documentElement.outerHTML, "Page HTML copied."));
+    $("#nx-download-html")?.addEventListener("click", () => {
+      download(`page-${Date.now()}.html`, document.documentElement.outerHTML, "text/html");
+      toast("Downloaded page HTML.", "success");
+    });
+    $("#nx-reset-tour")?.addEventListener("click", () => toast("Tour reset (no-op).", "info"));
+    $("#nx-command-run")?.addEventListener("click", runCustomCommand);
+    $("#nx-command-clear")?.addEventListener("click", clearCustomCommand);
+    $("#nx-emergency-reload")?.addEventListener("click", () => location.href = location.href);
+    $("#nx-remove-site-caches")?.addEventListener("click", async () => {
+      await clearCaches();
+      location.reload();
+    });
+  }
+
+  function installFunEffects() {
+    const body = document.body;
+    const toggleClass = (cls) => {
+      body.classList.toggle(cls);
+      toast((body.classList.contains(cls) ? "Enabled " : "Disabled ") + cls.replace("nx-fun-", ""), "info");
+    };
+
+    $("#nx-lag-toggle")?.addEventListener("click", () => {
+      STATE.fun.lagEnabled = !STATE.fun.lagEnabled;
+      const btn = $("#nx-lag-toggle");
+      if (btn) btn.textContent = "Simulate Lag: " + (STATE.fun.lagEnabled ? "On" : "Off");
+      if (STATE.fun.lagEnabled) {
+        STATE.fun.lagTimer = setInterval(() => {
+          const start = performance.now();
+          while (performance.now() - start < STATE.fun.lagMs) {}
+        }, 100);
+        toast("Lag simulation on (" + STATE.fun.lagMs + " ms).", "warn");
+      } else {
+        clearInterval(STATE.fun.lagTimer);
+        STATE.fun.lagTimer = null;
+        toast("Lag simulation off.", "info");
+      }
+    });
+    $("#nx-lag-range")?.addEventListener("input", (e) => {
+      STATE.fun.lagMs = Number(e.target.value) || 180;
+      const label = $("#nx-lag-value");
+      if (label) label.textContent = STATE.fun.lagMs + " ms";
+    });
+
+    $("#nx-css-nuke")?.addEventListener("click", () => {
+      if (!STATE.fun.cssNuked) {
+        STATE.fun.sheetStates = [...document.styleSheets].map((s) => {
+          try { return { sheet: s, disabled: s.disabled }; } catch { return null; }
+        }).filter(Boolean);
+        STATE.fun.sheetStates.forEach((s) => { try { s.sheet.disabled = true; } catch {} });
+        STATE.fun.cssNuked = true;
+        toast("CSS nuked.", "warn");
+      } else {
+        STATE.fun.sheetStates.forEach((s) => { try { s.sheet.disabled = s.disabled; } catch {} });
+        STATE.fun.cssNuked = false;
+        toast("CSS restored.", "success");
+      }
+    });
+
+    $("#nx-grayscale")?.addEventListener("click", () => toggleClass("nx-fun-grayscale"));
+    $("#nx-blur-page")?.addEventListener("click", () => toggleClass("nx-fun-blur"));
+    $("#nx-invert-page")?.addEventListener("click", () => toggleClass("nx-fun-invert"));
+    $("#nx-shake-page")?.addEventListener("click", () => toggleClass("nx-fun-shake"));
+    $("#nx-spin-page")?.addEventListener("click", () => toggleClass("nx-fun-spin"));
+    $("#nx-hide-images")?.addEventListener("click", () => toggleClass("nx-fun-hide-images"));
+    $("#nx-disco-page")?.addEventListener("click", () => toggleClass("nx-fun-disco"));
+    $("#nx-vhs")?.addEventListener("click", () => toggleClass("nx-fun-vhs"));
+    $("#nx-earthquake")?.addEventListener("click", () => toggleClass("nx-fun-earthquake"));
+    $("#nx-pixel")?.addEventListener("click", () => toggleClass("nx-fun-pixel"));
+    $("#nx-rainbow")?.addEventListener("click", () => toggleClass("nx-fun-rainbow"));
+    $("#nx-tilt")?.addEventListener("click", () => toggleClass("nx-fun-tilt"));
+    $("#nx-ghost")?.addEventListener("click", () => toggleClass("nx-fun-ghost"));
+    $("#nx-mega-blur")?.addEventListener("click", () => toggleClass("nx-fun-mega-blur"));
+    $("#nx-freeze")?.addEventListener("click", () => toggleClass("nx-fun-freeze"));
+    $("#nx-flip")?.addEventListener("click", () => toggleClass("nx-fun-flip"));
+    $("#nx-zoom")?.addEventListener("click", () => toggleClass("nx-fun-zoom"));
+    $("#nx-glow")?.addEventListener("click", () => toggleClass("nx-fun-glow"));
+    $("#nx-wire")?.addEventListener("click", () => toggleClass("nx-fun-wire"));
+    $("#nx-vignette")?.addEventListener("click", () => toggleClass("nx-fun-vignette"));
+    $("#nx-darkroom")?.addEventListener("click", () => toggleClass("nx-fun-darkroom"));
+    $("#nx-hologram")?.addEventListener("click", () => toggleClass("nx-fun-hologram"));
+    $("#nx-glitch")?.addEventListener("click", () => toggleClass("nx-fun-glitch"));
+    $("#nx-lines")?.addEventListener("click", () => toggleClass("nx-fun-lines"));
+    $("#nx-grid")?.addEventListener("click", () => toggleClass("nx-fun-grid"));
+
+    $("#nx-matrix-rain")?.addEventListener("click", () => {
+      if (STATE.fun.matrixEnabled) {
+        cancelAnimationFrame(STATE.fun.matrixFrame);
+        window.removeEventListener("resize", STATE.fun.matrixResize);
+        STATE.fun.matrixCanvas?.remove();
+        STATE.fun.matrixCanvas = null;
+        STATE.fun.matrixEnabled = false;
+        toast("Matrix rain off.", "info");
+        return;
+      }
+      const canvas = document.createElement("canvas");
+      canvas.id = "nx-matrix-canvas";
+      document.body.appendChild(canvas);
+      const ctx = canvas.getContext("2d");
+      const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+      resize();
+      window.addEventListener("resize", resize);
+      const cols = Math.floor(canvas.width / 14);
+      const drops = Array(cols).fill(1);
+      const chars = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン01";
+      function draw() {
+        ctx.fillStyle = "rgba(0,0,0,0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0f0";
+        ctx.font = "14px monospace";
+        for (let i = 0; i < drops.length; i++) {
+          const text = chars[Math.floor(Math.random() * chars.length)];
+          ctx.fillText(text, i * 14, drops[i] * 14);
+          if (drops[i] * 14 > canvas.height && Math.random() > 0.975) drops[i] = 0;
+          drops[i]++;
+        }
+        STATE.fun.matrixFrame = requestAnimationFrame(draw);
+      }
+      draw();
+      STATE.fun.matrixCanvas = canvas;
+      STATE.fun.matrixResize = resize;
+      STATE.fun.matrixEnabled = true;
+      toast("Matrix rain on.", "success");
+    });
+
+    $("#nx-random-colors")?.addEventListener("click", () => {
+      if (STATE.fun.randomStyle) {
+        STATE.fun.randomStyle.remove();
+        STATE.fun.randomStyle = null;
+        toast("Random colors off.", "info");
+        return;
+      }
+      const style = document.createElement("style");
+      style.textContent = `* { color: hsl(${Math.random()*360},70%,60%) !important; background-color: hsl(${Math.random()*360},30%,10%) !important; }`;
+      document.head.appendChild(style);
+      STATE.fun.randomStyle = style;
+      toast("Random colors on.", "warn");
+    });
+
+    $("#nx-reset-fun")?.addEventListener("click", () => {
+      ["nx-fun-grayscale","nx-fun-blur","nx-fun-invert","nx-fun-shake","nx-fun-spin","nx-fun-hide-images","nx-fun-disco","nx-fun-vhs","nx-fun-earthquake","nx-fun-pixel","nx-fun-rainbow","nx-fun-tilt","nx-fun-ghost","nx-fun-mega-blur","nx-fun-freeze","nx-fun-flip","nx-fun-zoom","nx-fun-glow","nx-fun-wire","nx-fun-vignette","nx-fun-darkroom","nx-fun-hologram","nx-fun-glitch","nx-fun-lines","nx-fun-grid"].forEach((c) => body.classList.remove(c));
+      if (STATE.fun.lagEnabled) {
+        clearInterval(STATE.fun.lagTimer);
+        STATE.fun.lagEnabled = false;
+        const btn = $("#nx-lag-toggle");
+        if (btn) btn.textContent = "Simulate Lag: Off";
+      }
+      if (STATE.fun.cssNuked) {
+        STATE.fun.sheetStates.forEach((s) => { try { s.sheet.disabled = s.disabled; } catch {} });
+        STATE.fun.cssNuked = false;
+      }
+      if (STATE.fun.matrixEnabled) {
+        cancelAnimationFrame(STATE.fun.matrixFrame);
+        window.removeEventListener("resize", STATE.fun.matrixResize);
+        STATE.fun.matrixCanvas?.remove();
+        STATE.fun.matrixCanvas = null;
+        STATE.fun.matrixEnabled = false;
+      }
+      if (STATE.fun.randomStyle) {
+        STATE.fun.randomStyle.remove();
+        STATE.fun.randomStyle = null;
+      }
+      toast("All fun effects reset.", "success");
+    });
+  }
+
+  function installGlobalKeys() {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "`" || e.key === "~") {
+        if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA" || e.target.isContentEditable) return;
+        e.preventDefault();
+        toggleHUD();
+      }
+      if (e.key === "Escape" && STATE.visible) {
+        toggleHUD();
+      }
+    });
+  }
+
+  function init() {
+    injectStyles();
+    buildDOM();
+    installTabs();
+    installHeaderDrag();
+    installOverviewActions();
+    installPerformanceActions();
+    installNetworkActions();
+    installStorageActions();
+    installConsoleActions();
+    installInspectorActions();
+    installToolsActions();
+    installFunEffects();
+    installGlobalKeys();
+    patchConsole();
+    patchNetwork();
+    updateFPS();
+    $("#nx-trigger")?.addEventListener("click", toggleHUD);
+    $("#nx-close")?.addEventListener("click", () => { if (STATE.visible) toggleHUD(); });
+    $("#nx-minimize")?.addEventListener("click", () => { if (STATE.visible) toggleHUD(); });
+    setInterval(() => {
+      if (STATE.visible) {
+        updateOverview();
+        updateStorageStats();
+      }
+    }, 1000);
+    window.__NULLX_DEVTOOLS__ = {
+      version: CONFIG.version,
+      toggle: () => toggleHUD(),
+      show: () => { if (!STATE.visible) toggleHUD(); },
+      hide: () => { if (STATE.visible) toggleHUD(); },
+      refresh: updateOverview,
+      log: (...args) => addLog("info", args),
+      state: STATE
+    };
+    console.info("NULL X DevTools v" + CONFIG.version + " online. Press ~ or click DEBUG.");
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init, { once: true });
+  } else {
+    init();
+  }
+})();
