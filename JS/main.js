@@ -144,6 +144,8 @@ let _0xData = [
 
   { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true },
   { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true },
+
+  { id: "supercold", title: "supercold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
