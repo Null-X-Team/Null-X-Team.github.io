@@ -140,10 +140,10 @@ let _0xData = [
 
   { id: "blackjack", title: "blackjack", url: "../Games/blackjack/index.html", desc: "Play classic casino blackjack—hit, stand, and double down as you try to beat the dealer without going over 21.", popular: true },
 
-  { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "A chaotic Kanye-themed experience packed with memes, music vibes, and unexpected challenges.", popular: true },
 
-  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true },
+  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
@@ -399,11 +399,6 @@ function launchStealthWindow(maskType, targetEnv) {
     alert("Pop-ups must be enabled to launch the Stealth Environment.");
   }
 }
-// Redirect original tab to the mask target
-window.location.replace(escapeRedirect);
-} else {
-  alert("Pop-ups must be enabled to launch the Stealth Environment.");
-}
 // ========================================================
 // CORE GAME LAUNCH ENGINE WITH STABILIZED CONTROLS
 // ========================================================
@@ -630,12 +625,6 @@ function enableBackBtnDrag(btn) {
       window.location.href = "https://www.google.com";
     }
   }, 120);
-
-    } else {
-      alert("Pop-up blocked! Please allow popup permissions to play games.");
-      return;
-    }
-  }
 }
 
 function renderLibraryGrid(gamesArray) {
