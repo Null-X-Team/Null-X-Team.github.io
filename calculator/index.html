@@ -1,1 +1,28 @@
-PLACEHOLDER
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Null X - Calculator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="calc-terminal">
+    <div class="terminal-header">
+      <span class="title">// NULL_X CALCULATOR ENGINE</span>
+      <span id="status" class="status-loading">BOOTING...</span>
+    </div>
+
+    <div id="terminal-output">
+      <div class="line system">Starting calculator...</div>
+    </div>
+
+    <div class="input-line">
+      <span class="prompt">calc>></span>
+      <input type="text" id="calc-input" placeholder="Loading..." disabled autofocus />
+    </div>
+  </div>
+
+  <script src="calc.js"></script>
+</body>
+</html>
