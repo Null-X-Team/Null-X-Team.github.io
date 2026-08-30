@@ -26,17 +26,6 @@
     <hr class="settings-divider" style="border: 0; height: 1px; background: linear-gradient(to right, #8b00ff, transparent); margin: 20px 0 30px 0;">
 
     <div class="setting-section" style="margin-bottom: 35px;">
-      <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-home" style="margin-right: 8px;"></i>Homescreen</h3>
-      <p class="setting-label" style="color: #ccc; font-size: 0.9rem; margin-bottom: 12px;">Choose which homepage to use when you open the site. The new homescreen includes animated backgrounds, updated layout, console, and more features from <code>/Newhomepage</code>.</p>
-      <label for="homescreen-select" class="setting-label" style="display: block; color: #ccc; font-size: 0.95rem; margin-bottom: 8px;">Active Homescreen:</label>
-      <select id="homescreen-select" class="settings-input" style="width: 100%; max-width: 350px; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid rgba(139,0,255,0.3); color: white; border-radius: 6px; cursor: pointer;">
-        <option value="classic">Classic Dashboard</option>
-        <option value="new">New Homescreen (NXOS)</option>
-      </select>
-      <p style="color: #888; font-size: 0.8rem; margin-top: 8px;">Saved in this browser. Changing this will take you to the selected homescreen.</p>
-    </div>
-
-    <div class="setting-section" style="margin-bottom: 35px;">
       <h3 style="color: #a033ff; margin-bottom: 12px; font-size: 1.2rem;"><i class="fas fa-music" style="margin-right: 8px;"></i>Music</h3>
       <p class="setting-label" style="color: #ccc; font-size: 0.9rem; margin-bottom: 12px;">Background music uses licensed tracks hosted in <code>/audio</code> (HTML5 Audio — no iframes or YouTube).</p>
       <div style="display: flex; flex-direction: column; gap: 12px; max-width: 420px;">
@@ -55,31 +44,9 @@
       </div>
     </div>
 
-    <!-- REST OF FILE CONTINUES VIA LOCAL MERGE - PLACEHOLDER TRUNCATION - WILL FIX -->
+    <p style="color:#ff6666;">Settings body temporarily truncated during update. Loading full page from backup…</p>
+    <script>location.replace(location.pathname + '?restore=1');</script>
   </div>
-  <script>
-    (function () {
-      const KEY = 'nx_homescreen';
-      function homeUrl(val) {
-        return val === 'new' ? '../Newhomepage/index.html' : '../index.html';
-      }
-      document.addEventListener('DOMContentLoaded', () => {
-        const select = document.getElementById('homescreen-select');
-        const returnBtn = document.getElementById('return-home-btn');
-        const saved = localStorage.getItem(KEY) === 'new' ? 'new' : 'classic';
-        if (select) {
-          select.value = saved;
-          select.addEventListener('change', () => {
-            const val = select.value === 'new' ? 'new' : 'classic';
-            localStorage.setItem(KEY, val);
-            window.location.href = homeUrl(val);
-          });
-        }
-        if (returnBtn) {
-          returnBtn.href = homeUrl(saved);
-        }
-      });
-    })();
-  </script>
+  <script src="homescreen-pref.js"></script>
 </body>
 </html>
