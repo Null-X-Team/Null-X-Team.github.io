@@ -9,128 +9,24 @@
   var STORAGE_KEY = "nx_achievements";
 
   var CATALOG = [
-    {
-      id: "welcome",
-      title: "Welcome Aboard",
-      desc: "Open Null X for the first time (this session counts).",
-      icon: "fa-rocket"
-    },
-    {
-      id: "trophy_case",
-      title: "Trophy Case",
-      desc: "Open the Achievements panel.",
-      icon: "fa-trophy"
-    },
-    {
-      id: "gamer",
-      title: "Boot Sequence",
-      desc: "Click a game card to launch something.",
-      icon: "fa-gamepad"
-    },
-    {
-      id: "collector",
-      title: "Collector",
-      desc: "Favorite a game.",
-      icon: "fa-star"
-    },
-    {
-      id: "lucky",
-      title: "Feeling Lucky",
-      desc: "Use Random Game.",
-      icon: "fa-shuffle"
-    },
-    {
-      id: "tuned",
-      title: "System Preferences",
-      desc: "Open Settings.",
-      icon: "fa-gear"
-    },
-    {
-      id: "ghost",
-      title: "Ghost Protocol",
-      desc: "Open Stealth Mode.",
-      icon: "fa-mask"
-    },
-    {
-      id: "social",
-      title: "Comms Online",
-      desc: "Open Communications / Chat.",
-      icon: "fa-comments"
-    },
-    {
-      id: "identity",
-      title: "Identity Check",
-      desc: "Open your Profile.",
-      icon: "fa-user"
-    },
-    {
-      id: "proxy",
-      title: "Bypass Engineer",
-      desc: "Open Unblockers.",
-      icon: "fa-shield-halved"
-    },
-    {
-      id: "searcher",
-      title: "Query Runner",
-      desc: "Search for a game.",
-      icon: "fa-magnifying-glass"
-    },
-    {
-      id: "egg_konami",
-      title: "Classic Input",
-      desc: "You entered a sequence older than most of this site.",
-      icon: "fa-keyboard",
-      secret: true,
-      hint: "An old console code still works somewhere on this page."
-    },
-    {
-      id: "egg_logo",
-      title: "Persistent Clicker",
-      desc: "The logo finally admitted you exist.",
-      icon: "fa-hand-pointer",
-      secret: true,
-      hint: "Something in the sidebar rewards patience."
-    },
-    {
-      id: "egg_night",
-      title: "Night Shift",
-      desc: "You showed up while the rest of the world slept.",
-      icon: "fa-moon",
-      secret: true,
-      hint: "Time of day matters."
-    },
-    {
-      id: "egg_console",
-      title: "Under the Hood",
-      desc: "You talked to the site console.",
-      icon: "fa-terminal",
-      secret: true,
-      hint: "There is a console on this page. Say hello."
-    },
-    {
-      id: "egg_title",
-      title: "Triple Tap",
-      desc: "The greeting noticed your enthusiasm.",
-      icon: "fa-hand-point-up",
-      secret: true,
-      hint: "The welcome text is more interactive than it looks."
-    },
-    {
-      id: "egg_news",
-      title: "Archive Diver",
-      desc: "You scrolled deep into System News.",
-      icon: "fa-newspaper",
-      secret: true,
-      hint: "History lives in the right rail."
-    },
-    {
-      id: "egg_matrix",
-      title: "Follow the White Rabbit",
-      desc: "You found the green path.",
-      icon: "fa-code",
-      secret: true,
-      hint: "A theme shares its name with a certain rain."
-    }
+    { id: "welcome", title: "Welcome Aboard", desc: "Open Null X for the first time (this session counts).", icon: "fa-rocket" },
+    { id: "trophy_case", title: "Trophy Case", desc: "Open the Achievements panel.", icon: "fa-trophy" },
+    { id: "gamer", title: "Boot Sequence", desc: "Click a game card to launch something.", icon: "fa-gamepad" },
+    { id: "collector", title: "Collector", desc: "Favorite a game.", icon: "fa-star" },
+    { id: "lucky", title: "Feeling Lucky", desc: "Use Random Game.", icon: "fa-shuffle" },
+    { id: "tuned", title: "System Preferences", desc: "Open Settings.", icon: "fa-gear" },
+    { id: "ghost", title: "Ghost Protocol", desc: "Open Stealth Mode.", icon: "fa-mask" },
+    { id: "social", title: "Comms Online", desc: "Open Communications / Chat.", icon: "fa-comments" },
+    { id: "identity", title: "Identity Check", desc: "Open your Profile.", icon: "fa-user" },
+    { id: "proxy", title: "Bypass Engineer", desc: "Open Unblockers.", icon: "fa-shield-halved" },
+    { id: "searcher", title: "Query Runner", desc: "Search for a game.", icon: "fa-magnifying-glass" },
+    { id: "egg_konami", title: "Classic Input", desc: "You entered a sequence older than most of this site.", icon: "fa-keyboard", secret: true, hint: "An old console code still works somewhere on this page." },
+    { id: "egg_logo", title: "Persistent Clicker", desc: "The logo finally admitted you exist.", icon: "fa-hand-pointer", secret: true, hint: "Something in the sidebar rewards patience." },
+    { id: "egg_night", title: "Night Shift", desc: "You showed up while the rest of the world slept.", icon: "fa-moon", secret: true, hint: "Time of day matters." },
+    { id: "egg_console", title: "Under the Hood", desc: "You talked to the site console.", icon: "fa-terminal", secret: true, hint: "There is a console on this page. Say hello." },
+    { id: "egg_title", title: "Triple Tap", desc: "The greeting noticed your enthusiasm.", icon: "fa-hand-point-up", secret: true, hint: "The welcome text is more interactive than it looks." },
+    { id: "egg_news", title: "Archive Diver", desc: "You scrolled deep into System News.", icon: "fa-newspaper", secret: true, hint: "History lives in the right rail." },
+    { id: "egg_matrix", title: "Follow the White Rabbit", desc: "You found the green path.", icon: "fa-code", secret: true, hint: "A theme shares its name with a certain rain." }
   ];
 
   function loadState() {
@@ -138,10 +34,7 @@
       var raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return { unlocked: {}, unlockedAt: {} };
       var parsed = JSON.parse(raw);
-      return {
-        unlocked: parsed.unlocked || {},
-        unlockedAt: parsed.unlockedAt || {}
-      };
+      return { unlocked: parsed.unlocked || {}, unlockedAt: parsed.unlockedAt || {} };
     } catch (e) {
       return { unlocked: {}, unlockedAt: {} };
     }
@@ -161,11 +54,8 @@
 
   function unlock(id, silent) {
     if (!id || isUnlocked(id)) return false;
-    var found = CATALOG.some(function (a) {
-      return a.id === id;
-    });
+    var found = CATALOG.some(function (a) { return a.id === id; });
     if (!found) return false;
-
     state.unlocked[id] = true;
     state.unlockedAt[id] = Date.now();
     saveState(state);
@@ -177,9 +67,7 @@
 
   function countUnlocked() {
     var n = 0;
-    CATALOG.forEach(function (a) {
-      if (isUnlocked(a.id)) n++;
-    });
+    CATALOG.forEach(function (a) { if (isUnlocked(a.id)) n++; });
     return n;
   }
 
@@ -232,18 +120,12 @@
       '<div class="nx-ach-body" id="nx-ach-list"></div>' +
       "</div>";
     document.body.appendChild(modal);
-
     var toast = document.createElement("div");
     toast.id = "nx-ach-toast";
     document.body.appendChild(toast);
-
-    modal.addEventListener("click", function (e) {
-      if (e.target === modal) closeModal();
-    });
+    modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
     document.getElementById("nx-ach-close").addEventListener("click", closeModal);
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape") closeModal();
-    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") closeModal(); });
   }
 
   function openModal() {
@@ -263,42 +145,21 @@
     var list = document.getElementById("nx-ach-list");
     var progress = document.getElementById("nx-ach-progress");
     if (!list) return;
-
     var unlockedN = countUnlocked();
-    if (progress) {
-      progress.textContent = unlockedN + " / " + CATALOG.length + " unlocked";
-    }
-
+    if (progress) progress.textContent = unlockedN + " / " + CATALOG.length + " unlocked";
     list.innerHTML = "";
     CATALOG.forEach(function (a) {
       var unlocked = isUnlocked(a.id);
       var card = document.createElement("div");
-      card.className =
-        "nx-ach-card " + (unlocked ? "unlocked" : "locked") + (a.secret ? " secret" : "");
-
+      card.className = "nx-ach-card " + (unlocked ? "unlocked" : "locked") + (a.secret ? " secret" : "");
       var title = unlocked ? a.title : a.secret ? "???" : a.title;
-      var desc;
-      if (unlocked) {
-        desc = a.desc;
-      } else if (a.secret) {
-        desc = a.hint || "A hidden achievement. Explore the site.";
-      } else {
-        desc = a.desc;
-      }
-
+      var desc = unlocked ? a.desc : a.secret ? (a.hint || "A hidden achievement. Explore the site.") : a.desc;
       var iconClass = unlocked ? a.icon : a.secret ? "fa-question" : a.icon;
-
       card.innerHTML =
-        '<div class="nx-ach-icon"><i class="fas ' +
-        iconClass +
-        '"></i></div>' +
+        '<div class="nx-ach-icon"><i class="fas ' + iconClass + '"></i></div>' +
         '<div class="nx-ach-meta">' +
-        '<p class="nx-ach-title">' +
-        title +
-        "</p>" +
-        '<p class="nx-ach-desc">' +
-        desc +
-        "</p>" +
+        '<p class="nx-ach-title">' + title + "</p>" +
+        '<p class="nx-ach-desc">' + desc + "</p>" +
         (a.secret
           ? '<span class="nx-ach-tag egg">' + (unlocked ? "Easter Egg" : "Secret") + "</span>"
           : unlocked
@@ -310,7 +171,7 @@
   }
 
   function updateBadge() {
-    var btn = document.getElementById("achievementsBtn");
+    var btn = document.getElementById("achievementsBtn") || document.getElementById("start-tour-btn");
     if (!btn) return;
     var badge = btn.querySelector(".nx-ach-badge");
     var n = countUnlocked();
@@ -325,10 +186,7 @@
   function showToast(id) {
     var a = null;
     for (var i = 0; i < CATALOG.length; i++) {
-      if (CATALOG[i].id === id) {
-        a = CATALOG[i];
-        break;
-      }
+      if (CATALOG[i].id === id) { a = CATALOG[i]; break; }
     }
     if (!a) return;
     var toast = document.getElementById("nx-ach-toast");
@@ -338,9 +196,16 @@
       a.title +
       (a.secret ? ' <span style="color:#ffb020;font-size:0.75rem">(Easter Egg)</span>' : "");
     toast.classList.add("show");
-    setTimeout(function () {
-      toast.classList.remove("show");
-    }, 3200);
+    setTimeout(function () { toast.classList.remove("show"); }, 3200);
+  }
+
+  function migrateTourButton() {
+    var oldBtn = document.getElementById("start-tour-btn");
+    if (oldBtn && !document.getElementById("achievementsBtn")) {
+      oldBtn.id = "achievementsBtn";
+      oldBtn.type = "button";
+      oldBtn.innerHTML = '<i class="fas fa-trophy" aria-hidden="true"></i> Achievements';
+    }
   }
 
   function wireUiHooks() {
@@ -352,25 +217,18 @@
       });
     }
 
-    document.addEventListener(
-      "click",
-      function (e) {
-        var t = e.target;
-        if (!t || !t.closest) return;
-
-        if (t.closest("#gameGrid .game-card, #gameGrid .game-item, .game-card, .game-item")) {
-          unlock("gamer");
-        }
-        if (t.closest("#ctx-favorite")) unlock("collector");
-        if (t.closest("#randomBtn")) unlock("lucky");
-        if (t.closest("#settingsBtn")) unlock("tuned");
-        if (t.closest("#stealthOpener")) unlock("ghost");
-        if (t.closest("#nav-communications")) unlock("social");
-        if (t.closest("#nav-profile")) unlock("identity");
-        if (t.closest("#nav-unblockers")) unlock("proxy");
-      },
-      true
-    );
+    document.addEventListener("click", function (e) {
+      var t = e.target;
+      if (!t || !t.closest) return;
+      if (t.closest("#gameGrid .game-card, #gameGrid .game-item, .game-card, .game-item")) unlock("gamer");
+      if (t.closest("#ctx-favorite")) unlock("collector");
+      if (t.closest("#randomBtn")) unlock("lucky");
+      if (t.closest("#settingsBtn")) unlock("tuned");
+      if (t.closest("#stealthOpener")) unlock("ghost");
+      if (t.closest("#nav-communications")) unlock("social");
+      if (t.closest("#nav-profile")) unlock("identity");
+      if (t.closest("#nav-unblockers")) unlock("proxy");
+    }, true);
 
     var search = document.getElementById("searchBar");
     if (search) {
@@ -379,17 +237,12 @@
       });
     }
 
-    // Easter eggs — conditions only in code; locked UI never reveals exact steps
-
     var seq = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
     var idx = 0;
     window.addEventListener("keydown", function (e) {
       if (e.keyCode === seq[idx]) {
         idx++;
-        if (idx === seq.length) {
-          idx = 0;
-          unlock("egg_konami");
-        }
+        if (idx === seq.length) { idx = 0; unlock("egg_konami"); }
       } else {
         idx = e.keyCode === seq[0] ? 1 : 0;
       }
@@ -403,13 +256,8 @@
       logo.addEventListener("click", function () {
         logoClicks++;
         clearTimeout(logoTimer);
-        logoTimer = setTimeout(function () {
-          logoClicks = 0;
-        }, 2500);
-        if (logoClicks >= 7) {
-          logoClicks = 0;
-          unlock("egg_logo");
-        }
+        logoTimer = setTimeout(function () { logoClicks = 0; }, 2500);
+        if (logoClicks >= 7) { logoClicks = 0; unlock("egg_logo"); }
       });
     }
 
@@ -428,18 +276,14 @@
     var news = document.getElementById("newsFeed") || document.querySelector(".news-feed");
     if (news) {
       news.addEventListener("scroll", function () {
-        if (news.scrollTop + news.clientHeight >= news.scrollHeight - 24) {
-          unlock("egg_news");
-        }
+        if (news.scrollTop + news.clientHeight >= news.scrollHeight - 24) unlock("egg_news");
       });
     }
 
     var consoleInput = document.getElementById("console-input");
     if (consoleInput) {
       consoleInput.addEventListener("keydown", function (e) {
-        if (e.key === "Enter" && (consoleInput.value || "").trim().length > 0) {
-          unlock("egg_console");
-        }
+        if (e.key === "Enter" && (consoleInput.value || "").trim().length > 0) unlock("egg_console");
       });
     }
 
@@ -453,6 +297,7 @@
   }
 
   function boot() {
+    migrateTourButton();
     ensureStyles();
     ensureModal();
     unlock("welcome", true);
@@ -470,8 +315,6 @@
     unlock: unlock,
     open: openModal,
     close: closeModal,
-    list: function () {
-      return CATALOG.slice();
-    }
+    list: function () { return CATALOG.slice(); }
   };
 })();
