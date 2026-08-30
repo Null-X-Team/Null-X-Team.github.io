@@ -1,6 +1,5 @@
 /**
- * Tour removed — this file now bootstraps Achievements so existing
- * index.html script tags keep working without a full HTML rewrite.
+ * Tour removed - bootstraps Achievements (catalog data + runtime).
  */
 (function () {
   try {
@@ -18,18 +17,28 @@
     }
   }
 
-  function loadAchievements() {
-    migrateButton();
-    if (window.NullXAchievements) return;
-    var existing = document.querySelector('script[src="achievements.js"]');
-    if (existing) return;
+  function loadScript(src, cb) {
+    var existing = document.querySelector('script[src="' + src + '"]');
+    if (existing) {
+      if (cb) cb();
+      return;
+    }
     var s = document.createElement("script");
-    s.src = "achievements.js";
+    s.src = src;
     s.async = false;
+    s.onload = function () { if (cb) cb(); };
+    s.onerror = function () { if (cb) cb(); };
     document.body.appendChild(s);
   }
 
-  // Neutralize any leftover tour API
+  function loadAchievements() {
+    migrateButton();
+    if (window.NullXAchievements) return;
+    loadScript("achievements-data.js", function () {
+      loadScript("achievements.js");
+    });
+  }
+
   window.startNullXTour = function () {};
   window.clearNullXTourBarrier = function () {};
 
