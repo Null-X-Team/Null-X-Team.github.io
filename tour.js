@@ -1,9 +1,8 @@
 /**
  * Null X site tour (driver.js)
  * - Skip allowed
- * - Games step: user must click Games (nothing else clickable)
- * - Barriers always cleared if tour ends
- * - Includes Communications (chat) + Settings
+ * - Games step: one real click on Games advances tour
+ * - Other UI locked via CSS pointer-events (cleared on tour end)
  */
 (function () {
   function ready(fn) {
@@ -22,8 +21,8 @@
 
     var driverFactory = window.driver.js.driver;
     var gamesClickHandler = null;
-    var barrierEl = null;
     var waitingForGamesClick = false;
+    var advanceTimer = null;
 
     function showSection(navId) {
       var el = document.getElementById(navId);
@@ -55,158 +54,98 @@
       );
     }
 
-    function waitFor(predicate, opts) {
-      opts = opts || {};
-      var timeout = opts.timeout != null ? opts.timeout : 4000;
-      var interval = opts.interval != null ? opts.interval : 100;
-      return new Promise(function (resolve) {
-        var start = Date.now();
-        (function tick() {
-          try {
-            if (predicate()) return resolve(true);
-          } catch (e) {}
-          if (Date.now() - start >= timeout) return resolve(false);
-          setTimeout(tick, interval);
-        })();
-      });
-    }
-
     function markTourSeen() {
       try {
         localStorage.setItem("hasSeenNullXTour", "true");
       } catch (e) {}
     }
 
-    function enableGamesOnlyBarrier() {
-      clearGamesOnlyBarrier();
-
-      barrierEl = document.createElement("div");
-      barrierEl.id = "nullx-tour-barrier";
-      barrierEl.setAttribute("aria-hidden", "true");
-      Object.assign(barrierEl.style, {
-        position: "fixed",
-        inset: "0",
-        zIndex: "9999990",
-        background: "transparent",
-        cursor: "not-allowed",
-        pointerEvents: "auto"
-      });
-
-      barrierEl.addEventListener(
-        "pointerdown",
-        function (e) {
-          var games = document.getElementById("nav-games");
-          if (!games) return;
-          var r = games.getBoundingClientRect();
-          var x = e.clientX;
-          var y = e.clientY;
-          if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-            barrierEl.style.pointerEvents = "none";
-            setTimeout(function () {
-              if (barrierEl) barrierEl.style.pointerEvents = "auto";
-            }, 300);
-            return;
-          }
-          e.preventDefault();
-          e.stopPropagation();
-        },
-        true
-      );
-
-      barrierEl.addEventListener(
-        "click",
-        function (e) {
-          var games = document.getElementById("nav-games");
-          if (!games) {
-            e.preventDefault();
-            e.stopPropagation();
-            return;
-          }
-          var r = games.getBoundingClientRect();
-          var x = e.clientX;
-          var y = e.clientY;
-          if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
-            return;
-          }
-          e.preventDefault();
-          e.stopPropagation();
-        },
-        true
-      );
-
-      document.body.appendChild(barrierEl);
-
-      var games = document.getElementById("nav-games");
-      if (games) {
-        games.style.position = games.style.position || "relative";
-        games.style.zIndex = "9999995";
-        games.style.pointerEvents = "auto";
-        games.classList.add("nullx-tour-games-target");
-      }
-
-      var style = document.getElementById("nullx-tour-barrier-style");
-      if (!style) {
-        style = document.createElement("style");
-        style.id = "nullx-tour-barrier-style";
-        style.textContent =
-          "#nullx-tour-barrier { z-index: 9999990 !important; }" +
-          ".driver-popover, .driver-popover * { pointer-events: auto !important; z-index: 10000000 !important; }" +
-          "#nav-games.nullx-tour-games-target { z-index: 9999995 !important; pointer-events: auto !important; position: relative; }" +
-          ".driver-active-element, .driver-active-element * { pointer-events: auto !important; }";
-        document.head.appendChild(style);
-      }
+    function ensureLockStyle() {
+      if (document.getElementById("nullx-tour-lock-style")) return;
+      var style = document.createElement("style");
+      style.id = "nullx-tour-lock-style";
+      style.textContent = [
+        "/* Lock everything except Games + tour UI */",
+        "body.nullx-tour-games-lock .dashboard,",
+        "body.nullx-tour-games-lock .dashboard * {",
+        "  pointer-events: none !important;",
+        "}",
+        "body.nullx-tour-games-lock #nav-games,",
+        "body.nullx-tour-games-lock #nav-games * {",
+        "  pointer-events: auto !important;",
+        "  cursor: pointer !important;",
+        "}",
+        "body.nullx-tour-games-lock .driver-popover,",
+        "body.nullx-tour-games-lock .driver-popover *,",
+        "body.nullx-tour-games-lock .driver-overlay,",
+        "body.nullx-tour-games-lock .driver-active-element,",
+        "body.nullx-tour-games-lock .driver-active-element * {",
+        "  pointer-events: auto !important;",
+        "}"
+      ].join("\n");
+      document.head.appendChild(style);
     }
 
-    function clearGamesOnlyBarrier() {
-      waitingForGamesClick = false;
+    function enableGamesOnlyLock() {
+      ensureLockStyle();
+      document.body.classList.add("nullx-tour-games-lock");
+    }
 
+    function clearGamesOnlyLock() {
+      waitingForGamesClick = false;
+      if (advanceTimer) {
+        clearTimeout(advanceTimer);
+        advanceTimer = null;
+      }
       if (gamesClickHandler) {
         var g = document.getElementById("nav-games");
-        if (g) g.removeEventListener("click", gamesClickHandler, true);
+        if (g) {
+          g.removeEventListener("click", gamesClickHandler, false);
+          g.removeEventListener("click", gamesClickHandler, true);
+        }
         gamesClickHandler = null;
       }
-
-      var games = document.getElementById("nav-games");
-      if (games) {
-        games.classList.remove("nullx-tour-games-target");
-        if (games.style.zIndex === "9999995") games.style.zIndex = "";
-      }
-
-      if (barrierEl && barrierEl.parentNode) {
-        barrierEl.parentNode.removeChild(barrierEl);
-      }
-      barrierEl = null;
-
-      var style = document.getElementById("nullx-tour-barrier-style");
+      document.body.classList.remove("nullx-tour-games-lock");
+      var style = document.getElementById("nullx-tour-lock-style");
       if (style && style.parentNode) style.parentNode.removeChild(style);
+      var oldBarrier = document.getElementById("nullx-tour-barrier");
+      if (oldBarrier && oldBarrier.parentNode) oldBarrier.parentNode.removeChild(oldBarrier);
+      var oldStyle = document.getElementById("nullx-tour-barrier-style");
+      if (oldStyle && oldStyle.parentNode) oldStyle.parentNode.removeChild(oldStyle);
     }
 
     function armGamesUserClick(driverInstance) {
-      clearGamesOnlyBarrier();
+      clearGamesOnlyLock();
       waitingForGamesClick = true;
-      enableGamesOnlyBarrier();
+      enableGamesOnlyLock();
 
       var games = document.getElementById("nav-games");
       if (!games) return;
 
-      gamesClickHandler = function (e) {
+      // Bubble phase so the site's own nav handler runs first
+      gamesClickHandler = function () {
         if (!waitingForGamesClick) return;
         waitingForGamesClick = false;
 
-        waitFor(function () {
-          var grid = document.getElementById("gameGrid");
-          return grid && (grid.offsetParent !== null || grid.children.length > 0);
-        }, { timeout: 5000 }).then(function () {
-          clearGamesOnlyBarrier();
+        // Unlock UI immediately so the section can render / respond
+        document.body.classList.remove("nullx-tour-games-lock");
+
+        // Advance tour after a short beat so Games section can settle
+        advanceTimer = setTimeout(function () {
+          advanceTimer = null;
+          clearGamesOnlyLock();
           try {
-            driverInstance.moveNext();
+            if (driverInstance && typeof driverInstance.moveNext === "function") {
+              driverInstance.moveNext();
+            }
           } catch (err) {
-            clearGamesOnlyBarrier();
+            console.warn("[NullX Tour] moveNext failed", err);
+            clearGamesOnlyLock();
           }
-        });
+        }, 450);
       };
 
-      games.addEventListener("click", gamesClickHandler, true);
+      games.addEventListener("click", gamesClickHandler, false);
     }
 
     var tour = driverFactory({
@@ -222,13 +161,13 @@
       doneBtnText: "Finish",
       progressText: "{{current}} / {{total}}",
       onDestroyStarted: function () {
-        clearGamesOnlyBarrier();
+        clearGamesOnlyLock();
         markTourSeen();
         closeContextMenu();
         if (tour) tour.destroy();
       },
       onDestroyed: function () {
-        clearGamesOnlyBarrier();
+        clearGamesOnlyLock();
       },
       steps: [
         {
@@ -246,7 +185,7 @@
           popover: {
             title: "Games",
             description:
-              "Click the Games button in the sidebar to open the library. Only Games is clickable right now.",
+              "Click Games once in the sidebar to open the library. Everything else is locked until you do.",
             side: "right",
             align: "center",
             showButtons: ["previous", "close"]
@@ -255,12 +194,12 @@
             armGamesUserClick(opts.driver);
           },
           onDeselected: function () {
-            clearGamesOnlyBarrier();
+            clearGamesOnlyLock();
           }
         },
         {
           element: function () {
-            return getGameCard() || document.getElementById("gameGrid");
+            return getGameCard() || document.getElementById("gameGrid") || document.body;
           },
           popover: {
             title: "Game Cards",
@@ -270,12 +209,12 @@
             align: "center"
           },
           onHighlightStarted: function () {
-            clearGamesOnlyBarrier();
+            clearGamesOnlyLock();
           }
         },
         {
           element: function () {
-            return getGameCard() || document.getElementById("gameGrid");
+            return getGameCard() || document.getElementById("gameGrid") || document.body;
           },
           popover: {
             title: "Game Menu",
@@ -425,18 +364,18 @@
     });
 
     function startTour() {
-      clearGamesOnlyBarrier();
+      clearGamesOnlyLock();
       closeContextMenu();
       try {
         tour.drive();
       } catch (err) {
-        clearGamesOnlyBarrier();
+        clearGamesOnlyLock();
         console.error("[NullX Tour]", err);
       }
     }
 
     window.startNullXTour = startTour;
-    window.clearNullXTourBarrier = clearGamesOnlyBarrier;
+    window.clearNullXTourBarrier = clearGamesOnlyLock;
 
     var btn = document.getElementById("start-tour-btn");
     if (btn) {
@@ -446,7 +385,7 @@
       });
     }
 
-    window.addEventListener("beforeunload", clearGamesOnlyBarrier);
+    window.addEventListener("beforeunload", clearGamesOnlyLock);
 
     try {
       if (!localStorage.getItem("hasSeenNullXTour")) {
