@@ -436,15 +436,12 @@
   </style>
 </head>
 <body>
-  <audio id="bgMusic" src="../audio/emmraan-evil-heavy-metal-261243.mp3" loop></audio>
+  ```html
+<audio id="bgMusic" src="../audio/emmraan-evil-heavy-metal-261243.mp3" autoplay loop></audio>
 
 <script>
   const bgMusic = document.getElementById('bgMusic');
   bgMusic.volume = 0.25;
-
-  document.addEventListener('click', () => {
-    bgMusic.play().catch(() => {});
-  }, { once: true });
 </script>
 
   <div id="educational-cloak">
