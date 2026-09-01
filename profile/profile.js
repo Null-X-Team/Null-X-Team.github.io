@@ -3,7 +3,7 @@
 const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co'; 
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw'; 
 
-const DEFAULT_PFP = 'https://Glaxyias.github.io/imgs/download.jpeg';
+const DEFAULT_PFP = 'https://null-x-team.github.io/imgs/download.jpeg';
 
 // Global headers mapping
 const SUPABASE_HEADERS = {
