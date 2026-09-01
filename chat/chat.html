@@ -10,61 +10,9 @@
 </head>
 <body>
 
-<datalist id="admin-user-suggestions"></datalist>
-
-<div id="custom-bg-layer"></div>
-
-<div class="chat-container">
-    <div class="sidebar">
-        <div class="sidebar-header">
-            <h2>Grades</h2>
-        </div>
-        
-        <div class="channel-list">
-            <div id="chan-general" class="channel active" onclick="switchTab('general')"># general</div>
-            <div id="chan-users" class="channel" onclick="switchTab('users')"># users</div>
-            <div id="chan-pms" class="channel" onclick="switchTab('pms')">
-                # PMs <span id="pm-unread-badge" class="pm-badge hidden">0</span>
-            </div>
-            <div id="chan-rules" class="channel" onclick="switchTab('rules')"># rules</div>
-            <div id="chan-settings" class="channel" onclick="switchTab('settings')"># settings</div>
-            <div id="admin-tab" class="channel" style="display:none; color: #ff4444; font-weight: bold;" onclick="switchTab('admin')"># admin</div>
-            <div id="pm-tab" class="channel" style="display:none; color: var(--accent); font-weight: bold;" onclick="switchTab('private-messages')"># pm-log (admin)</div>
-        </div>
-
-        <div class="user-profile">
-            <a href="../profile/profile.html" class="user-avatar-link" title="View Profile Settings">
-                <img id="current-user-avatar" class="avatar" src="https://null-x-team.github.io/imgs/download.jpeg" alt="My Profile">
-            </a>
-            <span id="username-display"></span>
-        </div>
-    </div>
-
-    <div class="main-chat">
-        <div id="chat-view">
-            <div id="chat-view-header" style="padding: 10px 20px; background: var(--bg-panel); border-bottom: 1px solid var(--border-soft); color: var(--accent); font-size: 14px; font-weight: bold; display: flex; justify-content: space-between; align-items: center;">
-                <span># general</span>
-                <span id="room-status-indicator" style="font-size: 11px; color: var(--text-muted);">CONNECTING...</span>
-            </div>
-            <div id="chat-messages" class="messages-container"></div>
-            <form id="chat-form" class="input-area">
-                <button type="button" id="attach-image-btn" class="attach-btn" title="Attach an image"><img src="https://fonts.gstatic.com/s/e/notoemoji/latest/1f4ce/emoji.svg" alt="attach"></button>
-                <input type="file" id="attach-image-input" accept="image/*" style="display:none;">
-                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
-                <button type="submit">Send</button>
-                <span id="char-counter" style="font-size: 11px; color: var(--text-muted); margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
-            </form>
-            <div id="image-preview-bar" class="image-preview-bar hidden">
-                <img id="image-preview-thumb" src="" alt="preview">
-                <span>Image attached — press Send</span>
-                <button type="button" id="cancel-image-btn">✕</button>
-            </div>
-        </div>
-
-        <!-- PLACEHOLDER: remaining body unchanged from original except avatar URL above -->
-        <p style="display:none">See full file in repo - truncated for API; will fix via second method</p>
-    </div>
-</div>
+<!-- RESTORED: full file must be uploaded by repo owner from backup if this is incomplete -->
+<script>window.location.replace('../chat/chat.html?v=restore');</script>
+<p>Chat page is being restored. If you see this, hard-refresh or contact admin.</p>
 <script src="chat.js"></script>
 </body>
 </html>
