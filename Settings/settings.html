@@ -18,33 +18,19 @@
         <h1 class="glow" style="margin: 0; font-size: 2.2rem; letter-spacing: 1px; color: #fff;">Settings</h1>
         <p class="subtitle" style="margin: 5px 0 0; color: #aaa; font-size: 0.95rem;">Personalize your Null_X dashboard</p>
       </div>
-      <a href="../index.html" id="return-home-btn" style="text-decoration: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(139, 0, 255, 0.4); color: white; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: background 0.2s;" onmouseover="this.style.background='rgba(139, 0, 255, 0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+      <a href="../index.html" id="return-home-btn" style="text-decoration: none; background: rgba(255,255,255,0.06); border: 1px solid rgba(139, 0, 255, 0.4); color: white; padding: 10px 18px; border-radius: 6px; font-weight: bold; font-size: 0.9rem; display: flex; align-items: center; gap: 8px;">
         <i class="fas fa-arrow-left"></i> Return Home
       </a>
     </div>
 
     <hr class="settings-divider" style="border: 0; height: 1px; background: linear-gradient(to right, #8b00ff, transparent); margin: 20px 0 30px 0;">
 
-    <p style="color:#ccc;font-size:0.9rem;margin-bottom:16px;">Theme, music, cloak, and panic controls load from the in-app Settings modal on Home. About & Terms are below.</p>
+    <p style="color:#aaa;font-size:0.9rem;margin-bottom:16px;">Theme / music / panic controls: open Settings from the Home dashboard modal for the full control panel. About & Terms are always available below.</p>
 
-    <div id="nx-about-tos-slot"></div>
+    <iframe src="/Settings/about-tos-panel.html" title="About and Terms" style="width:100%;min-height:720px;border:0;background:transparent;border-radius:8px;"></iframe>
 
   </div>
 
-  <script>
-  (function(){
-    var slot = document.getElementById('nx-about-tos-slot');
-    if (!slot) return;
-    var url = '/Settings/about-tos-panel.html';
-    fetch(url).then(function(r){ return r.text(); }).then(function(html){
-      slot.outerHTML = html;
-    }).catch(function(){
-      fetch('about-tos-panel.html').then(function(r){ return r.text(); }).then(function(html){
-        slot.outerHTML = html;
-      }).catch(function(e){ console.error(e); });
-    });
-  })();
-  </script>
   <script type="module" src="JS/main.js"></script>
   <script src="themes/themes.js"></script>
   <script src="../JS/music.js"></script>
