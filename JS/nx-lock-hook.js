@@ -375,9 +375,12 @@
   window.addEventListener(
     "keydown",
     function (e) {
-      if ((e.ctrlKey || e.altKey) && e.key.toLowerCase() === "l") {
+      // Use e.code so Alt+L works on all keyboard layouts (e.key is unreliable with Alt)
+      var isL = e.code === "KeyL" || (e.key && e.key.toLowerCase() === "l");
+      if ((e.ctrlKey || e.altKey || e.metaKey) && isL) {
         e.preventDefault();
         e.stopPropagation();
+        e.stopImmediatePropagation();
         handleLockRequest();
       }
     },
@@ -385,7 +388,11 @@
   );
 
   var obs = new MutationObserver(function () {
-    if (document.querySelector("#pin-lock-overlay .pin-box")) {
+    var legacy = document.querySelector("#pin-lock-overlay .pin-box");
+    if (legacy) {
+      // main.js still injects a legacy pin UI — replace with the real lockscreen
+      var parent = document.getElementById("pin-lock-overlay");
+      if (parent) parent.remove();
       handleLockRequest();
     }
   });
