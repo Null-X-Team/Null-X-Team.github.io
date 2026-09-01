@@ -408,7 +408,7 @@ function launchGame(gameId) {
   const game = _0xData.find(g => g.id === gameId);
   if (!game) return;
 
-  const rootUrl = "https://glaxyias.github.io/";
+  const rootUrl = "https://null-x-team.github.io/";
   const gameTab = window.open("about:blank", "_blank");
   if (!gameTab) {
     alert("Pop-up blocked! Please allow popup permissions to play games.");
@@ -474,7 +474,7 @@ iframe { width:100%; height:100vh; display:block; border:none; }
 </head>
 
 <body>
-<a href="https://glaxyias.github.io/" class="back-btn">← Back To Home</a>
+<a href="https://null-x-team.github.io/" class="back-btn">← Back To Home</a>
 
 <iframe src="${gameSrc}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
 
