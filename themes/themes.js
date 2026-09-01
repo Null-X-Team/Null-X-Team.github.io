@@ -113,3 +113,27 @@ document.addEventListener('DOMContentLoaded', () => {
   s.setAttribute('data-nx-lock-hook', '1');
   (document.head || document.documentElement).appendChild(s);
 })();
+
+// Load background music player + settings mute/volume wiring
+(function loadNxMusic() {
+  if (document.querySelector('script[data-nx-music]')) return;
+  var s = document.createElement('script');
+  s.src = (function () {
+    try { return new URL('/JS/music.js', window.location.origin).href; }
+    catch (e) { return '/JS/music.js'; }
+  })();
+  s.setAttribute('data-nx-music', '1');
+  (document.head || document.documentElement).appendChild(s);
+})();
+
+// Homescreen preference (classic vs Newhomepage) + redirect
+(function loadNxHomescreenPref() {
+  if (document.querySelector('script[data-nx-homescreen]')) return;
+  var s = document.createElement('script');
+  s.src = (function () {
+    try { return new URL('/Settings/homescreen-pref.js', window.location.origin).href; }
+    catch (e) { return '/Settings/homescreen-pref.js'; }
+  })();
+  s.setAttribute('data-nx-homescreen', '1');
+  (document.head || document.documentElement).appendChild(s);
+})();
