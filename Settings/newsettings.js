@@ -50,14 +50,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Build / expand theme grid
     const grid = document.getElementById("themeGrid") || document.querySelector(".theme-grid");
     if (grid) {
         const existing = new Set();
         grid.querySelectorAll(".theme-option").forEach(btn => {
             const id = btn.dataset.theme;
             if (id) existing.add(id);
-            // ensure data-bg/accent
             if (THEME_CATALOG[id]) {
                 btn.dataset.bg = THEME_CATALOG[id].bg;
                 btn.dataset.accent = THEME_CATALOG[id].accent;
@@ -101,7 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.getItem(THEME_ACCENT_KEY)
     );
 
-    // Interactive mesh toggle
     const interactiveToggle = document.getElementById("interactiveBgToggle");
     if (interactiveToggle) {
         const enabled = localStorage.getItem(INTERACTIVE_BG_KEY);
@@ -109,34 +106,8 @@ document.addEventListener("DOMContentLoaded", () => {
         interactiveToggle.addEventListener("change", () => {
             localStorage.setItem(INTERACTIVE_BG_KEY, interactiveToggle.checked ? "true" : "false");
         });
-    } else {
-        // Inject background controls if missing from HTML
-        const animCard = document.getElementById("animToggle") && document.getElementById("animToggle").closest(".settings-card");
-        if (animCard && !document.getElementById("interactiveBgToggle")) {
-            const sec = document.createElement("section");
-            sec.className = "settings-card";
-            sec.innerHTML = '<h3>Background</h3><p class="subtitle">Interactive mesh and custom image.</p>' +
-                '<div class="setting-row"><label for="interactiveBgToggle">Interactive mesh background</label>' +
-                '<label class="switch"><input type="checkbox" id="interactiveBgToggle" checked><span class="slider"></span></label></div>' +
-                '<div class="setting-row" style="margin-top:14px;flex-direction:column;align-items:flex-start;gap:10px;">' +
-                '<label>Custom background image</label><div class="upload-row">' +
-                '<label class="file-btn" for="bgImageInput">Upload image</label>' +
-                '<input type="file" id="bgImageInput" accept="image/*" hidden>' +
-                '<button type="button" id="clearBgImageBtn" class="ghost-btn">Clear image</button></div>' +
-                '<div id="bgImagePreview" class="bg-preview hidden"></div></div>';
-            animCard.parentNode.insertBefore(sec, animCard);
-            const t = document.getElementById("interactiveBgToggle");
-            if (t) {
-                const en = localStorage.getItem(INTERACTIVE_BG_KEY);
-                t.checked = en === null ? true : en === "true";
-                t.addEventListener("change", () => {
-                    localStorage.setItem(INTERACTIVE_BG_KEY, t.checked ? "true" : "false");
-                });
-            }
-        }
     }
 
-    // Background image
     function wireBgImage() {
         const bgInput = document.getElementById("bgImageInput");
         const clearBgBtn = document.getElementById("clearBgImageBtn");
@@ -217,7 +188,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Animations toggle ALSO disables interactive mesh
     const animToggle = document.getElementById("animToggle");
     const getInteractiveToggle = () => document.getElementById("interactiveBgToggle");
     if (animToggle) {
@@ -252,5 +222,37 @@ document.addEventListener("DOMContentLoaded", () => {
             alert("Local data cleared. Reloading…");
             location.reload();
         });
+    }
+
+    // Homescreen switch (classic <-> Newhomepage)
+    const homescreenSelect = document.getElementById("homescreenSelect");
+    if (homescreenSelect) {
+        const savedHome = localStorage.getItem("nx_homescreen") === "classic" ? "classic" : "new";
+        homescreenSelect.value = savedHome;
+        homescreenSelect.addEventListener("change", () => {
+            const val = homescreenSelect.value === "classic" ? "classic" : "new";
+            localStorage.setItem("nx_homescreen", val);
+            if (val === "classic") {
+                window.location.href = "/index.html";
+            } else {
+                window.location.href = "/Newhomepage/index.html";
+            }
+        });
+    }
+
+    // Wire music controls (NullXMusic may load slightly later)
+    function wireMusicWhenReady() {
+        if (window.NullXMusic && typeof window.NullXMusic.wireSettingsUI === "function") {
+            window.NullXMusic.wireSettingsUI();
+            return true;
+        }
+        return false;
+    }
+    if (!wireMusicWhenReady()) {
+        let tries = 0;
+        const t = setInterval(() => {
+            tries++;
+            if (wireMusicWhenReady() || tries > 40) clearInterval(t);
+        }, 100);
     }
 });
