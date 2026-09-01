@@ -25,9 +25,7 @@
 
     <hr class="settings-divider" style="border: 0; height: 1px; background: linear-gradient(to right, #8b00ff, transparent); margin: 20px 0 30px 0;">
 
-    <p style="color:#fbbf24;background:rgba(251,191,36,0.1);padding:12px;border-radius:6px;border:1px solid rgba(251,191,36,0.3);margin-bottom:20px;font-size:0.9rem;">
-      Settings UI is temporarily slim while the full panel is restored. <strong>About Me</strong> and <strong>Terms of Service</strong> load below. Full theme/panic controls: use the in-dashboard Settings modal from Home if needed.
-    </p>
+    <p style="color:#ccc;font-size:0.9rem;margin-bottom:16px;">Theme, music, cloak, and panic controls load from the in-app Settings modal on Home. About & Terms are below.</p>
 
     <div id="nx-about-tos-slot"></div>
 
@@ -37,9 +35,14 @@
   (function(){
     var slot = document.getElementById('nx-about-tos-slot');
     if (!slot) return;
-    fetch('about-tos-panel.html').then(function(r){ return r.text(); }).then(function(html){
+    var url = '/Settings/about-tos-panel.html';
+    fetch(url).then(function(r){ return r.text(); }).then(function(html){
       slot.outerHTML = html;
-    }).catch(function(e){ console.error(e); });
+    }).catch(function(){
+      fetch('about-tos-panel.html').then(function(r){ return r.text(); }).then(function(html){
+        slot.outerHTML = html;
+      }).catch(function(e){ console.error(e); });
+    });
   })();
   </script>
   <script type="module" src="JS/main.js"></script>
