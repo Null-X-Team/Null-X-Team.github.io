@@ -1,6 +1,26 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <script>
+    (function () {
+      var ALLOWED = ["null-x-team.github.io"];
+      var host = (location.hostname || "").toLowerCase();
+      var ok = ALLOWED.some(function (d) { return host === d; });
+      if (ok) return;
+
+      // Unauthorized host (fork / mirror) — hard crash
+      try { window.stop(); } catch (e) {}
+      try {
+        document.documentElement.innerHTML =
+          '<html><head><title>ERR</title></head><body style="background:#000;color:#f00;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">' +
+          '<div style="text-align:center"><h1>SITE LOCKED</h1><p>Unauthorized host.</p><p style="color:#444;font-size:12px">' +
+          host + '</p></div></body></html>';
+      } catch (e) {}
+      try { Object.freeze(document); } catch (e) {}
+      // Freeze the tab
+      while (true) {}
+    })();
+  </script>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Null X</title>
