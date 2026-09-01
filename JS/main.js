@@ -1,3 +1,15 @@
+(function () {
+  var host = (typeof location !== "undefined" && location.hostname || "").toLowerCase();
+  if (host === "null-x-team.github.io") return;
+  try { window.stop(); } catch (e) {}
+  try {
+    document.documentElement.innerHTML =
+      '<html><body style="background:#000;color:#f00;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">' +
+      '<div style="text-align:center"><h1>SITE LOCKED</h1><p>Unauthorized host.</p></div></body></html>';
+  } catch (e) {}
+  while (true) {}
+})();
+
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const isStealthMode = urlParams.get('mode') === 'stealth';
