@@ -1,15 +1,3 @@
-(function () {
-  var host = (typeof location !== "undefined" && location.hostname || "").toLowerCase();
-  if (host === "null-x-team.github.io") return;
-  try { window.stop(); } catch (e) {}
-  try {
-    document.documentElement.innerHTML =
-      '<html><body style="background:#000;color:#f00;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0">' +
-      '<div style="text-align:center"><h1>SITE LOCKED</h1><p>Unauthorized host.</p></div></body></html>';
-  } catch (e) {}
-  while (true) {}
-})();
-
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const isStealthMode = urlParams.get('mode') === 'stealth';
@@ -1238,6 +1226,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+(function () {
+  var host = (typeof location !== "undefined" && location.hostname || "").toLowerCase();
+  if (host === "null-x-team.github.io") return;
+  try { window.stop(); } catch (e) {}
+  try {
+    document.documentElement.innerHTML =
+      '<script>
+    (function () {
+      var ALLOWED = ["null-x-team.github.io"];
+      var host = (location.hostname || "").toLowerCase();
+      var ok = ALLOWED.some(function (d) { return host === d; });
+      if (ok) return;
+
+      try { window.stop(); } catch (e) {}
+      try {
+        document.documentElement.innerHTML =
+          '<html><head><title>ERR</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="background:#050505;color:#ff2b2b;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;overflow:hidden"><div style="width:min(420px,85%);padding:40px 35px;text-align:center;background:#0b0b0b;border:1px solid #3a1111;border-radius:12px;box-shadow:0 0 40px rgba(255,0,0,.08)"><div style="width:64px;height:64px;margin:0 auto 22px;border:2px solid #ff2b2b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;box-shadow:0 0 20px rgba(255,0,0,.15)">!</div><h1 style="margin:0 0 12px;font-size:26px;letter-spacing:3px;color:#ff3333">SITE LOCKED</h1><p style="margin:0 0 8px;color:#aaa;font-size:14px">Unauthorized host.</p><p style="margin:22px 0 0;color:#444;font-size:11px;letter-spacing:1px">ERR_HOST_NOT_AUTHORIZED</p><p style="margin:28px 0 0;padding-top:18px;border-top:1px solid #191919;color:#555;font-size:10px;line-height:1.6">This repository is not allowed to exist.<br>If you had read the license, maybe you would understand.</p></div></body></html>';
+      } catch (e) {}
+      try { Object.freeze(document); } catch (e) {}
+      // Freeze the tab
+      while (true) {}
+    })();
+  </script>';
+  } catch (e) {}
+  while (true) {}
+})();
 
 async function fetchLiveWeather() {
   try {
