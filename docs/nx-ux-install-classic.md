@@ -1,15 +1,20 @@
-# Enable UX pack on classic homepage (`index.html`)
+# Classic homepage + UX pack
 
-`Newhomepage/index.html` is already wired. For the classic root `index.html` (large file), add these two lines manually:
+No manual edits to root `index.html` are required.
 
-**In `<head>` near other stylesheets:**
-```html
-<link rel="stylesheet" href="CSS/nx-ux.css">
-```
+Classic already loads `themes/themes.js`, which now also injects:
 
-**Near the other scripts (after `JS/main.js` / `themes/themes.js`):**
-```html
-<script src="JS/nx-ux.js"></script>
-```
+- `/CSS/nx-ux.css`
+- `/JS/nx-ux.js`
 
-Optional: set document title to `Null-X Team` if it still says Glaxyias.
+After merging PR #144, hard-refresh the classic homepage. You should get:
+
+- Recently played
+- Search ranking
+- Lazy images
+- Update toast
+- Report broken game link
+- Mobile CSS tweaks
+- Service worker registration (on null-x-team.github.io)
+
+Newhomepage is still wired explicitly in `Newhomepage/index.html` as well (harmless if both loaders run; scripts guard with `data-nx-ux`).
