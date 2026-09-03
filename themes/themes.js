@@ -63,9 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.applyTheme(savedTheme);
 
   document.addEventListener('click', (e) => {
-    const themeOption = e.target.closest('[data-theme]');
-    if (!themeOption) return;
-    const theme = themeOption.getAttribute('data-theme');
+    const card = e.target.closest('.theme-card, .theme-option');
+    if (!card) return;
+    const theme = card.getAttribute('data-theme');
     if (theme) window.applyTheme(theme);
   });
 
