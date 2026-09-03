@@ -40,19 +40,63 @@ window.applyTheme = function(themeName) {
   document.documentElement.setAttribute('data-theme', name);
   document.body.setAttribute('data-theme', name);
 
-  try {
-    localStorage.setItem('selectedTheme', name);
-    localStorage.setItem('nxos_theme', name);
-  } catch (e) {}
+  // Keep all historical storage keys in sync so settings/debug/newsettings agree
+  localStorage.setItem('nullx-theme', name);
+  localStorage.setItem('selectedTheme', name);
+  localStorage.setItem('nxos_theme', name);
 };
 
-// Restore theme on load
-(function restoreTheme() {
+document.addEventListener('DOMContentLoaded', () => {
+  // Run guard early and keep watching in case debug injects styles later
+  nxScopeDebugStyles();
   try {
-    var saved = localStorage.getItem('nxos_theme') || localStorage.getItem('selectedTheme') || 'default';
-    if (typeof window.applyTheme === 'function') window.applyTheme(saved);
+    const mo = new MutationObserver(function () { nxScopeDebugStyles(); });
+    mo.observe(document.head || document.documentElement, { childList: true, subtree: true });
   } catch (e) {}
-})();
+
+  const savedTheme =
+    localStorage.getItem('selectedTheme') ||
+    localStorage.getItem('nullx-theme') ||
+    localStorage.getItem('nxos_theme') ||
+    'default';
+
+  window.applyTheme(savedTheme);
+
+  document.addEventListener('click', (e) => {
+    const themeOption = e.target.closest('[data-theme]');
+    if (!themeOption) return;
+    const theme = themeOption.getAttribute('data-theme');
+    if (theme) window.applyTheme(theme);
+  });
+
+  // Calculator nav alias (optional)
+  const navTerm = document.getElementById('nav-calculator') || document.getElementById('nav-terminal');
+  if (navTerm && !navTerm.dataset.nxCalcWired) {
+    navTerm.dataset.nxCalcWired = '1';
+    navTerm.innerHTML = '<i class="fas fa-calculator" style="margin-right:8px;"></i>Calculator';
+    navTerm.onclick = function (e) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      if (typeof clearAllViews === 'function') clearAllViews();
+      if (typeof updateNavActiveState === 'function') updateNavActiveState('nav-calculator');
+      else {
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        navTerm.classList.add('active');
+      }
+      let sec = document.getElementById('calculatorSection') || document.getElementById('terminalSection');
+      if (sec) {
+        sec.id = 'calculatorSection';
+        sec.style.setProperty('display', 'block', 'important');
+        sec.innerHTML =
+          '<h2 style="margin-top:0;color:#fff;font-family:sans-serif;">Calculator</h2>' +
+          '<iframe src="calculator/index.html" title="Calculator" ' +
+          'style="width:100%;height:calc(100vh - 160px);min-height:520px;border:1px solid rgba(139,0,255,0.35);' +
+          'border-radius:8px;background:#000;"></iframe>';
+      }
+    };
+  }
+});
+
 
 // Load full lockscreen hook (Alt+L / Ctrl+L -> Lockscreen/Lockscreen.html)
 (function loadNxLockHook() {
@@ -95,16 +139,16 @@ window.applyTheme = function(themeName) {
 
 // UX pack: recently played, search ranking, lazy images, toast, mobile CSS
 (function loadNxUx() {
-  if (document.querySelector('link[data-nx-ux-css]')) return;
-  var css = document.createElement('link');
-  css.rel = 'stylesheet';
-  css.href = (function () {
-    try { return new URL('/CSS/nx-ux.css', window.location.origin).href; }
-    catch (e) { return '/CSS/nx-ux.css'; }
-  })();
-  css.setAttribute('data-nx-ux-css', '1');
-  (document.head || document.documentElement).appendChild(css);
-
+  if (!document.querySelector('link[data-nx-ux-css]')) {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = (function () {
+      try { return new URL('/CSS/nx-ux.css', window.location.origin).href; }
+      catch (e) { return '/CSS/nx-ux.css'; }
+    })();
+    css.setAttribute('data-nx-ux-css', '1');
+    (document.head || document.documentElement).appendChild(css);
+  }
   if (document.querySelector('script[data-nx-ux]')) return;
   var s = document.createElement('script');
   s.src = (function () {
