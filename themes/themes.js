@@ -137,3 +137,25 @@ document.addEventListener('DOMContentLoaded', () => {
   s.setAttribute('data-nx-homescreen', '1');
   (document.head || document.documentElement).appendChild(s);
 })();
+
+// UX pack: recently played, search ranking, lazy images, toast, mobile CSS
+(function loadNxUx() {
+  if (!document.querySelector('link[data-nx-ux-css]')) {
+    var css = document.createElement('link');
+    css.rel = 'stylesheet';
+    css.href = (function () {
+      try { return new URL('/CSS/nx-ux.css', window.location.origin).href; }
+      catch (e) { return '/CSS/nx-ux.css'; }
+    })();
+    css.setAttribute('data-nx-ux-css', '1');
+    (document.head || document.documentElement).appendChild(css);
+  }
+  if (document.querySelector('script[data-nx-ux]')) return;
+  var s = document.createElement('script');
+  s.src = (function () {
+    try { return new URL('/JS/nx-ux.js', window.location.origin).href; }
+    catch (e) { return '/JS/nx-ux.js'; }
+  })();
+  s.setAttribute('data-nx-ux', '1');
+  (document.head || document.documentElement).appendChild(s);
+})();
