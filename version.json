@@ -1,1 +1,11 @@
-{"version": 1788397110825}
+{
+  "version": "2026.09.03.1",
+  "notes": [
+    "Recently played row",
+    "Smarter game search ranking",
+    "Lazy-load + missing image fallback",
+    "Update toast + report broken game link",
+    "Mobile layout tweaks",
+    "Light offline shell cache"
+  ]
+}
