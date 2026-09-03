@@ -1,0 +1,139 @@
+/* Null-X UX enhancements */
+.nx-recents-section {
+  margin: 12px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(139, 0, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(10, 10, 18, 0.55);
+}
+.nx-recents-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.nx-recents-head h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #c4b5fd;
+  letter-spacing: 0.02em;
+}
+.nx-recents-clear {
+  background: transparent;
+  border: 1px solid rgba(139, 0, 255, 0.35);
+  color: #a78bfa;
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.nx-recents-clear:hover {
+  background: rgba(139, 0, 255, 0.15);
+}
+.nx-recents-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.nx-recent-chip {
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  background: rgba(139, 0, 255, 0.12);
+  border: 1px solid rgba(139, 0, 255, 0.35);
+  color: #e9d5ff;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.nx-recent-chip:hover {
+  background: rgba(139, 0, 255, 0.28);
+}
+
+.nx-report-link {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 10px;
+  font-size: 12px;
+  color: #a78bfa;
+  text-decoration: none;
+  opacity: 0.85;
+}
+.nx-report-link:hover { opacity: 1; text-decoration: underline; }
+
+.nx-ux-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 999999;
+  max-width: min(340px, calc(100vw - 32px));
+  background: #0d0d13;
+  border: 1px solid rgba(139, 0, 255, 0.55);
+  border-radius: 10px;
+  padding: 14px 36px 14px 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+  color: #eee;
+  font-family: system-ui, sans-serif;
+  animation: nxToastIn 0.3s ease;
+}
+.nx-ux-toast-title {
+  color: #c084fc;
+  font-weight: 700;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.nx-ux-toast-body {
+  font-size: 12px;
+  color: #bbb;
+  line-height: 1.4;
+}
+.nx-ux-toast-x {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: transparent;
+  color: #888;
+  font-size: 18px;
+  cursor: pointer;
+}
+@keyframes nxToastIn {
+  from { transform: translateY(12px); opacity: 0; }
+  to { transform: none; opacity: 1; }
+}
+
+.nx-img-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100px;
+  color: #7c3aed;
+  font-size: 12px;
+}
+
+@media (max-width: 768px) {
+  .nx-ux .nav-tab-item,
+  .nx-ux .nav-item {
+    min-height: 44px;
+  }
+  .nx-ux #searchBar,
+  .nx-ux .search-container input {
+    font-size: 16px;
+  }
+  .nx-ux .apps-grid,
+  .nx-ux #gameGrid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+    gap: 10px !important;
+  }
+  .nx-ux .nx-recent-chip {
+    max-width: 46%;
+  }
+  .nx-ux .settings-container,
+  .nx-ux .main-content {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
