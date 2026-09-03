@@ -1,3 +1,4 @@
+
 (function() {
     const urlParams = new URLSearchParams(window.location.search);
     const isStealthMode = urlParams.get('mode') === 'stealth';
@@ -435,40 +436,45 @@ iframe { width:100%; height:100vh; display:block; border:none; }
 .back-btn {
   position: fixed; top: 15px; left: 15px; z-index: 99999999;
   background: #0a0a0a; color: #8b00ff; border: 2px solid #8b00ff;
-  padding: 8px 14px; font-weight: bold; border-radius: 6px;
-  cursor: pointer; box-shadow: 0 0 10px rgba(139,0,255,0.5);
-  font-family: sans-serif; text-decoration: none; display: inline-block;
+  padding: 8px 14px; font-weight: bold; border-radius: 8px;
+  cursor: pointer; box-shadow: 0 0 12px rgba(139,0,255,0.45);
+  font-family: system-ui, sans-serif; text-decoration: none; display: inline-flex;
+  align-items: center; gap: 6px; user-select: none; touch-action: none;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+.back-btn:hover {
+  background: #140a1c; border-color: #b056ff; box-shadow: 0 0 16px rgba(139,0,255,0.65);
+}
+.back-btn.dragging {
+  cursor: grabbing; opacity: 0.92; box-shadow: 0 0 20px rgba(139,0,255,0.8);
+  transition: none;
 }
 
 #back-btn-hint {
-  position: fixed;
-  top: 60px;
-  left: 15px;
-  background: #0a0a0a;
-  color: #8b00ff;
-  padding: 6px 10px;
-  border: 2px solid #8b00ff;
-  border-radius: 6px;
-  font-family: sans-serif;
-  z-index: 99999999;
-  box-shadow: 0 0 10px rgba(139,0,255,0.5);
+  position: fixed; top: 58px; left: 15px; z-index: 99999999;
+  background: rgba(10,10,10,0.95); color: #c4b5fd;
+  padding: 8px 12px; border: 1px solid #8b00ff; border-radius: 8px;
+  font-family: system-ui, sans-serif; font-size: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5); pointer-events: none;
+  animation: nxHintIn 0.25s ease;
 }
+@keyframes nxHintIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
 
 #back-btn-menu {
-  position: fixed;
-  background: #0a0a0a;
-  color: #8b00ff;
-  border: 2px solid #8b00ff;
-  border-radius: 6px;
-  padding: 6px;
-  font-family: sans-serif;
-  z-index: 99999999;
-  box-shadow: 0 0 10px rgba(139,0,255,0.5);
+  position: fixed; z-index: 999999999;
+  background: #0d0d13; color: #e9d5ff;
+  border: 1px solid rgba(139,0,255,0.55); border-radius: 10px;
+  padding: 6px; min-width: 160px;
+  font-family: system-ui, sans-serif; font-size: 13px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.55);
+  animation: nxHintIn 0.15s ease;
 }
-
 #back-btn-menu div {
-  padding: 4px 6px;
-  cursor: pointer;
+  padding: 8px 12px; border-radius: 6px; cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+#back-btn-menu div:hover {
+  background: rgba(139,0,255,0.22); color: #fff;
 }
 </style>
 </head>
@@ -479,116 +485,234 @@ iframe { width:100%; height:100vh; display:block; border:none; }
 <iframe src="${gameSrc}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
 
 <script>
-// First-time hint
-(function() {
-  if (!localStorage.getItem("backBtnHintShown")) {
-    var hint = document.createElement("div");
-    hint.id = "back-btn-hint";
-    hint.textContent = "Hate the positioning? Right-click to move it.";
-    document.body.appendChild(hint);
+(function () {
+  var POS_KEY = "nx_back_btn_pos";
+  var backBtn = null;
+  var dragState = null;
+
+  function clamp(n, min, max) { return Math.max(min, Math.min(max, n)); }
+
+  function savePos(data) {
+    try { localStorage.setItem(POS_KEY, JSON.stringify(data)); } catch (e) {}
   }
-})();
 
-window.addEventListener("load", function() {
-  var backBtn = document.querySelector(".back-btn");
-  if (!backBtn) return;
+  function loadPos() {
+    try {
+      var raw = localStorage.getItem(POS_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
 
-  backBtn.style.position = "fixed";
+  function applySavedPos(btn) {
+    var p = loadPos();
+    if (!p) return;
+    btn.style.transform = "";
+    btn.style.top = p.top != null ? p.top : "";
+    btn.style.bottom = p.bottom != null ? p.bottom : "";
+    btn.style.left = p.left != null ? p.left : "";
+    btn.style.right = p.right != null ? p.right : "";
+    if (p.transform) btn.style.transform = p.transform;
+  }
 
-  backBtn.addEventListener("contextmenu", function(e) {
+  function snapshotPos(btn) {
+    return {
+      top: btn.style.top || null,
+      bottom: btn.style.bottom || null,
+      left: btn.style.left || null,
+      right: btn.style.right || null,
+      transform: btn.style.transform || ""
+    };
+  }
+
+  function setBackBtnPos(btn, top, bottom, right, left) {
+    btn.style.transition = "top 0.25s ease, left 0.25s ease, right 0.25s ease, bottom 0.25s ease, transform 0.25s ease";
+    btn.style.top = top != null ? top : "auto";
+    btn.style.bottom = bottom != null ? bottom : "auto";
+    btn.style.right = right != null ? right : "auto";
+    btn.style.left = left != null ? left : "auto";
+    btn.style.transform = "";
+    savePos(snapshotPos(btn));
+    setTimeout(function () { btn.style.transition = ""; }, 280);
+  }
+
+  function setBackBtnCenter(btn, top, bottom) {
+    btn.style.transition = "top 0.25s ease, left 0.25s ease, right 0.25s ease, bottom 0.25s ease, transform 0.25s ease";
+    btn.style.top = top != null ? top : "auto";
+    btn.style.bottom = bottom != null ? bottom : "auto";
+    btn.style.left = "50%";
+    btn.style.right = "auto";
+    btn.style.transform = "translateX(-50%)";
+    savePos(snapshotPos(btn));
+    setTimeout(function () { btn.style.transition = ""; }, 280);
+  }
+
+  function placeMenu(menu, x, y) {
+    document.body.appendChild(menu);
+    var rect = menu.getBoundingClientRect();
+    var left = clamp(x, 8, window.innerWidth - rect.width - 8);
+    var top = clamp(y, 8, window.innerHeight - rect.height - 8);
+    menu.style.left = left + "px";
+    menu.style.top = top + "px";
+  }
+
+  function showBackBtnMenu(x, y, btn) {
+    var oldMenu = document.getElementById("back-btn-menu");
+    if (oldMenu) oldMenu.remove();
+
+    var menu = document.createElement("div");
+    menu.id = "back-btn-menu";
+
+    var options = [
+      { label: "Top Left", run: function () { setBackBtnPos(btn, "15px", null, null, "15px"); } },
+      { label: "Top Center", run: function () { setBackBtnCenter(btn, "15px"); } },
+      { label: "Top Right", run: function () { setBackBtnPos(btn, "15px", null, "15px", null); } },
+      { label: "Bottom Left", run: function () { setBackBtnPos(btn, null, "15px", null, "15px"); } },
+      { label: "Bottom Center", run: function () { setBackBtnCenter(btn, null, "15px"); } },
+      { label: "Bottom Right", run: function () { setBackBtnPos(btn, null, "15px", "15px", null); } },
+      { label: "Drag to move", run: function () { startDragMode(btn); } }
+    ];
+
+    options.forEach(function (opt) {
+      var item = document.createElement("div");
+      item.textContent = opt.label;
+      item.addEventListener("click", function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        opt.run();
+        menu.remove();
+      });
+      menu.appendChild(item);
+    });
+
+    placeMenu(menu, x, y);
+
+    setTimeout(function () {
+      document.addEventListener("click", function closeMenu() {
+        if (menu.parentNode) menu.remove();
+        document.removeEventListener("click", closeMenu);
+      });
+    }, 0);
+  }
+
+  function onPointerMove(e) {
+    if (!dragState) return;
     e.preventDefault();
+    var clientX = e.clientX != null ? e.clientX : (e.touches && e.touches[0].clientX);
+    var clientY = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+    if (clientX == null) return;
 
-    var hint = document.getElementById("back-btn-hint");
-    if (hint) {
-      hint.remove();
-      localStorage.setItem("backBtnHintShown", "true");
+    var btn = dragState.btn;
+    var w = btn.offsetWidth;
+    var h = btn.offsetHeight;
+    var left = clamp(clientX - dragState.offsetX, 0, window.innerWidth - w);
+    var top = clamp(clientY - dragState.offsetY, 0, window.innerHeight - h);
+
+    btn.style.left = left + "px";
+    btn.style.top = top + "px";
+    btn.style.right = "auto";
+    btn.style.bottom = "auto";
+    btn.style.transform = "";
+    dragState.moved = true;
+  }
+
+  function onPointerUp(e) {
+    if (!dragState) return;
+    var btn = dragState.btn;
+    var moved = dragState.moved;
+    btn.classList.remove("dragging");
+    btn.style.cursor = "pointer";
+    document.removeEventListener("mousemove", onPointerMove);
+    document.removeEventListener("mouseup", onPointerUp);
+    document.removeEventListener("touchmove", onPointerMove);
+    document.removeEventListener("touchend", onPointerUp);
+    if (moved) {
+      savePos(snapshotPos(btn));
+      // block the click that would navigate home right after a drag
+      var block = function (ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        btn.removeEventListener("click", block, true);
+      };
+      btn.addEventListener("click", block, true);
+      setTimeout(function () { btn.removeEventListener("click", block, true); }, 50);
+    }
+    dragState = null;
+  }
+
+  function beginDrag(btn, clientX, clientY) {
+    var rect = btn.getBoundingClientRect();
+    dragState = {
+      btn: btn,
+      offsetX: clientX - rect.left,
+      offsetY: clientY - rect.top,
+      moved: false
+    };
+    btn.classList.add("dragging");
+    btn.style.cursor = "grabbing";
+    btn.style.transition = "none";
+    btn.style.transform = "";
+    // convert any right/bottom anchoring to left/top so drag is stable
+    btn.style.left = rect.left + "px";
+    btn.style.top = rect.top + "px";
+    btn.style.right = "auto";
+    btn.style.bottom = "auto";
+
+    document.addEventListener("mousemove", onPointerMove, { passive: false });
+    document.addEventListener("mouseup", onPointerUp);
+    document.addEventListener("touchmove", onPointerMove, { passive: false });
+    document.addEventListener("touchend", onPointerUp);
+  }
+
+  function startDragMode(btn) {
+    btn.style.cursor = "grab";
+    var once = function (e) {
+      e.preventDefault();
+      var clientX = e.clientX != null ? e.clientX : (e.touches && e.touches[0].clientX);
+      var clientY = e.clientY != null ? e.clientY : (e.touches && e.touches[0].clientY);
+      beginDrag(btn, clientX, clientY);
+      btn.removeEventListener("mousedown", once);
+      btn.removeEventListener("touchstart", once);
+    };
+    btn.addEventListener("mousedown", once);
+    btn.addEventListener("touchstart", once, { passive: false });
+  }
+
+  function init() {
+    backBtn = document.querySelector(".back-btn");
+    if (!backBtn) return;
+    backBtn.style.position = "fixed";
+    applySavedPos(backBtn);
+
+    if (!localStorage.getItem("backBtnHintShown")) {
+      var hint = document.createElement("div");
+      hint.id = "back-btn-hint";
+      hint.textContent = "Right-click the button to reposition it.";
+      document.body.appendChild(hint);
+      setTimeout(function () {
+        if (hint.parentNode) hint.remove();
+      }, 5000);
     }
 
-    showBackBtnMenu(e.pageX, e.pageY, backBtn);
-  });
-});
-
-function showBackBtnMenu(x, y, backBtn) {
-  var oldMenu = document.getElementById("back-btn-menu");
-  if (oldMenu) oldMenu.remove();
-
-  var menu = document.createElement("div");
-  menu.id = "back-btn-menu";
-  menu.style.top = y + "px";
-  menu.style.left = x + "px";
-
-  var options = [
-    { label: "Top Left", pos: function(){ setBackBtnPos(backBtn, "15px", null, null, "15px"); } },
-    { label: "Top Center", pos: function(){ setBackBtnCenter(backBtn, "15px"); } },
-    { label: "Top Right", pos: function(){ setBackBtnPos(backBtn, "15px", null, "15px", null); } },
-    { label: "Bottom Left", pos: function(){ setBackBtnPos(backBtn, null, "15px", null, "15px"); } },
-    { label: "Bottom Center", pos: function(){ setBackBtnCenter(backBtn, null, "15px"); } },
-    { label: "Bottom Right", pos: function(){ setBackBtnPos(backBtn, null, "15px", "15px", null); } },
-    { label: "Custom (Drag)", pos: function(){ enableBackBtnDrag(backBtn); } }
-  ];
-
-  for (var i = 0; i < options.length; i++) {
-    var item = document.createElement("div");
-    item.textContent = options[i].label;
-    item.addEventListener("click", (function(opt){
-      return function(){
-        opt.pos();
-        menu.remove();
-      };
-    })(options[i]));
-    menu.appendChild(item);
+    backBtn.addEventListener("contextmenu", function (e) {
+      e.preventDefault();
+      var hint = document.getElementById("back-btn-hint");
+      if (hint) {
+        hint.remove();
+        localStorage.setItem("backBtnHintShown", "true");
+      }
+      showBackBtnMenu(e.clientX, e.clientY, backBtn);
+    });
   }
 
-  document.body.appendChild(menu);
-
-  document.addEventListener("click", function(){ menu.remove(); }, { once: true });
-}
-
-function setBackBtnPos(btn, top, bottom, right, left) {
-  btn.style.top = top;
-  btn.style.bottom = bottom;
-  btn.style.right = right;
-  btn.style.left = left;
-  btn.style.transform = "";
-}
-
-function setBackBtnCenter(btn, top, bottom) {
-  btn.style.top = top;
-  btn.style.bottom = bottom;
-  btn.style.left = "50%";
-  btn.style.right = null;
-  btn.style.transform = "translateX(-50%)";
-}
-
-function enableBackBtnDrag(btn) {
-  btn.style.cursor = "move";
-  btn.style.transform = "";
-
-  var dragging = false;
-
-  var startDrag = function(e) {
-    dragging = true;
-    document.addEventListener("mousemove", drag);
-    document.addEventListener("mouseup", stopDrag);
-  };
-
-  var drag = function(e) {
-    if (!dragging) return;
-    btn.style.left = e.pageX + "px";
-    btn.style.top = e.pageY + "px";
-    btn.style.right = null;
-    btn.style.bottom = null;
-  };
-
-  var stopDrag = function() {
-    dragging = false;
-    btn.style.cursor = "pointer";
-    document.removeEventListener("mousemove", drag);
-    document.removeEventListener("mouseup", stopDrag);
-  };
-
-  btn.addEventListener("mousedown", startDrag, { once: true });
-}
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", init);
+  } else {
+    init();
+  }
+  window.addEventListener("load", function () {
+    if (!backBtn) init();
+  });
+})();
 <\/script>
 
 </body>
