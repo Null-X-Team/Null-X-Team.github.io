@@ -44,11 +44,16 @@ document.addEventListener('DOMContentLoaded', () => {
   window.applyTheme(savedTheme);
   document.addEventListener('click', (e) => {
     const card = e.target.closest('.theme-card, .theme-option');
-    if (card) {
-      const selectedTheme = card.getAttribute('data-theme') || card.dataset.theme;
-      if (selectedTheme) window.applyTheme(selectedTheme);
-    }
+    if (!card) return;
+    const theme = card.getAttribute('data-theme');
+    if (theme) window.applyTheme(theme);
   });
+
+  // Calculator nav alias (optional)
+  const navTerm = document.getElementById('nav-calculator') || document.getElementById('nav-terminal');
+  if (navTerm && !navTerm.dataset.nxCalcWired) {
+    navTerm.dataset.nxCalcWired = '1';
+    navTerm.innerHTML = '<i class="fas fa-calculator" style="margin-right:8px;"></i>Calculator';
   const navTerm = document.getElementById('nav-terminal');
   if (navTerm) {
     navTerm.id = 'nav-calculator';
@@ -109,6 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
   (document.head || document.documentElement).appendChild(s);
 })();
 
+// UX pack: recently played, search ranking, lazy images, toast, mobile CSS
 (function loadNxUx() {
   if (!document.querySelector('link[data-nx-ux-css]')) {
     var css = document.createElement('link');
