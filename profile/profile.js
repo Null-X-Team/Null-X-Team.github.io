@@ -1,14 +1,11 @@
 // profile/profile.js — own + public profiles, robust avatars
-const SUPABASE_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
+// Turso via Vercel API (replaces Supabase)
+const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
 
 const DEFAULT_PFP = 'https://null-x-team.github.io/imgs/download.jpeg';
 
-const SUPABASE_HEADERS = {
-  apikey: SUPABASE_KEY,
-  Authorization: `Bearer ${SUPABASE_KEY}`,
-  'Content-Type': 'application/json',
-  Prefer: 'return=representation'
+const TURSO_HEADERS = {
+  'Content-Type': 'application/json'
 };
 
 function initialsAvatar(name) {
@@ -198,19 +195,19 @@ window.initProfileSystem = async () => {
   const loadProfile = async () => {
     try {
       const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(targetUser)}&select=*`,
-        { headers: SUPABASE_HEADERS }
+        `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(targetUser)}`,
+        { headers: TURSO_HEADERS }
       );
-      const data = await response.json();
+      const data = response.ok ? await response.json() : null;
 
       const userResponse = await fetch(
-        `${SUPABASE_URL}/rest/v1/users?username=ilike.${encodeURIComponent(targetUser)}&select=created_at`,
-        { headers: SUPABASE_HEADERS }
+        `${TURSO_API_BASE}/users?username=${encodeURIComponent(targetUser)}`,
+        { headers: TURSO_HEADERS }
       );
-      const userData = await userResponse.json();
+      const userData = userResponse.ok ? await userResponse.json() : null;
 
-      if (Array.isArray(data) && data[0]) {
-        const profile = data[0];
+      if (data && data.username) {
+        const profile = data;
         paintBio(profile.bio || '');
         currentPfpUrl = profile.pfp_url || '';
         setAvatar(pfpPreview, currentPfpUrl || DEFAULT_PFP, targetUser);
@@ -230,8 +227,8 @@ window.initProfileSystem = async () => {
         setAvatar(pfpPreview, DEFAULT_PFP, targetUser);
       }
 
-      if (Array.isArray(userData) && userData[0] && userData[0].created_at) {
-        const joined = new Date(userData[0].created_at).toLocaleDateString(undefined, {
+      if (userData && userData.created_at) {
+        const joined = new Date(userData.created_at).toLocaleDateString(undefined, {
           year: 'numeric',
           month: 'long',
           day: 'numeric'
@@ -251,11 +248,11 @@ window.initProfileSystem = async () => {
   const checkAndSetupAdminControls = async (targetUserIsAdmin) => {
     try {
       const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/user_roles?username=ilike.${encodeURIComponent(loggedInUser)}&select=is_admin`,
-        { headers: SUPABASE_HEADERS }
+        `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
+        { headers: TURSO_HEADERS }
       );
-      const data = await response.json();
-      const meAdmin = Array.isArray(data) && data[0] && data[0].is_admin;
+      const data = response.ok ? await response.json() : null;
+      const meAdmin = data && data.is_admin;
       const container = document.getElementById('admin-actions-container');
       const btn = document.getElementById('toggle-admin-btn');
       const label = document.getElementById('toggle-admin-label');
@@ -266,12 +263,21 @@ window.initProfileSystem = async () => {
 
       btn.onclick = async () => {
         const next = !targetUserIsAdmin;
+        const roleRes = await fetch(
+          `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(targetUser)}`,
+          { headers: TURSO_HEADERS }
+        );
+        if (!roleRes.ok) {
+          alert('Could not load role record.');
+          return;
+        }
+        const roleRow = await roleRes.json();
         const res = await fetch(
-          `${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(targetUser)}`,
+          `${TURSO_API_BASE}/user-roles`,
           {
             method: 'PATCH',
-            headers: SUPABASE_HEADERS,
-            body: JSON.stringify({ is_admin: next })
+            headers: TURSO_HEADERS,
+            body: JSON.stringify({ id: roleRow.id, is_admin: next ? 1 : 0 })
           }
         );
         if (res.ok) {
@@ -327,12 +333,19 @@ window.initProfileSystem = async () => {
       saveBtn.disabled = true;
 
       try {
+        const roleRes = await fetch(
+          `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
+          { headers: TURSO_HEADERS }
+        );
+        if (!roleRes.ok) throw new Error('Role record not found.');
+        const roleRow = await roleRes.json();
         const response = await fetch(
-          `${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(loggedInUser)}`,
+          `${TURSO_API_BASE}/user-roles`,
           {
             method: 'PATCH',
-            headers: SUPABASE_HEADERS,
+            headers: TURSO_HEADERS,
             body: JSON.stringify({
+              id: roleRow.id,
               bio: bio,
               pfp_url: finalPfp
             })
