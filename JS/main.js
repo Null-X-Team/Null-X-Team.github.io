@@ -134,7 +134,7 @@ let _0xData = [
 
   { id: "leafblower", title: "leafblower", url: "../Games/leafblower/index.html", desc: "Clear yards of leaves with your leaf blower, upgrade your gear, and grow your lawn-care empire in this idle-style game.", popular: true, image: "../Games/leafblower/images (11).jpeg" },
 
-  { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "A hyper-violent, style-focused FPS where every kill chains into the next—move fast, shoot faster, and stay stylish.", popular: true },
+  { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "A hyper-violent, style-focused FPS where every kill chains into the next—move fast, shoot faster, and stay stylish.", popular: true , image: "../Games/ultrakill/images (6).jpeg" },
 
   { id: "halflife", title: "halflife", url: "../Games/halflife/index.html", desc: "Step into the classic sci-fi shooter: fight through Black Mesa, battle aliens, and uncover a conspiracy that changes everything.", popular: true , image: "../Games/halflife/images (3).jpeg" },
 
