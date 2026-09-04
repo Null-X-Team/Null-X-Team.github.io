@@ -92,6 +92,7 @@
             margin-bottom: 20px;
         }
 
+        /* Utility class to hide elements smoothly */
         .hidden {
             display: none;
         }
@@ -219,9 +220,10 @@
         <div class="message-box" id="messageBox"></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/gh/Null-X-Team/badwordfilter@main/badword.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/Null-X-Team/badwordfilter@main/badword.js"></script>
     <script src="username-filter.js"></script>
     <script>
+        // --- CONFIGURATION ---
         const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
         const RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/verify_user_login`;
         const SIGNUP_RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/register_user_hashed`;
@@ -236,6 +238,7 @@
 
         let currentMode = 'signup';
 
+        // --- INTERFACE UTILITIES ---
         function setMode(mode) {
             currentMode = mode;
             const tabCreate = document.getElementById('tabCreate');
@@ -251,6 +254,8 @@
                 tabCreate.classList.add('active');
                 tabLogin.classList.remove('active');
                 submitBtn.textContent = 'Create Account';
+                
+                // Show handler field for signup
                 handlerGroup.classList.remove('hidden');
                 handlerInput.required = true;
                 usernameLabel.textContent = 'Display Name';
@@ -258,6 +263,8 @@
                 tabLogin.classList.add('active');
                 tabCreate.classList.remove('active');
                 submitBtn.textContent = 'Login';
+                
+                // Hide handler field for login (assume they log in with Display Name or you can change to Handler)
                 handlerGroup.classList.add('hidden');
                 handlerInput.required = false;
                 usernameLabel.textContent = 'Display Name or Handler';
@@ -282,7 +289,8 @@
             msgBox.className = isError ? 'message-box error-msg' : 'message-box success-msg';
         }
 
-        function handleSubmit(event) {
+        // --- REQUEST ROUTER ---
+                function handleSubmit(event) {
             event.preventDefault();
             const userVal = document.getElementById('username').value.trim();
             let handlerVal = document.getElementById('handler').value.trim();
@@ -294,6 +302,7 @@
             }
 
             if (currentMode === 'signup') {
+                // Format handler to ensure it starts with @
                 if (!handlerVal.startsWith('@')) {
                     handlerVal = '@' + handlerVal;
                 }
@@ -303,6 +312,7 @@
                     return;
                 }
 
+                // Block inappropriate display names / handlers (badwordfilter)
                 if (typeof window.nxUsernameIsClean === 'function') {
                     if (!window.nxUsernameIsClean(userVal)) {
                         showMessage('Display name contains inappropriate language. Please choose another.');
@@ -322,12 +332,16 @@
                 
                 handleSignUp(userVal, handlerVal, passVal);
             } else {
+                // For login, we just pass what they typed into the username box 
+                // (which could be a handler or a username depending on your backend setup)
                 handleLogin(userVal, passVal);
             }
         }
 
+        // --- HASHED SIGN UP ROUTINE ---
         async function handleSignUp(username, handler, password) {
             try {
+                // Payload now includes new_handler
                 const response = await fetch(SIGNUP_RPC_URL, {
                     method: 'POST',
                     headers: headers,
@@ -340,6 +354,8 @@
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
+                    
+                    // Catch unique constraint errors based on Supabase RPC feedback
                     if (errorData.message && errorData.message.includes('Username is already taken')) {
                         showMessage('Display Name is already taken!');
                     } else if (errorData.message && errorData.message.includes('Handler is already taken')) {
@@ -350,6 +366,7 @@
                     return;
                 }
 
+                // Store handler instead of display name for chat logic if you prefer
                 localStorage.setItem('chatUser', handler);
                 showMessage('Account created successfully! Logging you in...', false);
                 
@@ -363,6 +380,7 @@
             }
         }
 
+        // --- HASHED LOGIN ROUTINE ---
         async function handleLogin(username, password) {
             try {
                 const response = await fetch(RPC_URL, {
