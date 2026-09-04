@@ -1548,10 +1548,13 @@ fetchLiveWeather();
     .game-card-img {
       width: 100%;
       height: 140px;
-      /* Fill the entire image box (no letterboxing) */
-      object-fit: cover;
+      /* Show the FULL image — never crop text/logos on the art.
+         Box is a fixed barrier; image scales up to fit inside it only.
+         Empty sides get a dark fill so cards still look uniform. */
+      object-fit: contain;
       object-position: center;
-      background-color: #0d0d13;
+      background-color: #0a0a12;
+      background-image: linear-gradient(145deg, #12101c 0%, #0a0a12 100%);
       border-radius: 8px 8px 0 0;
       margin-bottom: 0;
       display: block;
