@@ -223,18 +223,21 @@
         <script src="https://cdn.jsdelivr.net/gh/Null-X-Team/badwordfilter@main/badword.js"></script>
     <script src="username-filter.js"></script>
     <script>
-        // --- CONFIGURATION ---
-        const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
-        const RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/verify_user_login`;
-        const SIGNUP_RPC_URL = `${SUPABASE_PROJECT_URL}/rest/v1/rpc/register_user_hashed`;
-        
-        const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
+        // --- CONFIGURATION: Turso via Vercel API ---
+        const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+        const headers = { 'Content-Type': 'application/json' };
 
-        const headers = {
-            'apikey': ANON_KEY,
-            'Authorization': `Bearer ${ANON_KEY}`,
-            'Content-Type': 'application/json'
-        };
+        async function sha256Hex(text) {
+            const data = new TextEncoder().encode(text);
+            const hash = await crypto.subtle.digest('SHA-256', data);
+            return Array.from(new Uint8Array(hash)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function passwordsMatch(stored, typedPlain, typedHash) {
+            if (stored == null) return false;
+            const s = String(stored);
+            return s === typedPlain || s === typedHash || s.toLowerCase() === typedHash.toLowerCase();
+        }
 
         let currentMode = 'signup';
 
@@ -338,38 +341,62 @@
             }
         }
 
-        // --- HASHED SIGN UP ROUTINE ---
+        // --- SIGN UP via Turso /api/users ---
         async function handleSignUp(username, handler, password) {
             try {
-                // Payload now includes new_handler
-                const response = await fetch(SIGNUP_RPC_URL, {
+                // Reject if username already exists
+                const existing = await fetch(`${TURSO_API_BASE}/users?username=${encodeURIComponent(username)}`, { headers });
+                if (existing.ok) {
+                    showMessage('Display Name is already taken!');
+                    return;
+                }
+
+                const passwordHash = await sha256Hex(password);
+                const newId = Date.now(); // simple unique id
+
+                const response = await fetch(`${TURSO_API_BASE}/users`, {
                     method: 'POST',
                     headers: headers,
-                    body: JSON.stringify({ 
-                        new_username: username, 
-                        new_handler: handler,
-                        new_password: password 
+                    body: JSON.stringify({
+                        id: newId,
+                        username: username,
+                        password: passwordHash,
+                        handler: handler,
+                        created_at: new Date().toISOString()
                     })
                 });
 
                 if (!response.ok) {
                     const errorData = await response.json().catch(() => ({}));
-                    
-                    // Catch unique constraint errors based on Supabase RPC feedback
-                    if (errorData.message && errorData.message.includes('Username is already taken')) {
-                        showMessage('Display Name is already taken!');
-                    } else if (errorData.message && errorData.message.includes('Handler is already taken')) {
-                        showMessage('That Handler is already in use!');
+                    const msg = (errorData.error || errorData.message || errorData.details || '').toString();
+                    if (/unique|already|constraint|duplicate/i.test(msg)) {
+                        showMessage('Display Name or Handler is already taken!');
                     } else {
                         showMessage('Registration failed. Name or Handler might be taken.');
                     }
                     return;
                 }
 
-                // Store handler instead of display name for chat logic if you prefer
-                localStorage.setItem('chatUser', handler);
+                // Create a default role row so ban/profile features work
+                try {
+                    await fetch(`${TURSO_API_BASE}/user-roles`, {
+                        method: 'POST',
+                        headers: headers,
+                        body: JSON.stringify({
+                            id: newId,
+                            username: username,
+                            role_tag: 'User',
+                            is_admin: 0,
+                            is_banned: 0
+                        })
+                    });
+                } catch (e) {
+                    console.warn('Role row create skipped:', e);
+                }
+
+                localStorage.setItem('chatUser', username);
                 showMessage('Account created successfully! Logging you in...', false);
-                
+
                 setTimeout(() => {
                     window.location.href = '../index.html';
                 }, 1500);
@@ -380,25 +407,27 @@
             }
         }
 
-        // --- HASHED LOGIN ROUTINE ---
+        // --- LOGIN via Turso /api/users ---
         async function handleLogin(username, password) {
             try {
-                const response = await fetch(RPC_URL, {
-                    method: 'POST',
-                    headers: headers,
-                    body: JSON.stringify({ 
-                        login_username: username, 
-                        login_password: password 
-                    })
+                const response = await fetch(`${TURSO_API_BASE}/users?username=${encodeURIComponent(username)}`, {
+                    method: 'GET',
+                    headers: headers
                 });
-                
-                if (!response.ok) throw new Error(`Verification endpoint offline.`);
-                const isValid = await response.json();
 
-                if (isValid === true) {
+                if (response.status === 404) {
+                    showMessage('Incorrect credentials.');
+                    return;
+                }
+                if (!response.ok) throw new Error('Verification endpoint offline.');
+
+                const user = await response.json();
+                const typedHash = await sha256Hex(password);
+
+                if (user && passwordsMatch(user.password, password, typedHash)) {
                     showMessage('Login successful! Redirecting...', false);
-                    localStorage.setItem('chatUser', username);
-                    
+                    localStorage.setItem('chatUser', user.username || username);
+
                     setTimeout(() => {
                         window.location.href = '../index.html';
                     }, 1500);
