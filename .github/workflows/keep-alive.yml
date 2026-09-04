@@ -10,46 +10,14 @@ jobs:
   ping-databases:
     runs-on: ubuntu-latest
     steps:
-      # --- DATABASE 1: MAIN SUBSYSTEM ---
-      - name: Update Main Database Subsystem
-        env:
-          SB_URL: ${{ secrets.SUPABASE_URL }}
-          SB_KEY: ${{ secrets.SUPABASE_KEY }}
+      # Supabase keep-alive removed — project migrated to Turso on Vercel.
+      # Optional: ping the Vercel API health endpoints so the deployment stays warm.
+      - name: Warm Turso API (Vercel)
         run: |
-          echo "[Upkeep Bot] Pinging Main Database Subsystem..."
-          RESPONSE=$(curl -s -X GET "$SB_URL/rest/v1/botupkeep?id=eq.1" -H "Authorization: Bearer $SB_KEY" -H "apikey: $SB_KEY")
-          CURRENT_NUM=$(echo "$RESPONSE" | grep -o '"counter":[0-9]*' | cut -d: -f2)
-          
-          if [ ! -z "$CURRENT_NUM" ]; then
-            NEW_NUM=$((CURRENT_NUM + 1))
-            curl -s -X PATCH "$SB_URL/rest/v1/botupkeep?id=eq.1" \
-              -H "Authorization: Bearer $SB_KEY" \
-              -H "apikey: $SB_KEY" \
-              -H "Content-Type: application/json" \
-              -d "{\"counter\": $NEW_NUM}"
-            echo "[Upkeep Bot] Main Subsystem updated to version $NEW_NUM."
-          else
-            echo "[Warning] Could not read Main Subsystem counter. Ensure table 'botupkeep' exists with id=1."
-          fi
-
-      # --- DATABASE 2: GAME SAVE DATA ---
-      - name: Update Game Save Data Subsystem
-        env:
-          GSD_URL: ${{ secrets.GAMESAVEDATA_URL }}
-          GSD_KEY: ${{ secrets.GAMESAVEDATA_KEY }}
-        run: |
-          echo "[Upkeep Bot] Pinging Game Save Data Subsystem..."
-          RESPONSE=$(curl -s -X GET "$GSD_URL/rest/v1/botupkeep?id=eq.1" -H "Authorization: Bearer $GSD_KEY" -H "apikey: $GSD_KEY")
-          CURRENT_NUM=$(echo "$RESPONSE" | grep -o '"counter":[0-9]*' | cut -d: -f2)
-          
-          if [ ! -z "$CURRENT_NUM" ]; then
-            NEW_NUM=$((CURRENT_NUM + 1))
-            curl -s -X PATCH "$GSD_URL/rest/v1/botupkeep?id=eq.1" \
-              -H "Authorization: Bearer $GSD_KEY" \
-              -H "apikey: $GSD_KEY" \
-              -H "Content-Type: application/json" \
-              -d "{\"counter\": $NEW_NUM}"
-            echo "[Upkeep Bot] Game Save Data Subsystem updated to version $NEW_NUM."
-          else
-            echo "[Warning] Could not read Game Save Data counter. Ensure table 'botupkeep' exists with id=1."
-          fi
+          echo "[Upkeep Bot] Warming Turso API routes on Vercel..."
+          BASE="https://null-x-team-github-io.vercel.app/api"
+          for path in users messages load; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" "$BASE/$path" || true)
+            echo "  GET /$path -> HTTP $code"
+          done
+          echo "[Upkeep Bot] Done."
