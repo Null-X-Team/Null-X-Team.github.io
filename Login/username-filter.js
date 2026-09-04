@@ -19,6 +19,7 @@
 
   function nameIsClean(text) {
     if (!text) return true;
+    // Strip leading @ for handler checks
     var t = String(text).replace(/^@+/, "").trim();
     if (!t) return true;
     if (typeof window.containsBadWords !== "function") return true;
@@ -31,6 +32,7 @@
 
   window.nxUsernameIsClean = nameIsClean;
 
+  // Attach live filter to inputs once library is ready
   ensureLib(function (ok) {
     if (!ok) console.warn("[username-filter] badword library failed to load");
     ["username", "handler"].forEach(function (id) {
