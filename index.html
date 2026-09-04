@@ -1035,8 +1035,9 @@
   <button id="console-toggle-btn">Console</button>
 
   <script>
-    const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
-    const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
+    // Turso via Vercel API (replaces Supabase)
+    const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+    const TURSO_HEADERS = { 'Content-Type': 'application/json' };
 
     /* SYSTEM UPDATE TIMER JS — disabled; uncomment to restore
 const targetDate = new Date("August 30, 2026 3:15:25");
@@ -1106,21 +1107,16 @@ const targetDate = new Date("August 30, 2026 3:15:25");
     async function checkForMissingHandler(username) {
       if (!username || username === 'Guest') return;
       try {
-        const authHeaders = {
-          'apikey': ANON_KEY,
-          'Authorization': `Bearer ${ANON_KEY}`
-        };
-
-        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/users?username=eq.${encodeURIComponent(username)}&select=handler`, {
+        const response = await fetch(`${TURSO_API_BASE}/users?username=${encodeURIComponent(username)}`, {
           method: 'GET',
-          headers: authHeaders
+          headers: TURSO_HEADERS
         });
 
         if (!response.ok) return;
 
         const data = await response.json();
         
-        if (data.length > 0 && (data[0].handler === null || data[0].handler.trim() === '')) {
+        if (data && (data.handler == null || String(data.handler).trim() === '')) {
           document.getElementById('handlerModal').classList.remove('hidden');
         }
       } catch (err) {
@@ -1146,19 +1142,20 @@ const targetDate = new Date("August 30, 2026 3:15:25");
       }
 
       try {
-        const authHeaders = {
-          'apikey': ANON_KEY,
-          'Authorization': `Bearer ${ANON_KEY}`,
-          'Content-Type': 'application/json'
-        };
-
-        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/users?username=eq.${encodeURIComponent(currentUsername)}`, {
+        // Turso users PATCH requires id
+        const getRes = await fetch(`${TURSO_API_BASE}/users?username=${encodeURIComponent(currentUsername)}`, {
+          headers: TURSO_HEADERS
+        });
+        if (!getRes.ok) {
+          msgBox.textContent = 'Could not load your account.';
+          msgBox.className = 'modal-msg-box error';
+          return;
+        }
+        const userRow = await getRes.json();
+        const response = await fetch(`${TURSO_API_BASE}/users`, {
           method: 'PATCH',
-          headers: {
-            ...authHeaders,
-            'Prefer': 'return=minimal'
-          },
-          body: JSON.stringify({ handler: handlerVal })
+          headers: TURSO_HEADERS,
+          body: JSON.stringify({ id: userRow.id, handler: handlerVal })
         });
 
         if (!response.ok) {
@@ -1188,25 +1185,26 @@ const targetDate = new Date("August 30, 2026 3:15:25");
     async function checkForWarnings(username) {
       if (!username || username === 'Guest') return;
       try {
-        const authHeaders = {
-          'apikey': ANON_KEY,
-          'Authorization': `Bearer ${ANON_KEY}`
-        };
-
-        const response = await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}&select=warned,last_action_reason`, {
+        const response = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(username)}`, {
           method: 'GET',
-          headers: authHeaders
+          headers: TURSO_HEADERS
         });
 
         if (!response.ok) return;
 
-        const data = await response.json();
+        const role = await response.json();
+        const isWarned = role && (
+          role.warned === true ||
+          role.warned === 1 ||
+          String(role.warned).toUpperCase() === 'TRUE' ||
+          (Number(role.warning_count) > 0 && role.last_action_type === 'warn')
+        );
         
-        if (data.length > 0 && data[0].warned === true) {
+        if (isWarned) {
           const overlay = document.getElementById('warning-modal-overlay');
           const reasonBox = document.getElementById('warning-reason-text');
           
-          reasonBox.textContent = data[0].last_action_reason || "Violation of community guidelines.";
+          reasonBox.textContent = role.last_action_reason || "Violation of community guidelines.";
           overlay.classList.remove('hidden');
 
           document.getElementById('warning-ack-btn').onclick = async () => {
@@ -1214,13 +1212,10 @@ const targetDate = new Date("August 30, 2026 3:15:25");
             btn.textContent = "Dismissing...";
             btn.disabled = true;
             
-            await fetch(`${SUPABASE_PROJECT_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(username)}`, {
+            await fetch(`${TURSO_API_BASE}/user-roles`, {
               method: 'PATCH',
-              headers: {
-                ...authHeaders,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ warned: false }) 
+              headers: TURSO_HEADERS,
+              body: JSON.stringify({ id: role.id, warning_count: 0, last_action_type: null })
             });
             
             overlay.classList.add('hidden');
