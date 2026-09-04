@@ -7,8 +7,8 @@
 // overwriting a cloud backup immediately after sign-in.
 
 (function () {
-    const SUPABASE_URL = 'https://sczkzwfcpmngwglbydmu.supabase.co';
-    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWJhYmFzZSIsInJlZiI6InNjemt6d2ZjcG1uZ3dnbGJ5ZG11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMDYxNTksImV4cCI6MjA5Njc4MjE1OX0.0O2pPwasyorT86MmJDoTccIlDKFFwRLoUIEZ_npDUII';
+    // Turso via Vercel serverless API (replaces Supabase)
+    const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
 
     // Keys that identify a session/UI preference, but are not actual game progress.
     const NON_PROGRESS_KEYS = new Set([
@@ -607,18 +607,14 @@
                     : 'Auto-saving to cloud...';
             }
 
-            const response = await fetch(`${SUPABASE_URL}/rest/v1/Gamesavedata`, {
+            const response = await fetch(`${TURSO_API_BASE}/save`, {
                 method: 'POST',
                 headers: {
-                    apikey: SUPABASE_KEY,
-                    Authorization: `Bearer ${SUPABASE_KEY}`,
-                    'Content-Type': 'application/json',
-                    Prefer: 'resolution=merge-duplicates'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     username: loggedInUser,
-                    save_string: completeJsonString,
-                    updated_at: new Date().toISOString()
+                    save_string: completeJsonString
                 })
             });
 
@@ -675,14 +671,24 @@
 
         try {
             const response = await fetch(
-                `${SUPABASE_URL}/rest/v1/Gamesavedata?username=eq.${encodeURIComponent(loggedInUser)}&select=save_string,updated_at`,
+                `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`,
                 {
+                    method: 'GET',
                     headers: {
-                        apikey: SUPABASE_KEY,
-                        Authorization: `Bearer ${SUPABASE_KEY}`
+                        'Content-Type': 'application/json'
                     }
                 }
             );
+
+            // 404 = no save yet (not a hard failure)
+            if (response.status === 404) {
+                if (currentUser() !== loggedInUser) return false;
+                if (statusBox) {
+                    statusBox.textContent = 'No cloud backup found for this account.';
+                    statusBox.style.color = '#ff8888';
+                }
+                return false;
+            }
 
             if (!response.ok) {
                 throw new Error(`Load failed with HTTP ${response.status}.`);
@@ -702,8 +708,8 @@
                 return false;
             }
 
-            if (data && data[0] && data[0].save_string) {
-                const cloudBackup = JSON.parse(data[0].save_string);
+            if (data && data.found && data.save_string) {
+                const cloudBackup = JSON.parse(data.save_string);
 
                 if (
                     !cloudBackup ||
