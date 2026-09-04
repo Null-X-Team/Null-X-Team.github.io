@@ -2,9 +2,8 @@
 (async function initSecurityGuard() {
     console.log("[Security System] Guard active. Connecting to user_roles repository...");
 
-    // Hardcoded project credentials 
-    const SUPABASE_URL = "https://ldojzaikkolrxkiwyqvq.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw";
+    // Turso via Vercel API (replaces Supabase)
+    const TURSO_API_BASE = "https://null-x-team-github-io.vercel.app/api";
 
     // Capture the logged-in username directly from your header elements
     let currentUsername = null;
@@ -23,21 +22,23 @@
     if (!currentUsername || currentUsername === "Guest") return;
 
     try {
-        // FIX: Using fast REST API instead of waiting for a slow CDN script to load
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/user_roles?username=eq.${encodeURIComponent(currentUsername)}&select=is_banned,temp_ban_until,last_action_reason`, {
+        const response = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(currentUsername)}`, {
             method: 'GET',
             headers: {
-                'apikey': SUPABASE_KEY,
-                'Authorization': `Bearer ${SUPABASE_KEY}`
+                'Content-Type': 'application/json'
             }
         });
 
+        if (response.status === 404) {
+            console.log("[Security System] No role record for user.");
+            return;
+        }
+
         if (!response.ok) throw new Error("Query fault");
         
-        const data = await response.json();
+        const userStatus = await response.json();
 
-        if (data && data.length > 0) {
-            const userStatus = data[0];
+        if (userStatus && userStatus.username) {
             const statusString = String(userStatus.is_banned).toUpperCase();
             const isPermanentlyBanned = (userStatus.is_banned === true || statusString === "TRUE");
             
