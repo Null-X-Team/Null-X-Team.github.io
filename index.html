@@ -528,6 +528,7 @@
       </header>
 
       <section class="hero" id="heroSection" style="position: relative;">
+        <!-- SYSTEM UPDATE TIMER — commented out for later use
         <div class="countdown-overlay-container">
           <div class="countdown-title">System Update</div>
           <div class="flip-clock">
@@ -569,6 +570,7 @@
 
           </div>
         </div>
+        -->
 
         <div class="hero-content">
           <span class="badge">Featured</span>
@@ -1036,7 +1038,8 @@
     const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
     const ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imxkb2p6YWlra29scnhraXd5cXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkzMDM2NjksImV4cCI6MjA5NDg3OTY2OX0.CXZf1jaNJ3njQhIWoaYFxuJWx2J0HQ9CPF5imQoxtMw';
 
-    const targetDate = new Date("August 30, 2026 3:15:25");
+    /* SYSTEM UPDATE TIMER JS — disabled; uncomment to restore
+const targetDate = new Date("August 30, 2026 3:15:25");
 
     function updateMatrixCard(cardId, value) {
       const cardContainer = document.getElementById(cardId);
@@ -1098,6 +1101,7 @@
 
     setInterval(runCountdown, 1000);
     runCountdown();
+*/
 
     async function checkForMissingHandler(username) {
       if (!username || username === 'Guest') return;
