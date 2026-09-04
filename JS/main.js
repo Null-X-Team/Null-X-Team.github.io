@@ -130,7 +130,7 @@ let _0xData = [
 
   { id: "clickerobby", title: "clickerobby", url: "../Games/clickerobby/index.html", desc: "Combine clicker progression with parkour stages—level up your power as you race through challenging maps.", popular: true , image: "../Games/clickerobby/images (4).jpeg" },
 
-  { id: "obbyforbrainrot", title: "obbyforbrainrot", url: "../Games/obbyforbrainrot/index.html", desc: "A chaotic meme-inspired obstacle course filled with viral brainrot vibes, wild jumps, and nonstop laughs.", popular: true },
+  { id: "obbyforbrainrot", title: "obbyforbrainrot", url: "../Games/obbyforbrainrot/index.html", desc: "A chaotic meme-inspired obstacle course filled with viral brainrot vibes, wild jumps, and nonstop laughs.", popular: true , image: "../Games/obbyforbrainrot/images (5).jpeg" },
 
   { id: "leafblower", title: "leafblower", url: "../Games/leafblower/index.html", desc: "Clear yards of leaves with your leaf blower, upgrade your gear, and grow your lawn-care empire in this idle-style game.", popular: true, image: "../Games/leafblower/images (11).jpeg" },
 
