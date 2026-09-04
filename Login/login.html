@@ -220,6 +220,8 @@
         <div class="message-box" id="messageBox"></div>
     </div>
 
+        <script src="https://cdn.jsdelivr.net/gh/Null-X-Team/badwordfilter@main/badword.js"></script>
+    <script src="username-filter.js"></script>
     <script>
         // --- CONFIGURATION ---
         const SUPABASE_PROJECT_URL = 'https://ldojzaikkolrxkiwyqvq.supabase.co';
@@ -288,7 +290,7 @@
         }
 
         // --- REQUEST ROUTER ---
-        function handleSubmit(event) {
+                function handleSubmit(event) {
             event.preventDefault();
             const userVal = document.getElementById('username').value.trim();
             let handlerVal = document.getElementById('handler').value.trim();
@@ -308,6 +310,24 @@
                 if (handlerVal.length < 3) {
                     showMessage('Handler must be at least 2 characters long.');
                     return;
+                }
+
+                // Block inappropriate display names / handlers (badwordfilter)
+                if (typeof window.nxUsernameIsClean === 'function') {
+                    if (!window.nxUsernameIsClean(userVal)) {
+                        showMessage('Display name contains inappropriate language. Please choose another.');
+                        return;
+                    }
+                    if (!window.nxUsernameIsClean(handlerVal)) {
+                        showMessage('Handler contains inappropriate language. Please choose another.');
+                        return;
+                    }
+                } else if (typeof window.containsBadWords === 'function') {
+                    const bareHandler = handlerVal.replace(/^@+/, '');
+                    if (window.containsBadWords(userVal) || window.containsBadWords(bareHandler) || window.containsBadWords(handlerVal)) {
+                        showMessage('That name is not allowed. Please choose a different username/handler.');
+                        return;
+                    }
                 }
                 
                 handleSignUp(userVal, handlerVal, passVal);
