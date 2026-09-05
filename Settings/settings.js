@@ -6,14 +6,22 @@ import { applyCloak } from '../Cloaks/Cloaks.js';
 
 // Utility function to set/apply theme across the site
 function setTheme(themeName) {
-    // 1. Save theme to local storage
-    localStorage.setItem('selectedTheme', themeName);
+    // Prefer the global theme engine (sets data-theme, theme-* class, all storage keys)
+    if (typeof window.applyTheme === 'function') {
+        window.applyTheme(themeName);
+    } else {
+        localStorage.setItem('selectedTheme', themeName);
+        localStorage.setItem('nullx-theme', themeName);
+        localStorage.setItem('nxos_theme', themeName);
+        document.documentElement.setAttribute('data-theme', themeName);
+        if (document.body) {
+            document.body.setAttribute('data-theme', themeName);
+            Array.from(document.body.classList).filter(c => c.startsWith('theme-')).forEach(c => document.body.classList.remove(c));
+            if (themeName && themeName !== 'default') document.body.classList.add('theme-' + themeName);
+        }
+    }
 
-    // 2. Apply theme attribute to html/body elements for CSS theme engines
-    document.documentElement.setAttribute('data-theme', themeName);
-    document.body.setAttribute('data-theme', themeName);
-
-    // 3. Highlight the selected card in settings UI
+    // Highlight the selected card in settings UI
     document.querySelectorAll('.theme-card').forEach(card => {
         if (card.getAttribute('data-theme') === themeName) {
             card.style.borderColor = '#00ff66';
