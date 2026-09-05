@@ -85,7 +85,7 @@ export default async function handler(req, res) {
       const result = await tursoExecute(
         databaseUrl,
         authToken,
-        `SELECT ID, sender_username, recipient_username, content, is_read, created_at
+        `SELECT id, sender_username, recipient_username, content, is_read, created_at
          FROM private_messages
          WHERE
            (sender_username = ? AND recipient_username = ?)
@@ -101,7 +101,6 @@ export default async function handler(req, res) {
       );
       const rows = (result.rows || []).map((r) => ({
         id: getValue(r[0]),
-        ID: getValue(r[0]),
         sender_username: getValue(r[1]),
         recipient_username: getValue(r[2]),
         content: getValue(r[3]),
@@ -113,27 +112,55 @@ export default async function handler(req, res) {
 
     if (req.method === "POST") {
       const b = req.body || {};
-      if (!b.id || !b.sender_username || !b.recipient_username || !b.content) {
+
+      const sender_username =
+        b.sender_username ||
+        (b.sender_handle ? String(b.sender_handle).replace(/^@/, "").replace(/_/g, " ") : null);
+      const recipient_username =
+        b.recipient_username ||
+        (b.recipient_handle ? String(b.recipient_handle).replace(/^@/, "").replace(/_/g, " ") : null);
+
+      if (!sender_username || !recipient_username || !b.content) {
         return res.status(400).json({
-          error: "id, sender_username, recipient_username, and content are required"
+          error: "sender_username, recipient_username, and content are required",
+          received: Object.keys(b)
         });
       }
+
+      const id =
+        b.id ||
+        `pm_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+
+      let isRead = 0;
+      if (b.is_read === true || b.is_read === 1 || b.is_read === "1") isRead = 1;
+
+      const createdAt = b.created_at || new Date().toISOString();
+
       await tursoExecute(
         databaseUrl,
         authToken,
         `INSERT INTO private_messages
-          (ID, sender_username, recipient_username, content, is_read, created_at)
+          (id, sender_username, recipient_username, content, is_read, created_at)
          VALUES (?, ?, ?, ?, ?, ?)`,
         [
-          { type: "text", value: b.id },
-          { type: "text", value: b.sender_username },
-          { type: "text", value: b.recipient_username },
+          { type: "text", value: id },
+          { type: "text", value: sender_username },
+          { type: "text", value: recipient_username },
           { type: "text", value: b.content },
-          { type: "integer", value: b.is_read ?? 0 },
-          { type: "text", value: b.created_at ?? new Date().toISOString() }
+          { type: "integer", value: isRead },
+          { type: "text", value: createdAt }
         ]
       );
-      return res.status(201).json({ success: true, message: "Private message sent" });
+      return res.status(201).json({
+        success: true,
+        message: "Private message sent",
+        id,
+        sender_username,
+        recipient_username,
+        content: b.content,
+        is_read: isRead,
+        created_at: createdAt
+      });
     }
 
     if (req.method === "PATCH") {
@@ -142,7 +169,7 @@ export default async function handler(req, res) {
       await tursoExecute(
         databaseUrl,
         authToken,
-        `UPDATE private_messages SET is_read = 1 WHERE ID = ?`,
+        `UPDATE private_messages SET is_read = 1 WHERE id = ?`,
         [{ type: "text", value: id }]
       );
       return res.status(200).json({ success: true, message: "Message marked as read" });
@@ -154,7 +181,7 @@ export default async function handler(req, res) {
       await tursoExecute(
         databaseUrl,
         authToken,
-        `DELETE FROM private_messages WHERE ID = ?`,
+        `DELETE FROM private_messages WHERE id = ?`,
         [{ type: "text", value: id }]
       );
       return res.status(200).json({ success: true, message: "Private message deleted" });
