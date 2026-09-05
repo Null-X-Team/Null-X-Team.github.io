@@ -3,7 +3,6 @@ const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
 const TURSO_HEADERS = { 'Content-Type': 'application/json' };
 
 
-/** Normalize Turso/SQLite admin flags (1/"1"/true/"true") and role tags (OWNER/ADMIN). */
 function isBannedFlag(val) {
   if (val === true || val === 1 || val === "1") return true;
   if (val == null) return false;
@@ -1237,16 +1236,50 @@ window.initializeChatEngine = async function() {
     async function sendPrivateMessage(content) {
         if (!activePmHandle) return;
         try {
-            await fetch(`${TURSO_API_BASE}/private-messages`, {
+            const convo = pmConversations[activePmHandle];
+            const recipientUsername = (convo && convo.otherUsername)
+                ? convo.otherUsername
+                : String(activePmHandle).replace(/^@/, '');
+            const id = (typeof crypto !== 'undefined' && crypto.randomUUID)
+                ? crypto.randomUUID()
+                : ('pm_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10));
+            const createdAt = new Date().toISOString();
+            const res = await fetch(`${TURSO_API_BASE}/private-messages`, {
                 method: 'POST',
                 headers: TURSO_HEADERS,
                 body: JSON.stringify({
-                    sender_handle: myHandleGlobal,
-                    recipient_handle: activePmHandle,
+                    id: id,
+                    sender_username: myUsernameGlobal,
+                    recipient_username: recipientUsername,
                     content: content,
-                    is_read: false
+                    is_read: 0,
+                    created_at: createdAt
                 })
             });
+            if (!res.ok) {
+                const errBody = await res.json().catch(() => ({}));
+                console.error("PM API error:", res.status, errBody);
+                throw new Error(errBody.error || ('HTTP ' + res.status));
+            }
+            // Optimistic local append so the thread updates immediately
+            if (!pmConversations[activePmHandle]) {
+                pmConversations[activePmHandle] = {
+                    otherHandle: activePmHandle,
+                    otherUsername: recipientUsername,
+                    messages: [],
+                    unread: 0
+                };
+            }
+            pmConversations[activePmHandle].messages.push({
+                id: id,
+                sender_username: myUsernameGlobal,
+                recipient_username: recipientUsername,
+                content: content,
+                is_read: 0,
+                created_at: createdAt
+            });
+            renderPmThread(activePmHandle);
+            renderPmConversationList();
             await fetchMyPrivateConversations();
         } catch (err) {
             console.error("Failed to send private message:", err);
