@@ -90,7 +90,7 @@ export default async function handler(req, res) {
                   args: [
                     {
                       type: "integer",
-                      value: limit
+                      value: String(limit)
                     }
                   ]
                 }
