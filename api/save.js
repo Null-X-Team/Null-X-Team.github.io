@@ -1,5 +1,14 @@
 // API/save.js
 
+function getTursoConfig() {
+  let databaseUrl = process.env.Turso_user_database || process.env.TURSO_DATABASE_URL || process.env.TURSO_URL || "";
+  const authToken = process.env.Turso_auth_token || process.env.TURSO_AUTH_TOKEN || process.env.TURSO_TOKEN || "";
+  // Pipeline HTTP API needs https:// — libsql:// is only for the native client
+  databaseUrl = String(databaseUrl).trim().replace(/^libsql:\/\//i, "https://").replace(/\/$/, "");
+  return { databaseUrl, authToken };
+}
+
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -30,12 +39,12 @@ export default async function handler(req, res) {
       });
     }
 
-    const databaseUrl = process.env.Turso_user_database;
-    const authToken = process.env.Turso_auth_token;
+    const { databaseUrl, authToken } = getTursoConfig();
 
     if (!databaseUrl || !authToken) {
       return res.status(500).json({
-        error: "Turso environment variables are missing"
+        error: "Turso environment variables are missing",
+        hint: "Set Turso_user_database and Turso_auth_token on Vercel"
       });
     }
 

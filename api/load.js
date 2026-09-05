@@ -1,5 +1,14 @@
 // API/load.js
 
+function getTursoConfig() {
+  let databaseUrl = process.env.Turso_user_database || process.env.TURSO_DATABASE_URL || process.env.TURSO_URL || "";
+  const authToken = process.env.Turso_auth_token || process.env.TURSO_AUTH_TOKEN || process.env.TURSO_TOKEN || "";
+  // Pipeline HTTP API needs https:// — libsql:// is only for the native client
+  databaseUrl = String(databaseUrl).trim().replace(/^libsql:\/\//i, "https://").replace(/\/$/, "");
+  return { databaseUrl, authToken };
+}
+
+
 export default async function handler(req, res) {
   // Allow requests from your GitHub Pages frontend
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -35,15 +44,14 @@ export default async function handler(req, res) {
       });
     }
 
-    // Get Turso credentials from Vercel environment variables
-    const databaseUrl = process.env.Turso_user_database;
-    const authToken = process.env.Turso_auth_token;
+    const { databaseUrl, authToken } = getTursoConfig();
 
     if (!databaseUrl || !authToken) {
       console.error("Turso environment variables are missing");
 
       return res.status(500).json({
-        error: "Turso environment variables are missing"
+        error: "Turso environment variables are missing",
+        hint: "Set Turso_user_database and Turso_auth_token on Vercel"
       });
     }
 
@@ -144,7 +152,9 @@ export default async function handler(req, res) {
 
     return res.status(500).json({
       error: "Internal server error",
-      details: error.message
+      details: error.message,
+      cause: error.cause ? String(error.cause) : undefined,
+      hint: "If details is 'fetch failed', Turso URL may be wrong or unreachable from Vercel."
     });
   }
 }
