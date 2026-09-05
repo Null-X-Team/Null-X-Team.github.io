@@ -51,11 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Calculator nav alias (optional)
   const navTerm = document.getElementById('nav-calculator') || document.getElementById('nav-terminal');
-  if (navTerm && !navTerm.dataset.nxCalcWired) {
-    navTerm.dataset.nxCalcWired = '1';
-    navTerm.innerHTML = '<i class="fas fa-calculator" style="margin-right:8px;"></i>Calculator';
-  const navTerm = document.getElementById('nav-terminal');
   if (navTerm) {
+    navTerm.dataset.nxCalcWired = '1';
     navTerm.id = 'nav-calculator';
     navTerm.innerHTML = '<i class="fas fa-calculator" style="margin-right: 8px;"></i>Calculator';
     navTerm.onclick = function (e) {
