@@ -3,6 +3,31 @@ const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
 const TURSO_HEADERS = { 'Content-Type': 'application/json' };
 
 
+/** Normalize Turso/SQLite admin flags (1/"1"/true/"true") and role tags (OWNER/ADMIN). */
+function isBannedFlag(val) {
+  if (val === true || val === 1 || val === "1") return true;
+  if (val == null) return false;
+  const s = String(val).toLowerCase().trim();
+  return s === "true" || s === "1" || s === "yes";
+}
+function isAdminFlag(val) {
+  if (val === true || val === 1 || val === "1") return true;
+  if (val == null) return false;
+  const s = String(val).toLowerCase().trim();
+  return s === "true" || s === "1" || s === "yes";
+}
+function isAdminRoleTag(tag) {
+  if (!tag) return false;
+  const s = String(tag).toLowerCase().trim();
+  return s === "admin" || s === "owner" || s === "mod" || s === "moderator" || s === "staff";
+}
+function isAdminProfile(profile) {
+  if (!profile) return false;
+  return isAdminFlag(profile.is_admin) || isAdminRoleTag(profile.role_tag);
+}
+
+
+
 async function patchUserRoleByUsername(username, fields) {
   const getRes = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(username)}`, { headers: TURSO_HEADERS });
   if (!getRes.ok) throw new Error('user role not found');
@@ -833,9 +858,9 @@ window.initializeChatEngine = async function() {
             const profile = banData.find(r => r.username && r.username.trim().toLowerCase() === user.trim().toLowerCase());
             
             if (profile) {
-                currentUserIsAdmin = (profile.is_admin === true || String(profile.is_admin).toLowerCase() === 'true' || String(profile.role_tag).toLowerCase() === 'admin');
+                currentUserIsAdmin = isAdminProfile(profile);
 
-                if (profile.is_banned === true || String(profile.is_banned).toLowerCase() === 'true') {
+                if (isBannedFlag(profile.is_banned)) {
                     alert("This account has been permanently banned from the server.");
                     localStorage.removeItem('chatUser');
                     window.location.href = "../Login/login.html";
@@ -1274,8 +1299,8 @@ window.initializeChatEngine = async function() {
                     pfp_url: foundProfile ? foundProfile.pfp_url : DEFAULT_PFP,
                     role_tag: foundProfile ? foundProfile.role_tag : 'User',
                     last_seen: foundProfile ? foundProfile.last_seen : null,
-                    is_banned: foundProfile ? (foundProfile.is_banned === true || String(foundProfile.is_banned).toLowerCase() === 'true') : false,
-                    is_admin: (checkAdminStatus === true || String(checkAdminStatus).toLowerCase() === 'true' || (foundProfile && String(foundProfile.role_tag).toLowerCase() === 'admin'))
+                    is_banned: isBannedFlag(foundProfile && foundProfile.is_banned),
+                    is_admin: isAdminProfile(foundProfile)
                 };
             });
             
@@ -1295,7 +1320,7 @@ window.initializeChatEngine = async function() {
         const filtered = allUsers.filter(u => u.username.toLowerCase().includes(filterTerm.toLowerCase()));
         
         listContainer.innerHTML = filtered.map(u => {
-            const displayTag = u.is_admin ? 'ADMIN' : u.role_tag;
+            const displayTag = isAdminProfile(u) ? (u.role_tag || 'ADMIN') : (u.role_tag || 'User');
             let onlineDot = "rgba(160, 146, 141, 0.4)";
             let statusLabel = "OFFLINE";
             if (u.last_seen) {
@@ -1324,7 +1349,7 @@ window.initializeChatEngine = async function() {
         if (!row) return;
         const total = allUsers.length;
         const bannedCount = allUsers.filter(u => u.is_banned).length;
-        const adminCount = allUsers.filter(u => u.is_admin).length;
+        const adminCount = allUsers.filter(u => isAdminProfile(u)).length;
         const onlineCount = allUsers.filter(u => u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)).length;
 
         row.innerHTML = `
@@ -1349,7 +1374,7 @@ window.initializeChatEngine = async function() {
         table.innerHTML = filtered.map(u => {
             let onlineDot = "rgba(160, 146, 141, 0.4)";
             if (u.last_seen && (Date.now() - new Date(u.last_seen).getTime() < 5 * 60 * 1000)) onlineDot = "#22c55e";
-            const tagLabel = u.is_admin ? 'ADMIN' : (u.role_tag || 'User');
+            const tagLabel = isAdminProfile(u) ? (u.role_tag || 'ADMIN') : (u.role_tag || 'User');
             const banLabel = u.is_banned ? `<span style="color:#ff4444; font-weight:bold;"> · BANNED</span>` : '';
             const safeName = u.username.replace(/'/g, "\\'");
 
@@ -1366,7 +1391,7 @@ window.initializeChatEngine = async function() {
                             ? `<button class="aur-btn unban" onclick="quickAdminAction('unban', '${safeName}')">Unban</button>`
                             : `<button class="aur-btn ban" onclick="quickAdminAction('ban', '${safeName}')">Ban</button>`
                         }
-                        <button class="aur-btn promote" onclick="quickAdminAction('${u.is_admin ? 'demote' : 'promote'}', '${safeName}')">${u.is_admin ? 'Demote' : 'Promote'}</button>
+                        <button class="aur-btn promote" onclick="quickAdminAction('${isAdminProfile(u) ? 'demote' : 'promote'}', '${safeName}')">${isAdminProfile(u) ? 'Demote' : 'Promote'}</button>
                     </div>
                 </div>
             `;
@@ -1512,10 +1537,10 @@ window.initializeChatEngine = async function() {
                 
                 const userPfp = role && role.pfp_url ? role.pfp_url : DEFAULT_PFP;
                 const evaluatedRole = role && role.role_tag ? role.role_tag : 'User';
-                const isMsgSenderAdmin = role ? (role.is_admin === true || String(role.is_admin).toLowerCase() === 'true' || String(role.role_tag).toLowerCase() === 'admin') : false;
+                const isMsgSenderAdmin = isAdminProfile(role);
                 
                 let tag = "";
-                if (isMsgSenderAdmin || evaluatedRole.toLowerCase() === 'admin') {
+                if (isMsgSenderAdmin || isAdminRoleTag(evaluatedRole)) {
                     tag = `<span class="badge admin-badge">ADMIN</span>`;
                 } else if (evaluatedRole && evaluatedRole.toLowerCase() !== 'user') {
                     tag = `<span class="badge custom-badge">[${evaluatedRole.toUpperCase()}]</span>`;
