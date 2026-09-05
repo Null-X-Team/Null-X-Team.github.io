@@ -1,14 +1,25 @@
-// API/user-roles.js
-
 const { createClient } = require("@libsql/client");
 
-const db = createClient({
-    url: process.env.Turso_user_database,
-    authToken: process.env.Turso_auth_token
-});
+function getDb() {
+    let url = process.env.Turso_user_database || process.env.TURSO_DATABASE_URL || "";
+    const authToken = process.env.Turso_auth_token || process.env.TURSO_AUTH_TOKEN || "";
+    url = String(url).trim();
+    if (!url || !authToken) {
+        const err = new Error("Turso environment variables are missing");
+        err.statusCode = 500;
+        throw err;
+    }
+    return createClient({ url, authToken });
+}
 
 module.exports = async (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE, OPTIONS");
+    res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+    if (req.method === "OPTIONS") return res.status(200).end();
+
     try {
+        const db = getDb();
         // GET user roles / moderation information
         if (req.method === "GET") {
             const { username, id } = req.query;
