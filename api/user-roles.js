@@ -1,4 +1,4 @@
-// API/user-roles.js — Turso HTTP pipeline (no @libsql/client)
+// API/user-roles.js — Turso HTTP pipeline (SELECT * = real schema)
 
 function getTursoConfig() {
   let databaseUrl = process.env.Turso_user_database || process.env.TURSO_DATABASE_URL || process.env.TURSO_URL || "";
@@ -11,6 +11,25 @@ function getValue(cell) {
   if (cell == null) return null;
   if (typeof cell === "object" && "value" in cell) return cell.value;
   return cell;
+}
+
+function rowsToObjects(result) {
+  const cols = (result.cols || []).map((c) => {
+    if (typeof c === "string") return c;
+    return c.name || c.nameid || c;
+  });
+  return (result.rows || []).map((row) => {
+    const obj = {};
+    cols.forEach((name, i) => {
+      obj[name] = getValue(row[i]);
+    });
+    if (!cols.length && Array.isArray(row)) {
+      row.forEach((cell, i) => {
+        obj[`col_${i}`] = getValue(cell);
+      });
+    }
+    return obj;
+  });
 }
 
 async function tursoExecute(databaseUrl, authToken, sql, args = []) {
@@ -65,20 +84,6 @@ function cors(res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 }
 
-const ROLE_COLS = [
-  "id", "username", "is_banned", "temp_ban_until", "last_action_reason",
-  "last_action_category", "role_tag", "pfp_url", "is_admin", "last_seen",
-  "bio", "warn_id", "warning_count", "last_action_type"
-];
-
-function rowToRole(row) {
-  const obj = {};
-  ROLE_COLS.forEach((col, i) => {
-    obj[col] = getValue(row[i]);
-  });
-  return obj;
-}
-
 export default async function handler(req, res) {
   cors(res);
   if (req.method === "OPTIONS") return res.status(200).end();
@@ -96,34 +101,36 @@ export default async function handler(req, res) {
         const result = await tursoExecute(
           databaseUrl,
           authToken,
-          `SELECT ${ROLE_COLS.join(", ")} FROM user_roles WHERE id = ? LIMIT 1`,
+          `SELECT * FROM user_roles WHERE id = ? LIMIT 1`,
           [{ type: "integer", value: id }]
         );
-        if (!(result.rows || []).length) {
+        const rows = rowsToObjects(result);
+        if (!rows.length) {
           return res.status(404).json({ error: "User role record not found" });
         }
-        return res.status(200).json(rowToRole(result.rows[0]));
+        return res.status(200).json(rows[0]);
       }
 
       if (username) {
         const result = await tursoExecute(
           databaseUrl,
           authToken,
-          `SELECT ${ROLE_COLS.join(", ")} FROM user_roles WHERE username = ? LIMIT 1`,
+          `SELECT * FROM user_roles WHERE username = ? LIMIT 1`,
           [{ type: "text", value: username }]
         );
-        if (!(result.rows || []).length) {
+        const rows = rowsToObjects(result);
+        if (!rows.length) {
           return res.status(404).json({ error: "User role record not found" });
         }
-        return res.status(200).json(rowToRole(result.rows[0]));
+        return res.status(200).json(rows[0]);
       }
 
       const result = await tursoExecute(
         databaseUrl,
         authToken,
-        `SELECT ${ROLE_COLS.join(", ")} FROM user_roles ORDER BY id ASC`
+        `SELECT * FROM user_roles ORDER BY id ASC`
       );
-      return res.status(200).json((result.rows || []).map(rowToRole));
+      return res.status(200).json(rowsToObjects(result));
     }
 
     if (req.method === "POST") {
@@ -136,9 +143,8 @@ export default async function handler(req, res) {
         authToken,
         `INSERT INTO user_roles (
           id, username, is_banned, temp_ban_until, last_action_reason,
-          last_action_category, role_tag, pfp_url, is_admin, last_seen,
-          bio, warn_id, warning_count, last_action_type
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          last_action_category, role_tag, pfp_url, is_admin, last_seen, bio
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           { type: "integer", value: b.id },
           { type: "text", value: b.username },
@@ -150,10 +156,7 @@ export default async function handler(req, res) {
           { type: "text", value: b.pfp_url ?? null },
           { type: "integer", value: b.is_admin ?? 0 },
           { type: "text", value: b.last_seen ?? new Date().toISOString() },
-          { type: "text", value: b.bio ?? null },
-          { type: "integer", value: b.warn_id ?? 0 },
-          { type: "integer", value: b.warning_count ?? 0 },
-          { type: "text", value: b.last_action_type ?? null }
+          { type: "text", value: b.bio ?? null }
         ]
       );
       return res.status(201).json({ success: true, message: "User role record created" });
@@ -177,10 +180,7 @@ export default async function handler(req, res) {
           pfp_url = COALESCE(?, pfp_url),
           is_admin = COALESCE(?, is_admin),
           last_seen = COALESCE(?, last_seen),
-          bio = COALESCE(?, bio),
-          warn_id = COALESCE(?, warn_id),
-          warning_count = COALESCE(?, warning_count),
-          last_action_type = COALESCE(?, last_action_type)
+          bio = COALESCE(?, bio)
         WHERE id = ?`,
         [
           { type: "text", value: b.username ?? null },
@@ -193,9 +193,6 @@ export default async function handler(req, res) {
           { type: "integer", value: b.is_admin ?? null },
           { type: "text", value: b.last_seen ?? null },
           { type: "text", value: b.bio ?? null },
-          { type: "integer", value: b.warn_id ?? null },
-          { type: "integer", value: b.warning_count ?? null },
-          { type: "text", value: b.last_action_type ?? null },
           { type: "integer", value: b.id }
         ]
       );
