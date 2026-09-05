@@ -148,6 +148,8 @@ let _0xData = [
   { id: "supercold", title: "supercold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "getawayshootout", title: "getawayshootout", url: "../Games/getawayshootout/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+
+  { id: "geodashlite", title: "geodashlite", url: "../Games/geodashlite/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
