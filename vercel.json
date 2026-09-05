@@ -1,7 +1,7 @@
 {
   "version": 2,
   "git": {
-    "deploymentEnabled": true
+    "deploymentEnabled": false
   },
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/$1" }
