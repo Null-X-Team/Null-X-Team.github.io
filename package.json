@@ -5,6 +5,9 @@
   "scripts": {
     "lint": "eslint . --ext .js,.html"
   },
+  "dependencies": {
+    "@libsql/client": "^0.14.0"
+  },
   "devDependencies": {
     "eslint": "^8.57.0",
     "eslint-plugin-html": "^8.0.0"
