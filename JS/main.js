@@ -154,6 +154,9 @@ let _0xData = [
   { id: "timeshooter2", title: "timeshooter2", url: "../Games/timeshooter2/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "granny", title: "granny", url: "../Games/granny/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+
+  { id: "cuphead", title: "cuphead", url: "../Games/cuphead/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "hollow_knight", title: "hollow knight", url: "../Games/hollow-knight/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
