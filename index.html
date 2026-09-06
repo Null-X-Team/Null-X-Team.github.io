@@ -5,325 +5,20 @@
     (function () {
       var ALLOWED = ["null-x-team.github.io"];
       var host = (location.hostname || "").toLowerCase();
-      var ok = ALLOWED.some(function (d) { return host === d; });
-      if (ok) return;
-
+      if (ALLOWED.some(function (d) { return host === d; })) return;
       try { window.stop(); } catch (e) {}
       try {
-        document.documentElement.innerHTML =
-          '<html><head><title>ERR</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="background:#050505;color:#ff2b2b;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;overflow:hidden"><div style="width:min(420px,85%);padding:40px 35px;text-align:center;background:#0b0b0b;border:1px solid #3a1111;border-radius:12px;box-shadow:0 0 40px rgba(255,0,0,.08)"><div style="width:64px;height:64px;margin:0 auto 22px;border:2px solid #ff2b2b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;box-shadow:0 0 20px rgba(255,0,0,.15)">!</div><h1 style="margin:0 0 12px;font-size:26px;letter-spacing:3px;color:#ff3333">SITE LOCKED</h1><p style="margin:0 0 8px;color:#aaa;font-size:14px">Unauthorized host.</p><p style="margin:22px 0 0;color:#444;font-size:11px;letter-spacing:1px">ERR_HOST_NOT_AUTHORIZED</p><p style="margin:28px 0 0;padding-top:18px;border-top:1px solid #191919;color:#555;font-size:10px;line-height:1.6">This repository is not allowed to exist.<br>If you had read the license, maybe you would understand.</p></div>
-  <div id="system-news-modal" role="dialog" aria-modal="true" aria-labelledby="snm-title">
-    <div class="snm-box">
-      <div class="snm-header">
-        <h3 id="snm-title">System News</h3>
-        <button type="button" class="snm-close" id="system-news-close" aria-label="Close">&times;</button>
-      </div>
-      <div class="snm-feed" id="newsFeed">
-
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Sorry Users, my site is a mess, moving to turso is very stressfull for me. I am sorry. It is very difficult and there are errors around every turn.</p>
-            <span class="news-date">Sep. 5</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Moving Supabase data over to Turso, higher free tier, and no stupid server side error that is holding all of your data back.</p>
-            <span class="news-date">Aug. 30</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Supabase has a server side error, so you cannot access your save data right now, but I promise, your save data is safe.</p>
-            <span class="news-date">Aug. 25th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>New Themes! YAY</p>
-            <span class="news-date">Aug 25th</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Dear users of glaxyias I am sorry about the delay, there is something wrong with the code, I promise it will be up within the next 72 hours</p>
-            <span class="news-date">AUG 17th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Save data isn't working and all three of us can't figure out how to fix it so... we're putting our Ai helper to get it to work</p>
-            <span class="news-date">August 4th</span>
-          </div>
-          
-           <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Me, Glaxyias, and Galethis are putting more work into the bitcoin clicker game, so there will be less updates on here. but don't worry, we haven't forgotten about you</p>
-            <span class="news-date">August 2nd</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>LISTEN! USERS OF GLAXYIAS, THERE MIGHT BE A CHANCE FOR ROBLOX TO EXIST ON THIS SITE. MIGHT. BUT STILL A POSSIBLITY...</p>
-            <span class="news-date">July 30th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Hear me out, I might be able to add a way for people to watch youtube on this site. Might...</p>
-            <span class="news-date">July 23</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added a lock screen, press ALT+L or Ctrl+L and create your pin. then press again, and then your screen is locked</p>
-            <span class="news-date">July 28th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Me Glaeesas of all people fixed themes! we have 3 contributers and glaxyias has claude. How was I the only one to fix the themes issue?</p>
-            <span class="news-date">July 24th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Your Progress now saves every 30 seconds and manual save was kept.</p>
-            <span class="news-date">July 23</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Fixed bans, fixed admin, added blocking, PMs, and friend requests, and added backup for when the openai ai key fails. also added handlers</p>
-            <span class="news-date">July 22nd</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>This is a test to see if the service workers were the issue.</p>
-            <span class="news-date">July 21st</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Null AI Update</span>
-            <p>The ai is a work in progress, very hard to build. very slow. functions. but very very slow. (also the sync button that runs when a update is pushed no longer works, me or glaxyias know why. so that still remains but functtions off. the best option is when you see that pop up is the just clear the cache and reload.)</p>
-            <span class="news-date">July 17th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Happy 1000th Commit!</p>
-            <span class="news-date">July 15th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>CodeQL Now has it's own workflow, and the notification for site update is no longer launching before CodeQL</p>
-            <span class="news-date">July 15</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Multi-Update</span>
-            <p>Iframing my site will not work, ragdoll drop now works, working on making it work for a few others that can't load, games load in a new abt:blnk page.</p>
-            <span class="news-date">July 14th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Games are going to launch in a new way because the old way had a 96.431% chance to crash on certain chromebooks, this push will fix that</p>
-            <span class="news-date">July 13th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>The Ai will be delayed due to LLM responce tokens so the Ai will be more limited then I expected</p>
-            <span class="news-date">July 11</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added a 404 Page for broken links</p>
-            <span class="news-date">July 11th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>This ai will be very advanced so it won't be ready till the next major update. ;]</p>
-            <span class="news-date">July 9th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Working on building Ai helper, and it's not on this repo so no-one can take my code.</p>
-            <span class="news-date">July 9th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>This newest update is sooo cool!!!!</p>
-            <span class="news-date">July 8th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Refactor modal settings for themes and auto-launch</p>
-            <span class="news-date">July 5th</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Working on fixing settIngs modal</p>
-            <span class="news-date">June 29</span>
-          </div>
-          
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Themes work 100% Try em out</p>
-            <span class="news-date">June 18</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>New Themes, Working on perfecting them but there are new themes that work!</p>
-            <span class="news-date">June 13</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Adding in THEMES! (that actually work)</p>
-            <span class="news-date">June 13</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Did a bunch of stuff that has improved the site</p>
-            <span class="news-date">June 9</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Fixed login</p>
-            <span class="news-date">June 4</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Removed Baldi's Basics in Education and Learning</p>
-            <span class="news-date">May 28</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added Baldi's Basics in Education and Learning</p>
-            <span class="news-date">May 22</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Issue for where for your first time opening a game it takes a while to load, and then it loads fine opening it the second time</p>
-            <span class="news-date">May 22</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Over The summer I am going to add many new games!</p>
-            <span class="news-date">May 22</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Grok broke the code, don't worry, I had a backup. ;]</p>
-            <span class="news-date">May 22 8:06</span>
-          </div>
-            
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Fixed login!</p>
-            <span class="news-date">May 21 9:57</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>The school's firewalls are making it impossible to make login work</p>
-            <span class="news-date">May 20 12:04</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>figured out the sign in issue, so login and sign up should work again soon</p>
-            <span class="news-date">May 20 11:13</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added New Cloaks!</p>
-            <span class="news-date">May 19 7:25</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Fixed sign in?</p>
-            <span class="news-date">May 19 8:57</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Increased timer from 10 to 20.</p>
-            <span class="news-date">May 19 8:33</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added ghost logouts.</p>
-            <span class="news-date">May 18 6:20pm</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Added in scrolling for news</p>
-            <span class="news-date">May 18</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Streamlined authentication & credentials.</p>
-            <span class="news-date">May 18</span>
-          </div>
-
-          <div class="news-card">
-            <span class="news-tag">Update</span>
-            <p>Fixed Bullet Force (still takes a while to load)</p>
-            <span class="news-date">May 15</span>
-          
-      </div>
-    </div>
-  </div>
-  <script>
-    (function () {
-      var btn = document.getElementById('system-news-btn');
-      var modal = document.getElementById('system-news-modal');
-      var closeBtn = document.getElementById('system-news-close');
-      if (!btn || !modal) return;
-      function open() { modal.classList.add('show'); }
-      function close() { modal.classList.remove('show'); }
-      btn.addEventListener('click', open);
-      closeBtn && closeBtn.addEventListener('click', close);
-      modal.addEventListener('click', function (e) { if (e.target === modal) close(); });
-      document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') close();
-      });
-    })();
-  </script>
-
-</body></html>';
+        var html = "<!DOCTYPE html><html><head><title>ERR</title><meta name=\"viewport\" content=\"width=device-width,initial-scale=1\"></head>"
+          + "<body style=\"background:#050505;color:#ff2b2b;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0\">"
+          + "<div style=\"text-align:center;padding:40px\"><h1>SITE LOCKED</h1><p>Unauthorized host.</p></div></body></html>";
+        document.open();
+        document.write(html);
+        document.close();
       } catch (e) {}
       try { Object.freeze(document); } catch (e) {}
-      // Freeze the tab
-      while (true) {}
     })();
   </script>
-  <meta charset="UTF-8">
+<meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Null X</title>
   <link rel="icon" type="image/png" href="https://null-x-team.github.io/imgs/Screenshot%202026-01-27%208.17.07%20PM.png">
@@ -1299,23 +994,7 @@ const targetDate = new Date("August 30, 2026 3:15:25");
       });
   </script>
   
-<script>
-    (function () {
-      var ALLOWED = ["null-x-team.github.io"];
-      var host = (location.hostname || "").toLowerCase();
-      var ok = ALLOWED.some(function (d) { return host === d; });
-      if (ok) return;
 
-      try { window.stop(); } catch (e) {}
-      try {
-        document.documentElement.innerHTML =
-          '<html><head><title>ERR</title><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="background:#050505;color:#ff2b2b;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;overflow:hidden"><div style="width:min(420px,85%);padding:40px 35px;text-align:center;background:#0b0b0b;border:1px solid #3a1111;border-radius:12px;box-shadow:0 0 40px rgba(255,0,0,.08)"><div style="width:64px;height:64px;margin:0 auto 22px;border:2px solid #ff2b2b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:bold;box-shadow:0 0 20px rgba(255,0,0,.15)">!</div><h1 style="margin:0 0 12px;font-size:26px;letter-spacing:3px;color:#ff3333">SITE LOCKED</h1><p style="margin:0 0 8px;color:#aaa;font-size:14px">Unauthorized host.</p><p style="margin:22px 0 0;color:#444;font-size:11px;letter-spacing:1px">ERR_HOST_NOT_AUTHORIZED</p><p style="margin:28px 0 0;padding-top:18px;border-top:1px solid #191919;color:#555;font-size:10px;line-height:1.6">This repository is not allowed to exist.<br>If you had read the license, maybe you would understand.</p></div></body></html>';
-      } catch (e) {}
-      try { Object.freeze(document); } catch (e) {}
-      // Freeze the tab
-      while (true) {}
-    })();
-  </script>
   
   <script>
     (function initInPageConsole() {
@@ -1390,5 +1069,310 @@ const targetDate = new Date("August 30, 2026 3:15:25");
     })();
   </script>
   <script src="Settings/homescreen-pref.js"></script>
+
+  <div id="system-news-modal" role="dialog" aria-modal="true" aria-labelledby="snm-title">
+    <div class="snm-box">
+      <div class="snm-header">
+        <h3 id="snm-title">System News</h3>
+        <button type="button" class="snm-close" id="system-news-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="snm-feed" id="newsFeed">
+
+
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Sorry Users, my site is a mess, moving to turso is very stressfull for me. I am sorry. It is very difficult and there are errors around every turn.</p>
+            <span class="news-date">Sep. 5</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Moving Supabase data over to Turso, higher free tier, and no stupid server side error that is holding all of your data back.</p>
+            <span class="news-date">Aug. 30</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Supabase has a server side error, so you cannot access your save data right now, but I promise, your save data is safe.</p>
+            <span class="news-date">Aug. 25th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>New Themes! YAY</p>
+            <span class="news-date">Aug 25th</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Dear users of glaxyias I am sorry about the delay, there is something wrong with the code, I promise it will be up within the next 72 hours</p>
+            <span class="news-date">AUG 17th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Save data isn't working and all three of us can't figure out how to fix it so... we're putting our Ai helper to get it to work</p>
+            <span class="news-date">August 4th</span>
+          </div>
+          
+           <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Me, Glaxyias, and Galethis are putting more work into the bitcoin clicker game, so there will be less updates on here. but don't worry, we haven't forgotten about you</p>
+            <span class="news-date">August 2nd</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>LISTEN! USERS OF GLAXYIAS, THERE MIGHT BE A CHANCE FOR ROBLOX TO EXIST ON THIS SITE. MIGHT. BUT STILL A POSSIBLITY...</p>
+            <span class="news-date">July 30th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Hear me out, I might be able to add a way for people to watch youtube on this site. Might...</p>
+            <span class="news-date">July 23</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added a lock screen, press ALT+L or Ctrl+L and create your pin. then press again, and then your screen is locked</p>
+            <span class="news-date">July 28th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Me Glaeesas of all people fixed themes! we have 3 contributers and glaxyias has claude. How was I the only one to fix the themes issue?</p>
+            <span class="news-date">July 24th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Your Progress now saves every 30 seconds and manual save was kept.</p>
+            <span class="news-date">July 23</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Fixed bans, fixed admin, added blocking, PMs, and friend requests, and added backup for when the openai ai key fails. also added handlers</p>
+            <span class="news-date">July 22nd</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>This is a test to see if the service workers were the issue.</p>
+            <span class="news-date">July 21st</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Null AI Update</span>
+            <p>The ai is a work in progress, very hard to build. very slow. functions. but very very slow. (also the sync button that runs when a update is pushed no longer works, me or glaxyias know why. so that still remains but functtions off. the best option is when you see that pop up is the just clear the cache and reload.)</p>
+            <span class="news-date">July 17th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Happy 1000th Commit!</p>
+            <span class="news-date">July 15th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>CodeQL Now has it's own workflow, and the notification for site update is no longer launching before CodeQL</p>
+            <span class="news-date">July 15</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Multi-Update</span>
+            <p>Iframing my site will not work, ragdoll drop now works, working on making it work for a few others that can't load, games load in a new abt:blnk page.</p>
+            <span class="news-date">July 14th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Games are going to launch in a new way because the old way had a 96.431% chance to crash on certain chromebooks, this push will fix that</p>
+            <span class="news-date">July 13th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>The Ai will be delayed due to LLM responce tokens so the Ai will be more limited then I expected</p>
+            <span class="news-date">July 11</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added a 404 Page for broken links</p>
+            <span class="news-date">July 11th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>This ai will be very advanced so it won't be ready till the next major update. ;]</p>
+            <span class="news-date">July 9th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Working on building Ai helper, and it's not on this repo so no-one can take my code.</p>
+            <span class="news-date">July 9th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>This newest update is sooo cool!!!!</p>
+            <span class="news-date">July 8th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Refactor modal settings for themes and auto-launch</p>
+            <span class="news-date">July 5th</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Working on fixing settIngs modal</p>
+            <span class="news-date">June 29</span>
+          </div>
+          
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Themes work 100% Try em out</p>
+            <span class="news-date">June 18</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>New Themes, Working on perfecting them but there are new themes that work!</p>
+            <span class="news-date">June 13</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Adding in THEMES! (that actually work)</p>
+            <span class="news-date">June 13</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Did a bunch of stuff that has improved the site</p>
+            <span class="news-date">June 9</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Fixed login</p>
+            <span class="news-date">June 4</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Removed Baldi's Basics in Education and Learning</p>
+            <span class="news-date">May 28</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added Baldi's Basics in Education and Learning</p>
+            <span class="news-date">May 22</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Issue for where for your first time opening a game it takes a while to load, and then it loads fine opening it the second time</p>
+            <span class="news-date">May 22</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Over The summer I am going to add many new games!</p>
+            <span class="news-date">May 22</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Grok broke the code, don't worry, I had a backup. ;]</p>
+            <span class="news-date">May 22 8:06</span>
+          </div>
+            
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Fixed login!</p>
+            <span class="news-date">May 21 9:57</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>The school's firewalls are making it impossible to make login work</p>
+            <span class="news-date">May 20 12:04</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>figured out the sign in issue, so login and sign up should work again soon</p>
+            <span class="news-date">May 20 11:13</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added New Cloaks!</p>
+            <span class="news-date">May 19 7:25</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Fixed sign in?</p>
+            <span class="news-date">May 19 8:57</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Increased timer from 10 to 20.</p>
+            <span class="news-date">May 19 8:33</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added ghost logouts.</p>
+            <span class="news-date">May 18 6:20pm</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Added in scrolling for news</p>
+            <span class="news-date">May 18</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Streamlined authentication & credentials.</p>
+            <span class="news-date">May 18</span>
+          </div>
+
+          <div class="news-card">
+            <span class="news-tag">Update</span>
+            <p>Fixed Bullet Force (still takes a while to load)</p>
+            <span class="news-date">May 15</span>
+          
+      
+      </div>
+    </div>
+  </div>
+  <script>
+    (function () {
+      var btn = document.getElementById('system-news-btn');
+      var modal = document.getElementById('system-news-modal');
+      var closeBtn = document.getElementById('system-news-close');
+      if (!btn || !modal) return;
+      function openNews() { modal.classList.add('show'); }
+      function closeNews() { modal.classList.remove('show'); }
+      btn.addEventListener('click', openNews);
+      if (closeBtn) closeBtn.addEventListener('click', closeNews);
+      modal.addEventListener('click', function (e) { if (e.target === modal) closeNews(); });
+      document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeNews(); });
+    })();
+  </script>
+
 </body>
 </html>
