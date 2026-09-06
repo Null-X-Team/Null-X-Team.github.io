@@ -821,6 +821,7 @@ function initFeaturedModule() {
   const heroTitle = document.getElementById('hero-title');
   const heroDesc = document.getElementById('hero-desc');
   const playFeaturedBtn = document.getElementById('playFeatured');
+  const heroSection = document.getElementById('heroSection') || document.querySelector('section.hero');
 
   if (_0xData.length > 0 && heroTitle) {
     const randomGameSelection = _0xData[Math.floor(Math.random() * _0xData.length)];
@@ -828,6 +829,14 @@ function initFeaturedModule() {
     if (heroDesc) heroDesc.textContent = randomGameSelection.desc;
     if (playFeaturedBtn) {
       playFeaturedBtn.onclick = () => launchGame(randomGameSelection.id);
+    }
+    // Fill featured banner with game art (falls back to gradient if no image)
+    if (heroSection) {
+      if (randomGameSelection.image) {
+        heroSection.style.setProperty('--hero-bg', 'url("' + String(randomGameSelection.image).replace(/"/g, '\"') + '")');
+      } else {
+        heroSection.style.removeProperty('--hero-bg');
+      }
     }
   }
 }
@@ -1551,22 +1560,20 @@ fetchLiveWeather();
     }
     .game-card-img {
       width: 100%;
-      height: 140px;
-      /* Show the FULL image — never crop text/logos on the art.
-         Box is a fixed barrier; image scales up to fit inside it only.
-         Empty sides get a dark fill so cards still look uniform. */
-      object-fit: contain;
+      height: 120px;
+      max-width: 100%;
+      max-height: 120px;
+      object-fit: cover;
       object-position: center;
       background-color: #0a0a12;
-      background-image: linear-gradient(145deg, #12101c 0%, #0a0a12 100%);
-      border-radius: 8px 8px 0 0;
+      border-radius: 14px 14px 0 0;
       margin-bottom: 0;
       display: block;
       flex-shrink: 0;
     }
     .game-card-img-placeholder {
       width: 100%;
-      height: 140px;
+      height: 120px;
       background: linear-gradient(135deg, #1f1f2e, #0d0d13);
       border-radius: 8px 8px 0 0;
       display: flex;
