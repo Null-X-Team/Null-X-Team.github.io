@@ -88,13 +88,6 @@
     });
   }
 
-  function getLibraryTrack(id) {
-    for (var i = 0; i < LIBRARY.length; i++) {
-      if (LIBRARY[i].id === id) return LIBRARY[i];
-    }
-    return LIBRARY[0];
-  }
-
   function createAudio() {
     if (audio) return audio;
     audio = new Audio();
@@ -130,17 +123,18 @@
             } else {
               trackId = LIBRARY[0].id;
               localStorage.setItem(STORAGE_TRACK, trackId);
-              applySrc(getLibraryTrack(trackId).src);
+              applySrc(LIBRARY[0].src);
             }
             resolve();
           })
           .catch(function () {
             trackId = LIBRARY[0].id;
-            applySrc(getLibraryTrack(trackId).src);
+            applySrc(LIBRARY[0].src);
             resolve();
           });
       } else {
-        applySrc(getLibraryTrack(trackId).src);
+        var track = LIBRARY.find(function (t) { return t.id === trackId; }) || LIBRARY[0];
+        applySrc(track.src);
         resolve();
       }
     });
@@ -179,10 +173,9 @@
     enabled = !!on;
     localStorage.setItem(STORAGE_ENABLED, enabled ? "true" : "false");
     if (!enabled) {
-      if (audio) {
-        try { audio.pause(); } catch (e) {}
-      }
+      if (audio) try { audio.pause(); } catch (e) {}
     } else if (!muted) tryPlay();
+    updateMuteBtn();
     syncSettingsUI();
   }
 
@@ -197,35 +190,26 @@
 
   function uploadMp3(file) {
     return new Promise(function (resolve, reject) {
-      if (!file) {
-        reject(new Error("No file"));
-        return;
-      }
-      var name = (file.name || "").toLowerCase();
-      var type = (file.type || "").toLowerCase();
-      if (!(type === "audio/mpeg" || type === "audio/mp3" || name.endsWith(".mp3"))) {
-        reject(new Error("Only MP3 files are allowed."));
-        return;
-      }
-      if (file.size > 15 * 1024 * 1024) {
-        reject(new Error("File too large (max ~15MB)."));
-        return;
-      }
+      if (!file) return reject(new Error("No file"));
       idbPut(file)
         .then(function () {
-          customTitle = file.name.replace(/\.mp3$/i, "") || "Uploaded track";
+          customTitle = file.name || "Uploaded track";
           localStorage.setItem("nx_music_custom_title", customTitle);
-          setTrack("custom");
+          trackId = "custom";
+          localStorage.setItem(STORAGE_TRACK, trackId);
+          return loadCurrentTrack();
+        })
+        .then(function () {
+          if (enabled && !muted) tryPlay();
+          updateMuteBtn();
+          syncSettingsUI();
           resolve(customTitle);
         })
-        .catch(function (err) {
-          reject(err || new Error("Could not save upload."));
-        });
+        .catch(reject);
     });
   }
 
   function toggleMute() {
-    // If music was disabled in settings, first click turns it back on
     if (!enabled) {
       setEnabled(true);
       setMuted(false);
@@ -255,7 +239,7 @@
     document.head.appendChild(s);
   }
 
-    function updateMuteBtn() {
+  function updateMuteBtn() {
     var btn = document.getElementById("nx-music-btn");
     if (!btn) return;
     var off = muted || !enabled;
@@ -264,7 +248,7 @@
     btn.setAttribute("aria-pressed", off ? "true" : "false");
   }
 
-function injectButton() {
+  function injectButton() {
     if (document.getElementById("nx-music-btn")) return;
     injectStyles();
     var btn = document.createElement("button");
@@ -276,10 +260,7 @@ function injectButton() {
       unlockOnGesture();
       createAudio();
       toggleMute();
-      // Hard fallback: if unmuted, force play attempt
-      if (enabled && !muted) {
-        tryPlay();
-      }
+      if (enabled && !muted) tryPlay();
     });
     document.body.appendChild(btn);
     updateMuteBtn();
@@ -289,15 +270,15 @@ function injectButton() {
     if (!sel) return;
     sel.innerHTML = "";
     LIBRARY.forEach(function (t) {
-      var opt = document.createElement("option");
-      opt.value = t.id;
-      opt.textContent = t.title;
-      sel.appendChild(opt);
+      var o = document.createElement("option");
+      o.value = t.id;
+      o.textContent = t.title;
+      sel.appendChild(o);
     });
-    var customOpt = document.createElement("option");
-    customOpt.value = "custom";
-    customOpt.textContent = "Uploaded: " + customTitle;
-    sel.appendChild(customOpt);
+    var o = document.createElement("option");
+    o.value = "custom";
+    o.textContent = customTitle || "Uploaded track";
+    sel.appendChild(o);
     sel.value = trackId;
   }
 
@@ -326,7 +307,6 @@ function injectButton() {
     var uploadEl = document.getElementById("nx-music-upload");
     var statusEl = document.getElementById("nx-music-upload-status");
     if (!enableEl && !muteEl && !volEl && !trackEl) return false;
-
     if (enableEl && !enableEl.dataset.nxWired) {
       enableEl.dataset.nxWired = "1";
       enableEl.checked = enabled;
@@ -343,12 +323,9 @@ function injectButton() {
     }
     if (volEl && !volEl.dataset.nxWired) {
       volEl.dataset.nxWired = "1";
-      volEl.value = String(Math.round(volume * 100));
-      if (volLabel) volLabel.textContent = Math.round(volume * 100) + "%";
       volEl.addEventListener("input", function () {
-        var v = (parseInt(volEl.value, 10) || 0) / 100;
-        setVolume(v);
-        if (volLabel) volLabel.textContent = Math.round(v * 100) + "%";
+        setVolume(parseInt(volEl.value, 10) / 100);
+        if (volLabel) volLabel.textContent = volEl.value + "%";
       });
     }
     if (trackEl && !trackEl.dataset.nxWired) {
