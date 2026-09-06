@@ -142,7 +142,7 @@ let _0xData = [
 
   { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "A chaotic Kanye-themed experience packed with memes, music vibes, and unexpected challenges.", popular: true },
 
-  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true },
+  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true , image: "../Games/blood/images (8).jpeg" },
   { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true },
 
   { id: "supercold", title: "supercold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
