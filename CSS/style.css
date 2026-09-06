@@ -184,9 +184,9 @@ nav {
 }
 
 .search-bar {
-  flex: 1 1 200px;
-  max-width: 450px;
-  min-width: 0;
+  flex: 1 1 280px;
+  max-width: none;
+  min-width: 180px;
   margin: 0;
   position: relative;
 }
@@ -1406,18 +1406,35 @@ nav {
 #system-news-btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
-  padding: 8px 14px;
+  padding: 8px 12px;
   border-radius: 8px;
   border: 1px solid rgba(139, 0, 255, 0.45);
   background: rgba(139, 0, 255, 0.15);
   color: #e8e0ff;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 700;
   cursor: pointer;
   font-family: system-ui, sans-serif;
   transition: background 0.2s, border-color 0.2s;
+  white-space: nowrap;
+  margin-right: 4px;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+.top-bar .greeting {
+  flex-shrink: 0;
+}
+
+.top-bar .search-bar {
+  flex: 1 1 auto;
 }
 
 #system-news-btn:hover {
