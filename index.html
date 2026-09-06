@@ -454,7 +454,7 @@
   </style>
 </head>
 <body>
-<audio id="bgMusic" src="../audio/emmraan-evil-heavy-metal-261243.mp3" autoplay loop></audio>
+<audio id="bgMusic" src="audio/emmraan-evil-heavy-metal-261243.mp3" autoplay loop></audio>
 
 <script>
   const bgMusic = document.getElementById('bgMusic');
@@ -508,14 +508,16 @@
           <p>Find something fun to play.</p>
         </div>
           
-        <div class="search-bar" style="display: flex; align-items: center; gap: 15px;">
-          <button type="button" id="system-news-btn" title="System News">
-            <span class="news-dot" aria-hidden="true"></span>
-            System News
-          </button>
+        <button type="button" id="system-news-btn" title="System News">
+          <span class="news-dot" aria-hidden="true"></span>
+          News
+        </button>
+
+        <div class="search-bar">
           <input type="text" id="searchBar" placeholder="Search games...">
+        </div>
           
-          <div class="top-bar-stats" style="display: flex; align-items: center; gap: 12px; font-family: monospace; font-size: 13px;">
+        <div class="top-bar-stats" style="display: flex; align-items: center; gap: 12px; font-family: monospace; font-size: 13px; flex-shrink: 0;">
             
             <div id="battery-widget" style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.04); padding: 6px 12px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.08); color: white;">
               <i class="fas fa-battery-three-quarters" id="battery-icon" style="color: #10b981;"></i>
@@ -968,6 +970,7 @@ const targetDate = new Date("August 30, 2026 3:15:25");
   <script src="https://cdn.jsdelivr.net/npm/driver.js@1.3.1/dist/driver.js.iife.js"></script>
   <script src="tour.js"></script>
 
+  <script src="JS/music.js"></script>
   <script src="debug.js"></script>
   
   <script type="module" src="JS/main.js"></script>
