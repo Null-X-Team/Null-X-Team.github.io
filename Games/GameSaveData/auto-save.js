@@ -1,3 +1,4 @@
+
 // auto-save.js
 // Cloud-save engine with mandatory import-before-save protection.
 //
@@ -390,6 +391,13 @@
             importReadyForUser === userAtStart &&
             importInFlightForUser === null
         ) {
+            // First-time cloud users (no row) may export even with a thin local cache.
+            if (window.__lastCloudLoadStatus === 'not_found') {
+                exportPaused = false;
+                hideEmptyCacheWarning();
+                return true;
+            }
+
             exportPaused = isProgressCacheEmpty();
 
             if (exportPaused) {
@@ -434,12 +442,43 @@
             // The import request finished for this user, even if no save exists.
             importReadyForUser = userAtStart;
 
+            const loadStatus = window.__lastCloudLoadStatus || (imported ? 'ok' : 'error');
+
             /*
-             * Critical protection:
-             * - Backup restored / game has real data: uploads may resume.
-             * - No cloud save, failed import, or still-empty cache: uploads stay blocked.
+             * - Restored OK: unlock (unless local is still empty).
+             * - not_found: no cloud row — allow Export to create the first backup.
+             * - error/corrupt: keep protection if local is empty; unlock if local has data.
              */
-            if (!imported || isProgressCacheEmpty()) {
+            if (imported || loadStatus === 'ok') {
+                if (isProgressCacheEmpty()) {
+                    exportPaused = true;
+                    showEmptyCacheWarning();
+                    return false;
+                }
+                exportPaused = false;
+                hideEmptyCacheWarning();
+                setSyncStatus(
+                    statusElementId,
+                    'Cloud data restored. Sync is now enabled.',
+                    '#00c853'
+                );
+                return true;
+            }
+
+            if (loadStatus === 'not_found') {
+                exportPaused = false;
+                hideEmptyCacheWarning();
+                setSyncStatus(
+                    statusElementId,
+                    'No cloud backup yet. Export is enabled — create your first save.',
+                    '#00c853'
+                );
+                console.log('[CloudSync] No cloud row for account; export unlocked.');
+                return true;
+            }
+
+            // Load error: only lock if there is nothing local to protect/upload
+            if (isProgressCacheEmpty()) {
                 exportPaused = true;
                 showEmptyCacheWarning();
                 return false;
@@ -447,13 +486,11 @@
 
             exportPaused = false;
             hideEmptyCacheWarning();
-
             setSyncStatus(
                 statusElementId,
-                'Cloud data restored. Sync is now enabled.',
-                '#00c853'
+                'Cloud import failed, but local progress can still be exported.',
+                '#ffaa00'
             );
-
             return true;
         })()
             .catch((err) => {
@@ -566,7 +603,7 @@
          * Empty-cache uploads are forbidden for BOTH manual and automatic saves.
          * A manual save should not provide a bypass around data-loss protection.
          */
-        if (isProgressCacheEmpty()) {
+        if (isProgressCacheEmpty() && window.__lastCloudLoadStatus !== 'not_found') {
             exportPaused = true;
             showEmptyCacheWarning();
 
@@ -577,6 +614,10 @@
             }
 
             return false;
+        }
+
+        if (isProgressCacheEmpty() && window.__lastCloudLoadStatus === 'not_found') {
+            console.log('[CloudSync] First-time cloud export with sparse local cache.');
         }
 
         try {
@@ -687,6 +728,7 @@
                     statusBox.textContent = 'No cloud backup found for this account.';
                     statusBox.style.color = '#ff8888';
                 }
+                window.__lastCloudLoadStatus = 'not_found';
                 return false;
             }
 
@@ -739,15 +781,17 @@
                     statusBox.style.color = '#00c853';
                 }
 
+                window.__lastCloudLoadStatus = 'ok';
                 return true;
             }
 
             if (statusBox) {
                 statusBox.textContent =
-                    'No cloud save was found. Create progress before backing up.';
+                    'No cloud save was found. You can Export to create one.';
                 statusBox.style.color = '#aaa';
             }
 
+            window.__lastCloudLoadStatus = 'not_found';
             return false;
         } catch (err) {
             console.error('Cloud Load Error:', err);
@@ -757,6 +801,7 @@
                 statusBox.style.color = '#ff4444';
             }
 
+            window.__lastCloudLoadStatus = 'error';
             return false;
         }
     };
