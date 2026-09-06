@@ -225,6 +225,12 @@
   }
 
   function toggleMute() {
+    // If music was disabled in settings, first click turns it back on
+    if (!enabled) {
+      setEnabled(true);
+      setMuted(false);
+      return;
+    }
     setMuted(!muted);
   }
 
@@ -239,31 +245,41 @@
     var s = document.createElement("style");
     s.id = "nx-music-style";
     s.textContent =
-      "#nx-music-btn{position:fixed;bottom:16px;right:96px;z-index:99990;" +
-      "width:44px;height:44px;border-radius:50%;border:1px solid rgba(139,0,255,0.5);" +
-      "background:rgba(18,9,28,0.9);color:#c084fc;cursor:pointer;font-size:18px;" +
-      "box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;}" +
-      "#nx-music-btn:hover{background:rgba(139,0,255,0.25);}";
+      "#nx-music-btn{position:fixed;bottom:16px;right:96px;z-index:2147483647;" +
+      "width:48px;height:48px;border-radius:12px;border:1px solid rgba(139,0,255,0.55);" +
+      "background:rgba(18,9,28,0.95);color:#e9d5ff;cursor:pointer;font-size:13px;font-weight:800;" +
+      "font-family:system-ui,sans-serif;letter-spacing:0.02em;" +
+      "box-shadow:0 4px 16px rgba(0,0,0,0.45);display:flex;align-items:center;justify-content:center;" +
+      "pointer-events:auto;user-select:none;}" +
+      "#nx-music-btn:hover{background:rgba(139,0,255,0.35);}";
     document.head.appendChild(s);
   }
 
-  function updateMuteBtn() {
+    function updateMuteBtn() {
     var btn = document.getElementById("nx-music-btn");
     if (!btn) return;
-    btn.textContent = muted || !enabled ? "\uD83D\uDD07" : "\uD83D\uDD0A";
-    btn.title = muted || !enabled ? "Unmute music" : "Mute music";
+    var off = muted || !enabled;
+    btn.textContent = off ? "MUTE" : "ON";
+    btn.title = off ? "Click to play / unmute music" : "Click to mute music";
+    btn.setAttribute("aria-pressed", off ? "true" : "false");
   }
 
-  function injectButton() {
+function injectButton() {
     if (document.getElementById("nx-music-btn")) return;
     injectStyles();
     var btn = document.createElement("button");
     btn.id = "nx-music-btn";
     btn.type = "button";
     btn.addEventListener("click", function (e) {
+      e.preventDefault();
       e.stopPropagation();
       unlockOnGesture();
+      createAudio();
       toggleMute();
+      // Hard fallback: if unmuted, force play attempt
+      if (enabled && !muted) {
+        tryPlay();
+      }
     });
     document.body.appendChild(btn);
     updateMuteBtn();
