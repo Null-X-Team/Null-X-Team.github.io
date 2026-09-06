@@ -239,7 +239,7 @@
     var s = document.createElement("style");
     s.id = "nx-music-style";
     s.textContent =
-      "#nx-music-btn{position:fixed;bottom:16px;right:16px;z-index:99990;" +
+      "#nx-music-btn{position:fixed;bottom:16px;right:96px;z-index:99990;" +
       "width:44px;height:44px;border-radius:50%;border:1px solid rgba(139,0,255,0.5);" +
       "background:rgba(18,9,28,0.9);color:#c084fc;cursor:pointer;font-size:18px;" +
       "box-shadow:0 4px 16px rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;}" +
