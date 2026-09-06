@@ -1,4 +1,3 @@
-
 // auto-save.js
 // Cloud-save engine with mandatory import-before-save protection.
 //
@@ -328,6 +327,17 @@
     }
 
     function showEmptyCacheWarning() {
+        // No cloud row for this account: never show the scary import modal.
+        // They are allowed to Export and create the first backup.
+        if (window.__lastCloudLoadStatus === 'not_found') {
+            exportPaused = false;
+            hideEmptyCacheWarning();
+            console.log(
+                '[CloudSync] Skipping empty-cache modal — no cloud save exists for this account.'
+            );
+            return;
+        }
+
         ensureEmptyCacheModal();
 
         const modal = document.getElementById('empty-cache-warning-modal');
