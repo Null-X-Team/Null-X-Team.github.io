@@ -176,6 +176,88 @@
 
         .error-msg { color: var(--error-color); }
         .success-msg { color: var(--success-color); }
+    
+        /* Reset-password modal (null password after migration) */
+        #resetPwModal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: rgba(0, 0, 0, 0.85);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+        #resetPwModal.show { display: flex; }
+        #resetPwModal .rpw-box {
+            background: var(--container-bg, #1a0a2e);
+            border: 2px solid var(--border-color, #8b3dff);
+            border-radius: 16px;
+            padding: 28px 24px;
+            width: min(400px, 94vw);
+            text-align: center;
+            box-shadow: 0 0 40px rgba(139, 61, 255, 0.35);
+            color: var(--text-color, #eee);
+        }
+        #resetPwModal .rpw-box h2 {
+            margin: 0 0 8px;
+            font-size: 1.25rem;
+            color: #ffcc66;
+        }
+        #resetPwModal .rpw-box p {
+            margin: 0 0 18px;
+            font-size: 0.9rem;
+            color: var(--text-secondary, #bbb);
+            line-height: 1.45;
+        }
+        #resetPwModal .rpw-box label {
+            display: block;
+            text-align: left;
+            font-size: 0.85rem;
+            margin-bottom: 4px;
+            color: var(--text-secondary, #bbb);
+        }
+        #resetPwModal .rpw-box input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 12px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color, #8b3dff);
+            background: rgba(0,0,0,0.35);
+            color: #fff;
+            font-size: 1rem;
+        }
+        #resetPwModal .rpw-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        #resetPwModal .rpw-actions button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+        }
+        #resetPwModal .rpw-save {
+            background: linear-gradient(135deg, #8b3dff, #a855f7);
+            color: #fff;
+        }
+        #resetPwModal .rpw-cancel {
+            background: transparent;
+            color: #ff8888;
+            border: 1px solid #663333 !important;
+        }
+        #resetPwModal #rpwMsg {
+            min-height: 1.2em;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+
     </style>
 </head>
 <body>
@@ -222,6 +304,29 @@
 
         <script src="https://cdn.jsdelivr.net/gh/Null-X-Team/badwordfilter@main/badword.js"></script>
     <script src="username-filter.js"></script>
+    
+    <div id="resetPwModal" role="dialog" aria-modal="true" aria-labelledby="rpwTitle">
+        <div class="rpw-box">
+            <h2 id="rpwTitle">Create a new password</h2>
+            <p>
+                Your account was found, but no password is stored (migration issue).
+                Please set a new password to continue. This only applies to accounts
+                that lost their password during the move.
+            </p>
+            <label for="rpwUser">Account</label>
+            <input type="text" id="rpwUser" readonly>
+            <label for="rpwNew">New password</label>
+            <input type="password" id="rpwNew" autocomplete="new-password" minlength="4" placeholder="At least 4 characters">
+            <label for="rpwConfirm">Confirm password</label>
+            <input type="password" id="rpwConfirm" autocomplete="new-password" placeholder="Type it again">
+            <div class="rpw-actions">
+                <button type="button" class="rpw-save" id="rpwSaveBtn">Save password &amp; log in</button>
+                <button type="button" class="rpw-cancel" id="rpwCancelBtn">Cancel</button>
+            </div>
+            <div id="rpwMsg"></div>
+        </div>
+    </div>
+
     <script>
         // --- CONFIGURATION: Turso via Vercel API ---
         const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
@@ -238,6 +343,90 @@
             const s = String(stored);
             return s === typedPlain || s === typedHash || s.toLowerCase() === typedHash.toLowerCase();
         }
+
+        function isPasswordMissing(stored) {
+            if (stored === null || stored === undefined) return true;
+            const s = String(stored).trim().toLowerCase();
+            return s === '' || s === 'null' || s === 'undefined' || s === 'none';
+        }
+
+        let pendingResetUser = null; // { id, username }
+
+        function openResetPasswordModal(user) {
+            pendingResetUser = user;
+            const modal = document.getElementById('resetPwModal');
+            document.getElementById('rpwUser').value = user.username || '';
+            document.getElementById('rpwNew').value = '';
+            document.getElementById('rpwConfirm').value = '';
+            document.getElementById('rpwMsg').textContent = '';
+            modal.classList.add('show');
+            setTimeout(() => document.getElementById('rpwNew').focus(), 50);
+        }
+
+        function closeResetPasswordModal() {
+            pendingResetUser = null;
+            document.getElementById('resetPwModal').classList.remove('show');
+        }
+
+        async function saveNewPasswordFromModal() {
+            const msg = document.getElementById('rpwMsg');
+            const pw = document.getElementById('rpwNew').value;
+            const conf = document.getElementById('rpwConfirm').value;
+
+            if (!pendingResetUser || pendingResetUser.id === undefined || pendingResetUser.id === null) {
+                msg.style.color = '#ff6666';
+                msg.textContent = 'Missing account id. Try logging in again.';
+                return;
+            }
+            if (!pw || pw.length < 4) {
+                msg.style.color = '#ff6666';
+                msg.textContent = 'Password must be at least 4 characters.';
+                return;
+            }
+            if (pw !== conf) {
+                msg.style.color = '#ff6666';
+                msg.textContent = 'Passwords do not match.';
+                return;
+            }
+
+            msg.style.color = '#a033ff';
+            msg.textContent = 'Saving...';
+
+            try {
+                const hashed = await sha256Hex(pw);
+                const res = await fetch(`${TURSO_API_BASE}/users`, {
+                    method: 'PATCH',
+                    headers: headers,
+                    body: JSON.stringify({
+                        id: pendingResetUser.id,
+                        password: hashed
+                    })
+                });
+                const body = await res.json().catch(() => ({}));
+                if (!res.ok) {
+                    throw new Error(body.error || ('HTTP ' + res.status));
+                }
+
+                localStorage.setItem('chatUser', pendingResetUser.username);
+                msg.style.color = '#00c853';
+                msg.textContent = 'Password saved! Logging you in...';
+                setTimeout(() => {
+                    window.location.href = '../index.html';
+                }, 1000);
+            } catch (err) {
+                msg.style.color = '#ff6666';
+                msg.textContent = 'Could not save password: ' + (err.message || err);
+                console.error(err);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('rpwSaveBtn')?.addEventListener('click', saveNewPasswordFromModal);
+            document.getElementById('rpwCancelBtn')?.addEventListener('click', closeResetPasswordModal);
+            document.getElementById('rpwConfirm')?.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') saveNewPasswordFromModal();
+            });
+        });
 
         let currentMode = 'signup';
 
@@ -422,6 +611,17 @@
                 if (!response.ok) throw new Error('Verification endpoint offline.');
 
                 const user = await response.json();
+
+                // Password was wiped during migration — force set a new one
+                if (user && isPasswordMissing(user.password)) {
+                    showMessage('No password on file — please create a new one.', false);
+                    openResetPasswordModal({
+                        id: user.id,
+                        username: user.username || username
+                    });
+                    return;
+                }
+
                 const typedHash = await sha256Hex(password);
 
                 if (user && passwordsMatch(user.password, password, typedHash)) {
