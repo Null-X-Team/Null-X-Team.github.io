@@ -37,6 +37,40 @@
 // ==========================================
 // DYNAMIC CORE SYSTEMS & GAMES REGISTER DATA
 // ==========================================
+
+// Obfuscated proxy endpoints (base64). Decode only at launch time.
+function __nxDecodeP(p) {
+  try { return atob(p); } catch (e) { return ''; }
+}
+function __nxLaunchProxy(encoded) {
+  const target = __nxDecodeP(encoded);
+  if (!target) { alert('Endpoint unavailable.'); return; }
+  const tab = window.open('about:blank', '_blank');
+  if (!tab) { alert('Pop-up blocked. Allow pop-ups to open this instance.'); return; }
+  tab.document.title = 'Google Docs';
+  tab.document.open();
+  tab.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Google Docs</title>
+<style>html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}iframe{border:0;width:100%;height:100vh;display:block}</style>
+</head><body><iframe src="${target.replace(/"/g,'&quot;')}" allow="fullscreen" allowfullscreen></iframe></body></html>`);
+  tab.document.close();
+}
+const __nxProxyList = [
+  { name: "NautilusOS", local: "unblockers/NautilusOS/index.html" },
+  { name: "GUST", local: "unblockers/GUST/GUST.html" },
+  { name: "Helios", local: "unblockers/Helios/Helios.html" },
+  { name: "Google Storage CDN", p: "aHR0cHM6Ly9zdG9yYWdlLmdvb2dsZWFwaXMuY29t" },
+  { name: "Fastly SSL Mirror", p: "aHR0cHM6Ly9hbGktaW4tYS1uZXctZHJlc3MuZ2xvYmFsLnNzbC5mYXN0bHkubmV0Lw==" },
+  { name: "Fastly FreeTLS Mirror", p: "aHR0cHM6Ly9hbGktaW4tYS1uZXctZHJlc3MuZnJlZXRscy5mYXN0bHkubmV0Lw==" },
+  { name: "CloudFront Edge", p: "aHR0cHM6Ly9kaXY3aWtxbTRvNTE1LmNsb3VkZnJvbnQubmV0Lw==" },
+  { name: "Lucide Proxy", p: "aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL25ld3JlbGlnaHRlZHRlYW0vbHVjaWRlcHJveHlANzJhZDQwNDQ3Mjk2MzE0MDFjY2NmMzQwYzRhNWZhOTI3ZTM1NWVlZC9uaXJieXRlcy5zdmcjLw==" },
+  { name: "DogeUB Static", p: "aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL2RvZ2V1Yi8tL2luZGV4LnN2Zw==" },
+  { name: "DD-Static", p: "aHR0cHM6Ly9jZG4uanNkZWxpdnIubmV0L2doL05pZ2h0UHJveHkvREQtU3RhdGljL2Rpc3QvaW5kZXguc3Zn" },
+  { name: "ProLogic", p: "aHR0cHM6Ly9wcm9sb2dpYy5rbGNjYy5jby51ay8=" },
+  { name: "BeanWeb", p: "aHR0cHM6Ly90NXoycGRmOC5iZWFud2ViLnF6ei5pby8=" },
+  { name: "Kriptic Edition", p: "aHR0cHM6Ly9rcmlwdGljZWRpdGlvbjIubmVvY2l0aWVzLm9yZy8=" },
+  { name: "Relaxed Alien", p: "aHR0cHM6Ly9tYW51YWxseS1yZWxheGVkLWFsaWVuLmdsb2JhbC5zc2wuZmFzdGx5Lm5ldC8=" },
+];
+
 let _0xData = [
   { id: "b_ap", title: "Brotato All Pain No Gain", url: "../Games/brotatoAPNG/Brotato.html", image: "../Games/brotatoAPNG/images (23).jpeg", desc: "The newest version of Brotato with the All Pain No Gain update.", popular: true },
 { id: "cloverpit", title: "cloverpit", url: "../Games/cloverpit/index.html", desc: "Clover Pit is a roguelite gambling game where you spin, bet, and chase huge payouts while trying not to go broke.", popular: true , image: "../Games/cloverpit/images.jpeg" },
@@ -986,26 +1020,21 @@ async function handlePlaceholderView(navId, viewName) {
     }
 
     if (viewLower === 'unblockers') {
-      // Inject unblocker cards if not already present
-      if (!customSectionContainer.querySelector('.unblocker-card-row')) {
-        customSectionContainer.innerHTML = `
+      const list = (typeof __nxProxyList !== 'undefined') ? __nxProxyList : [];
+      const cards = list.map((item, i) => {
+        const action = item.local
+          ? `window.open('${item.local}','_blank')`
+          : `__nxLaunchProxy('${item.p}')`;
+        return `<div class="unblocker-card" data-i="${i}" onclick="${action}" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);transition:transform .2s,border-color .2s;">
+              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">${item.name}</h4>
+              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
+            </div>`;
+      }).join('');
+      customSectionContainer.innerHTML = `
           <h2>Unblockers Portal</h2>
-          <p style="color:#aaa;margin-bottom:20px;">Deploy your web proxies and private environments.</p>
-          <div class="unblocker-card-row" style="display:flex;gap:15px;flex-wrap:wrap;margin-top:15px;">
-            <div class="unblocker-card" onclick="window.open('unblockers/NautilusOS/index.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
-              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">NautilusOS</h4>
-              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
-            </div>
-            <div class="unblocker-card" onclick="window.open('unblockers/GUST/GUST.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
-              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">GUST</h4>
-              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
-            </div>
-            <div class="unblocker-card" onclick="window.open('unblockers/Helios/Helios.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
-              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">Helios</h4>
-              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
-            </div>
-          </div>`;
-      }
+          <p style="color:#aaa;margin-bottom:12px;">Deploy proxy instances. Opens in a sandboxed tab.</p>
+          <p style="color:#666;font-size:12px;margin-bottom:20px;">By using these tools you agree to the Terms of Service — you are solely responsible for your activity. We are not liable for third-party content or malformed links.</p>
+          <div class="unblocker-card-row" style="display:flex;gap:15px;flex-wrap:wrap;margin-top:15px;">${cards}</div>`;
     }
 
     return;
@@ -2218,5 +2247,7 @@ try {
   window.clearAllViews = clearAllViews;
   window.renderLibraryGrid = renderLibraryGrid;
   window.launchGame = launchGame;
+  window.__nxLaunchProxy = __nxLaunchProxy;
+  window.__nxDecodeP = __nxDecodeP;
   window._0xData = _0xData;
 } catch (e) {}
