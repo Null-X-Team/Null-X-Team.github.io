@@ -895,11 +895,20 @@ function showAllGamesView() {
 
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
+  const section = gameGrid ? gameGrid.closest('section') : null;
 
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
+  if (section) {
+    section.style.setProperty('display', 'block', 'important');
+    section.style.setProperty('visibility', 'visible', 'important');
+  }
   if (gameGrid) {
-    gameGrid.style.setProperty('display', 'grid', 'important');
+    gameGrid.removeAttribute('hidden');
+    gameGrid.style.cssText = 'display:grid!important;visibility:visible!important;opacity:1!important;min-height:200px!important;';
     renderLibraryGrid(_0xData);
+    console.log('[NX] Games grid shown, cards:', gameGrid.children.length);
+  } else {
+    console.error('[NX] gameGrid element missing from DOM');
   }
 }
 
@@ -909,11 +918,18 @@ function showFavoritesView() {
 
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
+  const section = favGrid ? favGrid.closest('section') : (gameGrid ? gameGrid.closest('section') : null);
 
   if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important');
+  if (section) {
+    section.style.setProperty('display', 'block', 'important');
+    section.style.setProperty('visibility', 'visible', 'important');
+  }
   if (favGrid) {
-    favGrid.style.setProperty('display', 'grid', 'important');
+    favGrid.removeAttribute('hidden');
+    favGrid.style.cssText = 'display:grid!important;visibility:visible!important;opacity:1!important;min-height:200px!important;';
     renderFavoritesGrid();
+    console.log('[NX] Favorites grid shown, cards:', favGrid.querySelectorAll('.game-card').length);
   }
 }
 
