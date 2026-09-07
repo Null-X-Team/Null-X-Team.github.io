@@ -1,4 +1,8 @@
-/* EMERGENCY: educational-cloak has z-index 2147483647 and was covering everything */
+/* ==========================================================
+   FIX: content was pushed far down / main area looked empty
+   ========================================================== */
+
+/* Kill any leftover educational-cloak completely */
 #educational-cloak,
 #educational-cloak.hidden,
 div#educational-cloak {
@@ -14,29 +18,58 @@ div#educational-cloak {
   left: -9999px !important;
 }
 
-/* Ensure main layout stays on top */
-.dashboard {
+/* Force the home view elements to be visible and at the top */
+#heroSection,
+section.hero {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
   position: relative !important;
-  z-index: 1 !important;
+  z-index: 10 !important;
+  margin: 20px !important;
+  min-height: 180px !important;
 }
+
+.random-section {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Keep other views hidden by default so they don't create extra height */
+#gameGrid[style*="display: none"],
+#favoritesGrid[style*="display: none"],
+#unblockersSection[style*="display: none"],
+#profileSection[style*="display: none"],
+#calculatorSection[style*="display: none"],
+#terminalSection[style*="display: none"],
+#assistantSection[style*="display: none"] {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Make sure main content starts at the top and is not buried */
 .main-content {
   position: relative !important;
   z-index: 5 !important;
   visibility: visible !important;
   opacity: 1 !important;
+  overflow-y: auto !important;
 }
-.hero, #heroSection {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  z-index: 10 !important;
+
+.dashboard {
   position: relative !important;
+  z-index: 1 !important;
 }
-.random-section {
-  display: block !important;
-  visibility: visible !important;
-}
+
+/* Right sidebar stays in its grid column */
 .right-sidebar {
   position: sticky !important;
+  top: 0 !important;
   z-index: 50 !important;
+  align-self: start !important;
 }
