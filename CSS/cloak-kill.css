@@ -1,0 +1,42 @@
+/* EMERGENCY: educational-cloak has z-index 2147483647 and was covering everything */
+#educational-cloak,
+#educational-cloak.hidden,
+div#educational-cloak {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  z-index: -9999 !important;
+  width: 0 !important;
+  height: 0 !important;
+  overflow: hidden !important;
+  position: absolute !important;
+  left: -9999px !important;
+}
+
+/* Ensure main layout stays on top */
+.dashboard {
+  position: relative !important;
+  z-index: 1 !important;
+}
+.main-content {
+  position: relative !important;
+  z-index: 5 !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+.hero, #heroSection {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 10 !important;
+  position: relative !important;
+}
+.random-section {
+  display: block !important;
+  visibility: visible !important;
+}
+.right-sidebar {
+  position: sticky !important;
+  z-index: 50 !important;
+}
