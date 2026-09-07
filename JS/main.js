@@ -963,6 +963,51 @@ async function handlePlaceholderView(navId, viewName) {
     customSectionContainer.removeAttribute('hidden');
     customSectionContainer.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;padding:20px;color:white;width:100%;box-sizing:border-box;';
     console.log('[NX] Showing built-in section:', targetSectionId);
+
+    if (viewLower === 'profile') {
+      // Fill basics immediately from localStorage so UI is never stuck on Loading...
+      const u = localStorage.getItem('chatUser') || 'Guest';
+      const du = document.getElementById('display-username');
+      const iu = document.getElementById('info-username');
+      if (du) du.textContent = u;
+      if (iu) iu.textContent = u;
+      // Load full profile system (Turso/bio/avatar)
+      const existing = document.getElementById('profile-dynamic-script');
+      if (existing) existing.remove();
+      const script = document.createElement('script');
+      script.id = 'profile-dynamic-script';
+      script.src = 'profile/profile.js?v=' + Date.now();
+      script.onload = function () {
+        if (typeof window.initProfileSystem === 'function') {
+          try { window.initProfileSystem(); } catch (e) { console.warn(e); }
+        }
+      };
+      document.body.appendChild(script);
+    }
+
+    if (viewLower === 'unblockers') {
+      // Inject unblocker cards if not already present
+      if (!customSectionContainer.querySelector('.unblocker-card-row')) {
+        customSectionContainer.innerHTML = `
+          <h2>Unblockers Portal</h2>
+          <p style="color:#aaa;margin-bottom:20px;">Deploy your web proxies and private environments.</p>
+          <div class="unblocker-card-row" style="display:flex;gap:15px;flex-wrap:wrap;margin-top:15px;">
+            <div class="unblocker-card" onclick="window.open('unblockers/NautilusOS/index.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
+              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">NautilusOS</h4>
+              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
+            </div>
+            <div class="unblocker-card" onclick="window.open('unblockers/GUST/GUST.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
+              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">GUST</h4>
+              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
+            </div>
+            <div class="unblocker-card" onclick="window.open('unblockers/Helios/Helios.html','_blank')" style="background:rgba(255,255,255,0.05);padding:20px;border-radius:8px;width:180px;cursor:pointer;border:1px solid rgba(139,0,255,0.35);">
+              <h4 style="color:#fff;margin:0 0 10px 0;font-size:16px;">Helios</h4>
+              <span style="color:#8b00ff;font-weight:bold;font-size:14px;">Deploy Instance</span>
+            </div>
+          </div>`;
+      }
+    }
+
     return;
   }
 
