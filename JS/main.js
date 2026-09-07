@@ -858,6 +858,7 @@ function clearAllViews() {
     document.getElementById('favoritesGrid'),
     document.getElementById('unblockersSection'),
     document.getElementById('profileSection'),
+    document.getElementById('calculatorSection'),
     document.getElementById('terminalSection'),
     document.getElementById('assistantSection')
   ];
@@ -878,8 +879,8 @@ function showHomeView() {
   const gameGrid = document.getElementById('gameGrid');
   const favGrid = document.getElementById('favoritesGrid');
 
-  if (heroSection) heroSection.style.display = 'flex';
-  if (randomSection) randomSection.style.display = 'block';
+  if (heroSection) heroSection.style.setProperty('display', 'flex', 'important');
+  if (randomSection) randomSection.style.setProperty('display', 'block', 'important');
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
 
   if (gameGrid) {
@@ -897,7 +898,7 @@ function showAllGamesView() {
 
   if (favGrid) favGrid.style.setProperty('display', 'none', 'important');
   if (gameGrid) {
-    gameGrid.style.display = 'grid';
+    gameGrid.style.setProperty('display', 'grid', 'important');
     renderLibraryGrid(_0xData);
   }
 }
@@ -911,7 +912,7 @@ function showFavoritesView() {
 
   if (gameGrid) gameGrid.style.setProperty('display', 'none', 'important');
   if (favGrid) {
-    favGrid.style.display = 'grid';
+    favGrid.style.setProperty('display', 'grid', 'important');
     renderFavoritesGrid();
   }
 }
@@ -941,12 +942,19 @@ async function handlePlaceholderView(navId, viewName) {
     }
   }
 
-  customSectionContainer.style.display = 'block';
+  // Profile + Calculator already live in index.html — just reveal them
+  if (viewLower === 'profile' || viewLower === 'calculator') {
+    customSectionContainer.style.setProperty('display', 'block', 'important');
+    return;
+  }
+
+  customSectionContainer.style.setProperty('display', 'block', 'important');
   customSectionContainer.innerHTML = `<p style="color: #8b00ff; padding: 20px; font-family: sans-serif; font-style: italic; animation: pulse 1.5s infinite;">Mounting filesystem directory node...</p>`;
 
   try {
     const targetFolder = viewLower === 'terminal' ? 'Terminal' : viewLower;
-    const fetchPath = `../${targetFolder}/${viewLower}.html`;
+    // GitHub Pages root-relative paths
+    const fetchPath = `${targetFolder}/${viewLower}.html`;
 
     const response = await fetch(fetchPath);
     if (!response.ok) throw new Error(`Status error ${response.status}`);
@@ -954,20 +962,15 @@ async function handlePlaceholderView(navId, viewName) {
     const dynamicCodeContent = await response.text();
     customSectionContainer.innerHTML = dynamicCodeContent;
 
-    attachChatEventListeners();
+    if (typeof attachChatEventListeners === 'function') attachChatEventListeners();
 
-    // Execute the profile script dynamically if the profile view is loaded
     if (viewLower === 'profile') {
-      // Remove the old script if it exists so we get a fresh load
       const existingScript = document.getElementById('profile-dynamic-script');
       if (existingScript) existingScript.remove();
-
-      // Inject and execute the script
       const script = document.createElement('script');
       script.id = 'profile-dynamic-script';
       script.type = 'module';
-      // The timestamp trick forces the browser to run it every time instead of using a cached version
-      script.src = `../profile/profile.js?v=${Date.now()}`; 
+      script.src = `profile/profile.js?v=${Date.now()}`;
       document.body.appendChild(script);
     }
 
@@ -983,7 +986,7 @@ async function handlePlaceholderView(navId, viewName) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function __nxBootUI() {
   initializeBase44Chat();
 
   const isSplashDisabled = localStorage.getItem('disableStudyCloak') === 'true';
@@ -1202,6 +1205,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   if (document.getElementById('nav-unblockers')) document.getElementById('nav-unblockers').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-unblockers', 'Unblockers'); };
   if (document.getElementById('nav-profile')) document.getElementById('nav-profile').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-profile', 'Profile'); };
+  if (document.getElementById('nav-calculator')) document.getElementById('nav-calculator').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-calculator', 'Calculator'); };
   if (document.getElementById('nav-terminal')) document.getElementById('nav-terminal').onclick = (e) => { e.preventDefault(); handlePlaceholderView('nav-terminal', 'Terminal'); };
 
   if (document.getElementById('nav-assistant')) {
@@ -1237,10 +1241,14 @@ document.addEventListener('DOMContentLoaded', () => {
     searchBar.addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase().trim();
       if (!term) { showHomeView(); return; }
-      document.getElementById('heroSection').style.display = 'none';
-      document.querySelector('.random-section').style.display = 'none';
-      if (document.getElementById('favoritesGrid')) document.getElementById('favoritesGrid').style.display = 'none';
-      if (document.getElementById('gameGrid')) document.getElementById('gameGrid').style.display = 'grid';
+      const hs = document.getElementById('heroSection');
+      const rs = document.querySelector('.random-section');
+      const fg = document.getElementById('favoritesGrid');
+      const gg = document.getElementById('gameGrid');
+      if (hs) hs.style.setProperty('display', 'none', 'important');
+      if (rs) rs.style.setProperty('display', 'none', 'important');
+      if (fg) fg.style.setProperty('display', 'none', 'important');
+      if (gg) gg.style.setProperty('display', 'grid', 'important');
       const hits = _0xData.filter(g => g.title.toLowerCase().includes(term) || g.desc.toLowerCase().includes(term));
       renderLibraryGrid(hits);
     });
@@ -1363,7 +1371,14 @@ document.addEventListener('DOMContentLoaded', () => {
       window.location.replace(redirectUrl);
     }
   });
-});
+}
+
+// Boot UI whether DOM is already ready or still loading (fixes type=module defer race)
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', __nxBootUI, { once: true });
+} else {
+  try { __nxBootUI(); } catch (e) { console.error('[NX Boot]', e); }
+}
 
 (function () {
   var host = (typeof location !== "undefined" && (location.hostname || "") || "").toLowerCase();
@@ -2129,3 +2144,16 @@ if (stealthBtn) {
     }
   }
 })();
+
+
+// Expose core view functions globally (works whether loaded as module or classic script)
+try {
+  window.showHomeView = showHomeView;
+  window.showAllGamesView = showAllGamesView;
+  window.showFavoritesView = showFavoritesView;
+  window.handlePlaceholderView = handlePlaceholderView;
+  window.clearAllViews = clearAllViews;
+  window.renderLibraryGrid = renderLibraryGrid;
+  window.launchGame = launchGame;
+  window._0xData = _0xData;
+} catch (e) {}
