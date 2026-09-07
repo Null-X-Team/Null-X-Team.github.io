@@ -958,9 +958,11 @@ async function handlePlaceholderView(navId, viewName) {
     }
   }
 
-  // Profile + Calculator already live in index.html — just reveal them
-  if (viewLower === 'profile' || viewLower === 'calculator') {
-    customSectionContainer.style.setProperty('display', 'block', 'important');
+  // Built-in sections that already exist in index.html
+  if (viewLower === 'profile' || viewLower === 'calculator' || viewLower === 'unblockers') {
+    customSectionContainer.removeAttribute('hidden');
+    customSectionContainer.style.cssText = 'display:block!important;visibility:visible!important;opacity:1!important;padding:20px;color:white;width:100%;box-sizing:border-box;';
+    console.log('[NX] Showing built-in section:', targetSectionId);
     return;
   }
 
