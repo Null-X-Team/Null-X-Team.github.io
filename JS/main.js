@@ -176,8 +176,8 @@ let _0xData = [
 
   { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "A chaotic Kanye-themed experience packed with memes, music vibes, and unexpected challenges.", popular: true },
 
-  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true },
-  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true },
+  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true , image: "../Games/blood/images (8).jpeg" },
+  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true , image: "../Games/fallout/images (9).jpeg" },
 
   { id: "supercold", title: "supercold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
@@ -186,6 +186,13 @@ let _0xData = [
   { id: "geodashlite", title: "geodashlite", url: "../Games/geodashlite/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "timeshooter2", title: "timeshooter2", url: "../Games/timeshooter2/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+
+  { id: "cuphead", title: "cuphead", url: "../Games/cuphead/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "granny", title: "granny", url: "../Games/granny/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "hollow_knight", title: "hollow knight", url: "../Games/hollow-knight/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "jsab", title: "jsab", url: "../Games/jsab/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "miside", title: "miside", url: "../Games/miside/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "pvz", title: "pvz", url: "../Games/pvz/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
