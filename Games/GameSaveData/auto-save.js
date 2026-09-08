@@ -658,7 +658,11 @@
                     : 'Auto-saving to cloud...';
             }
 
-            const response = await fetch(`${TURSO_API_BASE}/save`, {
+            // Use absolute URL to ensure it works from about:blank iframes
+const saveUrl = `${TURSO_API_BASE}/save`;
+console.log('[CloudSync] Saving to:', saveUrl);
+
+const response = await fetch(saveUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -684,7 +688,7 @@
 
             return true;
         } catch (err) {
-            console.error('Cloud Save Error:', err);
+           console.error('[CloudSync] Cloud Save Error:', err.message, err);
 
             if (statusBox) {
                 statusBox.textContent = isManual
@@ -722,7 +726,11 @@
 
         try {
             const response = await fetch(
-                `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`,
+                // Use absolute URL to ensure it works from about:blank iframes
+const loadUrl = `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`;
+console.log('[CloudSync] Loading from:', loadUrl);
+
+const response = await fetch(loadUrl, {
                 {
                     method: 'GET',
                     headers: {
