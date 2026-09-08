@@ -1,183 +1,387 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Terms of Service | Null X</title>
-    <link rel="stylesheet" href="CSS/style.css">
-    <link rel="stylesheet" href="newpage.css">
-    <link rel="stylesheet" href="../themes/themes.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="../Games/GameSaveData/auto-save.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Terms of Service | Null X</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0612;
+      --panel: #12091c;
+      --card: rgba(28, 14, 42, 0.92);
+      --border: rgba(168, 85, 247, 0.28);
+      --accent: #c084fc;
+      --accent-2: #22d3ee;
+      --green: #4ade80;
+      --text: #f3e8ff;
+      --muted: #a78bfa;
+      --soft: #c4b5fd;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: Inter, system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 10% -10%, rgba(168, 85, 247, 0.18), transparent 55%),
+        radial-gradient(900px 500px at 100% 0%, rgba(34, 211, 238, 0.08), transparent 50%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.65;
+    }
+    .shell {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 28px;
+      animation: fadeDown 0.6s ease both;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .brand img {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+    }
+    .brand span {
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: var(--accent);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(168, 85, 247, 0.1);
+      color: var(--soft);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: 0.25s ease;
+    }
+    .back-link:hover {
+      background: rgba(168, 85, 247, 0.22);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(168, 85, 247, 0.2);
+    }
+    .hero-card {
+      background: linear-gradient(145deg, rgba(192, 132, 252, 0.12), rgba(34, 211, 238, 0.05));
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 26px;
+      margin-bottom: 22px;
+      position: relative;
+      overflow: hidden;
+      animation: fadeUp 0.7s ease both;
+    }
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      right: -40px;
+      top: -40px;
+      width: 180px;
+      height: 180px;
+      background: radial-gradient(circle, rgba(192, 132, 252, 0.35), transparent 70%);
+      pointer-events: none;
+    }
+    .hero-card h1 {
+      font-size: clamp(1.6rem, 4vw, 2.2rem);
+      font-weight: 800;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #e9d5ff, #67e8f9);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero-card p { color: var(--soft); max-width: 62ch; }
+    .meta {
+      margin-top: 14px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+    .toc {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 22px;
+      animation: fadeUp 0.75s ease both;
+      animation-delay: 0.05s;
+    }
+    .toc a {
+      text-decoration: none;
+      color: var(--soft);
+      border: 1px solid var(--border);
+      background: rgba(18, 9, 28, 0.8);
+      padding: 7px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      transition: 0.2s ease;
+    }
+    .toc a:hover {
+      color: #fff;
+      border-color: var(--accent);
+      background: rgba(168, 85, 247, 0.2);
+    }
+    .section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 22px 22px 18px;
+      margin-bottom: 14px;
+      opacity: 0;
+      transform: translateY(18px);
+      transition: opacity 0.55s ease, transform 0.55s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .section:hover {
+      border-color: rgba(192, 132, 252, 0.5);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(192, 132, 252, 0.08) inset;
+    }
+    .section h2 {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--green);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section h2 i {
+      color: var(--accent);
+      width: 1.25em;
+      text-align: center;
+    }
+    .section p, .section li { color: #ddd6fe; font-size: 0.94rem; }
+    .section p + p { margin-top: 10px; }
+    .section ul {
+      margin: 8px 0 0 1.15rem;
+      display: grid;
+      gap: 6px;
+    }
+    .section strong { color: #f5e8ff; }
+    .quote-card {
+      margin-top: 28px;
+      padding: 26px 24px;
+      border-radius: 18px;
+      border: 1px solid rgba(34, 211, 238, 0.28);
+      background:
+        linear-gradient(135deg, rgba(34, 211, 238, 0.08), rgba(168, 85, 247, 0.12));
+      position: relative;
+      overflow: hidden;
+      animation: pulseGlow 4.5s ease-in-out infinite;
+    }
+    .quote-card::before {
+      content: "\201C";
+      position: absolute;
+      left: 14px;
+      top: -8px;
+      font-size: 90px;
+      line-height: 1;
+      color: rgba(192, 132, 252, 0.18);
+      font-family: Georgia, serif;
+      pointer-events: none;
+    }
+    .quote-text {
+      font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+      font-weight: 600;
+      color: #f5f3ff;
+      line-height: 1.55;
+      max-width: 48ch;
+      position: relative;
+      z-index: 1;
+    }
+    .quote-attr {
+      margin-top: 14px;
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 0.92rem;
+      letter-spacing: 0.03em;
+    }
+    .footer-note {
+      margin-top: 18px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 0 rgba(34, 211, 238, 0); }
+      50% { box-shadow: 0 0 40px rgba(34, 211, 238, 0.12); }
+    }
+    @media (max-width: 640px) {
+      .shell { padding: 18px 12px 40px; }
+      .section, .hero-card, .quote-card { padding: 18px 16px; }
+    }
+  </style>
 </head>
 <body>
-
-    <div class="dashboard-wrapper">
-
-        <aside class="side-panel">
-            <div class="logo">
-                <img src="imgs/Screenshot 2026-01-27 8.17.07 PM.png" alt="Null_X Logo" class="site-logo" style="max-width: 100%; height: auto; margin-bottom: 15px;">
-            </div>
-            <nav style="display: flex; flex-direction: column; gap: 8px;">
-                <a href="../index.html" class="nav-tab-item nav-item"><i class="fas fa-house" style="margin-right: 8px;"></i>Home</a>
-                <a href="../index.html" class="nav-tab-item nav-item"><i class="fas fa-gamepad" style="margin-right: 8px;"></i>Games</a>
-                <a href="#" class="nav-tab-item nav-item active"><i class="fa-solid fa-scale-balanced" style="margin-right: 8px;"></i>Terms</a>
-            </nav>
-
-            <div class="widget-header" style="margin-top: 30px;">
-                <i class="fa-solid fa-microchip"></i> Diagnostics
-            </div>
-            <div class="weather-stats">
-                <span id="battery-status" style="color: #4ade80;">Battery: --%</span>
-                <span id="digital-clock" style="color: #b975ff;">00:00:00 AM</span>
-            </div>
-        </aside>
-
-        <main class="main-hub">
-            <header class="top-bar" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 20px;">
-                <div class="greeting">
-                    <h1 class="site-title" style="margin: 0;">Legal Center</h1>
-                    <p style="margin: 5px 0 0 0; color: #888;">Review platform rules and policies.</p>
-                </div>
-            </header>
-
-            <div class="main-content">
-                <div style="padding: 30px; background: rgba(139, 0, 255, 0.02); border: 1px solid rgba(139, 0, 255, 0.1); border-radius: 8px; color: white; font-family: system-ui, -apple-system, sans-serif; line-height: 1.65; max-width: 860px; margin: 0 auto;">
-                    
-                    <h2 style="color: #b975ff; border-bottom: 1px solid rgba(139, 0, 255, 0.2); padding-bottom: 12px; margin-bottom: 20px; font-size: 1.6rem; display: flex; align-items: center;">
-                        <i class="fa-solid fa-scale-balanced" style="margin-right: 12px;"></i> Terms of Service
-                    </h2>
-                    
-                    <p style="color: rgba(255,255,255,0.4); font-size: 0.85rem; margin-bottom: 12px;">Last Updated: September 7, 2026</p>
-                    <p style="color: #ccc; margin-bottom: 28px;">By accessing or using Null X (including the website, games, unblockers, profile tools, chat, calculator, themes, and any related features), you agree to these Terms. If you do not agree, do not use the site.</p>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-circle-info" style="margin-right: 8px;"></i> 1. What This Site Is (Intended Purpose)</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;">Null X is a personal / community web project intended to provide:</p>
-                        <ul style="color: #ccc; margin: 0; padding-left: 20px;">
-                            <li><strong>Games library</strong> — browser-based games and ports for entertainment and casual play.</li>
-                            <li><strong>Featured / random game tools</strong> — shortcuts to open games from the local catalog.</li>
-                            <li><strong>Unblockers / proxy shortcuts</strong> — optional convenience links that open third-party or self-hosted tools in a separate tab.</li>
-                            <li><strong>Profile & local settings</strong> — optional username, bio, avatar, and preference storage (largely in your browser and/or optional backend services).</li>
-                            <li><strong>Communications / chat</strong> — optional messaging features when enabled.</li>
-                            <li><strong>Calculator</strong> — a basic utility iframe for simple calculations.</li>
-                            <li><strong>Themes, stealth/cloak UI, news, and tour</strong> — interface helpers only.</li>
-                        </ul>
-                        <p style="color: #ccc; margin: 12px 0 0 0;">Anything that happens beyond these intended functions is <strong>not intentional</strong> on the part of the site owner. Bugs, misconfigurations, third-party outages, browser differences, network filters, and user actions can produce unexpected results. Those outcomes are not promised features and are not directed by the site owner.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-user-shield" style="margin-right: 8px;"></i> 2. Privacy & Data</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;"><strong>No data selling:</strong> We do not sell, rent, lease, or trade your personal settings, profile text, or usage habits to advertisers or data brokers.</p>
-                        <p style="color: #ccc; margin: 0 0 10px 0;"><strong>Local storage:</strong> Many preferences (theme, cloak settings, favorites, panic key, etc.) are stored in your browser (e.g. localStorage). Clearing site data removes them. We are not responsible for loss of local data.</p>
-                        <p style="color: #ccc; margin: 0;"><strong>IP / safety logs:</strong> Network identifiers may be recorded only as needed for abuse prevention, ban enforcement, or basic security. This is not for marketing.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-gamepad" style="margin-right: 8px;"></i> 3. Games & Embedded Content</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;">Games are provided for personal, non-commercial entertainment. Many titles are third-party or community ports loaded from this site’s files or external CDNs.</p>
-                        <ul style="color: #ccc; margin: 0; padding-left: 20px;">
-                            <li>Games may fail to load, crash, run slowly, or behave differently on different devices. That is not intentional harm.</li>
-                            <li>We do not guarantee uptime, saves, high scores, multiplayer integrity, or compatibility with every browser or school/network filter.</li>
-                            <li>Some games open in a new tab or use an about:blank wrapper for a simpler play window. That wrapper is a display helper only.</li>
-                            <li>If a game contains bugs, broken assets, or unexpected content, report it; we will try to fix or remove it when practical.</li>
-                        </ul>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-shield-halved" style="margin-right: 8px;"></i> 4. Unblockers, Proxies & Third-Party Links</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;">Unblocker / proxy buttons are optional shortcuts. They are <strong>not</strong> operated as a commercial VPN service by Null X. Some open local tools on this repo; others open external endpoints in a sandboxed tab (about:blank + iframe) for convenience.</p>
-                        <ul style="color: #ccc; margin: 0; padding-left: 20px;">
-                            <li><strong>Your activity is yours.</strong> The site owner and operators are not liable for anything you do while using a proxy or unblocker — browsing, downloads, logins, messages, or any other action on third-party networks.</li>
-                            <li><strong>Third-party content is uncontrolled.</strong> Proxies and external pages can show ads, other websites, downloads, or links we did not create. Malformed, broken, misleading, or harmful links are <strong>not intentionally placed</strong> by us.</li>
-                            <li><strong>No responsibility for outcomes.</strong> We take no responsibility for account bans, school/network discipline, malware, data loss, legal claims, or other consequences arising from use of these tools.</li>
-                            <li><strong>Endpoints change.</strong> External mirrors can go offline, change ownership, or serve different content without notice. That is outside our control.</li>
-                            <li>By using Unblockers you confirm you understand the above and accept full responsibility for your own conduct online.</li>
-                        </ul>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-eye-slash" style="margin-right: 8px;"></i> 5. Educational Cloak / Stealth UI</h3>
-                        <p style="color: #ccc; margin: 0;">The educational overlay and stealth/cloak options are <strong>interface presentation features only</strong> (for example, a study-style splash or a tab title/mask). They are not intended to defeat security systems, hide illegal activity, or misrepresent identity to authorities. Misuse is solely the user’s responsibility. Unexpected behavior of these features is not intentional wrongdoing by the site owner.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-trash-can" style="margin-right: 8px;"></i> 6. DMCA & Content Takedown</h3>
-                        <p style="color: #ccc; margin: 0;">We respect legitimate rights holders. If you own or represent content hosted here and want it removed, contact us with enough detail to locate it. We will review and remove material when a valid claim is established. We do not intentionally host material for the purpose of infringement; if something appears that should not, it is unintentional pending removal.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-terminal" style="margin-right: 8px;"></i> 7. Acceptable Use & Platform Rules</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;">You agree not to:</p>
-                        <ul style="color: #ccc; margin: 0; padding-left: 20px;">
-                            <li>Attack, scrape abusively, or attempt to break the site’s security or other users’ access.</li>
-                            <li>Inject malware, phishing, or hostile scripts into shared features.</li>
-                            <li>Use the site primarily to harm others or to violate applicable law.</li>
-                        </ul>
-                        <p style="color: #ccc; margin: 10px 0 0 0;">We may restrict or ban access (including by IP) when abuse is detected. Enforcement is discretionary and not a guarantee of monitoring.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-triangle-exclamation" style="margin-right: 8px;"></i> 8. No Warranties</h3>
-                        <p style="color: #ccc; margin: 0;">THE SITE AND ALL FEATURES ARE PROVIDED <strong>“AS IS”</strong> AND <strong>“AS AVAILABLE”</strong> WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, ACCURACY, OR UNINTERRUPTED ACCESS. We do not warrant that the site will be error-free, secure, or continuously available.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-gavel" style="margin-right: 8px;"></i> 9. Limitation of Liability</h3>
-                        <p style="color: #ccc; margin: 0 0 10px 0;">To the maximum extent permitted by law, the site owner, contributors, and operators shall not be liable for any indirect, incidental, special, consequential, exemplary, or punitive damages, or for any loss of data, profits, goodwill, device integrity, account access, school/employment standing, or other intangible losses, arising out of or related to your use of (or inability to use) the site, games, proxies, links, or third-party services.</p>
-                        <p style="color: #ccc; margin: 0;">If something occurs that is outside the intended purposes listed in Section 1 — including bugs, third-party content, network blocks, data loss, or user misconduct — it is <strong>not intentional</strong> on our part, and we disclaim liability for those events to the fullest extent allowed by law.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-user-check" style="margin-right: 8px;"></i> 10. Your Responsibility</h3>
-                        <p style="color: #ccc; margin: 0;">You are solely responsible for how you use this site, what you click, what you download, what you submit to forms or chat, and how you comply with school, workplace, and local rules. Parents/guardians are responsible for monitoring minors’ use where required.</p>
-                    </div>
-
-                    <div style="margin-bottom: 26px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-rotate" style="margin-right: 8px;"></i> 11. Changes</h3>
-                        <p style="color: #ccc; margin: 0;">We may update these Terms at any time by posting a new version on this page. Continued use after changes means you accept the updated Terms. The “Last Updated” date at the top reflects the latest revision.</p>
-                    </div>
-
-                    <div style="margin-bottom: 10px;">
-                        <h3 style="color: #4ade80; margin-bottom: 10px; font-size: 1.15rem;"><i class="fa-solid fa-bookmark" style="margin-right: 8px;"></i> 12. Agreement</h3>
-                        <p style="color: #ccc; margin: 0;">Using Null X constitutes acceptance of these Terms. If any part of these Terms is found unenforceable, the rest remains in effect. These Terms describe the intended operation of the site; unintended behavior is disclaimed as stated above.</p>
-                    </div>
-                    
-                </div>
-            </div>
-        </main>
-
+  <div class="shell">
+    <div class="topbar">
+      <a class="brand" href="../index.html">
+        <img src="../imgs/Screenshot 2026-01-27 8.17.07 PM.png" alt="Null X">
+        <span>NULL X</span>
+      </a>
+      <a class="back-link" href="../index.html"><i class="fas fa-arrow-left"></i> Back to Home</a>
     </div>
 
-    <script>
-        if (navigator.getBattery) {
-            navigator.getBattery().then(battery => {
-                function updateBattery() {
-                    const statusText = document.getElementById('battery-status');
-                    if (statusText) {
-                        const lvl = Math.round(battery.level * 100);
-                        const state = battery.charging ? " (Charging)" : "";
-                        statusText.textContent = `Battery: ${lvl}%${state}`;
-                    }
-                }
-                updateBattery();
-                battery.addEventListener('levelchange', updateBattery);
-                battery.addEventListener('chargingchange', updateBattery);
-            }).catch(() => {});
-        }
+    <header class="hero-card">
+      <h1><i class="fa-solid fa-scale-balanced" style="margin-right:10px;"></i>Terms of Service</h1>
+      <p>These Terms explain what Null X is meant to do, what it is not, and the limits of our responsibility. By using the site you agree to this page in full.</p>
+      <div class="meta">Last updated: September 7, 2026 · Personal / community project — not a commercial legal product</div>
+    </header>
 
-        function updateLiveClock() {
-            const clock = document.getElementById('digital-clock');
-            if (clock) {
-                const config = { hour: '2-digit', minute: '2-digit', second: '2-digit', timeZoneName: 'short' };
-                clock.textContent = new Date().toLocaleTimeString(undefined, config);
-            }
-        }
-        updateLiveClock();
-        setInterval(updateLiveClock, 1000);
-    </script>
+    <nav class="toc" aria-label="Sections">
+      <a href="#s1">Purpose</a>
+      <a href="#s2">Privacy</a>
+      <a href="#s3">Games</a>
+      <a href="#s4">Proxies</a>
+      <a href="#s5">Cloak</a>
+      <a href="#s6">DMCA</a>
+      <a href="#s7">Conduct</a>
+      <a href="#s8">No Warranty</a>
+      <a href="#s9">Liability</a>
+      <a href="#s10">You</a>
+      <a href="#s11">Changes</a>
+      <a href="#s12">Agreement</a>
+    </nav>
 
-    <script src="../JS/main.js"></script>
-    <script src="../themes/themes.js"></script>
+    <section class="section" id="s1">
+      <h2><i class="fa-solid fa-circle-info"></i>1. Intended Purpose</h2>
+      <p>Null X is a personal / community web project. It is intended to provide only the following:</p>
+      <ul>
+        <li><strong>Games library</strong> — browser games and ports for casual entertainment.</li>
+        <li><strong>Featured / random tools</strong> — shortcuts into the local catalog.</li>
+        <li><strong>Unblockers / proxy shortcuts</strong> — optional links that open local or external tools in another tab.</li>
+        <li><strong>Profile & settings</strong> — optional username, bio, avatar, and preferences (mostly in your browser).</li>
+        <li><strong>Chat / communications</strong> — optional messaging when enabled.</li>
+        <li><strong>Calculator</strong> — a simple utility iframe.</li>
+        <li><strong>Themes, news, tour, cloak UI</strong> — interface helpers only.</li>
+      </ul>
+      <p>If something occurs outside these intended functions — bugs, odd redirects, third-party ads, broken assets, filter blocks, or unexpected pages — it is <strong>not intentional</strong> on the part of the site owner and is not a promised feature of the service.</p>
+    </section>
+
+    <section class="section" id="s2">
+      <h2><i class="fa-solid fa-user-shield"></i>2. Privacy & Data</h2>
+      <p><strong>No data selling.</strong> We do not sell, rent, or trade your profile text, preferences, or usage habits to advertisers or brokers.</p>
+      <p><strong>Local storage.</strong> Themes, favorites, cloak options, panic key, and similar items often live in your browser. Clearing site data deletes them. We are not responsible for lost local data.</p>
+      <p><strong>Security logs.</strong> IP or similar identifiers may be stored only for abuse prevention and ban enforcement — not for marketing.</p>
+      <p><strong>Optional backends.</strong> If profile or cloud features call an external API, that service may process the data you choose to submit. Use those features only if you accept that risk.</p>
+    </section>
+
+    <section class="section" id="s3">
+      <h2><i class="fa-solid fa-gamepad"></i>3. Games & Embedded Content</h2>
+      <p>Games are for personal, non-commercial entertainment. Many are third-party or community ports loaded from this repo or public CDNs.</p>
+      <ul>
+        <li>Titles may fail to load, lag, crash, or differ by device/browser. That is not intentional harm.</li>
+        <li>No guarantee of uptime, cloud saves, leaderboards, multiplayer fairness, or filter bypass.</li>
+        <li>New-tab / about:blank wrappers are display helpers only.</li>
+        <li>Report broken or inappropriate content; we will fix or remove when practical.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s4">
+      <h2><i class="fa-solid fa-shield-halved"></i>4. Unblockers, Proxies & Third-Party Links</h2>
+      <p>Proxy buttons are optional convenience shortcuts. Null X is <strong>not</strong> a commercial VPN. Some links open tools on this site; others open external endpoints in a sandboxed tab.</p>
+      <ul>
+        <li><strong>Your activity is yours.</strong> We are not liable for what you do on third-party networks.</li>
+        <li><strong>We do not control third-party pages.</strong> Ads, downloads, or odd links you see there were <strong>not intentionally placed by us</strong>.</li>
+        <li><strong>No responsibility for consequences</strong> such as account bans, school discipline, malware, data loss, or legal claims.</li>
+        <li>External mirrors can change or die without notice.</li>
+        <li>Using Unblockers means you accept full responsibility for your own conduct online.</li>
+      </ul>
+    </section>
+
+    <section class="section" id="s5">
+      <h2><i class="fa-solid fa-eye-slash"></i>5. Educational Cloak / Stealth UI</h2>
+      <p>The study-style overlay and stealth options are <strong>presentation features only</strong> (tab title, splash, visual mask). They are not provided to defeat security systems, hide illegal activity, or impersonate institutions. Misuse is solely your responsibility. Glitches in these features are not intentional wrongdoing by the owner.</p>
+    </section>
+
+    <section class="section" id="s6">
+      <h2><i class="fa-solid fa-trash-can"></i>6. DMCA & Takedown</h2>
+      <p>We respect valid rights-holder claims. If you own content hosted here and want it removed, contact us with enough detail to find it. We do not host material for the purpose of infringement; if something appears that should not, it is unintentional pending review and removal.</p>
+    </section>
+
+    <section class="section" id="s7">
+      <h2><i class="fa-solid fa-terminal"></i>7. Acceptable Use</h2>
+      <p>You agree not to attack the site, abuse other users, inject malware/phishing, or use Null X primarily to break the law or harm people. We may restrict or ban access (including by IP) when abuse is detected. Monitoring is not guaranteed.</p>
+    </section>
+
+    <section class="section" id="s8">
+      <h2><i class="fa-solid fa-triangle-exclamation"></i>8. No Warranties</h2>
+      <p>THE SITE AND ALL FEATURES ARE PROVIDED <strong>“AS IS”</strong> AND <strong>“AS AVAILABLE.”</strong> No warranties of merchantability, fitness for a particular purpose, non-infringement, accuracy, security, or uninterrupted access. Errors and downtime will happen.</p>
+    </section>
+
+    <section class="section" id="s9">
+      <h2><i class="fa-solid fa-gavel"></i>9. Limitation of Liability</h2>
+      <p>To the maximum extent permitted by law, the site owner, contributors, and operators are not liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for loss of data, profits, goodwill, device integrity, accounts, school/work standing, or other intangible losses arising from use of the site, games, proxies, links, or third-party services.</p>
+      <p>Events outside Section 1’s intended purposes — including bugs, third-party content, network blocks, user misconduct, or data loss — are <strong>not intentional</strong> on our part. We disclaim liability for them to the fullest extent allowed by law.</p>
+      <p>Some jurisdictions limit these disclaimers; in those places, our liability is limited to the minimum the law requires.</p>
+    </section>
+
+    <section class="section" id="s10">
+      <h2><i class="fa-solid fa-user-check"></i>10. Your Responsibility</h2>
+      <p>You alone control what you click, download, type, and share. You are responsible for following school, work, and local rules. Parents and guardians should supervise minors where required. Attention or proximity does not create ownership of the operator’s time, private life, or decisions.</p>
+    </section>
+
+    <section class="section" id="s11">
+      <h2><i class="fa-solid fa-rotate"></i>11. Changes</h2>
+      <p>We may update these Terms by posting a new version here. Continued use after a change means you accept the new Terms. The date at the top is the latest revision.</p>
+    </section>
+
+    <section class="section" id="s12">
+      <h2><i class="fa-solid fa-bookmark"></i>12. Agreement</h2>
+      <p>Using Null X means you accept these Terms. If one part is unenforceable, the rest still applies. These Terms describe intended operation; unintended behavior is disclaimed as stated above.</p>
+    </section>
+
+    <figure class="quote-card">
+      <blockquote class="quote-text">
+        The more people see you, the more they assume they own you. Fame, attention, or even closeness can make people feel entitled to your life, your time, your choices. Protect yourself.
+      </blockquote>
+      <figcaption class="quote-attr">— Jake</figcaption>
+    </figure>
+
+    <p class="footer-note">Null X · Terms of Service · Not legal advice for every jurisdiction</p>
+  </div>
+
+  <script>
+    const sections = document.querySelectorAll('.section');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) e.target.classList.add('visible');
+      });
+    }, { threshold: 0.12 });
+    sections.forEach((s) => io.observe(s));
+    sections.forEach((s, i) => { if (i < 2) s.classList.add('visible'); });
+  </script>
 </body>
 </html>
