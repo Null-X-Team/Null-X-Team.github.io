@@ -20,8 +20,8 @@ window.fetch = async function(url, options = {}) {
         return originalFetch(url, options);
       }
 
-      // Build the worker URL
-      const workerUrl = `${CLOUDFLARE_WORKER}/${apiPath}`;
+      // Build the worker URL - add /api-worker/ prefix for worker routing
+      const workerUrl = `${CLOUDFLARE_WORKER}/api-worker/${apiPath}`;
       
       // Forward the request through the worker
       const response = await originalFetch(workerUrl, {
