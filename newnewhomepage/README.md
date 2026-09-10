@@ -1,117 +1,109 @@
-# Null-X Beautiful Homepage with Proxy
+# Null-X Portal
 
-A modern, feature-rich homepage with integrated web proxy and theme system.
+A clean, minimal web proxy portal with black and orange design.
 
 ## Features
 
-✨ **Multiple Themes**
-- Dark Theme (Default)
-- Light Theme
-- Neon Theme (High contrast)
-- Cyberpunk Theme (Vibrant)
-
-🌐 **Web Proxy**
-- Fast URL proxying
-- Support for multiple websites
-- Example quick links
-- URL normalization
-
-🎨 **Design**
-- Modern, glassmorphic UI
-- Responsive design
-- Smooth animations
-- Beautiful gradients
-
-📱 **Mobile Friendly**
-- Works on all devices
-- Touch-friendly buttons
-- Responsive grid layout
+- **Real Proxy Backend** - Actual Node.js proxy server, not browser-based
+- **Fast & Simple** - Minimal interface, maximum functionality
+- **Black & Orange** - Clean aesthetic without fluff
+- **Mobile Friendly** - Works on all devices
+- **Quick Links** - Fast access to popular sites
 
 ## File Structure
 
 ```
 newnewhomepage/
-├── index.html          # Main HTML file
-├── styles.css          # Core styling
-├── themes.js           # Theme management
-├── proxy.js            # Proxy functionality
-├── api-handler.js      # Backend proxy logic
-├── themes/
-│   ├── dark.css        # Dark theme
-│   ├── light.css       # Light theme
-│   ├── neon.css        # Neon theme
-│   └── cyberpunk.css   # Cyberpunk theme
-└── README.md           # This file
+├── index.html       # Frontend homepage
+├── styles.css       # Styling (black & orange)
+├── proxy.js         # Client-side proxy handler
+├── server.js        # Backend proxy server (Node.js)
+├── package.json     # Node dependencies
+├── vercel.json      # Vercel deployment config
+└── README.md        # This file
 ```
 
-## How to Use
+## How It Works
 
-### Basic Usage
-1. Enter a URL in the input field (e.g., google.com)
-2. Click "Browse" or press Enter
-3. The proxy will open the website in a new tab
+1. User enters a URL in the input field
+2. Frontend sends request to `/api/proxy` endpoint
+3. Backend validates the URL
+4. User is redirected to `/proxy?url=...` which streams the proxied content
+5. Website loads through the proxy server
 
-### Switching Themes
-Click the theme button (🌙, ☀️, ⚡, 🤖) in the top-right to cycle through themes.
-Your preference is saved in browser storage.
+## Setup
 
-### Example Links
-Click on "Google", "YouTube", or "GitHub" to quickly proxy those sites.
+### Local Development
+```bash
+cd newnewhomepage
+npm install
+npm start
+```
+
+Then open `http://localhost:3000`
+
+### Vercel Deployment
+1. Push to your repo
+2. Vercel automatically deploys using `vercel.json` config
+3. Frontend and proxy API both run on Vercel
+
+## Usage
+
+1. Type or paste a website URL
+2. Press Enter or click "Go"
+3. Website loads through the proxy
+
+Alternatively, click quick links:
+- Google
+- YouTube  
+- GitHub
 
 ## Technical Details
 
-### Proxy System
-The proxy uses CORS proxy services to bypass restrictions:
-- Default: corsproxy.io
-- URLs are properly normalized
-- Opens in new tabs for better UX
+### Backend (server.js)
+- Node.js HTTP/HTTPS proxy
+- Handles both HTTP and HTTPS requests
+- Sets proper User-Agent and headers
+- Error handling for failed connections
+- 5 second timeout per request
 
-### Theme System
-- CSS variables for easy customization
-- LocalStorage for persistence
-- Real-time switching without reload
-
-### Responsive Design
-- Mobile-first approach
-- Breakpoints at 768px
-- Flexible grid layouts
+### Frontend (proxy.js)
+- Simple, clean JavaScript
+- URL normalization (converts "google.com" to "https://google.com")
+- Error messages
+- Loading states
 
 ## Customization
 
-### Adding a New Theme
-1. Create `themes/mytheme.css`
-2. Define CSS variables:
-```css
-:root {
-    --primary-color: #yourcolor;
-    --secondary-color: #yourcolor;
-    /* ... other variables ... */
-}
-```
-3. Add theme name to `themes.js` array
-4. Add icon to `updateToggleIcon()` method
+### Change Colors
+Edit `styles.css`:
+- `#ff8c00` - Orange
+- `#0a0a0a` - Black
+- `#1a1a1a` - Dark gray
+- `#ffffff` - White
 
-### Changing Proxy Service
-Edit `proxy.js` line with `proxyService` variable to use a different proxy:
-```javascript
-const proxyService = 'https://yourproxy.com/?';
+### Add Quick Links
+Edit `index.html` quick-links section:
+```html
+<a href="#" class="quick-link" data-url="example.com">Example</a>
+```
+
+### Change Server Port
+Edit `server.js` last line or set `PORT` environment variable:
+```bash
+PORT=8080 npm start
 ```
 
 ## Browser Support
+
 - Chrome/Edge 90+
 - Firefox 88+
 - Safari 14+
-- Mobile browsers (iOS Safari, Chrome Mobile)
+- Mobile browsers
 
 ## Notes
-- This proxy is for educational/legitimate use only
-- Some websites may have specific restrictions
-- JavaScript is required for full functionality
-- Theme preference persists across sessions
 
-## Future Enhancements
-- User bookmarks
-- History tracking
-- Advanced proxy options
-- Custom URL shortcuts
-- Search suggestions
+- This proxy is for legitimate use only
+- Some websites may block proxy requests
+- JavaScript required on frontend
+- Backend requires Node.js 18+

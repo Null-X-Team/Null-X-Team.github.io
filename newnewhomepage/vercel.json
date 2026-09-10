@@ -1,0 +1,27 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "newnewhomepage/server.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "newnewhomepage/index.html",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "newnewhomepage/server.js"
+    },
+    {
+      "src": "/proxy(.*)",
+      "dest": "newnewhomepage/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "newnewhomepage/index.html"
+    }
+  ]
+}

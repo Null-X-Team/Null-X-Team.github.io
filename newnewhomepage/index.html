@@ -3,85 +3,50 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Null-X Team - Portal</title>
+    <title>Null-X Portal</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="themes/dark.css" id="theme-link">
 </head>
 <body>
     <div class="container">
-        <!-- Navigation Bar -->
         <nav class="navbar">
             <div class="nav-brand">
-                <span class="logo">❌ NULL-X</span>
+                <span class="logo">NULL-X</span>
             </div>
-            <div class="nav-links">
-                <button class="theme-toggle" id="themeToggle" title="Toggle Theme">🌙</button>
-            </div>
+            <div class="nav-divider"></div>
         </nav>
 
-        <!-- Main Content -->
         <main class="main-content">
-            <!-- Hero Section -->
             <section class="hero">
-                <h1>Welcome to Null-X Portal</h1>
-                <p>Fast, secure, and powerful web proxy</p>
+                <h1>Portal</h1>
+                <p>Fast proxy access to any website</p>
             </section>
 
-            <!-- Proxy Section -->
             <section class="proxy-section">
                 <div class="proxy-card">
-                    <h2>🌐 Web Proxy</h2>
-                    <div class="search-container">
+                    <div class="input-wrapper">
                         <input 
                             type="text" 
                             id="urlInput" 
                             class="url-input" 
-                            placeholder="Enter URL... (e.g., google.com)"
+                            placeholder="Enter a website..."
                             autocomplete="off"
                         >
-                        <button class="search-btn" id="proxyBtn">Browse</button>
+                        <button class="search-btn" id="proxyBtn">Go</button>
                     </div>
-                    <div class="examples">
-                        <p>Try: <span class="example-link" data-url="google.com">Google</span> | 
-                               <span class="example-link" data-url="youtube.com">YouTube</span> | 
-                               <span class="example-link" data-url="github.com">GitHub</span></p>
+                    <div class="quick-links">
+                        <a href="#" class="quick-link" data-url="google.com">Google</a>
+                        <a href="#" class="quick-link" data-url="youtube.com">YouTube</a>
+                        <a href="#" class="quick-link" data-url="github.com">GitHub</a>
                     </div>
-                </div>
-            </section>
-
-            <!-- Features Section -->
-            <section class="features">
-                <div class="feature-card">
-                    <div class="feature-icon">⚡</div>
-                    <h3>Fast</h3>
-                    <p>Lightning quick proxy speeds</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🔒</div>
-                    <h3>Secure</h3>
-                    <p>Your data stays private</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">🎯</div>
-                    <h3>Reliable</h3>
-                    <p>Always available when you need it</p>
-                </div>
-                <div class="feature-card">
-                    <div class="feature-icon">✨</div>
-                    <h3>Modern</h3>
-                    <p>Beautiful and intuitive design</p>
                 </div>
             </section>
         </main>
 
-        <!-- Footer -->
         <footer class="footer">
-            <p>&copy; 2024 Null-X Team. All rights reserved.</p>
+            <p>Null-X Team</p>
         </footer>
     </div>
 
-    <!-- Scripts -->
     <script src="proxy.js"></script>
-    <script src="themes.js"></script>
 </body>
 </html>

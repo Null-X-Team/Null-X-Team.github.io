@@ -1,0 +1,13 @@
+{
+  "name": "null-x-proxy",
+  "version": "1.0.0",
+  "description": "Null-X Portal - Fast proxy access",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

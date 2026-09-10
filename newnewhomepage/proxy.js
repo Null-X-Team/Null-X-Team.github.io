@@ -1,10 +1,8 @@
-// Proxy Service Handler
 class ProxyService {
     constructor() {
-        this.proxyEndpoint = '/api/proxy'; // This will use your server's proxy endpoint
         this.urlInput = document.getElementById('urlInput');
         this.proxyBtn = document.getElementById('proxyBtn');
-        this.exampleLinks = document.querySelectorAll('.example-link');
+        this.quickLinks = document.querySelectorAll('.quick-link');
         
         this.init();
     }
@@ -17,8 +15,9 @@ class ProxyService {
             }
         });
         
-        this.exampleLinks.forEach(link => {
-            link.addEventListener('click', () => {
+        this.quickLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
                 const url = link.getAttribute('data-url');
                 this.urlInput.value = url;
                 this.handleProxy();
@@ -27,70 +26,73 @@ class ProxyService {
     }
     
     normalizeUrl(url) {
-        // Remove whitespace
         url = url.trim();
-        
-        // If URL doesn't start with http:// or https://, add https://
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             url = 'https://' + url;
         }
-        
         return url;
     }
     
-    handleProxy() {
+    async handleProxy() {
         const url = this.urlInput.value.trim();
         
         if (!url) {
-            alert('Please enter a URL');
+            this.showError('Please enter a URL');
             return;
         }
         
         const normalizedUrl = this.normalizeUrl(url);
-        
-        // For a static site on GitHub Pages, we need to encode the URL for the proxy
-        // This sends the request through our API proxy endpoint
         this.proxyRequest(normalizedUrl);
     }
     
     async proxyRequest(url) {
         try {
-            // Show loading state
             const originalText = this.proxyBtn.textContent;
-            this.proxyBtn.textContent = '⏳ Loading...';
+            this.proxyBtn.textContent = 'Loading...';
             this.proxyBtn.disabled = true;
+            this.proxyBtn.classList.add('loading');
             
-            // Encode the URL for the API
-            const encodedUrl = encodeURIComponent(url);
+            const response = await fetch('/api/proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ url: url })
+            });
             
-            // For GitHub Pages, we'll use a simpler approach:
-            // Open the URL with the proxy service
-            // You can configure different proxy services here
+            const data = await response.json();
             
-            // Option 1: Direct navigation (browser's built-in proxy capability)
-            // Option 2: Use a third-party proxy service
-            const proxyService = 'https://corsproxy.io/?';
-            const proxyUrl = proxyService + encodedUrl;
-            
-            // Try to open in a new tab
-            window.open(proxyUrl, '_blank');
-            
-            // Reset button
-            setTimeout(() => {
-                this.proxyBtn.textContent = originalText;
-                this.proxyBtn.disabled = false;
-            }, 500);
-            
+            if (response.ok) {
+                // Open proxy in new tab or navigate
+                window.location.href = `/proxy?url=${encodeURIComponent(url)}`;
+            } else {
+                this.showError(data.error || 'Error connecting to proxy');
+            }
         } catch (error) {
             console.error('Proxy error:', error);
-            alert('Error: Could not connect to proxy service');
-            this.proxyBtn.textContent = 'Browse';
+            this.showError('Connection failed. Please try again.');
+        } finally {
+            this.proxyBtn.textContent = 'Go';
             this.proxyBtn.disabled = false;
+            this.proxyBtn.classList.remove('loading');
         }
+    }
+    
+    showError(message) {
+        const errorDiv = document.querySelector('.error-message') || this.createErrorDiv();
+        errorDiv.textContent = message;
+        errorDiv.classList.add('show');
+        setTimeout(() => errorDiv.classList.remove('show'), 4000);
+    }
+    
+    createErrorDiv() {
+        const div = document.createElement('div');
+        div.className = 'error-message';
+        document.querySelector('.proxy-card').insertBefore(div, document.querySelector('.input-wrapper'));
+        return div;
     }
 }
 
-// Initialize proxy service when DOM is ready
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => {
         new ProxyService();
