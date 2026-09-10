@@ -2,8 +2,8 @@
 (async function initSecurityGuard() {
     console.log("[Security System] Guard active. Connecting to user_roles repository...");
 
-    // Turso via Vercel API (replaces Supabase)
-    const TURSO_API_BASE = "https://null-x-team-github-io.vercel.app/api";
+    // Routes through Cloudflare Worker for security
+    const CLOUDFLARE_WORKER = "https://apithingy.jlsniperelite4.workers.dev/api-worker";
 
     // Capture the logged-in username directly from your header elements
     let currentUsername = null;
@@ -22,7 +22,7 @@
     if (!currentUsername || currentUsername === "Guest") return;
 
     try {
-        const response = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(currentUsername)}`, {
+        const response = await fetch(`${CLOUDFLARE_WORKER}/user-roles?username=${encodeURIComponent(currentUsername)}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json'
