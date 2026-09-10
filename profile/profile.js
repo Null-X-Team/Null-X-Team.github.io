@@ -1,6 +1,6 @@
 // profile/profile.js — own + public profiles, robust avatars
-// Turso via Vercel API (replaces Supabase)
-const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+// Routes through Cloudflare Worker for security
+const CLOUDFLARE_WORKER = 'https://apithingy.jlsniperelite4.workers.dev/api-worker';
 
 const DEFAULT_PFP = 'https://null-x-team.github.io/imgs/download.jpeg';
 
@@ -195,13 +195,13 @@ window.initProfileSystem = async () => {
   const loadProfile = async () => {
     try {
       const response = await fetch(
-        `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(targetUser)}`,
+        `${CLOUDFLARE_WORKER}/user-roles?username=${encodeURIComponent(targetUser)}`,
         { headers: TURSO_HEADERS }
       );
       const data = response.ok ? await response.json() : null;
 
       const userResponse = await fetch(
-        `${TURSO_API_BASE}/users?username=${encodeURIComponent(targetUser)}`,
+        `${CLOUDFLARE_WORKER}/users?username=${encodeURIComponent(targetUser)}`,
         { headers: TURSO_HEADERS }
       );
       const userData = userResponse.ok ? await userResponse.json() : null;
@@ -248,7 +248,7 @@ window.initProfileSystem = async () => {
   const checkAndSetupAdminControls = async (targetUserIsAdmin) => {
     try {
       const response = await fetch(
-        `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
+        `${CLOUDFLARE_WORKER}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
         { headers: TURSO_HEADERS }
       );
       const data = response.ok ? await response.json() : null;
@@ -264,7 +264,7 @@ window.initProfileSystem = async () => {
       btn.onclick = async () => {
         const next = !targetUserIsAdmin;
         const roleRes = await fetch(
-          `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(targetUser)}`,
+          `${CLOUDFLARE_WORKER}/user-roles?username=${encodeURIComponent(targetUser)}`,
           { headers: TURSO_HEADERS }
         );
         if (!roleRes.ok) {
@@ -273,7 +273,7 @@ window.initProfileSystem = async () => {
         }
         const roleRow = await roleRes.json();
         const res = await fetch(
-          `${TURSO_API_BASE}/user-roles`,
+          `${CLOUDFLARE_WORKER}/user-roles`,
           {
             method: 'PATCH',
             headers: TURSO_HEADERS,
@@ -334,13 +334,13 @@ window.initProfileSystem = async () => {
 
       try {
         const roleRes = await fetch(
-          `${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
+          `${CLOUDFLARE_WORKER}/user-roles?username=${encodeURIComponent(loggedInUser)}`,
           { headers: TURSO_HEADERS }
         );
         if (!roleRes.ok) throw new Error('Role record not found.');
         const roleRow = await roleRes.json();
         const response = await fetch(
-          `${TURSO_API_BASE}/user-roles`,
+          `${CLOUDFLARE_WORKER}/user-roles`,
           {
             method: 'PATCH',
             headers: TURSO_HEADERS,
