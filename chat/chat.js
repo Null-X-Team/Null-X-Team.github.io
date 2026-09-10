@@ -15,7 +15,7 @@ document.addEventListener('mousemove', trackUserActivity);
 document.addEventListener('keypress', trackUserActivity);
 document.addEventListener('click', trackUserActivity);
 
-function function isBannedFlag(val) {
+function isBannedFlag(val) {
   if (val === true || val === 1 || val === "1") return true;
   if (val == null) return false;
   const s = String(val).toLowerCase().trim();
