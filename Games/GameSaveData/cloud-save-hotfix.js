@@ -1,6 +1,8 @@
 // cloud-save-hotfix.js
 // Drop-in after auto-save.js. Fully replaces cloudLoad. No PRs needed — just host this file.
 (function () {
+  const CLOUDFLARE_WORKER = 'https://apithingy.jlsniperelite4.workers.dev/api-worker';
+  
   function setStatus(elId, text, color) {
     var box = elId ? document.getElementById(elId) : null;
     if (!box) return;
@@ -73,8 +75,7 @@
 
       try {
         var response = await fetch(
-          'https://null-x-team-github-io.vercel.app/api/load?username=' +
-            encodeURIComponent(user),
+          CLOUDFLARE_WORKER + '/load?username=' + encodeURIComponent(user),
           { method: 'GET', headers: { 'Content-Type': 'application/json' } }
         );
 
