@@ -1,0 +1,23 @@
+/* Neon Theme */
+:root {
+    --primary-color: #0ff;
+    --secondary-color: #0ff;
+    --accent-color: #f0f;
+    --bg-primary: #000;
+    --bg-secondary: #0a0a0a;
+    --text-primary: #0ff;
+    --text-secondary: #088;
+    --border-color: #0ff;
+    --success-color: #0f0;
+    --danger-color: #f00;
+}
+
+body {
+    background: #000;
+    color: var(--text-primary);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.navbar, .proxy-card, .feature-card {
+    box-shadow: 0 0 20px var(--primary-color), inset 0 0 10px rgba(0, 255, 255, 0.1);
+}

@@ -1,0 +1,17 @@
+/* Dark Theme (Default) */
+:root {
+    --primary-color: #00d4ff;
+    --secondary-color: #0066cc;
+    --accent-color: #ff00ff;
+    --bg-primary: #0a0e27;
+    --bg-secondary: #151b35;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b5c0;
+    --border-color: #2a3050;
+    --success-color: #00ff00;
+    --danger-color: #ff0000;
+}
+
+body {
+    background: linear-gradient(135deg, #0a0e27 0%, #151b35 100%);
+}

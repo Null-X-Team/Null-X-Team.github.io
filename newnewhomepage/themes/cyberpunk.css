@@ -1,0 +1,28 @@
+/* Cyberpunk Theme */
+:root {
+    --primary-color: #ff006e;
+    --secondary-color: #8338ec;
+    --accent-color: #00f5ff;
+    --bg-primary: #0d0221;
+    --bg-secondary: #1a0033;
+    --text-primary: #ffbe0b;
+    --text-secondary: #8338ec;
+    --border-color: #ff006e;
+    --success-color: #00f5ff;
+    --danger-color: #ff006e;
+}
+
+body {
+    background: linear-gradient(135deg, #0d0221 0%, #1a0033 100%);
+    color: var(--text-primary);
+}
+
+.navbar, .proxy-card, .feature-card {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 20px var(--primary-color), 0 0 40px var(--secondary-color);
+}
+
+.search-btn {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    box-shadow: 0 0 20px var(--primary-color);
+}
