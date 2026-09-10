@@ -53,12 +53,12 @@
                 <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" maxlength="250">
                 <button type="submit">Send</button>
                 <span id="char-counter" style="font-size: 11px; color: var(--text-muted); margin-left: 10px; min-width: 50px; text-align: right;">0 / 250</span>
+                <div id="image-preview-bar" class="image-preview-bar hidden">
+                    <img id="image-preview-thumb" src="" alt="preview">
+                    <span>Image attached — press Send</span>
+                    <button type="button" id="cancel-image-btn">✕</button>
+                </div>
             </form>
-            <div id="image-preview-bar" class="image-preview-bar hidden">
-                <img id="image-preview-thumb" src="" alt="preview">
-                <span>Image attached — press Send</span>
-                <button type="button" id="cancel-image-btn">✕</button>
-            </div>
         </div>
 
         <div id="users-view" style="display:none; padding: 40px; height: 100%; overflow-y: auto;">
@@ -91,12 +91,12 @@
                         <input type="file" id="pm-attach-image-input" accept="image/*" style="display:none;">
                         <input type="text" id="pm-message-input" placeholder="Send your first message..." autocomplete="off" maxlength="250">
                         <button type="submit">Send</button>
+                        <div id="pm-image-preview-bar" class="image-preview-bar hidden">
+                            <img id="pm-image-preview-thumb" src="" alt="preview">
+                            <span>Image attached — press Send</span>
+                            <button type="button" id="pm-cancel-image-btn">✕</button>
+                        </div>
                     </form>
-                    <div id="pm-image-preview-bar" class="image-preview-bar hidden">
-                        <img id="pm-image-preview-thumb" src="" alt="preview">
-                        <span>Image attached — press Send</span>
-                        <button type="button" id="pm-cancel-image-btn">✕</button>
-                    </div>
                 </div>
             </div>
         </div>
