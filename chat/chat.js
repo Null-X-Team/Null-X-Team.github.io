@@ -2,8 +2,20 @@
 const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
 const TURSO_HEADERS = { 'Content-Type': 'application/json' };
 
+// --- ONLINE STATUS TRACKING (mouse movement) ---
+let lastMouseActivity = Date.now();
+let userActivityTrackingInterval = null;
 
-function isBannedFlag(val) {
+function trackUserActivity() {
+    lastMouseActivity = Date.now();
+}
+
+// Add mouse move listener globally to track activity
+document.addEventListener('mousemove', trackUserActivity);
+document.addEventListener('keypress', trackUserActivity);
+document.addEventListener('click', trackUserActivity);
+
+function function isBannedFlag(val) {
   if (val === true || val === 1 || val === "1") return true;
   if (val == null) return false;
   const s = String(val).toLowerCase().trim();
@@ -59,9 +71,11 @@ let lastMessageTime = 0;
 let chatPollingInterval = null; 
 let heartbeatInterval = null;
 let pmPollingInterval = null;
+let lastFetchedMessagesHash = null; // Track message hash to prevent re-renders
 
 // Track active menu state
 let selectedChatUser = { username: '', handler: '' };
+let selectedMessageId = null; // Track for right-click message menu
 
 // Track the live authorization status dynamically from Supabase
 let currentUserIsAdmin = false;
@@ -91,6 +105,77 @@ function renderMessageBody(content) {
     }
     return content;
 }
+
+// ==========================================================================
+// RIGHT-CLICK MESSAGE MENU (edit, delete, recall)
+// ==========================================================================
+window.openMessageMenu = function(event, messageId, messageUsername) {
+    // Only allow user to right-click their own messages
+    if (messageUsername !== myUsernameGlobal) return;
+    
+    event.preventDefault();
+    event.stopPropagation();
+    selectedMessageId = messageId;
+
+    const menu = document.getElementById('message-context-menu');
+    if (!menu) return;
+
+    let posX = event.clientX;
+    let posY = event.clientY;
+    const menuWidth = 180;
+    const menuHeight = 120;
+    
+    if (posX + menuWidth > window.innerWidth) posX = window.innerWidth - menuWidth - 10;
+    if (posY + menuHeight > window.innerHeight) posY = window.innerHeight - menuHeight - 10;
+    
+    menu.style.left = `${posX}px`;
+    menu.style.top = `${posY}px`;
+    menu.classList.remove('hidden');
+};
+
+document.addEventListener('click', (e) => {
+    const menu = document.getElementById('message-context-menu');
+    if (menu && !e.target.closest('#message-context-menu')) {
+        menu.classList.add('hidden');
+    }
+});
+
+window.editMessage = async function() {
+    const input = document.getElementById('message-input');
+    if (!input) return;
+    // Populate input with message to edit (you'd need to fetch the message first)
+    input.focus();
+};
+
+window.deleteMessage = async function(messageId) {
+    if (!confirm("Delete this message?")) return;
+    try {
+        await fetch(`${TURSO_API_BASE}/messages`, {
+            method: 'PATCH',
+            headers: TURSO_HEADERS,
+            body: JSON.stringify({ id: messageId, content: "Message Was Deleted By Owner" })
+        });
+        window.refreshChatMessages?.();
+    } catch (err) {
+        console.error("Delete failed:", err);
+        alert("Failed to delete message.");
+    }
+};
+
+window.recallMessage = async function(messageId) {
+    if (!confirm("Recall this message? (Remove from everyone's view)")) return;
+    try {
+        await fetch(`${TURSO_API_BASE}/messages`, {
+            method: 'DELETE',
+            headers: TURSO_HEADERS,
+            body: JSON.stringify({ id: messageId })
+        });
+        window.refreshChatMessages?.();
+    } catch (err) {
+        console.error("Recall failed:", err);
+        alert("Failed to recall message.");
+    }
+};
 
 // ==========================================================================
 // IMAGE LIGHTBOX (enlarge + zoom + pan)
@@ -771,9 +856,6 @@ function renderPmUserSearchResults(term) {
         </div>
     `).join('');
 
-    // Bind click handlers directly instead of inline onclick, and stop the
-    // click from bubbling up to the modal-overlay "click outside to close"
-    // listener, which was racing with the PM-open logic below.
     container.querySelectorAll('.pm-user-result-item').forEach(item => {
         item.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -784,20 +866,10 @@ function renderPmUserSearchResults(term) {
 }
 
 window.startNewPm = function(username) {
-    // Guard the PM state against the background poller for a moment while
-    // we switch tabs and open the thread, so a fetch that lands mid-transition
-    // can't stomp on the conversation we're about to open.
     suppressPmRefresh = true;
-
     document.getElementById('new-pm-modal')?.classList.add('hidden');
-
-    // The modal previously only hid itself and opened the thread state,
-    // but never actually switched the visible view to the PMs tab. If the
-    // user opened "+ New PM" from anywhere other than the PMs tab, nothing
-    // appeared to happen — the modal just closed. Explicitly switch tabs first.
     if (window.switchTab) window.switchTab('pms');
     window.openPmWithUser?.(username);
-
     setTimeout(() => { suppressPmRefresh = false; }, 500);
 };
 
@@ -816,6 +888,7 @@ window.initializeChatEngine = async function() {
     if (chatPollingInterval) clearInterval(chatPollingInterval);
     if (heartbeatInterval) clearInterval(heartbeatInterval);
     if (pmPollingInterval) clearInterval(pmPollingInterval);
+    if (userActivityTrackingInterval) clearInterval(userActivityTrackingInterval);
 
     try {
         const verifyRes = await fetch(`${TURSO_API_BASE}/users`, {
@@ -834,18 +907,26 @@ window.initializeChatEngine = async function() {
         console.error("Security handshake failed:", authError);
     }
 
+    // --- IMPROVED ONLINE/OFFLINE TRACKING (mouse movement based) ---
     async function executePresenceHeartbeat() {
         try {
-            await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(user)}`, {
-                method: 'PATCH',
-                headers: TURSO_HEADERS,
-                body: JSON.stringify({ last_seen: new Date().toISOString() })
-            });
+            // Calculate if user is "online" based on mouse activity
+            const timeSinceLastActivity = Date.now() - lastMouseActivity;
+            const isCurrentlyActive = timeSinceLastActivity < 5 * 60 * 1000; // 5 minutes
+            
+            // Only update if active
+            if (isCurrentlyActive) {
+                await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(user)}`, {
+                    method: 'PATCH',
+                    headers: TURSO_HEADERS,
+                    body: JSON.stringify({ last_seen: new Date().toISOString() })
+                });
+            }
         } catch (e) { console.error("Heartbeat sync lost:", e); }
     }
     
     executePresenceHeartbeat();
-    heartbeatInterval = setInterval(executePresenceHeartbeat, 10000);
+    heartbeatInterval = setInterval(executePresenceHeartbeat, 15000); // Check every 15 seconds
 
     try {
         const banRes = await fetch(`${TURSO_API_BASE}/user-roles`, {
@@ -1036,8 +1117,6 @@ window.initializeChatEngine = async function() {
     async function fetchMyPrivateConversations() {
         if (suppressPmRefresh) return;
         try {
-            // Turso private-messages requires a conversation pair (sender + recipient).
-            // Load threads against known users (and active PM partner).
             const partners = new Set();
             (allUsers || []).forEach(u => {
                 if (u && u.username && u.username !== myUsernameGlobal) partners.add(u.username);
@@ -1071,9 +1150,6 @@ window.initializeChatEngine = async function() {
                 if (!isMine && !msg.is_read) freshConversations[otherHandle].unread++;
             });
 
-            // Preserve any conversation the user just opened locally (e.g. via
-            // "+ New PM") that has no messages yet, so a poll landing right
-            // after doesn't make the freshly-opened thread disappear.
             if (activePmHandle && !freshConversations[activePmHandle] && pmConversations[activePmHandle]) {
                 freshConversations[activePmHandle] = pmConversations[activePmHandle];
             }
@@ -1261,7 +1337,6 @@ window.initializeChatEngine = async function() {
                 console.error("PM API error:", res.status, errBody);
                 throw new Error(errBody.error || ('HTTP ' + res.status));
             }
-            // Optimistic local append so the thread updates immediately
             if (!pmConversations[activePmHandle]) {
                 pmConversations[activePmHandle] = {
                     otherHandle: activePmHandle,
@@ -1358,6 +1433,7 @@ window.initializeChatEngine = async function() {
             let statusLabel = "OFFLINE";
             if (u.last_seen) {
                 const diff = Date.now() - new Date(u.last_seen).getTime();
+                // Updated: 5 minutes instead of old hardcoded value
                 if (diff < 5 * 60 * 1000) { onlineDot = "#22c55e"; statusLabel = "ONLINE"; }
             }
 
@@ -1528,7 +1604,7 @@ window.initializeChatEngine = async function() {
         URL.revokeObjectURL(url);
     };
 
-    // --- MESSAGE ENGINE (MAIN CHAT) ---
+    // --- MESSAGE ENGINE (MAIN CHAT) WITH ANTI-FLICKER OPTIMIZATION ---
     async function fetchMessages() {
         if (!document.getElementById('chat-messages')) {
             clearInterval(chatPollingInterval);
@@ -1546,6 +1622,13 @@ window.initializeChatEngine = async function() {
             const messages = Array.isArray(messagesRaw) ? messagesRaw : (messagesRaw && messagesRaw.messages) ? messagesRaw.messages : [];
             const rolesRaw = await rRes.json();
             const roles = Array.isArray(rolesRaw) ? rolesRaw : (rolesRaw ? [rolesRaw] : []);
+
+            // Calculate a hash of current messages to avoid re-rendering if nothing changed
+            const currentHash = JSON.stringify(messages.map(m => m.id));
+            if (currentHash === lastFetchedMessagesHash) {
+                return; // No new messages, skip re-render
+            }
+            lastFetchedMessagesHash = currentHash;
 
             const activeHeaderSpan = document.getElementById('room-status-indicator');
             if (activeHeaderSpan && roles) {
@@ -1605,7 +1688,7 @@ window.initializeChatEngine = async function() {
                             ${tag}
                             <span class="message-timestamp">${time}</span>
                         </div>
-                        <div class="message-text-bubble ${isMine ? 'my-bubble-color' : 'other-bubble-color'}${bubbleExtraClass}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}">
+                        <div class="message-text-bubble ${isMine ? 'my-bubble-color' : 'other-bubble-color'}${bubbleExtraClass}" style="${isDel ? 'font-style:italic; opacity:0.5;' : ''}" oncontextmenu="openMessageMenu(event, '${msg.id}', '${msg.username}')">
                             ${bodyHtml}
                         </div>
                          ${(currentUserIsAdmin && !isDel) ? `<button style="background:none; color:red; font-size:10px; padding:0; margin-top:5px; cursor:pointer; width:auto; display:block;" onclick="deleteMsg('${msg.id}')">Delete</button>` : ""}
@@ -1684,6 +1767,7 @@ window.initializeChatEngine = async function() {
                     await sendPlainMessage(val);
                 }
 
+                lastFetchedMessagesHash = null; // Reset hash to force refresh after sending
                 fetchMessages().then(() => { msgContainer.scrollTop = msgContainer.scrollHeight; });
             } catch (err) {
                 console.error("Message send failed:", err);
@@ -1756,6 +1840,7 @@ window.initializeChatEngine = async function() {
             headers: TURSO_HEADERS, 
             body: JSON.stringify({ content: "Message Was Deleted By Owner" })
         });
+        lastFetchedMessagesHash = null; // Force refresh
         fetchMessages();
     };
 
