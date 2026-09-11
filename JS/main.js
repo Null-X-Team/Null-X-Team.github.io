@@ -153,50 +153,47 @@ let _0xData = [
   { id: "advent_neon", title: "AdventNEON", url: "../Games/adventneon/index.html", image: "../Games/adventneon/images (2).jpeg", desc: "A hyper-active 2D action platformer focused on intense speed and crushing combat.", popular: true },
   { id: "adventure_capitalist", title: "Adventure Capitalist", url: "../Games/adventure capitalist/index.html", image: "../Games/adventure capitalist/images (3).jpeg", desc: "Start with a single lemonade stand and invest your way to building a massive financial empire.", popular: true },
   { id: "ahoysurvival", title: "Ahoy Survival", url: "../Games/ahoysurvival/index.html", jsbin: "https://codepen.io/Glaeesas/embed/019fe8bf-da2a-7eaa-8e4c-33c4ab9ba7d8?default-tab=result&theme-id=dark", isEmbedCode: true, image: "../Games/ahoysurvival/images (8).jpeg", desc: "Survive the open seas, gather resources, and fight to stay alive in a dangerous ocean world.", popular: false },
-  { id: "airline", title: "airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
-  { id: "bitplanes", title: "bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
+  { id: "airline", title: "Airline tycoon", url: "../Games/airline/index.html", desc: "An idle airline management game where you build your own airline empire, buy and upgrade planes, unlock new routes, and earn money as your airline grows!", popular: true, image: "../Games/airline/images (4).png" },
+  { id: "bitplanes", title: "Bitplanes", url: "../Games/bitplanes/index.html", desc: "BitPlanes is an addictive idle aviation game where you build your fleet, manage planes, unlock new aircraft, and grow your airline empire while earning money over time.", popular: true , image: "../Games/bitplanes/images.jpeg" },
 
-  { id: "jailbreakobby", title: "jailbreakobby", url: "../Games/jailbreakobby/index.html", desc: "Parkour through a prison complex, dodge guards, and race for freedom in this high-stakes escape obby.", popular: true , image: "../Games/jailbreakobby/images.jpeg" },
+  { id: "jailbreakobby", title: "Jail Break Obby", url: "../Games/jailbreakobby/index.html", desc: "Parkour through a prison complex, dodge guards, and race for freedom in this high-stakes escape obby.", popular: true , image: "../Games/jailbreakobby/images.jpeg" },
 
-  { id: "luckyblockobby", title: "luckyblockobby", url: "../Games/luckyblockobby/index.html", desc: "Jump through obstacle courses packed with lucky blocks, random rewards, and surprise challenges.", popular: true , image: "../Games/luckyblockobby/images (1).jpeg" },
+  { id: "luckyblockobby", title: "Lucky Block Obby", url: "../Games/luckyblockobby/index.html", desc: "Jump through obstacle courses packed with lucky blocks, random rewards, and surprise challenges.", popular: true , image: "../Games/luckyblockobby/images (1).jpeg" },
 
-  { id: "ninjaobby", title: "ninjaobby", url: "../Games/ninjaobby/index.html", desc: "Leap across rooftops, dodge traps, and master precise parkour moves in this ninja-themed obstacle course.", popular: true , image: "../Games/ninjaobby/images (2).jpeg" },
+  { id: "ninjaobby", title: "Ninja Obby", url: "../Games/ninjaobby/index.html", desc: "Leap across rooftops, dodge traps, and master precise parkour moves in this ninja-themed obstacle course.", popular: true , image: "../Games/ninjaobby/images (2).jpeg" },
 
-  { id: "clickerobby", title: "clickerobby", url: "../Games/clickerobby/index.html", desc: "Combine clicker progression with parkour stages—level up your power as you race through challenging maps.", popular: true , image: "../Games/clickerobby/images (4).jpeg" },
+  { id: "clickerobby", title: "Clicker Obby", url: "../Games/clickerobby/index.html", desc: "Combine clicker progression with parkour stages—level up your power as you race through challenging maps.", popular: true , image: "../Games/clickerobby/images (4).jpeg" },
 
-  { id: "obbyforbrainrot", title: "obbyforbrainrot", url: "../Games/obbyforbrainrot/index.html", desc: "A chaotic meme-inspired obstacle course filled with viral brainrot vibes, wild jumps, and nonstop laughs.", popular: true , image: "../Games/obbyforbrainrot/images (5).jpeg" },
+  { id: "obbyforbrainrot", title: "Obby For Brainrot", url: "../Games/obbyforbrainrot/index.html", desc: "A chaotic meme-inspired obstacle course filled with viral brainrot vibes, wild jumps, and nonstop laughs.", popular: true , image: "../Games/obbyforbrainrot/images (5).jpeg" },
 
-  { id: "leafblower", title: "leafblower", url: "../Games/leafblower/index.html", desc: "Clear yards of leaves with your leaf blower, upgrade your gear, and grow your lawn-care empire in this idle-style game.", popular: true, image: "../Games/leafblower/images (11).jpeg" },
+  { id: "leafblower", title: "Leafblower", url: "../Games/leafblower/index.html", desc: "Clear yards of leaves with your leaf blower, upgrade your gear, and grow your lawn-care empire in this idle-style game.", popular: true, image: "../Games/leafblower/images (11).jpeg" },
 
-  { id: "ultrakill", title: "ultrakill", url: "../Games/ultrakill/index.html", desc: "A hyper-violent, style-focused FPS where every kill chains into the next—move fast, shoot faster, and stay stylish.", popular: true , image: "../Games/ultrakill/images (6).jpeg" },
+  { id: "ultrakill", title: "Ultrakill", url: "../Games/ultrakill/index.html", desc: "A hyper-violent, style-focused FPS where every kill chains into the next—move fast, shoot faster, and stay stylish.", popular: true , image: "../Games/ultrakill/images (6).jpeg" },
 
-  { id: "halflife", title: "halflife", url: "../Games/halflife/index.html", desc: "Step into the classic sci-fi shooter: fight through Black Mesa, battle aliens, and uncover a conspiracy that changes everything.", popular: true , image: "../Games/halflife/images (3).jpeg" },
+  { id: "halflife", title: "Halflife", url: "../Games/halflife/index.html", desc: "Step into the classic sci-fi shooter: fight through Black Mesa, battle aliens, and uncover a conspiracy that changes everything.", popular: true , image: "../Games/halflife/images (3).jpeg" },
 
-  { id: "blackjack", title: "blackjack", url: "../Games/blackjack/index.html", desc: "Play classic casino blackjack—hit, stand, and double down as you try to beat the dealer without going over 21.", popular: true , image: "../Games/blackjack/images (7).jpeg" },
+  { id: "blackjack", title: "Blackjack", url: "../Games/blackjack/index.html", desc: "Play classic casino blackjack—hit, stand, and double down as you try to beat the dealer without going over 21.", popular: true , image: "../Games/blackjack/images (7).jpeg" },
 
-  { id: "kanyezone", title: "kanyezone", url: "../Games/kanyezone/index.html", desc: "A chaotic Kanye-themed experience packed with memes, music vibes, and unexpected challenges.", popular: true },
+  { id: "kanyezone", title: "Kanyezone", url: "../Games/kanyezone/index.html", desc: "Doesn't work. leave it alone.", popular: true },
 
-  { id: "blood", title: "blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true , image: "../Games/blood/images (8).jpeg" },
-  { id: "fallout", title: "fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true , image: "../Games/fallout/images (9).jpeg" },
+  { id: "blood", title: "Blood", url: "../Games/blood/index.html", desc: "A classic retro FPS filled with demons, heavy weapons, and nonstop action.", popular: true , image: "../Games/blood/images (8).jpeg" },
+  { id: "fallout", title: "Fallout", url: "../Games/fallout/index.html", desc: "Survive the wasteland, scavenge gear, and navigate a post-apocalyptic world full of danger.", popular: true , image: "../Games/fallout/images (9).jpeg" },
 
-  { id: "supercold", title: "supercold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "supercold", title: "Super Cold", url: "../Games/supercold/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
-  { id: "getawayshootout", title: "getawayshootout", url: "../Games/getawayshootout/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "getawayshootout", title: "Get Away Shootout", url: "../Games/getawayshootout/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
-  { id: "geodashlite", title: "geodashlite", url: "../Games/geodashlite/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "geodashlite", title: "Geo Dash Lite", url: "../Games/geodashlite/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
-  { id: "timeshooter2", title: "timeshooter2", url: "../Games/timeshooter2/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "timeshooter2", title: "Time shooter 2", url: "../Games/timeshooter2/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
-  { id: "cuphead", title: "cuphead", url: "../Games/cuphead/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "granny", title: "granny", url: "../Games/granny/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "hollow_knight", title: "hollow knight", url: "../Games/hollow-knight/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "jsab", title: "jsab", url: "../Games/jsab/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "miside", title: "miside", url: "../Games/miside/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-  { id: "pvz", title: "pvz", url: "../Games/pvz/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
-
-  { id: "incremancer_master", title: "incremancer master", url: "../Games/incremancer-master/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/incremancer-master/images/boots.png" },
-
-  { id: "incremancer_master", title: "incremancer master", url: "../Games/incremancer-master/index2.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/incremancer-master/images/boots.png" },
+  { id: "cuphead", title: "Cup head", url: "../Games/cuphead/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "granny", title: "Granny", url: "../Games/granny/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "hollow_knight", title: "Hollow knight", url: "../Games/hollow-knight/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "jsab", title: "Jsab", url: "../Games/jsab/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "miside", title: "Miside", url: "../Games/miside/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "pvz", title: "Pvz", url: "../Games/pvz/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
+  { id: "incremancer_master", title: "Incremancer", url: "../Games/incremancer-master/index2.html", desc: "A incremental necromancer zombie game", popular: true, image: "../Games/incremancer-master/images/boots.png" },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
