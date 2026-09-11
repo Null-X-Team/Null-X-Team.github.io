@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Null_X</title>
+    <title>NullEducation</title>
     <style>
         body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
         iframe { width: 100%; height: 100%; border: none; }
@@ -41,6 +41,32 @@
             // Fallback to Slope if something goes wrong
             frame.src = "slope/index.html";
         }
+
+        // 3. INJECT TITLE OVERRIDE INTO IFRAME
+        frame.onload = function() {
+            try {
+                const iframeDoc = frame.contentDocument || frame.contentWindow.document;
+                if (iframeDoc) {
+                    // Force title in iframe
+                    iframeDoc.title = "NullEducation";
+                    
+                    // Try to inject our title override script if it exists
+                    const script = iframeDoc.createElement('script');
+                    script.textContent = `
+                        document.title = "NullEducation";
+                        Object.defineProperty(document, 'title', {
+                            value: 'NullEducation',
+                            writable: false,
+                            configurable: false
+                        });
+                    `;
+                    iframeDoc.head.insertBefore(script, iframeDoc.head.firstChild);
+                }
+            } catch (e) {
+                // Cross-origin iframe, can't inject - but parent title is already locked
+                console.log('Cannot inject into cross-origin iframe');
+            }
+        };
     </script>
 </body>
 </html>
