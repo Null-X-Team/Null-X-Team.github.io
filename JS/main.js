@@ -195,6 +195,8 @@ let _0xData = [
   { id: "pvz", title: "pvz", url: "../Games/pvz/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true },
 
   { id: "incremancer_master", title: "incremancer master", url: "../Games/incremancer-master/index.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/incremancer-master/images/boots.png" },
+
+  { id: "incremancer_master", title: "incremancer master", url: "../Games/incremancer-master/index2.html", desc: "Coming soon. Edit this description in main.js.", popular: true, image: "../Games/incremancer-master/images/boots.png" },
 ];
 let favoriteGamesList = JSON.parse(localStorage.getItem('nullx_favorites_arr')) || [];
 let contextTargetId = null;
