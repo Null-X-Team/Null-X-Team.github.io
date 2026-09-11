@@ -530,7 +530,12 @@ iframe { width:100%; height:100vh; display:block; border:none; }
 <body>
 <a href="https://null-x-team.github.io/" class="back-btn">← Back To Home</a>
 
-<iframe src="${gameSrc}" sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"></iframe>
+<iframe 
+  src="${gameSrc}" 
+  sandbox="allow-scripts allow-same-origin allow-forms allow-pointer-lock allow-popups allow-modals" 
+  allow="pointer-lock *; fullscreen *; gamepad *; autoplay *"
+  style="width:100%; height:100vh; display:block; border:none;"
+></iframe>
 
 <script>
 (function () {
