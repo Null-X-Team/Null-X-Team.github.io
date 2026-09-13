@@ -659,10 +659,10 @@
             }
 
             // Use absolute URL to ensure it works from about:blank iframes
-const saveUrl = `${TURSO_API_BASE}/save`;
-console.log('[CloudSync] Saving to:', saveUrl);
+            const saveUrl = `${TURSO_API_BASE}/save`;
+            console.log('[CloudSync] Saving to:', saveUrl);
 
-const response = await fetch(saveUrl, {
+            const response = await fetch(saveUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -688,7 +688,7 @@ const response = await fetch(saveUrl, {
 
             return true;
         } catch (err) {
-           console.error('[CloudSync] Cloud Save Error:', err.message, err);
+            console.error('[CloudSync] Cloud Save Error:', err.message, err);
 
             if (statusBox) {
                 statusBox.textContent = isManual
@@ -725,19 +725,16 @@ const response = await fetch(saveUrl, {
         }
 
         try {
-            const response = await fetch(
-                // Use absolute URL to ensure it works from about:blank iframes
-const loadUrl = `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`;
-console.log('[CloudSync] Loading from:', loadUrl);
+            // Use absolute URL to ensure it works from about:blank iframes
+            const loadUrl = `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`;
+            console.log('[CloudSync] Loading from:', loadUrl);
 
-const response = await fetch(loadUrl, {
-                {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
+            const response = await fetch(loadUrl, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
                 }
-            );
+            });
 
             // 404 = no save yet (not a hard failure)
             if (response.status === 404) {
