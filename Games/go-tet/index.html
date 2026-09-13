@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="patch/cdn/bootstrap.3.4.1.min.css" />
+    <link rel="stylesheet" href="Index.css" />
+    <link rel="preload" href="p2p.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="stm.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="Pos3.gif" as="image" crossorigin />
+    <meta name="viewport" content="user-scalable=no, width=device-width, minimum-scale=1.0" />
+    <meta
+      name="description"
+      content="Interactive tile-matching game. Gain levels for completing your increasing square pattern. Compete against the clock and use fun spells against other players."
+    />
+    <meta
+      name="keywords"
+      content="game, multiplayer, online, interactive, tile, pattern, tile-matching, building, competitive, addictive, easy, puzzle, countdown, spells, fun, gameplay, io, vintage, 8-bit, retro"
+    />
+  </head>
+  <body onload="Game.start()">
+    <div id="gamebar">
+      <div id="helpcollapsed">?</div>
+      <div id="helpexpand">
+        Help<br />
+        <div class="expands">
+          <script type="text/javascript" style="display: none">
+            //<![CDATA[
+            window.__mirage2 = { petok: "aCj.QNwGUOfLrCmu67eagpL0xPleX_OUL2kyVMsyHGk-31536000-0" };
+            //]]>
+          </script>
+          <script type="text/javascript" src="patch/cdn/mirage2.min.js"></script>
+          <img data-cfsrc="wasd.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="wasd.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="arrows.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="arrows.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="mouseblack.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="mouseblack.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="touch.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="touch.png" class="mw8" /></noscript
+          >: Movement<br />
+          <img data-cfsrc="space.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="space.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="squareclickblack.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="squareclickblack.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="Glue.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="Glue.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="squaretouch.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="squaretouch.png" class="mw8"
+          /></noscript>
+          : Glue tiles<br />
+          M or <img data-cfsrc="rightclick.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="rightclick.png" class="mw8"
+          /></noscript>
+          or <img data-cfsrc="Release.png" class="mw8" style="display: none; visibility: hidden" /><noscript
+            ><img src="Release.png" class="mw8" /></noscript
+          >: Release tiles<br />
+          N or <img data-cfsrc="Rotate.png" class="mw6" style="display: none; visibility: hidden" /><noscript
+            ><img src="Rotate.png" class="mw6"
+          /></noscript>
+          : Rotate<br />
+          F or <img data-cfsrc="Fire.png" class="mw6" style="display: none; visibility: hidden" /><noscript
+            ><img src="Fire.png" class="mw6" /></noscript
+          >: Fire<br />
+          B or <img data-cfsrc="Magnet.png" class="mw6" style="display: none; visibility: hidden" /><noscript
+            ><img src="Magnet.png" class="mw6" /></noscript
+          >: Magnet Rearrange<br />
+          X or <img data-cfsrc="Speed.png" class="mw6" style="display: none; visibility: hidden" /><noscript
+            ><img src="Speed.png" class="mw6" /></noscript
+          >: +1 Speed<br />
+          Fore more help click <a href="https://gotet.io/" id="domain" target="_blank">here</a>
+        </div>
+      </div>
+      <div id="settingscollapsed">Settings</div>
+      <div id="settingsexpand">
+        Settings<br />
+        <div class="expands">
+          <div class="textimg">
+            <input type="checkbox" id="glueCb" onclick="event.stopPropagation();handleGlue(this);" />
+            <span class="checkmark"></span>&nbsp;Click/tap in the square to glue
+          </div>
+          <br />
+          <div class="textimg">
+            <input type="checkbox" id="hideCb" onclick="event.stopPropagation();handleHide(this);" />
+            <span class="checkmark"></span>&nbsp;Hide interface
+          </div>
+          <div class="textimg">
+            <input type="checkbox" id="shadowsCb" onclick="event.stopPropagation();handleShadows(this);" />
+            <span class="checkmark"></span>&nbsp;Draw shadows (high cpu)
+          </div>
+          <div class="textimg">
+            <input type="checkbox" id="colorsCb" onclick="event.stopPropagation();handleColors(this);" />
+            <span class="checkmark"></span>&nbsp;4-Colors Mode
+          </div>
+          <div class="textimg">
+            <input type="checkbox" id="darkCb" onclick="event.stopPropagation();handleDark(this);" />
+            <span class="checkmark"></span>&nbsp;Dark Mode
+          </div>
+        </div>
+      </div>
+      <div id="statuscollapsed">
+        <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+          ><img src="GoldMini.png" class="w3"
+        /></noscript>
+      </div>
+      <div id="statusexpand">
+        <div class="textimg jc">
+          <div id="goldCoins">0</div>
+          <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+            ><img src="GoldMini.png" class="w3"
+          /></noscript>
+          <div id="silverCoins">0</div>
+          <img data-cfsrc="SilverMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+            ><img src="SilverMini.png" class="w3"
+          /></noscript>
+          <div id="bronzeCoins">0</div>
+          <img data-cfsrc="BronzeMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+            ><img src="BronzeMini.png" class="w3"
+          /></noscript>
+        </div>
+        <div class="flex jc">
+          Exchange&nbsp;
+          <div class="flex jc">
+            <div id="stg" class="textimg be">
+              2<img data-cfsrc="SilverMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                ><img src="SilverMini.png" class="w3" /></noscript
+              >&nbsp;= 1<img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                ><img src="GoldMini.png" class="w3"
+              /></noscript>
+            </div>
+          </div>
+          <div class="flex jc">
+            <div id="btg" class="textimg be">
+              4<img data-cfsrc="BronzeMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                ><img src="BronzeMini.png" class="w3" /></noscript
+              >&nbsp;= 1<img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                ><img src="GoldMini.png" class="w3"
+              /></noscript>
+            </div>
+          </div>
+          <div class="flex jc">
+            <div id="gtp" class="textimg be">
+              1<img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                ><img src="GoldMini.png" class="w3" /></noscript
+              >&nbsp;= 100&nbsp;<img data-cfsrc="Point.png" class="w15" style="display: none; visibility: hidden" /><noscript
+                ><img src="Point.png" class="w15"
+              /></noscript>
+            </div>
+          </div>
+        </div>
+        <div class="flex">
+          <div id="Charms" class="tab selected">Charms</div>
+          <div id="Skins" class="tab">Skins</div>
+          <div id="Trophies" class="tab">Trophies</div>
+        </div>
+        <div id="CharmsTab" class="left">
+          <div class="flex">
+            <div class="center charmCost">
+              <div id="charm0" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac0" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp0"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Factory.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Factory.png" class="w6" /></noscript
+                  ><br />
+                  Generates one tile within your square every 5s
+                </div>
+              </div>
+              <div id="cd0" class="textimg jc">
+                15&nbsp;<img data-cfsrc="Point.png" class="w15" style="display: none; visibility: hidden" /><noscript
+                  ><img src="Point.png" class="w15" /></noscript
+                >&nbsp;/30s
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="charm1" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac1" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp1"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Speed.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Speed.png" class="w6" /></noscript
+                  ><br />
+                  +1 Speed
+                </div>
+              </div>
+              <div id="cd1" class="textimg jc">
+                20&nbsp;<img data-cfsrc="Point.png" class="w15" style="display: none; visibility: hidden" /><noscript
+                  ><img src="Point.png" class="w15" /></noscript
+                >&nbsp;/30s
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="charm2" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac2" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp2"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Speed.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Speed.png" class="w6" /></noscript
+                  ><br />
+                  +1 Speed. Increase Speed duration with 10 seconds.
+                </div>
+              </div>
+              <div id="cd2" class="textimg jc">
+                25&nbsp;<img data-cfsrc="Point.png" class="w15" style="display: none; visibility: hidden" /><noscript
+                  ><img src="Point.png" class="w15" /></noscript
+                >&nbsp;/30s
+              </div>
+            </div>
+          </div>
+          <div class="expands flex">
+            <div class="center charmCost">
+              <div id="charm3" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac3" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp3"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Shield.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Shield.png" class="w6" /></noscript
+                  ><br />
+                  Immune to ice (traps and wall).
+                </div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="charm4" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac4" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp4"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Fire.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Fire.png" class="w6" /></noscript
+                  ><br />
+                  Increases Fire duration with 2 seconds. Immune to fire (traps and wall).
+                </div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="charm5" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="ac5" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="cp5"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="AntiShrink.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="AntiShrink.png" class="w6" /></noscript
+                  ><br />
+                  When casting or being cast upon, Shrink decreases the players TTL with 50% instead of decreasing the size
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="SkinsTab" class="left">
+          <div class="flex">
+            <div class="center charmCost">
+              <div id="skin0" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="as0" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="sp0"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Hipo.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Hipo.png" class="w6" /></noscript
+                  ><br />
+                  Hippopotamus
+                </div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="skin1" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="as1" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="sp1"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Bear.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Bear.png" class="w6" /></noscript
+                  ><br />
+                  Bear
+                </div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="skin2" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="as2" class="be">Buy</div>
+                    &nbsp;
+                    <div class="textimg">
+                      <div id="sp2"></div>
+                      <img data-cfsrc="GoldMini.png" class="w3" style="display: none; visibility: hidden" /><noscript
+                        ><img src="GoldMini.png" class="w3"
+                      /></noscript>
+                    </div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Penguin.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Penguin.png" class="w6" /></noscript
+                  ><br />
+                  Penguin (use with Dark Mode)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="TrophiesTab" class="left">
+          <div class="flex">
+            <div class="center charmCost">
+              <div id="trophy0" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="at0" class="be">Equip</div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="BombL.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="BombL.png" class="w6" /></noscript
+                  ><br />
+                  <div class="ib">
+                    +
+                    <div id="tp0" class="ib"></div>
+                    to your explosion radius
+                  </div>
+                  <br /><br />
+                  Explode 5 bombs to unlock next level
+                  <br /><br />
+                  <div id="tnl0" class="ib">
+                    Next level: +
+                    <div id="tnlv0" class="ib"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="jc flex" id="tl0">
+                Level&nbsp;
+                <div id="tlv0">0</div>
+                /
+                <div id="tm0"></div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="trophy1" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="at1" class="be">Equip</div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="Magnet.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="Magnet.png" class="w6" /></noscript
+                  ><br />
+                  <div class="ib">
+                    Casts Magnet for free every
+                    <div id="tp1" class="ib"></div>
+                    seconds
+                  </div>
+                  <br /><br />
+                  Complete maximum level without using Magnet to unlock next level
+                  <br /><br />
+                  <div id="tnl1" class="ib">
+                    Next level: every
+                    <div id="tnlv1" class="ib"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="jc flex" id="tl1">
+                Level&nbsp;
+                <div id="tlv1">0</div>
+                /
+                <div id="tm1"></div>
+              </div>
+            </div>
+            <div class="center charmCost">
+              <div id="trophy2" class="charm ib">
+                <div>
+                  <div class="flex jc">
+                    <div id="at2" class="be">Equip</div>
+                  </div>
+                  <br />
+                  <img data-cfsrc="PointBig.png" class="w6" style="display: none; visibility: hidden" /><noscript
+                    ><img src="PointBig.png" class="w6" /></noscript
+                  ><br />
+                  <div class="ib">
+                    Shield, Fire and Magnet cost
+                    <div id="tp2" class="ib"></div>
+                    less points to cast
+                  </div>
+                  <br /><br />
+                  Complete maximum level without stealing from other players to unlock next level
+                  <br /><br />
+                  <div id="tnl2" class="ib">
+                    Next level: -
+                    <div id="tnlv2" class="ib"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="jc flex" id="tl2">
+                Level&nbsp;
+                <div id="tlv2">0</div>
+                /
+                <div id="tm2"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="statusCharm" class="center red"></div>
+      </div>
+      <div id="scorecollapsed">
+        <div class="bg">SCORE&nbsp;</div>
+        <div id="lvl" class="bg">1</div>
+        &nbsp;
+        <div class="textimg">
+          <img data-cfsrc="Speed.png" class="w5" style="display: none; visibility: hidden" /><noscript
+            ><img src="Speed.png" class="w5"
+          /></noscript>
+          <div id="statusSpeed"></div>
+        </div>
+      </div>
+      <div id="scoreexpand">
+        <div class="flex jc">
+          <div class="bg">Lvl&nbsp;</div>
+          <div id="scoreLvl" class="bg">1</div>
+          &nbsp;
+        </div>
+        Leaderboard<br />
+        <div id="leaderboard"></div>
+      </div>
+    </div>
+    <div id="leftpanel">
+      <div id="points" class="textimg jc">
+        <div id="pointsValue">0</div>
+        &nbsp;<img data-cfsrc="Point.png" class="mw16" style="display: none; visibility: hidden" /><noscript
+          ><img src="Point.png" class="mw16"
+        /></noscript>
+      </div>
+      <div id="spells">
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="Spin around the center, counter&#8209;clockwise. Spin is possible only if the position after the spin is valid (i.e., no collision of your tiles with other tiles)."
+          >
+            <img data-cfsrc="Rotate.png" id="RotateSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Rotate.png" id="RotateSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costrotate" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will activate a temporary ice shield which will protect you from other players. Any player which steps into your square surface is frozen and cannot move.
+                    If two players with shield intersect each other they are both frozen."
+          >
+            <img data-cfsrc="Shield.png" id="ShieldSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Shield.png" id="ShieldSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costshield" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will activate a temporary fire spell that will destroy tiles your square will run into, including tiles from enemy squares.'Fire' and 'Shield' spells cancel each other once two squares with these spells activated meet."
+          >
+            <img data-cfsrc="Fire.png" id="FireSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Fire.png" id="FireSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costfire" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will attract all your tiles to the center of the square and rearrange them in a spiral starting from center and avoiding occupied positions."
+          >
+            <img data-cfsrc="Magnet.png" id="MagnetSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Magnet.png" id="MagnetSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costmagnet" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will temporarily increase your speed, unless you're already at maximum speed."
+          >
+            <img data-cfsrc="Speed.png" id="SpeedSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Speed.png" id="SpeedSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costspeed" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will add more seconds to your time to live."
+          >
+            <img data-cfsrc="Time.png" id="TimeSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Time.png" id="TimeSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costtime" class="cost"></div>
+        </div>
+        <div class="spellimg">
+          <div
+            class="tp"
+            data-delay='{"show":"2000"}'
+            data-placement="right"
+            data-toggle="tooltip"
+            title="It will decrease the level of all players that intersect your square and have a completion percentage smaller than you.
+                    Frozen players cannot be shrunk. The level of the shrunk players decreases by one and the players that get shrunk to level zero are eliminated.
+                    The spell is cast even if there are no players that can be shrunk in your square.
+                    You get points for shrinking and eliminating other players."
+          >
+            <img data-cfsrc="Shrink.png" id="ShrinkSpell" class="img" style="display: none; visibility: hidden" /><noscript
+              ><img src="Shrink.png" id="ShrinkSpell" class="img"
+            /></noscript>
+          </div>
+          <div id="costshrink" class="cost"></div>
+        </div>
+      </div>
+    </div>
+    <div id="gifts"></div>
+    <div id="gopopup">
+      <div id="goreason"></div>
+      <div class="flex">
+        <button class="go" id="goplayagain">Play&nbsp;Again</button>
+      </div>
+    </div>
+    <div id="winpopup">
+      <div id="winner">Maximum&nbsp;Level!&nbsp;You&nbsp;Win!</div>
+    </div>
+    <div id="zooms">
+      <div id="zoomscontainer">
+        <img data-cfsrc="Plus.png" id="Plus" class="w10" style="display: none; visibility: hidden" /><noscript
+          ><img src="Plus.png" id="Plus" class="w10"
+        /></noscript>
+        <img data-cfsrc="Minus.png" id="Minus" class="w10" style="display: none; visibility: hidden" /><noscript
+          ><img src="Minus.png" id="Minus" class="w10"
+        /></noscript>
+      </div>
+    </div>
+    <canvas id="gameCanvas" width="0" height="0">
+      Your browser does not support the canvas element.
+      <img data-cfsrc="Magnet.png" id="Magnet" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet.png" id="Magnet"
+      /></noscript>
+      <img data-cfsrc="Rotate.png" id="Rotate" style="display: none; visibility: hidden" /><noscript
+        ><img src="Rotate.png" id="Rotate"
+      /></noscript>
+      <img data-cfsrc="Fire.png" id="Fire" style="display: none; visibility: hidden" /><noscript
+        ><img src="Fire.png" id="Fire"
+      /></noscript>
+      <img data-cfsrc="Shield.png" id="Shield" style="display: none; visibility: hidden" /><noscript
+        ><img src="Shield.png" id="Shield"
+      /></noscript>
+      <img data-cfsrc="Speed.png" id="Speed" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed.png" id="Speed"
+      /></noscript>
+      <img data-cfsrc="Gift.png" id="Gift" style="display: none; visibility: hidden" /><noscript
+        ><img src="Gift.png" id="Gift"
+      /></noscript>
+      <img data-cfsrc="Lock.png" id="Lock" style="display: none; visibility: hidden" /><noscript
+        ><img src="Lock.png" id="Lock"
+      /></noscript>
+      <img data-cfsrc="Chain.png" id="Chain" style="display: none; visibility: hidden" /><noscript
+        ><img src="Chain.png" id="Chain"
+      /></noscript>
+      <img data-cfsrc="Glue.png" id="Glue" style="display: none; visibility: hidden" /><noscript
+        ><img src="Glue.png" id="Glue"
+      /></noscript>
+      <img data-cfsrc="GlueNoBorders.png" style="display: none; visibility: hidden" /><noscript
+        ><img src="GlueNoBorders.png"
+      /></noscript>
+      <img data-cfsrc="Release.png" id="Release" style="display: none; visibility: hidden" /><noscript
+        ><img src="Release.png" id="Release"
+      /></noscript>
+      <img data-cfsrc="Gold.png" id="Gold" style="display: none; visibility: hidden" /><noscript
+        ><img src="Gold.png" id="Gold"
+      /></noscript>
+      <img data-cfsrc="Silver.png" id="Silver" style="display: none; visibility: hidden" /><noscript
+        ><img src="Silver.png" id="Silver"
+      /></noscript>
+      <img data-cfsrc="Bronze.png" id="Bronze" style="display: none; visibility: hidden" /><noscript
+        ><img src="Bronze.png" id="Bronze"
+      /></noscript>
+      <img data-cfsrc="Point.png" id="Point" style="display: none; visibility: hidden" /><noscript
+        ><img src="Point.png" id="Point"
+      /></noscript>
+      <img data-cfsrc="PointBig.png" id="PointBig" style="display: none; visibility: hidden" /><noscript
+        ><img src="PointBig.png" id="PointBig"
+      /></noscript>
+      <img data-cfsrc="CoinBig.png" id="CoinBig" style="display: none; visibility: hidden" /><noscript
+        ><img src="CoinBig.png" id="CoinBig"
+      /></noscript>
+      <img data-cfsrc="BombS.png" id="BombS" style="display: none; visibility: hidden" /><noscript
+        ><img src="BombS.png" id="BombS"
+      /></noscript>
+      <img data-cfsrc="BombM.png" id="BombM" style="display: none; visibility: hidden" /><noscript
+        ><img src="BombM.png" id="BombM"
+      /></noscript>
+      <img data-cfsrc="BombL.png" id="BombL" style="display: none; visibility: hidden" /><noscript
+        ><img src="BombL.png" id="BombL"
+      /></noscript>
+      <img data-cfsrc="Wall.png" id="Wall" style="display: none; visibility: hidden" /><noscript
+        ><img src="Wall.png" id="Wall"
+      /></noscript>
+      <img data-cfsrc="BrickMini.png" id="BrickMini" style="display: none; visibility: hidden" /><noscript
+        ><img src="BrickMini.png" id="BrickMini"
+      /></noscript>
+      <img data-cfsrc="Ghost.png" id="Ghost" style="display: none; visibility: hidden" /><noscript
+        ><img src="Ghost.png" id="Ghost"
+      /></noscript>
+      <img data-cfsrc="c1.png" id="c1" style="display: none; visibility: hidden" /><noscript
+        ><img src="c1.png" id="c1"
+      /></noscript>
+      <img data-cfsrc="c2.png" id="c2" style="display: none; visibility: hidden" /><noscript
+        ><img src="c2.png" id="c2"
+      /></noscript>
+      <img data-cfsrc="c3.png" id="c3" style="display: none; visibility: hidden" /><noscript
+        ><img src="c3.png" id="c3"
+      /></noscript>
+      <img data-cfsrc="c4.png" id="c4" style="display: none; visibility: hidden" /><noscript
+        ><img src="c4.png" id="c4"
+      /></noscript>
+      <img data-cfsrc="c5.png" id="c5" style="display: none; visibility: hidden" /><noscript
+        ><img src="c5.png" id="c5"
+      /></noscript>
+      <img data-cfsrc="c6.png" id="c6" style="display: none; visibility: hidden" /><noscript
+        ><img src="c6.png" id="c6"
+      /></noscript>
+      <img data-cfsrc="Hipo.png" id="Hipo" style="display: none; visibility: hidden" /><noscript
+        ><img src="Hipo.png" id="Hipo"
+      /></noscript>
+      <img data-cfsrc="Bear.png" id="Bear" style="display: none; visibility: hidden" /><noscript
+        ><img src="Bear.png" id="Bear"
+      /></noscript>
+      <img data-cfsrc="Penguin.png" id="Penguin" style="display: none; visibility: hidden" /><noscript
+        ><img src="Penguin.png" id="Penguin"
+      /></noscript>
+      <img data-cfsrc="Speed100.png" id="Speed100" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed100.png" id="Speed100"
+      /></noscript>
+      <img data-cfsrc="Speed80.png" id="Speed80" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed80.png" id="Speed80"
+      /></noscript>
+      <img data-cfsrc="Speed60.png" id="Speed60" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed60.png" id="Speed60"
+      /></noscript>
+      <img data-cfsrc="Speed40.png" id="Speed40" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed40.png" id="Speed40"
+      /></noscript>
+      <img data-cfsrc="Speed20.png" id="Speed20" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed20.png" id="Speed20"
+      /></noscript>
+      <img data-cfsrc="Speed5.png" id="Speed5" style="display: none; visibility: hidden" /><noscript
+        ><img src="Speed5.png" id="Speed5"
+      /></noscript>
+      <img data-cfsrc="Time.png" id="Time" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time.png" id="Time"
+      /></noscript>
+      <img data-cfsrc="Time100.png" id="Time100" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time100.png" id="Time100"
+      /></noscript>
+      <img data-cfsrc="Time80.png" id="Time80" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time80.png" id="Time80"
+      /></noscript>
+      <img data-cfsrc="Time60.png" id="Time60" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time60.png" id="Time60"
+      /></noscript>
+      <img data-cfsrc="Time40.png" id="Time40" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time40.png" id="Time40"
+      /></noscript>
+      <img data-cfsrc="Time20.png" id="Time20" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time20.png" id="Time20"
+      /></noscript>
+      <img data-cfsrc="Time5.png" id="Time5" style="display: none; visibility: hidden" /><noscript
+        ><img src="Time5.png" id="Time5"
+      /></noscript>
+      <img data-cfsrc="Magnet100.png" id="Magnet100" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet100.png" id="Magnet100"
+      /></noscript>
+      <img data-cfsrc="Magnet80.png" id="Magnet80" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet80.png" id="Magnet80"
+      /></noscript>
+      <img data-cfsrc="Magnet60.png" id="Magnet60" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet60.png" id="Magnet60"
+      /></noscript>
+      <img data-cfsrc="Magnet40.png" id="Magnet40" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet40.png" id="Magnet40"
+      /></noscript>
+      <img data-cfsrc="Magnet20.png" id="Magnet20" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet20.png" id="Magnet20"
+      /></noscript>
+      <img data-cfsrc="Magnet5.png" id="Magnet5" style="display: none; visibility: hidden" /><noscript
+        ><img src="Magnet5.png" id="Magnet5"
+      /></noscript>
+      <img data-cfsrc="Shrink.png" id="Shrink" style="display: none; visibility: hidden" /><noscript
+        ><img src="Shrink.png" id="Shrink"
+      /></noscript>
+      <img data-cfsrc="AntiShrink.png" id="AntiShrink" style="display: none; visibility: hidden" /><noscript
+        ><img src="AntiShrink.png" id="AntiShrink"
+      /></noscript>
+      <img data-cfsrc="ChestOpen.gif" style="display: none; visibility: hidden" /><noscript><img src="ChestOpen.gif" /></noscript>
+      <img data-cfsrc="mouse.png" style="display: none; visibility: hidden" /><noscript><img src="mouse.png" /></noscript>
+      <img data-cfsrc="squareclick.png" style="display: none; visibility: hidden" /><noscript
+        ><img src="squareclick.png"
+      /></noscript>
+      <img data-cfsrc="squaretouchblack.png" style="display: none; visibility: hidden" /><noscript
+        ><img src="squaretouchblack.png"
+      /></noscript>
+      <img data-cfsrc="touchblack.png" style="display: none; visibility: hidden" /><noscript
+        ><img src="touchblack.png"
+      /></noscript>
+    </canvas>
+    <div id="player"></div>
+    <div id="ttl"></div>
+    <script src="jquery-3.5.1.min.js"></script>
+    <script src="Game.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+      });
+      $(document).ready(function () {
+        $('[data-toggle="tooltip"]').click(function () {
+          $('[data-toggle="tooltip"]').tooltip("hide");
+        });
+        window.SDK_OPTIONS = {
+          gameId: "djcg61a4swys5wah0dxdi4c68i9hxc8f",
+          onEvent: function (a) {
+            switch (a.name) {
+              case "SDK_GAME_PAUSE":
+                gamePause();
+                break;
+              case "SDK_GAME_START":
+                gameResume();
+                break;
+              case "SDK_READY":
+                // when sdk is ready
+                break;
+            }
+          },
+        };
+        (function (a, b, c) {
+          var d = a.getElementsByTagName(b)[0];
+          a.getElementById(c) ||
+            ((a = a.createElement(b)), (a.id = c), (a.src = "patch/js/gm-sdk.js"), d.parentNode.insertBefore(a, d));
+        })(document, "script", "gamemonetize-sdk");
+      });
+    </script>
+    <script type="text/javascript"></script>
+    <script>
+      (function (a, b, c) {
+        var d = a.getElementsByTagName(b)[0];
+        a.getElementById(c) ||
+          ((a = a.createElement(b)),
+          (a.id = c),
+          (a.src = "patch/js/gm-sdk-preload.js?v=" + Date.now()),
+          d.parentNode.insertBefore(a, d));
+      })(document, "script", "gamemonetize-preload-api");
+    </script>
+  </body>
+</html>
+

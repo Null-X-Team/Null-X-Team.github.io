@@ -1,0 +1,16 @@
+{
+"companyName": "Superera",
+"productName": "Wizard Mike",
+"dataUrl": "Wizard_Mike.data.unityweb",
+"wasmCodeUrl": "Wizard_Mike.wasm.code.unityweb",
+"wasmFrameworkUrl": "Wizard_Mike.wasm.framework.unityweb",
+"asmCodeUrl": "Wizard_Mike.asm.code.unityweb",
+"asmMemoryUrl": "Wizard_Mike.asm.memory.unityweb",
+"asmFrameworkUrl": "Wizard_Mike.asm.framework.unityweb",
+"TOTAL_MEMORY": 268435456,
+"graphicsAPI": ["WebGL 2.0"],
+"webglContextAttributes": {"preserveDrawingBuffer": false},
+"splashScreenStyle": "Dark",
+"backgroundColor": "#231F20",
+"cacheControl": {"default": "must-revalidate"}
+}

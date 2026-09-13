@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+    <script src="Build/UnityLoader.js"></script>
+    <script>
+      var unityInstance = (window.unityInstance = UnityLoader.instantiate("gameContainer", "Build/Wizard_Mike.json"));
+      var scaleToFit;
+      try {
+        scaleToFit = !!JSON.parse("true");
+      } catch (e) {
+        scaleToFit = true;
+      }
+      function onResize() {
+        var canvas = unityInstance.Module.canvas;
+        var container = unityInstance.container;
+        var w;
+        var h;
+        if (scaleToFit) {
+          w = window.innerWidth;
+          h = window.innerHeight;
+          if (
+            w > h &&
+            (navigator.userAgent.match(/Android/i) ||
+              navigator.userAgent.match(/webOS/i) ||
+              navigator.userAgent.match(/iPhone/i) ||
+              navigator.userAgent.match(/iPad/i) ||
+              navigator.userAgent.match(/iPod/i) ||
+              navigator.userAgent.match(/BlackBerry/i) ||
+              navigator.userAgent.match(/Windows Phone/i))
+          ) {
+            window.unityInstance.SendMessage("Rotate", "ShowImage");
+          } else {
+            window.unityInstance.SendMessage("Rotate", "HideImage");
+          }
+          var r = 1280 / 720;
+          if (w * r > window.innerHeight) {
+            w = Math.min(w, Math.ceil(h / r));
+          }
+          h = Math.floor(w * r);
+        } else {
+          w = 720;
+          h = 1280;
+        }
+        container.style.width = canvas.style.width = w + "px";
+        container.style.height = canvas.style.height = h + "px";
+        container.style.top = Math.floor((window.innerHeight - h) / 2) + "px";
+        container.style.left = Math.floor((window.innerWidth - w) / 2) + "px";
+      }
+      window.addEventListener("resize", onResize);
+    </script>
+    <style>
+      html,
+      body {
+        background: #000;
+        background: #000;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        padding: 0;
+        margin: 0;
+      }
+      div#gameContainer {
+        background: transparent !important;
+        position: absolute;
+      }
+      div#gameContainer canvas {
+        position: absolute;
+      }
+      div#gameContainer[data-pixelated="true"] canvas {
+        image-rendering: optimizeSpeed;
+        image-rendering: -webkit-crisp-edges;
+        image-rendering: -moz-crisp-edges;
+        image-rendering: -o-crisp-edges;
+        image-rendering: crisp-edges;
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: optimize-contrast;
+        image-rendering: pixelated;
+        -ms-interpolation-mode: nearest-neighbor;
+      }
+    </style>
+  </head>
+  <body onload="onResize();">
+    <div id="gameContainer" data-pixelated="false"></div>
+  </body>
+</html>
+
