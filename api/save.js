@@ -48,6 +48,16 @@ export default async function handler(req, res) {
       });
     }
 
+    const saveValue =
+      typeof save_string === "string"
+        ? save_string
+        : JSON.stringify(save_string);
+
+    const updatedAt = new Date().toISOString();
+
+    // 1) Ensure table exists with PRIMARY KEY on username
+    //    (required for ON CONFLICT to work on re-saves)
+    // 2) UPSERT the row
     const response = await fetch(`${databaseUrl}/v2/pipeline`, {
       method: "POST",
 
@@ -58,6 +68,19 @@ export default async function handler(req, res) {
 
       body: JSON.stringify({
         requests: [
+          {
+            type: "execute",
+            stmt: {
+              sql: `
+                CREATE TABLE IF NOT EXISTS Gamesavedata (
+                  username TEXT PRIMARY KEY,
+                  save_string TEXT,
+                  updated_at TEXT
+                )
+              `,
+              args: []
+            }
+          },
           {
             type: "execute",
             stmt: {
@@ -82,14 +105,11 @@ export default async function handler(req, res) {
                 },
                 {
                   type: "text",
-                  value:
-                    typeof save_string === "string"
-                      ? save_string
-                      : JSON.stringify(save_string)
+                  value: saveValue
                 },
                 {
                   type: "text",
-                  value: new Date().toISOString()
+                  value: updatedAt
                 }
               ]
             }
@@ -112,8 +132,22 @@ export default async function handler(req, res) {
       });
     }
 
+    // Check for statement-level errors (e.g. constraint issues)
+    const results = data?.results || [];
+    for (const result of results) {
+      if (result?.type === "error") {
+        console.error("Turso statement error:", result);
+        return res.status(500).json({
+          error: "Failed to save data",
+          details: result
+        });
+      }
+    }
+
     return res.status(200).json({
-      success: true
+      success: true,
+      username,
+      updated_at: updatedAt
     });
 
   } catch (error) {
