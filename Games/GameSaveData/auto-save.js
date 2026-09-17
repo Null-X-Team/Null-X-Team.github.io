@@ -662,37 +662,98 @@
             const saveUrl = `${TURSO_API_BASE}/save`;
             console.log('[CloudSync] Saving to:', saveUrl);
 
-            const response = await fetch(saveUrl, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    username: loggedInUser,
-                    save_string: completeJsonString
-                })
-            });
+            // FIX: Add timeout and better error handling for Cloudflare proxy issues
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-            if (!response.ok) {
-                throw new Error(`Upload failed with HTTP ${response.status}.`);
+            try {
+                const response = await fetch(saveUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username: loggedInUser,
+                        save_string: completeJsonString
+                    }),
+                    signal: controller.signal,
+                    // FIX: Add cache-busting to avoid Cloudflare serving stale responses
+                    cache: 'no-store'
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    // FIX: Better error message extraction
+                    let errorMessage = `HTTP ${response.status}`;
+                    
+                    try {
+                        const errorData = await response.json();
+                        console.error('[CloudSync] Server error response:', errorData);
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        // Response was not JSON, use status message
+                        console.error('[CloudSync] HTTP error response (non-JSON):', response.statusText);
+                        errorMessage = response.statusText || errorMessage;
+                    }
+
+                    throw new Error(`Upload failed: ${errorMessage}`);
+                }
+
+                // FIX: Verify response is valid JSON
+                let responseData;
+                try {
+                    responseData = await response.json();
+                } catch (e) {
+                    console.error('[CloudSync] Response was not valid JSON:', e);
+                    throw new Error('Server response was invalid. Try again.');
+                }
+
+                if (!responseData.success) {
+                    throw new Error(responseData.error || 'Server did not confirm save');
+                }
+
+                lastSavedString = completeJsonString;
+
+                if (statusBox) {
+                    statusBox.textContent = isManual
+                        ? 'Backup successful!'
+                        : 'Auto-saved successfully!';
+                    statusBox.style.color = '#00c853';
+                }
+
+                console.log('[CloudSync] Save successful for user:', loggedInUser);
+                return true;
+
+            } catch (fetchErr) {
+                clearTimeout(timeoutId);
+                
+                // FIX: Better timeout vs network error distinction
+                if (fetchErr.name === 'AbortError') {
+                    console.error('[CloudSync] Request timeout (10s) - possible Cloudflare issue');
+                    if (statusBox) {
+                        statusBox.textContent = 'Save timed out. Server may be slow or blocked.';
+                        statusBox.style.color = '#ff6644';
+                    }
+                } else {
+                    console.error('[CloudSync] Fetch error:', fetchErr.message);
+                    if (statusBox) {
+                        statusBox.textContent = isManual
+                            ? `Upload failed: ${fetchErr.message}`
+                            : 'Auto-save failed.';
+                        statusBox.style.color = '#ff4444';
+                    }
+                }
+                
+                return false;
             }
 
-            lastSavedString = completeJsonString;
-
-            if (statusBox) {
-                statusBox.textContent = isManual
-                    ? 'Backup successful!'
-                    : 'Auto-saved successfully!';
-                statusBox.style.color = '#00c853';
-            }
-
-            return true;
         } catch (err) {
             console.error('[CloudSync] Cloud Save Error:', err.message, err);
 
             if (statusBox) {
                 statusBox.textContent = isManual
-                    ? 'Upload unsuccessful. Check connection.'
+                    ? `Backup error: ${err.message}`
                     : 'Auto-save failed.';
                 statusBox.style.color = '#ff4444';
             }
@@ -729,85 +790,132 @@
             const loadUrl = `${TURSO_API_BASE}/load?username=${encodeURIComponent(loggedInUser)}`;
             console.log('[CloudSync] Loading from:', loadUrl);
 
-            const response = await fetch(loadUrl, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            });
+            // FIX: Add timeout for load as well
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-            // 404 = no save yet (not a hard failure)
-            if (response.status === 404) {
-                if (currentUser() !== loggedInUser) return false;
-                if (statusBox) {
-                    statusBox.textContent = 'No cloud backup found for this account.';
-                    statusBox.style.color = '#ff8888';
-                }
-                window.__lastCloudLoadStatus = 'not_found';
-                return false;
-            }
-
-            if (!response.ok) {
-                throw new Error(`Load failed with HTTP ${response.status}.`);
-            }
-
-            const data = await response.json();
-
-            /*
-             * Do not apply a response if the current account changed while
-             * this request was waiting for the network.
-             */
-            if (currentUser() !== loggedInUser) {
-                console.warn(
-                    '[CloudSync] Ignored cloud-load result because account changed during import.'
-                );
-
-                return false;
-            }
-
-            if (data && data.found && data.save_string) {
-                const cloudBackup = JSON.parse(data.save_string);
-
-                if (
-                    !cloudBackup ||
-                    typeof cloudBackup !== 'object' ||
-                    Array.isArray(cloudBackup)
-                ) {
-                    throw new Error('Cloud save has an invalid format.');
-                }
-
-                Object.keys(cloudBackup).forEach((key) => {
-                    /*
-                     * Keep the active account identity from the current
-                     * session, not whatever was stored in an older backup.
-                     */
-                    if (key !== 'chatUser') {
-                        localStorage.setItem(key, cloudBackup[key]);
-                    }
+            try {
+                const response = await fetch(loadUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    signal: controller.signal,
+                    cache: 'no-store'
                 });
 
-                localStorage.setItem('chatUser', loggedInUser);
-                lastSavedString = data.save_string;
+                clearTimeout(timeoutId);
 
-                if (statusBox) {
-                    statusBox.textContent = isManual
-                        ? 'All data successfully restored from cloud!'
-                        : 'Cloud data restored!';
-                    statusBox.style.color = '#00c853';
+                // 404 = no save yet (not a hard failure)
+                if (response.status === 404) {
+                    if (currentUser() !== loggedInUser) return false;
+                    if (statusBox) {
+                        statusBox.textContent = 'No cloud backup found for this account.';
+                        statusBox.style.color = '#ff8888';
+                    }
+                    window.__lastCloudLoadStatus = 'not_found';
+                    console.log('[CloudSync] No save found for user (404)');
+                    return false;
                 }
 
-                window.__lastCloudLoadStatus = 'ok';
-                return true;
+                if (!response.ok) {
+                    let errorMessage = `HTTP ${response.status}`;
+                    try {
+                        const errorData = await response.json();
+                        console.error('[CloudSync] Load error:', errorData);
+                        errorMessage = errorData.error || errorMessage;
+                    } catch (e) {
+                        console.error('[CloudSync] Load error (non-JSON):', response.statusText);
+                    }
+                    throw new Error(`Load failed: ${errorMessage}`);
+                }
+
+                let data;
+                try {
+                    data = await response.json();
+                } catch (e) {
+                    console.error('[CloudSync] Load response was not valid JSON:', e);
+                    throw new Error('Server response was invalid.');
+                }
+
+                /*
+                 * Do not apply a response if the current account changed while
+                 * this request was waiting for the network.
+                 */
+                if (currentUser() !== loggedInUser) {
+                    console.warn(
+                        '[CloudSync] Ignored cloud-load result because account changed during import.'
+                    );
+
+                    return false;
+                }
+
+                if (data && data.found && data.save_string) {
+                    const cloudBackup = JSON.parse(data.save_string);
+
+                    if (
+                        !cloudBackup ||
+                        typeof cloudBackup !== 'object' ||
+                        Array.isArray(cloudBackup)
+                    ) {
+                        throw new Error('Cloud save has an invalid format.');
+                    }
+
+                    Object.keys(cloudBackup).forEach((key) => {
+                        /*
+                         * Keep the active account identity from the current
+                         * session, not whatever was stored in an older backup.
+                         */
+                        if (key !== 'chatUser') {
+                            localStorage.setItem(key, cloudBackup[key]);
+                        }
+                    });
+
+                    localStorage.setItem('chatUser', loggedInUser);
+                    lastSavedString = data.save_string;
+
+                    if (statusBox) {
+                        statusBox.textContent = isManual
+                            ? 'All data successfully restored from cloud!'
+                            : 'Cloud data restored!';
+                        statusBox.style.color = '#00c853';
+                    }
+
+                    window.__lastCloudLoadStatus = 'ok';
+                    console.log('[CloudSync] Load successful for user:', loggedInUser);
+                    return true;
+                }
+
+                if (statusBox) {
+                    statusBox.textContent =
+                        'No cloud save was found. You can Export to create one.';
+                    statusBox.style.color = '#aaa';
+                }
+
+                window.__lastCloudLoadStatus = 'not_found';
+                return false;
+
+            } catch (fetchErr) {
+                clearTimeout(timeoutId);
+                
+                if (fetchErr.name === 'AbortError') {
+                    console.error('[CloudSync] Load request timeout (10s)');
+                    if (statusBox) {
+                        statusBox.textContent = 'Load timed out. Server may be slow.';
+                        statusBox.style.color = '#ff6644';
+                    }
+                } else {
+                    console.error('[CloudSync] Load fetch error:', fetchErr.message);
+                    if (statusBox) {
+                        statusBox.textContent = 'Cloud restore failed. Saving remains locked.';
+                        statusBox.style.color = '#ff4444';
+                    }
+                }
+                
+                window.__lastCloudLoadStatus = 'error';
+                return false;
             }
 
-            if (statusBox) {
-                statusBox.textContent =
-                    'No cloud save was found. You can Export to create one.';
-                statusBox.style.color = '#aaa';
-            }
-
-            window.__lastCloudLoadStatus = 'not_found';
-            return false;
         } catch (err) {
             console.error('Cloud Load Error:', err);
 
