@@ -71,6 +71,17 @@ function setAvatar(img, url, username) {
 
 function resizeImageFile(file, maxSide, quality) {
   return new Promise(function (resolve, reject) {
+    // If it's a GIF, keep it as a GIF without resizing
+    if (file.type === 'image/gif') {
+      const reader = new FileReader();
+      reader.onerror = reject;
+      reader.onload = function () {
+        resolve(reader.result);
+      };
+      reader.readAsDataURL(file);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onerror = reject;
     reader.onload = function () {
