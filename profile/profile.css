@@ -105,11 +105,12 @@ body, html {
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  object-fit: cover;
+  object-fit: contain;
   border: 3px solid rgba(139,0,255,0.55);
   background: #1a1224;
   box-shadow: 0 8px 28px rgba(0,0,0,0.45);
   display: block;
+  image-rendering: auto;
 }
 #pfp-preview.is-hidden { display: none; }
 .avatar-fallback {
