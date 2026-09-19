@@ -881,7 +881,7 @@ function launchGame(gameId) {
   gameTab.document.open();
 
   const isEmbed = game.isEmbedCode;
-  const gameSrc = isEmbed ? game.jsbin : (rootUrl + game.url.replace(/^\.\.\//, ""));
+  const gameSrc = isEmbed ? game.jsbin : (game.url.startsWith("http") ? game.url : (rootUrl + game.url.replace(/^\.\.\//, "")));
 
   gameTab.document.write(`
 <!DOCTYPE html>
