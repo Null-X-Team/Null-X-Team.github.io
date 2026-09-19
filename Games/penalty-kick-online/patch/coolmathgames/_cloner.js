@@ -1,1 +1,0 @@
-// coolmathgames/_cloner.js
