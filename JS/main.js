@@ -71,7 +71,11 @@ const __nxProxyList = [
   { name: "Relaxed Alien", p: "aHR0cHM6Ly9tYW51YWxseS1yZWxheGVkLWFsaWVuLmdsb2JhbC5zc2wuZmFzdGx5Lm5ldC8=" },
 ];
 
-  let _0xData = [
+
+const GFILES_BASE  = "https://cdn.jsdelivr.net/gl/DeclineOptionalCookies/gfiles@main/";
+const GFILES2_BASE = "https://cdn.jsdelivr.net/gl/DeclineOptionalCookies/gfiles2@main/";
+
+let _0xData = [
   { id: "1-on-1-soccer", title: "1 On 1 Soccer", url: GFILES_BASE + "1-on-1-soccer/index.html", desc: "gfiles", popular: true },
   { id: "1", title: "1", url: GFILES_BASE + "1/index.html", desc: "gfiles", popular: true },
   { id: "10-minutes-till-dawn", title: "10 Minutes Till Dawn", url: GFILES_BASE + "10-minutes-till-dawn/index.html", desc: "gfiles", popular: true },
