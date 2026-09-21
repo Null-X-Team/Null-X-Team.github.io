@@ -22,7 +22,7 @@ jobs:
           node-version: "24"
 
       - name: Verify update script
-        run: test -f ./JS/update-main.js
+        run: test -f ./JS/update.js
 
       - name: Run update script
         env:
