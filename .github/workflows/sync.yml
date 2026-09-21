@@ -2,7 +2,7 @@ name: Sync gfiles
 
 on:
   schedule:
-    - cron: '0 */6 * * *'
+    - cron: "0 */6 * * *"
   workflow_dispatch:
 
 permissions:
@@ -19,10 +19,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "24"
 
       - name: Verify update script
-        run: test -f ./update-main.js
+        run: test -f ./JS/update-main.js
 
       - name: Run update script
         env:
@@ -32,9 +32,13 @@ jobs:
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
           git add main.js
-          git diff --cached --quiet || (
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
             git commit -m "Auto-update main.js with all games"
             git push
-          )
+          fi
