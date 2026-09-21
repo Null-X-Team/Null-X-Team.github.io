@@ -659,7 +659,6 @@
 
                 handleSignUp(userVal, handlerVal, passVal);
             } else {
-                // Login: try handler first, then fall back to display name
                 handleLogin(userVal, handlerVal, passVal);
             }
         }
@@ -762,8 +761,9 @@
                     loginIdentifier = username;
                 }
 
+                // Check if password is missing BEFORE attempting password match
                 if (user && isPasswordMissing(user.password)) {
-                    showMessage('No password on file — please create a new one.', false);
+                    showMessage('Your password was deleted in the great data move. Please set a new one.', false);
                     openResetPasswordModal({
                         id: user.id,
                         username: user.username || loginIdentifier
@@ -771,9 +771,15 @@
                     return;
                 }
 
+                // Only reach here if password is NOT missing
+                if (!user) {
+                    showMessage('Incorrect credentials.');
+                    return;
+                }
+
                 const typedHash = await sha256Hex(password);
 
-                if (user && passwordsMatch(user.password, password, typedHash)) {
+                if (passwordsMatch(user.password, password, typedHash)) {
                     showMessage('Login successful! Redirecting...', false);
                     localStorage.setItem('chatUser', user.username || loginIdentifier);
 
