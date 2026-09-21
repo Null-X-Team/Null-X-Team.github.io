@@ -68,6 +68,105 @@ async function tursoJson(path, options = {}) {
 const DEFAULT_PFP = "https://null-x-team.github.io/imgs/download.jpeg";
 let allUsers = [];
 let lastMessageTime = 0;
+
+// --- BROWSER NOTIFICATIONS ---
+const NOTIF_PREF_KEY = 'nullchat_notifications';
+let knownMessageIds = new Set();
+let knownPmIds = new Set();
+let notificationsReady = false;
+
+function notificationsEnabled() {
+    return localStorage.getItem(NOTIF_PREF_KEY) === 'granted'
+        && typeof Notification !== 'undefined'
+        && Notification.permission === 'granted';
+}
+
+function showChatNotification(title, body, tag) {
+    if (!notificationsEnabled()) return;
+    try {
+        // Don't notify if the tab is focused
+        if (!document.hidden && document.hasFocus()) return;
+        const n = new Notification(title, {
+            body: body || '',
+            icon: 'https://null-x-team.github.io/imgs/download.jpeg',
+            tag: tag || 'nullchat',
+            renotify: true
+        });
+        n.onclick = () => {
+            window.focus();
+            n.close();
+        };
+        setTimeout(() => n.close(), 8000);
+    } catch (e) {
+        console.warn('Notification failed:', e);
+    }
+}
+
+function promptEnableNotifications() {
+    // Only ask once (unless they chose "ask later")
+    const pref = localStorage.getItem(NOTIF_PREF_KEY);
+    if (pref === 'granted' || pref === 'denied') return;
+    if (typeof Notification === 'undefined') return;
+
+    // If already granted at browser level, just save preference
+    if (Notification.permission === 'granted') {
+        localStorage.setItem(NOTIF_PREF_KEY, 'granted');
+        notificationsReady = true;
+        return;
+    }
+    if (Notification.permission === 'denied') {
+        localStorage.setItem(NOTIF_PREF_KEY, 'denied');
+        return;
+    }
+
+    // Show custom modal
+    const existing = document.getElementById('notif-prompt-modal');
+    if (existing) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'notif-prompt-modal';
+    modal.innerHTML = `
+      <div class="notif-prompt-backdrop"></div>
+      <div class="notif-prompt-card">
+        <div class="notif-prompt-icon">🔔</div>
+        <h2>Enable chat notifications?</h2>
+        <p>Get notified when someone messages you in <strong>general</strong> or sends you a <strong>PM</strong>, even if this tab is in the background.</p>
+        <div class="notif-prompt-actions">
+          <button type="button" id="notif-allow-btn" class="notif-btn-primary">Enable notifications</button>
+          <button type="button" id="notif-later-btn" class="notif-btn-secondary">Not now</button>
+          <button type="button" id="notif-never-btn" class="notif-btn-ghost">Never ask again</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    document.getElementById('notif-allow-btn').onclick = async () => {
+        try {
+            const result = await Notification.requestPermission();
+            if (result === 'granted') {
+                localStorage.setItem(NOTIF_PREF_KEY, 'granted');
+                notificationsReady = true;
+                showChatNotification('Notifications enabled', 'You will be notified about new chat messages and PMs.', 'nullchat-setup');
+            } else {
+                localStorage.setItem(NOTIF_PREF_KEY, 'denied');
+            }
+        } catch (e) {
+            console.warn(e);
+            localStorage.setItem(NOTIF_PREF_KEY, 'denied');
+        }
+        modal.remove();
+    };
+    document.getElementById('notif-later-btn').onclick = () => {
+        // Ask again next session
+        modal.remove();
+    };
+    document.getElementById('notif-never-btn').onclick = () => {
+        localStorage.setItem(NOTIF_PREF_KEY, 'denied');
+        modal.remove();
+    };
+}
+
+
 let chatPollingInterval = null; 
 let heartbeatInterval = null;
 let pmPollingInterval = null;
@@ -884,6 +983,9 @@ window.initializeChatEngine = async function() {
 
     myUsernameGlobal = user;
     myHandleGlobal = usernameToHandle(user);
+    if (localStorage.getItem(NOTIF_PREF_KEY) === 'granted' && typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+        notificationsReady = true;
+    }
 
     if (chatPollingInterval) clearInterval(chatPollingInterval);
     if (heartbeatInterval) clearInterval(heartbeatInterval);
@@ -1147,7 +1249,18 @@ window.initializeChatEngine = async function() {
                     freshConversations[otherHandle] = { otherHandle, otherUsername: handleToDisplayUsername(otherHandle), messages: [], unread: 0 };
                 }
                 freshConversations[otherHandle].messages.push(msg);
-                if (!isMine && !msg.is_read) freshConversations[otherHandle].unread++;
+                if (!isMine && !msg.is_read) {
+                    freshConversations[otherHandle].unread++;
+                    // Browser notification for new PM (skip first seed pass)
+                    if (msg.id && notificationsReady && knownPmIds.size > 0 && !knownPmIds.has(msg.id)) {
+                        const who = msg.sender_username || otherHandle || 'Someone';
+                        const preview = String(msg.content || '').replace(/^\[\[IMG\]\].*/, '[Image]').slice(0, 120);
+                        showChatNotification('PM from ' + who, preview || 'New private message', 'pm-' + msg.id);
+                    }
+                    if (msg.id) knownPmIds.add(msg.id);
+                } else if (msg.id) {
+                    knownPmIds.add(msg.id);
+                }
             });
 
             if (activePmHandle && !freshConversations[activePmHandle] && pmConversations[activePmHandle]) {
@@ -1628,6 +1741,21 @@ window.initializeChatEngine = async function() {
             if (currentHash === lastFetchedMessagesHash) {
                 return; // No new messages, skip re-render
             }
+            // Notify about brand-new messages from other people
+            if (knownMessageIds.size > 0) {
+                messages.forEach(msg => {
+                    if (!msg || !msg.id) return;
+                    if (knownMessageIds.has(msg.id)) return;
+                    const fromMe = msg.username && msg.username.trim().toLowerCase() === myUsernameGlobal.trim().toLowerCase();
+                    if (!fromMe && msg.content !== "Message Was Deleted By Owner") {
+                        const preview = String(msg.content || '').replace(/^\[\[IMG\]\].*/, '[Image]').slice(0, 120);
+                        showChatNotification(msg.username || 'Someone', preview || 'New message in general chat', 'general-' + msg.id);
+                    }
+                });
+            }
+            // Seed / update known ids
+            messages.forEach(msg => { if (msg && msg.id) knownMessageIds.add(msg.id); });
+
             lastFetchedMessagesHash = currentHash;
 
             const activeHeaderSpan = document.getElementById('room-status-indicator');
@@ -1857,6 +1985,10 @@ window.initializeChatEngine = async function() {
 
     const dirSearch = document.getElementById('directory-search');
     if (dirSearch) dirSearch.oninput = (e) => renderUserDirectory(e.target.value);
+
+
+    // Ask about notifications after login (once)
+    setTimeout(() => promptEnableNotifications(), 800);
 
     chatPollingInterval = setInterval(fetchMessages, 3000);
     fetchMessages().then(() => { msgContainer.scrollTop = msgContainer.scrollHeight; });
