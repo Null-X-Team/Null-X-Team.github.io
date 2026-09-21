@@ -1,29 +1,44 @@
 const fs = require('fs');
 
-// Repositories to check
 const repos = ['gfiles', 'gfiles2', 'gfiles3', 'gfiles4', 'gfiles5'];
 const owner = 'declineoptionalcookies';
+
+// Helper function to turn folder names like "retro-bowl" into "Retro Bowl"
+function formatTitle(name) {
+  return name
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, char => char.toUpperCase());
+}
 
 async function fetchRepoContents() {
   const allEntries = [];
 
   for (const repo of repos) {
     try {
-      // Fetch public repository file tree using GitHub API
-      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`);
-      if (!response.ok) continue;
+      const headers = { 'User-Agent': 'node.js' };
+      if (process.env.GITHUB_TOKEN) {
+        headers['Authorization'] = `token ${process.env.GITHUB_TOKEN}`;
+      }
+
+      const response = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents`, { headers });
+      if (!response.ok) {
+        console.error(`Failed to fetch ${repo}: ${response.statusText}`);
+        continue;
+      }
 
       const files = await response.json();
 
-      // Filter for numbered directories (e.g., "1", "2")
       for (const file of files) {
-        if (file.type === 'dir' && !isNaN(file.name)) {
-          const id = file.name;
+        // Accept ANY folder, skipping hidden directories (like .github)
+        if (file.type === 'dir' && !file.name.startsWith('.')) {
+          const folderName = file.name;
+          const formattedTitle = formatTitle(folderName);
+
           allEntries.push({
-            id: id,
-            title: id,
-            url: `https://${owner}.github.io/${repo}/${id}/index.html`,
-            desc: `Play ${id} online in your browser.`,
+            id: folderName,
+            title: formattedTitle,
+            url: `https://${owner}.github.io/${repo}/${folderName}/index.html`,
+            desc: `Play ${formattedTitle} online in your browser.`,
             popular: true
           });
         }
@@ -39,11 +54,10 @@ async function fetchRepoContents() {
 async function updateMainJs() {
   const entries = await fetchRepoContents();
   
-  // Format as JavaScript array content
   const content = `const items = ${JSON.stringify(entries, null, 2)};\n\nmodule.exports = items;\n`;
 
   fs.writeFileSync('main.js', content, 'utf-8');
-  console.log('main.js updated successfully!');
+  console.log(`main.js updated successfully with ${entries.length} items!`);
 }
 
 updateMainJs();
