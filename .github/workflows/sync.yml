@@ -27,7 +27,7 @@ jobs:
       - name: Run update script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node ./update-main.js
+        run: node ../JS/update-main.js
 
       - name: Commit and push changes
         run: |
