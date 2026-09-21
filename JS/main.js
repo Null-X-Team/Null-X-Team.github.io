@@ -101,7 +101,6 @@ let _0xData = [
   { id: "bally", title: "Bally", url: "https://declineoptionalcookies.github.io/gfiles/bally/index.html", desc: "Play Bally online in your browser.", popular: true },
   { id: "battle-for-gondor", title: "Battle For Gondor", url: "https://declineoptionalcookies.github.io/gfiles/battle-for-gondor/index.html", desc: "Play Battle For Gondor online in your browser.", popular: true },
   { id: "big-tower-tiny-square", title: "Big Tower Tiny Square", url: "https://declineoptionalcookies.github.io/gfiles/big-tower-tiny-square/index.html", desc: "Play Big Tower Tiny Square online in your browser.", popular: true },
-  { id: "bitlife", title: "Bitlife", url: "https://declineoptionalcookies.github.io/gfiles/bitlife/index.html", desc: "Life simulator full of random events and choices.", popular: true },
   { id: "black-hole-square", title: "Black Hole Square", url: "https://declineoptionalcookies.github.io/gfiles/black-hole-square/index.html", desc: "Play Black Hole Square online in your browser.", popular: true },
   { id: "block-the-pig", title: "Block The Pig", url: "https://declineoptionalcookies.github.io/gfiles/block-the-pig/index.html", desc: "Play Block The Pig online in your browser.", popular: true },
   { id: "bloons-tower-defense-2", title: "Bloons Tower Defense 2", url: "https://declineoptionalcookies.github.io/gfiles/bloons-tower-defense-2/index.html", desc: "Second Bloons Tower Defense game.", popular: true },
