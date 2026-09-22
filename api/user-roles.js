@@ -115,7 +115,7 @@ export default async function handler(req, res) {
         const result = await tursoExecute(
           databaseUrl,
           authToken,
-          `SELECT * FROM user_roles WHERE username = ? LIMIT 1`,
+          `SELECT * FROM user_roles WHERE LOWER(username) = LOWER(?) LIMIT 1`,
           [{ type: "text", value: username }]
         );
         const rows = rowsToObjects(result);
@@ -164,39 +164,137 @@ export default async function handler(req, res) {
 
     if (req.method === "PATCH") {
       const b = req.body || {};
-      if (b.id === undefined) {
-        return res.status(400).json({ error: "id is required" });
+      const queryUsername = (req.query && req.query.username) || b.username;
+      let targetId = b.id;
+
+      function flagToInt(val) {
+        if (val === true || val === 1 || val === "1" || val === "true") return 1;
+        if (val === false || val === 0 || val === "0" || val === "false") return 0;
+        return null;
       }
+
+      // Resolve row by id or username (case-insensitive)
+      let existing = null;
+      if (targetId !== undefined && targetId !== null && targetId !== "") {
+        const result = await tursoExecute(
+          databaseUrl,
+          authToken,
+          `SELECT * FROM user_roles WHERE id = ? LIMIT 1`,
+          [{ type: "integer", value: targetId }]
+        );
+        const rows = rowsToObjects(result);
+        existing = rows[0] || null;
+      }
+      if (!existing && queryUsername) {
+        const result = await tursoExecute(
+          databaseUrl,
+          authToken,
+          `SELECT * FROM user_roles WHERE LOWER(username) = LOWER(?) LIMIT 1`,
+          [{ type: "text", value: queryUsername }]
+        );
+        const rows = rowsToObjects(result);
+        existing = rows[0] || null;
+        if (existing) targetId = existing.id;
+      }
+
+      // Create a role row if the user exists in users but not user_roles
+      if (!existing && queryUsername) {
+        const userRes = await tursoExecute(
+          databaseUrl,
+          authToken,
+          `SELECT id, username FROM users WHERE LOWER(username) = LOWER(?) LIMIT 1`,
+          [{ type: "text", value: queryUsername }]
+        );
+        const userRows = rowsToObjects(userRes);
+        const userRow = userRows[0];
+        if (!userRow) {
+          return res.status(404).json({ error: "User not found" });
+        }
+        targetId = userRow.id;
+        await tursoExecute(
+          databaseUrl,
+          authToken,
+          `INSERT INTO user_roles (
+            id, username, is_banned, temp_ban_until, last_action_reason,
+            last_action_category, role_tag, pfp_url, is_admin, last_seen, bio
+          ) VALUES (?, ?, 0, NULL, NULL, NULL, 'User', NULL, 0, ?, NULL)`,
+          [
+            { type: "integer", value: targetId },
+            { type: "text", value: userRow.username },
+            { type: "text", value: new Date().toISOString() }
+          ]
+        );
+        existing = { id: targetId, username: userRow.username };
+      }
+
+      if (targetId === undefined || targetId === null || targetId === "") {
+        return res.status(400).json({ error: "id or username is required" });
+      }
+
+      // Map client-only fields onto real columns
+      if (b.warned === true || b.last_action_type === "warn") {
+        if (b.last_action_category == null) b.last_action_category = "Warning";
+      }
+      if (b.last_action_type === "ban" && b.last_action_category == null) {
+        b.last_action_category = "Ban";
+      }
+      if (b.last_action_type === "unban" && b.last_action_category == null) {
+        b.last_action_category = "Unban";
+      }
+      if (b.last_action_type === "temp_ban" && b.last_action_category == null) {
+        b.last_action_category = "Temp Ban";
+      }
+
+      const sets = [];
+      const args = [];
+
+      function setText(col, val, allowNull) {
+        if (val === undefined) return;
+        if (val === null || val === "") {
+          if (!allowNull) return;
+          sets.push(`${col} = NULL`);
+          return;
+        }
+        sets.push(`${col} = ?`);
+        args.push({ type: "text", value: val });
+      }
+      function setInt(col, val) {
+        if (val === undefined) return;
+        const n = flagToInt(val);
+        if (n === null && val !== 0 && val !== "0") return;
+        sets.push(`${col} = ?`);
+        args.push({ type: "integer", value: n === null ? 0 : n });
+      }
+
+      if (b.username !== undefined) setText("username", b.username, false);
+      setInt("is_banned", b.is_banned);
+      if (b.temp_ban_until !== undefined) {
+        if (b.temp_ban_until === null || b.temp_ban_until === "" || b.temp_ban_until === false) {
+          sets.push("temp_ban_until = NULL");
+        } else {
+          setText("temp_ban_until", b.temp_ban_until, false);
+        }
+      }
+      setText("last_action_reason", b.last_action_reason, true);
+      setText("last_action_category", b.last_action_category, true);
+      setText("role_tag", b.role_tag, false);
+      setText("pfp_url", b.pfp_url, true);
+      setInt("is_admin", b.is_admin);
+      setText("last_seen", b.last_seen, false);
+      setText("bio", b.bio, true);
+
+      if (!sets.length) {
+        return res.status(400).json({ error: "No fields to update" });
+      }
+
+      args.push({ type: "integer", value: targetId });
       await tursoExecute(
         databaseUrl,
         authToken,
-        `UPDATE user_roles SET
-          username = COALESCE(?, username),
-          is_banned = COALESCE(?, is_banned),
-          temp_ban_until = COALESCE(?, temp_ban_until),
-          last_action_reason = COALESCE(?, last_action_reason),
-          last_action_category = COALESCE(?, last_action_category),
-          role_tag = COALESCE(?, role_tag),
-          pfp_url = COALESCE(?, pfp_url),
-          is_admin = COALESCE(?, is_admin),
-          last_seen = COALESCE(?, last_seen),
-          bio = COALESCE(?, bio)
-        WHERE id = ?`,
-        [
-          { type: "text", value: b.username ?? null },
-          { type: "integer", value: b.is_banned ?? null },
-          { type: "text", value: b.temp_ban_until ?? null },
-          { type: "text", value: b.last_action_reason ?? null },
-          { type: "text", value: b.last_action_category ?? null },
-          { type: "text", value: b.role_tag ?? null },
-          { type: "text", value: b.pfp_url ?? null },
-          { type: "integer", value: b.is_admin ?? null },
-          { type: "text", value: b.last_seen ?? null },
-          { type: "text", value: b.bio ?? null },
-          { type: "integer", value: b.id }
-        ]
+        `UPDATE user_roles SET ${sets.join(", ")} WHERE id = ?`,
+        args
       );
-      return res.status(200).json({ success: true, message: "User role record updated" });
+      return res.status(200).json({ success: true, message: "User role record updated", id: targetId });
     }
 
     if (req.method === "DELETE") {
