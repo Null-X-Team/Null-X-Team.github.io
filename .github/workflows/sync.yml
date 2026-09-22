@@ -8,6 +8,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sync-gfiles-main
+  cancel-in-progress: false
+
 jobs:
   update-repo:
     runs-on: ubuntu-latest
@@ -15,30 +19,55 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Verify update script
         run: test -f ./JS/update.js
 
-      - name: Run update script
+      - name: Update JS/main.js and push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node ./JS/update.js
-
-      - name: Commit and push changes
+        shell: bash
         run: |
+          set -Eeuo pipefail
+
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add JS/main.js
+          git fetch --no-tags origin main
+          git reset --hard origin/main
 
-          if git diff --cached --quiet; then
-            echo "No changes to commit."
-          else
+          for attempt in 1 2 3; do
+            echo "Sync attempt ${attempt}/3"
+
+            node ./JS/update.js
+            git add JS/main.js
+
+            if git diff --cached --quiet; then
+              echo "No changes to commit."
+              exit 0
+            fi
+
             git commit -m "Auto-update JS/main.js with all games from gfiles repos"
-            git push
-          fi
+
+            if git push origin HEAD:main; then
+              echo "Update pushed successfully."
+              exit 0
+            fi
+
+            if [ "${attempt}" -eq 3 ]; then
+              echo "Push failed after 3 attempts."
+              exit 1
+            fi
+
+            git fetch --no-tags origin main
+            git reset --hard origin/main
+          done
