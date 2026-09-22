@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "24"
+          node-version: "20"
 
       - name: Verify update script
         run: test -f ./JS/update.js
@@ -27,18 +27,18 @@ jobs:
       - name: Run update script
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node ./JS/update-main.js
+        run: node ./JS/update.js
 
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add main.js
+          git add JS/main.js
 
           if git diff --cached --quiet; then
             echo "No changes to commit."
           else
-            git commit -m "Auto-update main.js with all games"
+            git commit -m "Auto-update JS/main.js with all games from gfiles repos"
             git push
           fi
