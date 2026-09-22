@@ -4,9 +4,11 @@
  * Uses Vercel API proxy to communicate with Turso
  */
 
-// Turso API Configuration
-const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
-const TURSO_HEADERS = { 'Content-Type': 'application/json' };
+// Scope constants to avoid re-declaration errors if script loads twice
+if (typeof TURSO_API_BASE === 'undefined') {
+  var TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+  var TURSO_HEADERS = { 'Content-Type': 'application/json' };
+}
 
 /**
  * Export (Save) all user game data to Turso database
@@ -172,7 +174,6 @@ window.enableAutoSaveInterval = function() {
 window.addEventListener('beforeunload', () => {
   const username = localStorage.getItem('chatUser');
   if (username && username !== 'Guest') {
-    // Use sendBeacon for reliable delivery even if page unloads
     const gameSaves = {};
     for (let key in localStorage) {
       if (localStorage.hasOwnProperty(key) && key.startsWith('game_save_')) {
@@ -186,7 +187,9 @@ window.addEventListener('beforeunload', () => {
       timestamp: new Date().toISOString()
     });
 
-    navigator.sendBeacon(TURSO_API_BASE + '/saves', saveData);
+    // Send payload explicitly formatted as application/json
+    const blob = new Blob([saveData], { type: 'application/json' });
+    navigator.sendBeacon(TURSO_API_BASE + '/saves', blob);
   }
 });
 
