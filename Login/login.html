@@ -434,7 +434,7 @@
                 <div class="form-group">
                     <label for="password">Password</label>
                     <div class="input-wrapper">
-                        <input type="password" id="password" class="password-input" placeholder="Enter password" required autocomplete="current-password">
+                        <input type="password" id="password" class="password-input" placeholder="Enter password (any value if resetting)" required autocomplete="current-password">
                         <span class="toggle-password" onclick="togglePasswordVis()">
                             <svg id="eyeIcon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
@@ -457,7 +457,7 @@
     <div id="resetPwModal" role="dialog" aria-modal="true" aria-labelledby="rpwTitle">
         <div class="rpw-box">
             <h2 id="rpwTitle">Create New Password</h2>
-            <p>Your account was found, but no password is stored. Please set a new password to continue.</p>
+            <p>Your password was deleted (or never set). You are logged in — create a new password to continue.</p>
             <label for="rpwUser">Account</label>
             <input type="text" id="rpwUser" readonly>
             <label for="rpwNew">New Password</label>
@@ -483,7 +483,8 @@
         }
 
         function passwordsMatch(stored, typedPlain, typedHash) {
-            if (stored == null) return false;
+            // Null / missing password = accept anything (user must reset after login)
+            if (isPasswordMissing(stored)) return true;
             const s = String(stored);
             return s === typedPlain || s === typedHash || s.toLowerCase() === typedHash.toLowerCase();
         }
@@ -518,9 +519,9 @@
             const pw = document.getElementById('rpwNew').value;
             const conf = document.getElementById('rpwConfirm').value;
 
-            if (!pendingResetUser || pendingResetUser.id === undefined || pendingResetUser.id === null) {
+            if (!pendingResetUser || (!pendingResetUser.id && !pendingResetUser.username)) {
                 msg.style.color = '#ff4444';
-                msg.textContent = 'Missing account id. Try logging in again.';
+                msg.textContent = 'Missing account info. Try logging in again.';
                 return;
             }
             if (!pw || pw.length < 4) {
@@ -543,7 +544,8 @@
                     method: 'PATCH',
                     headers: headers,
                     body: JSON.stringify({
-                        id: pendingResetUser.id,
+                        ...(pendingResetUser.id != null ? { id: pendingResetUser.id } : {}),
+                        ...(pendingResetUser.username ? { username: pendingResetUser.username } : {}),
                         password: hashed
                     })
                 });
@@ -761,28 +763,29 @@
                     loginIdentifier = username;
                 }
 
-                // Check if password is missing BEFORE attempting password match
-                if (user && isPasswordMissing(user.password)) {
-                    showMessage('Your password was deleted in the great data move. Please set a new one.', false);
-                    openResetPasswordModal({
-                        id: user.id,
-                        username: user.username || loginIdentifier
-                    });
-                    return;
-                }
-
-                // Only reach here if password is NOT missing
                 if (!user) {
                     showMessage('Incorrect credentials.');
                     return;
                 }
 
                 const typedHash = await sha256Hex(password);
+                const needsPasswordReset = isPasswordMissing(user.password);
 
-                if (passwordsMatch(user.password, password, typedHash)) {
-                    showMessage('Login successful! Redirecting...', false);
+                // Missing password: any typed password is accepted
+                if (needsPasswordReset || passwordsMatch(user.password, password, typedHash)) {
                     localStorage.setItem('chatUser', user.username || loginIdentifier);
 
+                    if (needsPasswordReset) {
+                        showMessage('Logged in. Your password was deleted — please create a new one.', false);
+                        openResetPasswordModal({
+                            id: user.id,
+                            username: user.username || loginIdentifier
+                        });
+                        // Do not redirect until they set a password
+                        return;
+                    }
+
+                    showMessage('Login successful! Redirecting...', false);
                     setTimeout(() => {
                         window.location.href = '../index.html';
                     }, 1500);
