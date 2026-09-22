@@ -40,14 +40,20 @@ function isAdminProfile(profile) {
 
 
 async function patchUserRoleByUsername(username, fields) {
-  const getRes = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(username)}`, { headers: TURSO_HEADERS });
-  if (!getRes.ok) throw new Error('user role not found');
-  const row = await getRes.json();
-  return fetch(`${TURSO_API_BASE}/user-roles`, {
+  const clean = String(username || '').replace(/^@/, '').trim();
+  if (!clean) throw new Error('username required');
+
+  // PATCH API now accepts username in the query OR body
+  const res = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(clean)}`, {
     method: 'PATCH',
     headers: TURSO_HEADERS,
-    body: JSON.stringify({ id: row.id, ...fields })
+    body: JSON.stringify({ username: clean, ...fields })
   });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(errText || ('HTTP ' + res.status));
+  }
+  return res;
 }
 
 
@@ -1636,11 +1642,7 @@ window.initializeChatEngine = async function() {
         else if (action === 'demote') data.is_admin = false;
 
         try {
-            const res = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(username)}`, {
-                method: 'PATCH',
-                headers: TURSO_HEADERS,
-                body: JSON.stringify(data)
-            });
+            const res = await patchUserRoleByUsername(username, data);
             if (!res.ok) throw new Error(await res.text());
 
             const target = allUsers.find(u => u.username === username);
@@ -1691,11 +1693,7 @@ window.initializeChatEngine = async function() {
         if (!tag) return alert("Enter a role tag value.");
 
         try {
-            const res = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(target)}`, {
-                method: 'PATCH',
-                headers: TURSO_HEADERS,
-                body: JSON.stringify({ role_tag: tag })
-            });
+            const res = await patchUserRoleByUsername(target, { role_tag: tag });
             if (!res.ok) throw new Error(await res.text());
             alert(`Role tag "${tag}" applied to ${target}.`);
             fetchAllUsers();
@@ -1932,11 +1930,7 @@ window.initializeChatEngine = async function() {
         else if (action === 'warn') data.warned = true;
 
         try {
-            const res = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(target)}`, {
-                method: 'PATCH',
-                headers: TURSO_HEADERS,
-                body: JSON.stringify(data)
-            });
+            const res = await patchUserRoleByUsername(target, data);
             if (!res.ok) throw new Error(await res.text());
             alert("Action completed successfully!");
             fetchAllUsers();
@@ -1960,13 +1954,16 @@ window.initializeChatEngine = async function() {
         expiry.setMinutes(expiry.getMinutes() + duration);
 
         try {
-            const res = await fetch(`${TURSO_API_BASE}/user-roles?username=${encodeURIComponent(target)}`, {
-                method: 'PATCH',
-                headers: TURSO_HEADERS,
-                body: JSON.stringify({ last_action_type: 'temp_ban', last_action_reason: reason, temp_ban_until: expiry.toISOString() })
+            const res = await patchUserRoleByUsername(target, {
+                last_action_type: 'temp_ban',
+                last_action_reason: reason,
+                last_action_category: 'Temp Ban',
+                temp_ban_until: expiry.toISOString(),
+                is_banned: false
             });
             if (!res.ok) throw new Error(await res.text());
             alert("Temporary ban applied successfully!");
+            fetchAllUsers();
         } catch (err) {
             console.error("Temp ban failed:", err);
             alert("Failed to apply temp ban. Check console for details.");
