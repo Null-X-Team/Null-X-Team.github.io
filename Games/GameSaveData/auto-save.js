@@ -1,12 +1,12 @@
 /**
  * Auto-Save System for Null_X
  * Handles importing and exporting game saves to/from Turso database
- * Uses Vercel API proxy to communicate with Turso
+ * Uses Cloudflare Worker proxy to communicate with Vercel API
  */
 
 // Scope constants to avoid re-declaration errors if script loads twice
 if (typeof TURSO_API_BASE === 'undefined') {
-  var TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+  var TURSO_API_BASE = 'https://apithingy.jlsniperelite4.workers.dev';
   var TURSO_HEADERS = { 'Content-Type': 'application/json' };
 }
 
@@ -43,7 +43,7 @@ window.cloudSave = async function(msgElementId, showMessage = false) {
       deviceInfo: navigator.userAgent
     };
 
-    // Send to Turso via Vercel API
+    // Send to Turso via Cloudflare Worker Proxy
     const response = await fetch(`${TURSO_API_BASE}/saves`, {
       method: 'POST',
       headers: TURSO_HEADERS,
@@ -97,7 +97,7 @@ window.cloudLoad = async function(msgElementId, showMessage = false) {
       msgEl.style.color = '#a033ff';
     }
 
-    // Fetch saves from Turso via Vercel API
+    // Fetch saves from Turso via Cloudflare Worker Proxy
     const response = await fetch(
       `${TURSO_API_BASE}/saves?username=${encodeURIComponent(username)}`,
       {
@@ -193,4 +193,4 @@ window.addEventListener('beforeunload', () => {
   }
 });
 
-console.log('Auto-save system initialized. Using Turso database via Vercel API.');
+console.log('Auto-save system initialized. Using Cloudflare Worker proxy.');
