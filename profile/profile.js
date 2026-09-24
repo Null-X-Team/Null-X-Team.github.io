@@ -1,6 +1,6 @@
 // profile/profile.js — own + public profiles, robust avatars
 // Routes through Cloudflare Worker for security
-const CLOUDFLARE_WORKER = 'https://apithingy.jlsniperelite4.workers.dev/api-worker';
+const CLOUDFLARE_WORKER = 'https://apithingy.jlsniperelite4.workers.dev';
 
 const DEFAULT_PFP = 'https://null-x-team.github.io/imgs/download.jpeg';
 
