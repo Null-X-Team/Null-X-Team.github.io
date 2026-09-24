@@ -1,6 +1,23 @@
 // --- CONFIGURATION: Turso via Vercel API (replaces Supabase) ---
-const TURSO_API_BASE = 'https://apithingy.jlsniperelite4.workers.dev/';
+const TURSO_API_BASE = 'https://apithingy.jlsniperelite4.workers.dev';
 const TURSO_HEADERS = { 'Content-Type': 'application/json' };
+
+/** Cloudflare may return { success, users/messages } or a raw array */
+function unwrapList(data, key) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data[key])) return data[key];
+    if (data && Array.isArray(data.data)) return data.data;
+    return [];
+}
+function unwrapOne(data, key) {
+    if (!data || typeof data !== 'object') return data;
+    if (Array.isArray(data)) return data[0] || null;
+    if (data[key] && Array.isArray(data[key])) return data[key][0] || null;
+    if (data.user) return data.user;
+    if (data.id !== undefined || data.username !== undefined) return data;
+    return data;
+}
+
 
 // --- ONLINE STATUS TRACKING (mouse movement) ---
 let lastMouseActivity = Date.now();
@@ -1003,8 +1020,9 @@ window.initializeChatEngine = async function() {
             headers: TURSO_HEADERS
         });
         const verifyData = await verifyRes.json();
+        const verifyList = unwrapList(verifyData, 'users');
 
-        const userExists = verifyData && verifyData.some(u => u.username && u.username.trim().toLowerCase() === user.trim().toLowerCase());
+        const userExists = verifyList.some(u => u.username && u.username.trim().toLowerCase() === user.trim().toLowerCase());
         if (!userExists) {
             localStorage.removeItem('chatUser');
             localStorage.clear();
@@ -1509,12 +1527,16 @@ window.initializeChatEngine = async function() {
             const usersRes = await fetch(`${TURSO_API_BASE}/users`, {
                 headers: TURSO_HEADERS
             });
-            const usersData = await usersRes.json();
+            const usersDataRaw = await usersRes.json();
+            const usersData = unwrapList(usersDataRaw, 'users');
 
             const rolesRes = await fetch(`${TURSO_API_BASE}/user-roles`, {
                 headers: TURSO_HEADERS
             });
-            const rolesData = await rolesRes.json();
+            const rolesDataRaw = await rolesRes.json();
+            const rolesData = unwrapList(rolesDataRaw, 'roles').length
+                ? unwrapList(rolesDataRaw, 'roles')
+                : (Array.isArray(rolesDataRaw) ? rolesDataRaw : (rolesDataRaw && rolesDataRaw.username ? [rolesDataRaw] : []));
 
             const uniqueNames = [...new Set(usersData.map(u => u.username))].filter(name => name != null);
             
