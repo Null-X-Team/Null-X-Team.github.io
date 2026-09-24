@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NULL GEOGRAPHY</title>
-    <script src="../js/api-proxy.js"></script>
-    <style>
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -473,8 +472,25 @@
     </div>
 
     <script>
-        const TURSO_API_BASE = 'https://null-x-team-github-io.vercel.app/api';
+        const TURSO_API_BASE = 'https://apithingy.jlsniperelite4.workers.dev';
         const headers = { 'Content-Type': 'application/json' };
+
+        function unwrapUserPayload(data) {
+            if (!data) return null;
+            if (Array.isArray(data)) return data[0] || null;
+            if (data.users && Array.isArray(data.users)) return data.users[0] || null;
+            if (data.user) return data.user;
+            if (data.id !== undefined || data.username !== undefined) return data;
+            return null;
+        }
+
+        function unwrapUsersList(data) {
+            if (!data) return [];
+            if (Array.isArray(data)) return data;
+            if (data.users && Array.isArray(data.users)) return data.users;
+            return [];
+        }
+
 
         async function sha256Hex(text) {
             const data = new TextEncoder().encode(text);
@@ -748,7 +764,7 @@
                     });
                     
                     if (handlerResponse.ok) {
-                        user = await handlerResponse.json();
+                        user = unwrapUserPayload(await handlerResponse.json());
                         loginIdentifier = handlerToTry;
                     }
                 }
@@ -766,7 +782,7 @@
                     }
                     if (!response.ok) throw new Error('Verification endpoint offline.');
 
-                    user = await response.json();
+                    user = unwrapUserPayload(await response.json());
                     loginIdentifier = username;
                 }
 
