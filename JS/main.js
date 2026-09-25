@@ -273,6 +273,8 @@ let _0xData = [
   { id: "guess-the-kitty", title: "Guess The Kitty", url: "https://declineoptionalcookies.github.io/gfiles2/guess-the-kitty/index.html", desc: "Play Guess The Kitty online in your browser.", popular: true },
   { id: "gura-tambourine", title: "Gura Tambourine", url: "https://declineoptionalcookies.github.io/gfiles2/gura-tambourine/index.html", desc: "Play Gura Tambourine online in your browser.", popular: true },
   { id: "hacker-typer", title: "Hacker Typer", url: "https://declineoptionalcookies.github.io/gfiles2/hacker-typer/index.html", desc: "Play Hacker Typer online in your browser.", popular: true },
+  { id: "hollowknightsilksong", title: "Hollowknightsilksong", url: "https://declineoptionalcookies.github.io/gfiles2/hollowknightsilksong/index.html", desc: "Play Hollowknightsilksong online in your browser.", popular: true },
+  { id: "hollownight", title: "Hollownight", url: "https://declineoptionalcookies.github.io/gfiles2/hollownight/index.html", desc: "Play Hollownight online in your browser.", popular: true },
   { id: "hop-and-pop-it", title: "Hop And Pop It", url: "https://declineoptionalcookies.github.io/gfiles2/hop-and-pop-it/index.html", desc: "Play Hop And Pop It online in your browser.", popular: true },
   { id: "idle-breakout", title: "Idle Breakout", url: "https://declineoptionalcookies.github.io/gfiles2/idle-breakout/index.html", desc: "Play Idle Breakout online in your browser.", popular: true },
   { id: "idle-light-city", title: "Idle Light City", url: "https://declineoptionalcookies.github.io/gfiles2/idle-light-city/index.html", desc: "Play Idle Light City online in your browser.", popular: true },
