@@ -134,6 +134,7 @@ let _0xData = [
   { id: "dino-bros", title: "Dino Bros", url: "https://declineoptionalcookies.github.io/gfiles/dino-bros/index.html", desc: "Play Dino Bros online in your browser.", popular: true },
   { id: "doctor-acorn-2", title: "Doctor Acorn 2", url: "https://declineoptionalcookies.github.io/gfiles/doctor-acorn-2/index.html", desc: "Play Doctor Acorn 2 online in your browser.", popular: true },
   { id: "doge-2048", title: "Doge 2048", url: "https://declineoptionalcookies.github.io/gfiles/doge-2048/index.html", desc: "Play Doge 2048 online in your browser.", popular: true },
+  { id: "doublebarrelsniper", title: "Doublebarrelsniper", url: "https://declineoptionalcookies.github.io/gfiles/doublebarrelsniper/index.html", desc: "Play Doublebarrelsniper online in your browser.", popular: true },
   { id: "dummy-never-fails-2", title: "Dummy Never Fails 2", url: "https://declineoptionalcookies.github.io/gfiles/dummy-never-fails-2/index.html", desc: "Play Dummy Never Fails 2 online in your browser.", popular: true },
   { id: "dummy-never-fails", title: "Dummy Never Fails", url: "https://declineoptionalcookies.github.io/gfiles/dummy-never-fails/index.html", desc: "Play Dummy Never Fails online in your browser.", popular: true },
   { id: "edge-not-found", title: "Edge Not Found", url: "https://declineoptionalcookies.github.io/gfiles/edge-not-found/index.html", desc: "Play Edge Not Found online in your browser.", popular: true },
