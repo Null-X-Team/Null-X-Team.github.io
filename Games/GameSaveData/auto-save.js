@@ -44,7 +44,7 @@ window.cloudSave = async function(msgElementId, showMessage = false) {
     };
 
     // Send to Turso via Cloudflare Worker Proxy
-    const response = await fetch(`${TURSO_API_BASE}/saves`, {
+    const response = await fetch(`${TURSO_API_BASE}/save`, {
       method: 'POST',
       headers: TURSO_HEADERS,
       body: JSON.stringify(saveData)
@@ -99,7 +99,7 @@ window.cloudLoad = async function(msgElementId, showMessage = false) {
 
     // Fetch saves from Turso via Cloudflare Worker Proxy
     const response = await fetch(
-      `${TURSO_API_BASE}/saves?username=${encodeURIComponent(username)}`,
+      `${TURSO_API_BASE}/load?username=${encodeURIComponent(username)}`,
       {
         method: 'GET',
         headers: TURSO_HEADERS
@@ -189,7 +189,7 @@ window.addEventListener('beforeunload', () => {
 
     // Send payload explicitly formatted as application/json
     const blob = new Blob([saveData], { type: 'application/json' });
-    navigator.sendBeacon(TURSO_API_BASE + '/saves', blob);
+    navigator.sendBeacon(TURSO_API_BASE + '/save', blob);
   }
 });
 
